@@ -78,7 +78,7 @@ class MOGLabsFZW(DataInStreamInterface, FiniteSamplingInputInterface):
         super().__init__(*args, **kwargs)
         self._constraints: Optional[DataInStreamConstraints] = None
         self.socket_thread = QtCore.QThread()
-        self._socket_handler = SocketHandler(self)
+        self._socket_handler = SerialHandler(self)
         self._lock = Mutex()
         self._data_buffer: Optional[np.ndarray] = None
         self._timestamp_buffer: Optional[np.ndarray] = None
