@@ -33,6 +33,10 @@ class SerialHandler(QtCore.QObject):
         self.log.info("Connecting to MOGLabs interface.")
         self.serial.port = self._parentclass._com_port
         self.serial.timeout = 0.1
+        self.serial.baudrate = 115200
+        self.serial.bytesize=8
+        self.serial.parity='N'
+        self.serial.stopbits=1
         self.serial.open()
 
     def disconnect_socket(self):
