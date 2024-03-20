@@ -367,12 +367,12 @@ class MOGLabsLaser(DataInStreamInterface, FiniteSamplingInputInterface):
 
     @property
     def available_samples(self) -> int:
-        self.log.warning("Available samples reading is not available on the MOGLabs FZW.")
+        # self.log.warning("Available samples reading is not available on the MOGLabs FZW.")
         return 1
 
     @property
     def sample_rate(self) -> float:
-        self.log.warning("Sample rate reading is not available on the MOGLabs FZW.")
+        # self.log.warning("Sample rate reading is not available on the MOGLabs FZW.")
         return 1e3
 
     @property
@@ -393,7 +393,7 @@ class MOGLabsLaser(DataInStreamInterface, FiniteSamplingInputInterface):
                   channel_buffer_size: int,
                   sample_rate: float) -> None:
         """ Configure a data stream. See read-only properties for information on each parameter. """
-        self.log.warning("There is nothing to configure on the MOGLabs FZW!")
+        # self.log.warning("There is nothing to configure on the MOGLabs FZW!")
 
     # FiniteSamplingInputInterface
     @constraints.overload("FiniteSamplingInputInterface")
