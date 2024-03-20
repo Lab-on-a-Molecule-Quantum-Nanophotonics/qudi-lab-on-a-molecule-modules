@@ -412,6 +412,9 @@ class MOGLabsLaser(DataInStreamInterface, FiniteSamplingInputInterface):
     def set_active_channels(self, _):
         pass 
 
+    def set_sample_rate(self, rate):
+        pass
+
     def set_frame_size(self, size):
         self._frame_size = size
 
