@@ -41,6 +41,7 @@ class SocketHandler(QtCore.QObject):
     in a dedicated thread."""
 
     response_received = QtCore.Signal(object)
+    connection_established = QtCore.Signal()
 
     def __init__(self, parentclass):
         super().__init__()
@@ -66,19 +67,26 @@ class SocketHandler(QtCore.QObject):
     def run(self):
         self.connect_socket()
         value = None
+        self.connection_established.emit()
         while True:
             if self._parentclass.module_state() == 'deactivated':
                 break
             try:
                 value = self.input_queue.get(block=False)
+                self.log.info("sending %r" % value)
                 self.socket.sendall(value)
             except queue.Empty:
                 pass
+            except Exception as e:
+                self.log.error("Error while sending: %r" % e)
             try:
                 value = self.socket.recv(1024)
+                self.log.info("emitting %r" % value)
                 self.response_received.emit(value)
             except TimeoutError:
                 pass
+            except Exception as e:
+                self.log.error("Error while receiving: %r" % e)
         self.disconnect_socket()
 
 class MOGLabsLaser(DataInStreamInterface, FiniteSamplingInputInterface):
@@ -96,12 +104,13 @@ class MOGLabsLaser(DataInStreamInterface, FiniteSamplingInputInterface):
     sig_connect_cem = QtCore.Signal()
     sig_scan_done = QtCore.Signal()
     _sig_next_frame = QtCore.Signal()
+    _sig_send_data = QtCore.Signal(str)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._constraints: Optional[DataInStreamConstraints] = None
-        self.socket_thread = QtCore.QThread()
-        self._socket_handler = SocketHandler(self)
+        #self.socket_thread = QtCore.QThread()
+        #self._socket_handler = SocketHandler(self)
         self._lock = Mutex()
         self._data_buffer: Optional[np.ndarray] = None
         self._timestamp_buffer: Optional[np.ndarray] = None
@@ -109,18 +118,22 @@ class MOGLabsLaser(DataInStreamInterface, FiniteSamplingInputInterface):
         self._time_offset = 0
         self._last_read = 0
         self._frame_size = 1
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     # Qudi activation / deactivation
     def on_activate(self):
         """Activate module.
         """
         self.log.info("Starting the MOGLabs laser.")
-        self._socket_handler.moveToThread(self.socket_thread)
-        self.response_queue = queue.Queue()
-        self.sig_connect_cem.connect(self._socket_handler.run)
-        self._socket_handler.response_received.connect(self.on_receive)
-        self.socket_thread.start()
-        self.sig_connect_cem.emit()
+        #self._socket_handler.moveToThread(self.socket_thread)
+        #self.response_queue = queue.Queue()
+        #self.sig_connect_cem.connect(self._socket_handler.run, QtCore.Qt.QueuedConnection)
+        #self._socket_handler.response_received.connect(self.on_receive, QtCore.Qt.QueuedConnection)
+        #self._sig_send_data.connect(self._socket_handler.send, QtCore.Qt.QueuedConnection)
+        # Enable external modulation once connected to the interface.
+        #self._socket_handler.connection_established.connect(self._external_modulation, QtCore.Qt.QueuedConnection)
+        #self.socket_thread.start()
+        #self.sig_connect_cem.emit()
         self._time_offset = 0
 
         self._constraints = DataInStreamConstraints(
@@ -134,7 +147,7 @@ class MOGLabsLaser(DataInStreamInterface, FiniteSamplingInputInterface):
                                                  bounds=(2, (2**32)//10),
                                                  increment=1,
                                                  enforce_int=True),
-            sample_rate=ScalarConstraint(default=1e3,bounds=(1e3,1e3),increment=0),
+            sample_rate=ScalarConstraint(default=2,bounds=(2,2),increment=0),
         )
         self._constraints_finite_sampling = FiniteSamplingInputConstraints(
             channel_units = {
@@ -143,28 +156,32 @@ class MOGLabsLaser(DataInStreamInterface, FiniteSamplingInputInterface):
             frame_size_limits=(1,2**16),
             sample_rate_limits=(1,1e3),
         )
-
+        self.log.info("Connecting to MOGLabs interface.")
+        self.socket.connect((self.address, self.port))
+        self.socket.settimeout(1)
+        self._external_modulation()
 
     def on_deactivate(self):
         """Deactivate module.
         """
-        self.socket_thread.quit()
-        self._socket_handler.response_received.disconnect()
-        self.sig_connect_cem.disconnect()
+        self._external_modulation(False)
+        #self.socket_thread.quit()
+        #self._socket_handler.response_received.disconnect()
+        #self.sig_connect_cem.disconnect()
+        self.log.info("Disconnecting from MOGLabs interface.")
+        self.socket.close()
         self.stop_stream()
         self._data_buffer = None
         self._timestamp_buffer = None
 
     # Internal communication facilities
-    def on_receive(self, value):
-        self.response_queue.put(value)
-
     def send_and_recv(self, value, timeout_s=1, check_ok=True):
-        self._socket_handler.send(value)
+        self.socket.settimeout(timeout_s)
+        self.socket.sendall(value.encode("utf8"))
         recv = None
         try:
-            recv = self.response_queue.get(timeout=timeout_s)
-        except queue.Empty:
+            recv = self.socket.recv(1024)
+        except TimeoutError:
             self.log.warning("Timeout while waiting for a response to %s", value)
         if check_ok:
             if recv is None:
@@ -173,10 +190,14 @@ class MOGLabsLaser(DataInStreamInterface, FiniteSamplingInputInterface):
                 self.log.error(f"Command \"{value}\" errored: \"{recv}\"")
                 recv = None
         return recv
-
-    def empty_input_queue(self):
-        while not self.response_queue.empty():
-            self.response_queue.get()
+            
+    def _external_modulation(self, on=True):
+        if on:
+            self.log.info("Enabling external modulation for the piezo.")
+            self.send_and_recv("mld,hv,mod,ext", timeout_s=2)
+        else:
+            self.log.info("Disabling external modulation for the piezo.")
+            self.send_and_recv("mld,hv,mod,ramp", timeout_s=2)
 
     def _set_continuous_acquisition(self):
         ret = self.send_and_recv("fzw,meas,extrig,off")
@@ -190,15 +211,15 @@ class MOGLabsLaser(DataInStreamInterface, FiniteSamplingInputInterface):
             return
         self.send_and_recv("fzw,meas,clear")
 
-    def _dump_data(self, buffer_data : Optional[np.ndarray] = None , buffer_timestamp : Optional[np.ndarray] = None) -> Tuple[np.ndarray, np.ndarray, int]:
-        self.empty_input_queue()
-        self._socket_handler.send("fzw,meas,dump")
+    def _dump_data(self, buffer_data : Optional[np.ndarray] = None , buffer_timestamp : Optional[np.ndarray] = None, timeout=0.5) -> Tuple[np.ndarray, np.ndarray, int]:
+        self.socket.settimeout(timeout)
+        self.socket.sendall(b"fzw,meas,dump")
         recv = b''
         while True:
             try:
-                recv += self.response_queue.get(timeout=10)
-            except queue.Empty:
-                self.log.warning("Timeout while waiting for a response to dump.")
+                recv += self.socket.recv(1024)
+            except TimeoutError:
+                self.log.warning("Timeout while waiting for a response to %s", value)
                 break
             if recv[-2:] == b'\r\n':
                 break
@@ -422,20 +443,20 @@ class MOGLabsLaser(DataInStreamInterface, FiniteSamplingInputInterface):
         self._set_oneshot_acquisition()
 
     def stop_buffered_acquisition(self):
-        pass
+        self._set_continuous_acquisition()
 
     def get_buffered_samples(self, number_of_samples: Optional[int] =None):
         with self._lock:
             if number_of_samples is None:
-                buffer_data, _, l = self._dump_data()
+                buffer_data, _, l = self._dump_data(timeout=3)
                 return {"wavelength": buffer_data}
             elif number_of_samples > self.frame_size:
                 raise ValueError(f"You are asking for too many samples ({number_of_samples} for a maximum of {self.frame_size}.")
             else:
-                buffer_data, _, l = self._dump_data()
+                buffer_data, _, l = self._dump_data(timeout=3)
                 while l < number_of_samples:
                     time.sleep(0.1)
-                    added_buffer_data, added_buffer_timestamp, added_l = self._dump_data()
+                    added_buffer_data, added_buffer_timestamp, added_l = self._dump_data(timeout=3)
                     l += added_l
                     buffer_data = np.concatenate(buffer_data, added_buffer_data)
                 return {"wavelength": buffer_data[:number_of_samples]}
