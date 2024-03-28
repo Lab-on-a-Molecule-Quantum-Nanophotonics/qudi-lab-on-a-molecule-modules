@@ -15,6 +15,8 @@ from qudi.interface.finite_sampling_input_interface import FiniteSamplingInputIn
 from qudi.util.mutex import Mutex
 from qudi.util.overload import OverloadedAttribute
 
+CRLF=b"\r\n"
+
 class SerialHandler(QtCore.QObject):
     """Handler class for the socket that communicates with the MOGLabs software
     in a dedicated thread."""
@@ -31,21 +33,21 @@ class SerialHandler(QtCore.QObject):
 
     def connect_socket(self):
         self.log.info("Connecting to MOGLabs interface.")
-        self.serial.port = self._parentclass._com_port
-        self.serial.timeout = 0.1
-        self.serial.baudrate = 115200
-        self.serial.bytesize=8
-        self.serial.parity='N'
-        self.serial.stopbits=1
-        self.serial.open()
+        self.serial = serial.Serial(self._parentclass._com_port,
+        timeout = 0.00,
+        baudrate = 115200,
+        bytesize=8,
+        parity='N',
+        stopbits=1)
+        #self.serial.open()
 
     def disconnect_socket(self):
         self.log.info("Disconnecting from MOGLabs interface.")
-        self.serial.open()
+        self.serial.close()
 
     @QtCore.Slot(str)
     def send(self, value):
-        self.input_queue.put(bytes(value, "utf8"))
+        self.input_queue.put(value)
 
     def run(self):
         self.connect_socket()
@@ -54,13 +56,17 @@ class SerialHandler(QtCore.QObject):
             if self._parentclass.module_state() == 'deactivated':
                 break
             try:
-                value = self.input_queue.get(block=False)
-                self.serial.write(value.encode('utf8'))
+                value = self.input_queue.get(block=False).encode("utf8")
+                if not value.endswith(CRLF):
+                    value += CRLF
+                self.serial.write(value)
             except queue.Empty:
                 pass
             try:
-                value = self.serial.readline()
-                self.response_received.emit(value)
+                if self.serial.in_waiting > 0: 
+                    value = self.serial.read(self.serial.in_waiting)
+                    if value != b'':
+                        self.response_received.emit(value)
             except TimeoutError:
                 pass
         self.disconnect_socket()
@@ -72,7 +78,7 @@ class MOGLabsFZW(DataInStreamInterface, FiniteSamplingInputInterface):
 
     """
     _com_port = ConfigOption('com_port', 'COM6')
-    refresh_rate = ConfigOption('refresh_rate', 10)
+    poll_time = ConfigOption('poll_time_ms', 10)
 
     sig_connect_cem = QtCore.Signal()
     sig_scan_done = QtCore.Signal()
@@ -90,6 +96,7 @@ class MOGLabsFZW(DataInStreamInterface, FiniteSamplingInputInterface):
         self._time_offset = 0
         self._last_read = 0
         self._frame_size = 1
+        self.timer = QtCore.QTimer()
 
     # Qudi activation / deactivation
     def on_activate(self):
@@ -115,7 +122,7 @@ class MOGLabsFZW(DataInStreamInterface, FiniteSamplingInputInterface):
                                                  bounds=(2, (2**32)//10),
                                                  increment=1,
                                                  enforce_int=True),
-            sample_rate=ScalarConstraint(default=1e3,bounds=(1e3,1e3),increment=0),
+            sample_rate=ScalarConstraint(default=10,bounds=(10,10),increment=0),
         )
         self._constraints_finite_sampling = FiniteSamplingInputConstraints(
             channel_units = {
@@ -124,7 +131,10 @@ class MOGLabsFZW(DataInStreamInterface, FiniteSamplingInputInterface):
             frame_size_limits=(1,2**16),
             sample_rate_limits=(1,1e3),
         )
-
+        self.timer.setInterval(self.poll_time)
+        self._sig_next_frame.connect(self.timer.start)
+        self.timer.timeout.connect(self._continuous_read_callback)
+        self.timer.setSingleShot(True)
 
     def on_deactivate(self):
         """Deactivate module.
@@ -138,9 +148,10 @@ class MOGLabsFZW(DataInStreamInterface, FiniteSamplingInputInterface):
 
     # Internal communication facilities
     def on_receive(self, value):
+        self.log.info("putting in input queue %r bytes"%len(value))
         self.response_queue.put(value)
 
-    def send_and_recv(self, value, timeout_s=1, check_ok=True):
+    def send_and_recv(self, value, timeout_s=5, check_ok=True):
         self._socket_handler.send(value)
         recv = None
         try:
@@ -170,27 +181,26 @@ class MOGLabsFZW(DataInStreamInterface, FiniteSamplingInputInterface):
         if ret is None:
             return
         self.send_and_recv("meas,clear")
+        
+    def _prepare_buffers(self):
+        self._data_buffer = np.empty(4096, dtype=np.float64)
+        self._timestamp_buffer = np.empty(4096, dtype=np.float64)
+        self._current_buffer_position = 0
 
-    def _dump_data(self, buffer_data : Optional[np.ndarray] = None , buffer_timestamp : Optional[np.ndarray] = None) -> Tuple[np.ndarray, np.ndarray, int]:
-        self.empty_input_queue()
+    def _dump_data(self, buffer_data : Optional[np.ndarray] = None , buffer_timestamp : Optional[np.ndarray] = None, dump_start = 0) -> Tuple[np.ndarray, np.ndarray, int]:
         current_time = time.time()# - self._time_offset
         self._socket_handler.send("meas,dump")
         recv = b''
         while True:
             try:
-                recv += self.response_queue.get(timeout=10)
+                value = self.response_queue.get(timeout=0.1)
+                recv += value
+                self.log.info("read from input queue %r bytes."%len(value))
             except queue.Empty:
-                self.log.warning("Timeout while waiting for a response to dump.")
                 break
-            if recv[-2:] == b'\r\n':
-                break
-        if len(recv) < 0:
+        if len(recv) < 4:
             return np.empty(0),np.empty(0),0
-        try:
-            recv = eval(recv)
-        except:
-            self.log.warning("Could not parse the response.")
-            return np.empty(0),np.empty(0),0
+       
 
         size = struct.unpack("<I", recv[:4])[0]
         number_of_measurements = size//10
@@ -202,24 +212,40 @@ class MOGLabsFZW(DataInStreamInterface, FiniteSamplingInputInterface):
         
         recv = recv[4:]
 
-        dump_index = 0
+        dump_index = dump_start
         remaining_bytes = size
         d,_ = divmod(len(recv),10)
         for i in range(0,d*10,10):
             t,wavelength,_,_,_,_=struct.unpack("<HIbbbb", recv[i:(i+10)])
             remaining_bytes -= 10
-            if dump_index < dump_stop:
-                buffer_timestamp[dump_index] = t / 1000
+            if dump_index-dump_start < dump_stop:
+                # buffer_timestamp[dump_index] = t / 1000
                 buffer_data[dump_index] = (wavelength * 1200.0 / (2**32 - 1)) * 1e-9
                 dump_index += 1
         
-        differences = np.diff(buffer_timestamp)
-        differences[differences < 0] = 0.001 # time wrapped
-        differences = np.hstack(([0], differences))
-        buffer_timestamp = np.cumsum(differences)
-        buffer_timestamp = buffer_timestamp - buffer_timestamp[-1]
-        buffer_timestamp = current_time + buffer_timestamp
-        return buffer_data,buffer_timestamp,dump_index+1
+        # differences = np.diff(buffer_timestamp)
+        # differences[differences < 0] = 0.001 # time wrapped
+        # differences = np.hstack(([0], differences))
+        # buffer_timestamp = np.cumsum(differences)
+        # buffer_timestamp = buffer_timestamp - buffer_timestamp[-1]
+        # buffer_timestamp = current_time + buffer_timestamp
+        n_read = dump_index-dump_start
+        buffer_timestamp[dump_start:dump_index] = np.linspace(start=self._time_offset, stop=n_read/1000, num=n_read)
+        self._time_offset = buffer_timestamp[dump_index]+1/1000
+        return buffer_data,buffer_timestamp,dump_index-dump_start
+        
+    def _continuous_read_callback(self):
+        with self._lock:
+            _,_,n_read = self._dump_data(self._data_buffer, self._timestamp_buffer, self._current_buffer_position)
+            self._current_buffer_position += n_read
+            self.log.info("Read %r" %n_read)
+            if self.module_state() == 'locked':
+                self._sig_next_frame.emit()
+    
+    def _roll_buffers(self, n_read):
+        np.roll(self._data_buffer, -n_read)
+        np.roll(self._timestamp_buffer, -n_read)
+        self._current_buffer_position -= n_read
 
     # DataInStreamInterface
     constraints = OverloadedAttribute()
@@ -235,8 +261,11 @@ class MOGLabsFZW(DataInStreamInterface, FiniteSamplingInputInterface):
         with self._lock:
             if self.module_state() == 'idle':
                 self.module_state.lock()
+                self.empty_input_queue()
                 self._set_continuous_acquisition()
-                self._time_offset = time.time()
+                self._prepare_buffers()
+                self._time_offset = 0
+                self._sig_next_frame.emit()
             else:
                 self.log.warning('Unable to start input stream. It is already running.')
 
@@ -271,7 +300,11 @@ class MOGLabsFZW(DataInStreamInterface, FiniteSamplingInputInterface):
         with self._lock:
             if self.module_state() != 'locked':
                 raise RuntimeError('Unable to read data. Stream is not running.')
-            self._dump_data(data_buffer, timestamp_buffer)
+            n_read = min(self._current_buffer_position, samples_per_channel)
+            data_buffer[:n_read] = self._data_buffer[:n_read]
+            if timestamp_buffer is not None:
+                timestamp_buffer[:n_read] = self._timestamp_buffer[:n_read]
+            self._roll_buffers(n_read)
 
     def read_available_data_into_buffer(self,
                                         data_buffer: np.ndarray,
@@ -296,8 +329,12 @@ class MOGLabsFZW(DataInStreamInterface, FiniteSamplingInputInterface):
                 raise RuntimeError(
                     'SampleTiming.TIMESTAMP mode requires a timestamp buffer array'
                 )
-
-            return self._dump_data(data_buffer, timestamp_buffer)[-1]
+            n_read = min(self._current_buffer_position, len(data_buffer))
+            data_buffer[:n_read] = self._data_buffer[:n_read]
+            if timestamp_buffer is not None:
+                timestamp_buffer[:n_read] = self._timestamp_buffer[:n_read]
+            self._roll_buffers(n_read)
+            return n_read
 
     def read_data(self,
                   samples_per_channel: Optional[int] = None
@@ -320,11 +357,15 @@ class MOGLabsFZW(DataInStreamInterface, FiniteSamplingInputInterface):
             if self.module_state() != 'locked':
                 raise RuntimeError('Unable to read data. Stream is not running.')
 
-            buffer_data, buffer_timestamp, l = self._dump_data()
-            if samples_per_channel is not None and l > samples_per_channel:
-                buffer_data = buffer_data[:samples_per_channel]
-                buffer_timestamp = buffer_timestamp[:samples_per_channel]
-            return buffer_data, buffer_timestamp
+            if samples_per_channel is None:
+                samples_per_channel = self._current_buffer_position
+            n_read = min(self._current_buffer_position, samples_per_channel)
+            data_buffer = np.empty(n_read,dtype=np.float64)
+            timestamp_buffer = np.empty(n_read,dtype=np.float64)
+            data_buffer[:n_read] = self._data_buffer[:n_read]
+            timestamp_buffer[:n_read] = self._timestamp_buffer[:n_read]
+            self._roll_buffers(n_read)
+            return (data_buffer, timestamp_buffer)
 
     def read_single_point(self) -> Tuple[np.ndarray, Union[None, np.float64]]:
         """ This method will initiate a single sample read on each configured data channel.
@@ -352,12 +393,12 @@ class MOGLabsFZW(DataInStreamInterface, FiniteSamplingInputInterface):
     @property
     def available_samples(self) -> int:
         # self.log.warning("Available samples reading is not available on the MOGLabs FZW.")
-        return 1
+        return self._current_buffer_position
 
     @property
     def sample_rate(self) -> float:
         # self.log.warning("Sample rate reading is not available on the MOGLabs FZW.")
-        return 140
+        return 1e3
 
     @property
     def channel_buffer_size(self) -> int:
