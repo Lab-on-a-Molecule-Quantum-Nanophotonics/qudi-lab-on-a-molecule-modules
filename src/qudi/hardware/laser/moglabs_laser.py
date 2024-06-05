@@ -33,63 +33,11 @@ from qudi.core.configoption import ConfigOption
 # from qudi.interface.scanning_laser_interface import ScanningLaserInterface, ScanningState, ScanningLaserReturnError
 from qudi.interface.data_instream_interface import DataInStreamInterface, DataInStreamConstraints, SampleTiming, StreamingMode, ScalarConstraint
 from qudi.interface.finite_sampling_input_interface import FiniteSamplingInputInterface, FiniteSamplingInputConstraints
+from qudi.interface.motor_interface import MotorInterface
 from qudi.util.mutex import Mutex
 from qudi.util.overload import OverloadedAttribute
 
-class SocketHandler(QtCore.QObject):
-    """Handler class for the socket that communicates with the MOGLabs software
-    in a dedicated thread."""
-
-    response_received = QtCore.Signal(object)
-    connection_established = QtCore.Signal()
-
-    def __init__(self, parentclass):
-        super().__init__()
-        # The settings are stored within the parent class
-        self._parentclass = parentclass
-        self.log = self._parentclass.log
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.input_queue = queue.Queue()
-
-    def connect_socket(self):
-        self.log.info("Connecting to MOGLabs interface.")
-        self.socket.connect((self._parentclass.address, self._parentclass.port))
-        self.socket.settimeout(0.1)
-
-    def disconnect_socket(self):
-        self.log.info("Disconnecting from MOGLabs interface.")
-        self.socket.close()
-
-    @QtCore.Slot(str)
-    def send(self, value):
-        self.input_queue.put(bytes(value, "utf8"))
-
-    def run(self):
-        self.connect_socket()
-        value = None
-        self.connection_established.emit()
-        while True:
-            if self._parentclass.module_state() == 'deactivated':
-                break
-            try:
-                value = self.input_queue.get(block=False)
-                self.log.info("sending %r" % value)
-                self.socket.sendall(value)
-            except queue.Empty:
-                pass
-            except Exception as e:
-                self.log.error("Error while sending: %r" % e)
-            try:
-                value = self.socket.recv(1024)
-                self.log.info("emitting %r" % value)
-                self.response_received.emit(value)
-            except TimeoutError:
-                pass
-            except Exception as e:
-                self.log.error("Error while receiving: %r" % e)
-        self.disconnect_socket()
-
-class MOGLabsLaser(DataInStreamInterface, FiniteSamplingInputInterface):
+class MOGLabsLaser(DataInStreamInterface, FiniteSamplingInputInterface, MotorInterface):
     """A class to control our MOGLabs laser to perform excitation spectroscopy.
 
     Example config:
@@ -100,6 +48,7 @@ class MOGLabsLaser(DataInStreamInterface, FiniteSamplingInputInterface):
     timeout_seconds = ConfigOption('timeout_seconds', 0.2)
     set_mode = ConfigOption('set_mode', "fast")
     refresh_rate = ConfigOption('refresh_rate', 10)
+    _grating_steps = ConfigOption('grating_steps', 100)
 
     sig_connect_cem = QtCore.Signal()
     sig_scan_done = QtCore.Signal()
@@ -119,6 +68,7 @@ class MOGLabsLaser(DataInStreamInterface, FiniteSamplingInputInterface):
         self._last_read = 0
         self._frame_size = 1
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.timeouted = False
 
     # Qudi activation / deactivation
     def on_activate(self):
@@ -158,6 +108,7 @@ class MOGLabsLaser(DataInStreamInterface, FiniteSamplingInputInterface):
         )
         self.log.info("Connecting to MOGLabs interface.")
         self.socket.connect((self.address, self.port))
+        self.timeouted = False
         self.socket.settimeout(1)
         self._external_modulation()
 
@@ -176,6 +127,13 @@ class MOGLabsLaser(DataInStreamInterface, FiniteSamplingInputInterface):
 
     # Internal communication facilities
     def send_and_recv(self, value, timeout_s=1, check_ok=True):
+        if self.timeouted:
+            self.timeouted = False
+            self.socket.settimeout(0)
+            chunk = self.socket.recv(1024)
+            while chunk is not None:
+                chunk = self.socket.recv(1024)
+            
         self.socket.settimeout(timeout_s)
         self.socket.sendall(value.encode("utf8"))
         recv = None
@@ -183,6 +141,7 @@ class MOGLabsLaser(DataInStreamInterface, FiniteSamplingInputInterface):
             recv = self.socket.recv(1024)
         except TimeoutError:
             self.log.warning("Timeout while waiting for a response to %s", value)
+            self.timeouted = True
         if check_ok:
             if recv is None:
                 self.log.error(f"Command \"{value}\" did not return.")
@@ -200,18 +159,26 @@ class MOGLabsLaser(DataInStreamInterface, FiniteSamplingInputInterface):
             self.send_and_recv("mld,hv,mod,ramp", timeout_s=2)
 
     def _set_continuous_acquisition(self):
+        self.log.info("Disabling external triggering of the wavemeter.")
         ret = self.send_and_recv("fzw,meas,extrig,off")
         if ret is None:
             return
         self.send_and_recv("fzw,meas,clear")
 
     def _set_oneshot_acquisition(self):
+        self.log.info("Enabling external triggering of the wavemeter.")
         ret = self.send_and_recv("fzw,meas,extrig,on")
         if ret is None:
             return
         self.send_and_recv("fzw,meas,clear")
 
     def _dump_data(self, buffer_data : Optional[np.ndarray] = None , buffer_timestamp : Optional[np.ndarray] = None, timeout=0.5) -> Tuple[np.ndarray, np.ndarray, int]:
+        if self.timeouted:
+            self.timeouted = False
+            self.socket.settimeout(0)
+            chunk = self.socket.recv(1)
+            while chunk is not None:
+                chunk = self.socket.recv(1)
         self.socket.settimeout(timeout)
         self.socket.sendall(b"fzw,meas,dump")
         recv = b''
@@ -219,7 +186,8 @@ class MOGLabsLaser(DataInStreamInterface, FiniteSamplingInputInterface):
             try:
                 recv += self.socket.recv(1024)
             except TimeoutError:
-                self.log.warning("Timeout while waiting for a response to %s", value)
+                self.log.warning("Timeout while waiting for dump response")
+                self.timeouted = True
                 break
             if recv[-2:] == b'\r\n':
                 break
@@ -258,7 +226,69 @@ class MOGLabsLaser(DataInStreamInterface, FiniteSamplingInputInterface):
         perm = np.argsort(buffer_timestamp)
 
         return buffer_data[perm],buffer_timestamp[perm],dump_index+1
-
+        
+    def _fzw_pid_enabled():
+        r = self.send_and_recv("fzw,pid,status")
+        return r == "ENABLED"
+        
+    def _set_fzw_pid_enabled(state : bool):
+        if state:
+            self.send_and_recv("fzw,pid,enable")
+        else:
+            self.send_and_recv("fzw,pid,disable")
+            
+    def _mod_status(self):
+        return self.send_and_recv("mld,hv,mod", check_ok=False).decode("utf8").rstrip()
+        
+    def _set_mod_status(self, val):
+        return self.send_and_recv(f"mld,hv,mod,{val}")
+        
+    def _motor_range(self):
+        mini,maxi = self.send_and_recv("cem,motor,travel", check_ok=False).decode("utf8").split(" ")
+        return int(mini), int(maxi)
+    
+    def _motor_position(self):
+        return int(self.send_and_recv("cem,motor,position", check_ok=False))
+        
+    def _set_motor_position(self, value):
+        return self.send_and_recv(f"cem,motor,dest,{value}")
+        
+    def _move_motor_rel(self, value):
+        return self.send_and_recv(f"cem,motor,step,{value}")
+        
+    def _frequency(self):
+        f = self.send_and_recv("freq", check_ok=False)
+        if f is None:
+            return np.empty(0)
+        try:
+            return np.array(float(f)),None 
+        except ValueError:
+            return np.empty(0), None
+        
+    def _calibration_scan(self):    
+        mod_status = self._mod_status()
+        self._set_mod_status("none")
+        mini,maxi = self._motor_range()
+        self._motor_positions = np.arange(start=mini, stop=maxi, step=500, dtype=int)
+        self._frequencies = np.empty(len(self._motor_positions), dtype=np.float64)
+        self.log.info("Starting calibration scan...")
+        for i in range(len(self._motor_positions)):
+            self._set_motor_position(self._motor_positions[i])
+            while self._motor_position() != self._motor_positions[i]:
+                time.sleep(0.1)
+            self.send_and_recv("fzw,meas,softrig")
+            f = self.send_and_recv("freq", check_ok=False)
+            if f is None:
+                self._frequencies[i] = np.nan
+            try:
+                self._frequencies[i] = float(f) 
+            except ValueError:
+                self._frequencies[i] = np.nan
+        self._motor_positions = self._motor_positions[self._frequencies != np.nan]
+        self._frequencies = self._frequencies[self._frequencies != np.nan]
+        self._set_mod_status(mod_status)        
+        self.log.info("Calibration scan done.")
+        
     # DataInStreamInterface
     constraints = OverloadedAttribute()
     @constraints.overload("DataInStreamInterface")
@@ -471,3 +501,50 @@ class MOGLabsLaser(DataInStreamInterface, FiniteSamplingInputInterface):
         if frame_size is not None:
             self.set_frame_size(old_frame_size)
         return data
+
+    # MotorInterface
+    
+    def get_constraints(self):
+        axis0 = {}
+        axis0['label'] = 'grating'
+        axis0['unit'] = None
+        axis0['ramp'] = None
+        mini,maxi = self._motor_range()
+        axis0['pos_min'] = mini
+        axis0['pos_max'] = maxi
+        axis0['pos_step'] = self._grating_steps
+        axis0['vel_min'] = None
+        axis0['vel_max'] = None
+        axis0['vel_step'] = None
+        axis0['acc_min'] = None
+        axis0['acc_max'] = None
+        axis0['acc_step'] = None
+        constraints = {}
+        constraints[axis0['label']] = axis0
+        return constraints
+        
+    def move_rel(self,  param_dict):
+        rel = param_dict['grating']
+        self._move_motor_rel(rel)
+        
+    def move_abs(self, param_dict):
+        rel = param_dict['grating']
+        self._set_motor_position(rel)
+        
+    def abort(self):
+        pass
+        
+    def get_pos(self, param_list=None):
+        return {'grating': self._motor_position()}
+        
+    def get_status(self, param_list=None):
+        pass
+        
+    def calibrate(self, param_list=None):
+        pass
+        
+    def get_velocity(self, param_list=None):
+        pass
+        
+    def set_velocity(self, param_dict):
+        pass
