@@ -77,7 +77,7 @@ class NiScanningProbeInterfuseBare(ScanningProbeInterface):
                 APD2: 'c/s'
                 AI0: 'V'
             backwards_line_resolution: 50 # optional
-            move_velocity: 400e-6 #m/s; This speed is used for scanner movements and avoids jumps from position to position.
+            maximum_move_velocity: 400e-6 #m/s; This speed is used for scanner movements and avoids jumps from position to position.
     """
 
     # TODO What about channels which are not "calibrated" to 'm', e.g. just use 'V'?
