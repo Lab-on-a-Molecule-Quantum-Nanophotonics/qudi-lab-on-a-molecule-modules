@@ -9,111 +9,57 @@ from PySide2 import QtCore
 import numpy as np
 
 from qudi.core.configoption import ConfigOption
+from qudi.core.statusvariable import StatusVar
 # from qudi.interface.scanning_laser_interface import ScanningLaserInterface, ScanningState, ScanningLaserReturnError
 from qudi.interface.data_instream_interface import DataInStreamInterface, DataInStreamConstraints, SampleTiming, StreamingMode, ScalarConstraint
 from qudi.interface.finite_sampling_input_interface import FiniteSamplingInputInterface, FiniteSamplingInputConstraints
+from qudi.interface.switch_interface import SwitchInterface
 from qudi.util.mutex import Mutex
 from qudi.util.overload import OverloadedAttribute
 
 CRLF=b"\r\n"
 
-class SerialHandler(QtCore.QObject):
-    """Handler class for the socket that communicates with the MOGLabs software
-    in a dedicated thread."""
-
-    response_received = QtCore.Signal(object)
-
-    def __init__(self, parentclass):
-        super().__init__()
-        # The settings are stored within the parent class
-        self._parentclass = parentclass
-        self.log = self._parentclass.log
-        self.serial = serial.Serial()
-        self.input_queue = queue.Queue()
-
-    def connect_socket(self):
-        self.log.info("Connecting to MOGLabs interface.")
-        self.serial = serial.Serial(self._parentclass._com_port,
-        timeout = 0.00,
-        baudrate = 115200,
-        bytesize=8,
-        parity='N',
-        stopbits=1)
-        #self.serial.open()
-
-    def disconnect_socket(self):
-        self.log.info("Disconnecting from MOGLabs interface.")
-        self.serial.close()
-
-    @QtCore.Slot(str)
-    def send(self, value):
-        self.input_queue.put(value)
-
-    def run(self):
-        self.connect_socket()
-        value = None
-        while True:
-            if self._parentclass.module_state() == 'deactivated':
-                break
-            try:
-                value = self.input_queue.get(block=False).encode("utf8")
-                if not value.endswith(CRLF):
-                    value += CRLF
-                self.serial.write(value)
-            except queue.Empty:
-                pass
-            try:
-                if self.serial.in_waiting > 0: 
-                    value = self.serial.read(self.serial.in_waiting)
-                    if value != b'':
-                        self.response_received.emit(value)
-            except TimeoutError:
-                pass
-        self.disconnect_socket()
-
-class MOGLabsFZW(DataInStreamInterface, FiniteSamplingInputInterface):
+class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInterface):
     """A class to control our MOGLabs laser to perform excitation spectroscopy.
 
     Example config:
 
     """
-    _com_port = ConfigOption('com_port', 'COM6')
-    poll_time = ConfigOption('poll_time_ms', 10)
+    port = ConfigOption('port', 'COM6')
+    poll_time = ConfigOption('poll_time_ms', 100)
+    default_buffer_size = ConfigOption("buffer_size", 1024)
+    auto_start_acquisition = ConfigOption("auto_start_acquisition", False)
 
-    sig_connect_cem = QtCore.Signal()
-    sig_scan_done = QtCore.Signal()
-    _sig_next_frame = QtCore.Signal()
+    instream_rate = StatusVar("instream_rate", default=20)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._constraints: Optional[DataInStreamConstraints] = None
-        self.socket_thread = QtCore.QThread()
-        self._socket_handler = SerialHandler(self)
+        self._constraints_finite_sampling = None
         self._lock = Mutex()
         self._data_buffer: Optional[np.ndarray] = None
         self._timestamp_buffer: Optional[np.ndarray] = None
+        self._instream_data_buffer = None
+        self._instream_timestamp_buffer = None
         self._current_buffer_position = 0
+        self._corrected_time_offset_position = 0
         self._time_offset = 0
-        self._last_read = 0
+        self._first_time = None
+        self.buffer_size = 0
+        self.serial = serial.Serial()
+        self._watchdog_active = False
+        self._time_start_instream = 0
+        self._instream_offset = 0
         self._frame_size = 1
-        self.timer = QtCore.QTimer()
 
     # Qudi activation / deactivation
     def on_activate(self):
         """Activate module.
         """
-        self.log.info("Starting the MOGLabs laser.")
-        self._socket_handler.moveToThread(self.socket_thread)
-        self.response_queue = queue.Queue()
-        self.sig_connect_cem.connect(self._socket_handler.run)
-        self._socket_handler.response_received.connect(self.on_receive)
-        self.socket_thread.start()
-        self.sig_connect_cem.emit()
-        self._time_offset = 0
-
+        self.buffer_size = self.default_buffer_size
         self._constraints = DataInStreamConstraints(
             channel_units = {
-                'wavelength': 'nm',
+                'wavelength': 'm',
             },
             sample_timing=SampleTiming.TIMESTAMP,
             streaming_modes = [StreamingMode.CONTINUOUS],
@@ -122,130 +68,153 @@ class MOGLabsFZW(DataInStreamInterface, FiniteSamplingInputInterface):
                                                  bounds=(2, (2**32)//10),
                                                  increment=1,
                                                  enforce_int=True),
-            sample_rate=ScalarConstraint(default=10,bounds=(10,10),increment=0),
+            sample_rate=ScalarConstraint(default=self.instream_rate,bounds=(1,20),increment=1),
         )
         self._constraints_finite_sampling = FiniteSamplingInputConstraints(
             channel_units = {
                 'wavelength': 'm',
             },
-            frame_size_limits=(1,2**16),
-            sample_rate_limits=(1,1e3),
+            frame_size_limits = (1, self.default_buffer_size),
+            sample_rate_limits = (1, 4000)
         )
-        self.timer.setInterval(self.poll_time)
-        self._sig_next_frame.connect(self.timer.start)
-        self.timer.timeout.connect(self._continuous_read_callback)
-        self.timer.setSingleShot(True)
+        self.serial.baudrate=115200
+        self.serial.bytesize=8
+        self.serial.parity='N'
+        self.serial.stopbits=1
+        self.serial.timeout=1
+        self.serial.writeTimeout=0
+        self.serial.port=self.port
+        self.serial.open()
+        if self.auto_start_acquisition :
+            self._watchdog_active = True
+            self._prepare_buffers()
+            QtCore.QMetaObject.invokeMethod(self, '_continuous_read_callback', QtCore.Qt.QueuedConnection)
+        else:
+            self._watchdog_active = False
 
     def on_deactivate(self):
         """Deactivate module.
         """
-        self.socket_thread.quit()
-        self._socket_handler.response_received.disconnect()
-        self.sig_connect_cem.disconnect()
-        self.stop_stream()
-        self._data_buffer = None
-        self._timestamp_buffer = None
+        self.log.info("Stopping continuous acquisition.")
+        self._stop_continuous_read()
+        time.sleep(self.poll_time/1000)
+        self.log.info("Closing serial port.")
+        self.serial.close()
 
     # Internal communication facilities
-    def on_receive(self, value):
-        self.log.info("putting in input queue %r bytes"%len(value))
-        self.response_queue.put(value)
-
-    def send_and_recv(self, value, timeout_s=5, check_ok=True):
-        self._socket_handler.send(value)
-        recv = None
-        try:
-            recv = self.response_queue.get(timeout=timeout_s)
-        except queue.Empty:
-            self.log.warning("Timeout while waiting for a response to %s", value)
-        if check_ok:
-            if recv is None:
-                self.log.error(f"Command \"{value}\" did not return.")
-            elif not recv.decode("utf8").startswith("OK"):
-                self.log.error(f"Command \"{value}\" errored: \"{recv}\"")
-                recv = None
-        return recv
-
-    def empty_input_queue(self):
-        while not self.response_queue.empty():
-            self.response_queue.get()
-
-    def _set_continuous_acquisition(self):
-        ret = self.send_and_recv("meas,extrig,off")
-        if ret is None:
-            return
+    def send_and_recv(self, value, check_ok=True):
+        if not value.endswith("\r\n"):
+            value += "\r\n"
+        self.serial.write(value.encode("utf8"))
+        ret = self.serial.readline().decode('utf8')
+        if check_ok and not ret.startswith("OK"):
+            self.log.error(f"Command \"{value}\" errored: \"{ret}\"")
+        return ret
+    def _set_exposure(self, value="auto"):
+        self.send_and_recv(f"cam,exp,{value}")
+    def _get_exposure(self):
+        ret = self.send_and_recv("cam,exp", check_ok=False)
+        val = float(ret.split()[0])
+        return val
+    def _clear_buffer(self):
         self.send_and_recv("meas,clear")
-
-    def _set_oneshot_acquisition(self):
-        ret = self.send_and_recv("meas,extrig,on")
-        if ret is None:
-            return
-        self.send_and_recv("meas,clear")
-        
-    def _prepare_buffers(self):
-        self._data_buffer = np.empty(4096, dtype=np.float64)
-        self._timestamp_buffer = np.empty(4096, dtype=np.float64)
-        self._current_buffer_position = 0
-
-    def _dump_data(self, buffer_data : Optional[np.ndarray] = None , buffer_timestamp : Optional[np.ndarray] = None, dump_start = 0) -> Tuple[np.ndarray, np.ndarray, int]:
-        current_time = time.time()# - self._time_offset
-        self._socket_handler.send("meas,dump")
-        recv = b''
-        while True:
-            try:
-                value = self.response_queue.get(timeout=0.1)
-                recv += value
-                self.log.info("read from input queue %r bytes."%len(value))
-            except queue.Empty:
-                break
-        if len(recv) < 4:
-            return np.empty(0),np.empty(0),0
-       
-
-        size = struct.unpack("<I", recv[:4])[0]
+    def _get_trig(self):
+        return self.send_and_recv("meas,extrig", check_ok=False)
+    def _set_trig(self,value):
+        return self.send_and_recv(f"meas,extrig,{value}")
+    def _softrig(self):
+        return self.send_and_recv(f"meas,softrig")
+    def _dump(self, buffer_data : Optional[np.ndarray] = None , buffer_timestamp : Optional[np.ndarray] = None, dump_start = 0) -> Tuple[np.ndarray, np.ndarray, int]:
+        self.serial.reset_input_buffer()
+        self.serial.write("meas,dump\r\n".encode("utf8"))
+        header = self.serial.read(4)
+        size = struct.unpack("<I", header)[0]
         number_of_measurements = size//10
         if buffer_data is None:
             buffer_data = np.empty(number_of_measurements, dtype=np.float64)
         if buffer_timestamp is None:
             buffer_timestamp = np.empty(number_of_measurements, dtype=np.float64)
-        dump_stop = min(number_of_measurements, len(buffer_timestamp))
-        
-        recv = recv[4:]
 
+        dump_stop = min(number_of_measurements, len(buffer_timestamp)-dump_start)
+        binary_data = self.serial.read(size)
         dump_index = dump_start
         remaining_bytes = size
-        d,_ = divmod(len(recv),10)
+        d,_ = divmod(len(binary_data),10)
         for i in range(0,d*10,10):
-            t,wavelength,_,_,_,_=struct.unpack("<HIbbbb", recv[i:(i+10)])
+            t,wavelength,_,_,_,_=struct.unpack("<HIbbbb", binary_data[i:(i+10)])
             remaining_bytes -= 10
             if dump_index-dump_start < dump_stop:
-                # buffer_timestamp[dump_index] = t / 1000
+                buffer_timestamp[dump_index] = t
                 buffer_data[dump_index] = (wavelength * 1200.0 / (2**32 - 1)) * 1e-9
                 dump_index += 1
-        
-        # differences = np.diff(buffer_timestamp)
-        # differences[differences < 0] = 0.001 # time wrapped
-        # differences = np.hstack(([0], differences))
-        # buffer_timestamp = np.cumsum(differences)
-        # buffer_timestamp = buffer_timestamp - buffer_timestamp[-1]
-        # buffer_timestamp = current_time + buffer_timestamp
-        n_read = dump_index-dump_start
-        buffer_timestamp[dump_start:dump_index] = np.linspace(start=self._time_offset, stop=n_read/1000, num=n_read)
-        self._time_offset = buffer_timestamp[dump_index]+1/1000
+
         return buffer_data,buffer_timestamp,dump_index-dump_start
         
+    # Internal management of buffers
+    def _prepare_buffers(self):
+        self._data_buffer = np.empty(self.buffer_size, dtype=np.float64)
+        self._timestamp_buffer = np.empty(self.buffer_size, dtype=np.float64)
+        self._instream_data_buffer = np.empty(self.buffer_size, dtype=np.float64)
+        self._instream_timestamp_buffer = np.empty(self.buffer_size, dtype=np.float64)
+        self._current_buffer_position = 0
+        self._corrected_time_offset_position = 0
+    @QtCore.Slot()
+    def _start_continuous_read(self):
+        self._watchdog_active = True
+        self._time_offset=0
+        self._first_time = None
+        QtCore.QMetaObject.invokeMethod(self, '_continuous_read_callback', QtCore.Qt.QueuedConnection)
+    @QtCore.Slot()
+    def _stop_continuous_read(self):
+        self._watchdog_active = False
+    @QtCore.Slot()
     def _continuous_read_callback(self):
         with self._lock:
-            _,_,n_read = self._dump_data(self._data_buffer, self._timestamp_buffer, self._current_buffer_position)
+            _,_,n_read = self._dump(self._data_buffer, self._timestamp_buffer, self._current_buffer_position)
             self._current_buffer_position += n_read
-            self.log.info("Read %r" %n_read)
-            if self.module_state() == 'locked':
-                self._sig_next_frame.emit()
-    
+            if n_read > 0:
+                self._fix_time()
+            if self._watchdog_active:
+                QtCore.QTimer.singleShot(self.poll_time, self._continuous_read_callback)
     def _roll_buffers(self, n_read):
         np.roll(self._data_buffer, -n_read)
         np.roll(self._timestamp_buffer, -n_read)
         self._current_buffer_position -= n_read
+        self._corrected_time_offset_position -= n_read
+    def _fix_time(self):
+        if self._first_time is None:
+            self._first_time = self._timestamp_buffer[0]
+        self._timestamp_buffer[self._corrected_time_offset_position:self._current_buffer_position] -= self._first_time
+        wrapped = np.concatenate((
+            np.array([self._time_offset]), 
+            self._timestamp_buffer[self._corrected_time_offset_position:self._current_buffer_position]
+        ))
+        unwrapped = np.unwrap(wrapped, period=2**10)
+        b = np.diff(unwrapped, prepend=self._time_offset)
+        if np.any(b<0):
+            self.log.info(f"problematic unwrapping {wrapped}")
+        self._timestamp_buffer[self._corrected_time_offset_position:self._current_buffer_position] = unwrapped[1:]
+        self._time_offset = self._timestamp_buffer[self._current_buffer_position-1]
+        self._corrected_time_offset_position = self._current_buffer_position
+
+    @QtCore.Slot()
+    def _instream_buffers_callback(self):
+        with self._lock:
+            if self._instream_offset < len(self._instream_data_buffer):
+                t = time.time()
+                view = self._data_buffer[:self._current_buffer_position]
+                view = view[~np.isnan(view)]
+                if len(view) > 0:
+                    self._instream_data_buffer[self._instream_offset] = view.mean()
+                    self._instream_timestamp_buffer[self._instream_offset] = t - self._time_start_instream
+                    self._roll_buffers(self._current_buffer_position)
+                    self._instream_offset += 1
+        if self.module_state() == 'locked':
+            QtCore.QTimer.singleShot(1000/self.instream_rate, self._instream_buffers_callback)
+    def _roll_instream_buffers(self, n_read):
+        np.roll(self._instream_data_buffer, -n_read)
+        np.roll(self._instream_timestamp_buffer, -n_read)
+        self._instream_offset -= n_read
 
     # DataInStreamInterface
     constraints = OverloadedAttribute()
@@ -258,24 +227,26 @@ class MOGLabsFZW(DataInStreamInterface, FiniteSamplingInputInterface):
 
     def start_stream(self) -> None:
         """ Start the data acquisition/streaming """
-        with self._lock:
-            if self.module_state() == 'idle':
-                self.module_state.lock()
-                self.empty_input_queue()
-                self._set_continuous_acquisition()
+        if self.module_state() == 'idle':
+            self.module_state.lock()
+            with self._lock:
+                self._set_trig("off")
                 self._prepare_buffers()
-                self._time_offset = 0
-                self._sig_next_frame.emit()
-            else:
-                self.log.warning('Unable to start input stream. It is already running.')
+            self._time_start_instream = time.time()
+            self._instream_offset = 0
+            self._start_continuous_read()
+            QtCore.QMetaObject.invokeMethod(self, '_instream_buffers_callback', QtCore.Qt.QueuedConnection)
+        else:
+            self.log.warning('Unable to start input stream. It is already running.')
 
     def stop_stream(self) -> None:
         """ Stop the data acquisition/streaming """
-        with self._lock:
-            if self.module_state() == 'locked':
-                self.module_state.unlock()
-            else:
-                self.log.warning('Unable to stop wavemeter input stream as nothing is running.')
+        self.log.info("Requested stop.")
+        if self.module_state() == 'locked':
+            self._stop_continuous_read()
+            self.module_state.unlock()
+        else:
+            self.log.warning('Unable to stop wavemeter input stream as nothing is running.')
 
     def read_data_into_buffer(self,
                               data_buffer: np.ndarray,
@@ -295,16 +266,18 @@ class MOGLabsFZW(DataInStreamInterface, FiniteSamplingInputInterface):
         provided to be filled with timestamps corresponding to the data_buffer array. It must be
         able to hold at least <samples_per_channel> items:
 
-        If the number of available samples is too low, you will get zeros at the end.
+        This function is blocking until the required number of samples has been acquired.
         """
+        if self.module_state() != 'locked':
+            raise RuntimeError('Unable to read data. Stream is not running.')
+        while self.available_samples < samples_per_channel:
+            time.sleep(1/self.instream_rate)
         with self._lock:
-            if self.module_state() != 'locked':
-                raise RuntimeError('Unable to read data. Stream is not running.')
-            n_read = min(self._current_buffer_position, samples_per_channel)
-            data_buffer[:n_read] = self._data_buffer[:n_read]
+            n_read = min(self._instream_offset, samples_per_channel)
+            data_buffer[:n_read] = self._instream_data_buffer[:n_read]
             if timestamp_buffer is not None:
-                timestamp_buffer[:n_read] = self._timestamp_buffer[:n_read]
-            self._roll_buffers(n_read)
+                timestamp_buffer[:n_read] = self._instream_timestamp_buffer[:n_read]
+            self._roll_instream_buffers(n_read)
 
     def read_available_data_into_buffer(self,
                                         data_buffer: np.ndarray,
@@ -320,20 +293,19 @@ class MOGLabsFZW(DataInStreamInterface, FiniteSamplingInputInterface):
         See "read_data_into_buffer" documentation for more details.
 
         This method will read all currently available samples into buffer. If number of available
-        samples exceeds buffer size, read only as many samples as fit into the buffer and drop the rest.
+        samples exceeds buffer size, read only as many samples as fit into the buffer.
         """
+        if self.module_state() != 'locked':
+            raise RuntimeError('Unable to read data. Stream is not running.')
         with self._lock:
-            if self.module_state() != 'locked':
-                raise RuntimeError('Unable to read data. Stream is not running.')
             if timestamp_buffer is None:
                 raise RuntimeError(
                     'SampleTiming.TIMESTAMP mode requires a timestamp buffer array'
                 )
-            n_read = min(self._current_buffer_position, len(data_buffer))
-            data_buffer[:n_read] = self._data_buffer[:n_read]
-            if timestamp_buffer is not None:
-                timestamp_buffer[:n_read] = self._timestamp_buffer[:n_read]
-            self._roll_buffers(n_read)
+            n_read = min(self._instream_offset, len(data_buffer))
+            data_buffer[:n_read] = self._instream_data_buffer[:n_read]
+            timestamp_buffer[:n_read] = self._instream_timestamp_buffer[:n_read] / 1000
+            self._roll_instream_buffers(n_read)
             return n_read
 
     def read_data(self,
@@ -349,22 +321,24 @@ class MOGLabsFZW(DataInStreamInterface, FiniteSamplingInputInterface):
 
         In case of SampleTiming.TIMESTAMP a 1D numpy.float64 timestamp_buffer array will be
         returned as well with timestamps corresponding to the data_buffer array.
-
+np.concatenate(np.array([self._time_offset]), wrapped)
+TypeError: only integer scalar arrays can be converted to a scalar index
         If samples_per_channel is omitted all currently available samples are read from buffer.
         This method will not return until all requested samples have been read or a timeout occurs.
         """
+        if self.module_state() != 'locked':
+            raise RuntimeError('Unable to read data. Stream is not running.')
+        if samples_per_channel is None:
+            samples_per_channel = self.available_samples
+        while self.available_samples < samples_per_channel:
+            time.sleep(1/self.instream_rate)
         with self._lock:
-            if self.module_state() != 'locked':
-                raise RuntimeError('Unable to read data. Stream is not running.')
-
-            if samples_per_channel is None:
-                samples_per_channel = self._current_buffer_position
-            n_read = min(self._current_buffer_position, samples_per_channel)
+            n_read = min(self._instream_offset, samples_per_channel)
             data_buffer = np.empty(n_read,dtype=np.float64)
             timestamp_buffer = np.empty(n_read,dtype=np.float64)
-            data_buffer[:n_read] = self._data_buffer[:n_read]
-            timestamp_buffer[:n_read] = self._timestamp_buffer[:n_read]
-            self._roll_buffers(n_read)
+            data_buffer[:n_read] = self._instream_data_buffer[:n_read]
+            timestamp_buffer[:n_read] = self._instream_timestamp_buffer[:n_read] / 1000
+            self._roll_instream_buffers(n_read)
             return (data_buffer, timestamp_buffer)
 
     def read_single_point(self) -> Tuple[np.ndarray, Union[None, np.float64]]:
@@ -378,10 +352,10 @@ class MOGLabsFZW(DataInStreamInterface, FiniteSamplingInputInterface):
         In case of SampleTiming.TIMESTAMP a single numpy.float64 timestamp value will be returned
         as well.
         """
+        if self.module_state() != 'locked':
+            raise RuntimeError('Unable to read data. Stream is not running.')
         with self._lock:
-            if self.module_state() != 'locked':
-                raise RuntimeError('Unable to read data. Stream is not running.')
-            self.send_and_recv("meas,softrig")
+            self._softrig()
             f = self.send_and_recv("freq", check_ok=False)
             if f is None:
                 return np.empty(0),None
@@ -392,17 +366,16 @@ class MOGLabsFZW(DataInStreamInterface, FiniteSamplingInputInterface):
 
     @property
     def available_samples(self) -> int:
-        # self.log.warning("Available samples reading is not available on the MOGLabs FZW.")
-        return self._current_buffer_position
+        with self._lock:
+            return self._instream_offset
 
     @property
     def sample_rate(self) -> float:
-        # self.log.warning("Sample rate reading is not available on the MOGLabs FZW.")
-        return 1e3
+        return self.instream_rate
 
     @property
     def channel_buffer_size(self) -> int:
-        return (2**32)/10
+        return self.buffer_size
 
     @property 
     def streaming_mode(self) -> StreamingMode:
@@ -418,7 +391,30 @@ class MOGLabsFZW(DataInStreamInterface, FiniteSamplingInputInterface):
                   channel_buffer_size: int,
                   sample_rate: float) -> None:
         """ Configure a data stream. See read-only properties for information on each parameter. """
-        # self.log.warning("There is nothing to configure on the MOGLabs FZW!")
+        with self._lock:
+            self.buffer_size = channel_buffer_size
+            self._prepare_buffers()
+            self.instream_rate = sample_rate
+
+    # SwitchInterface
+    @property
+    def name(self):
+        return "FZW"
+    @property
+    def available_states(self):
+        return {
+                "MEAS,EXTRIG":("OFF", "ON")
+        }
+    def get_state(self, switch):
+        with self._lock:
+            st = self._get_trig()
+            if "ON" in st:
+                return "ON"
+            else:
+                return "OFF"
+    def set_state(self, switch, state):
+        with self._lock:
+            self._set_trig(state)
 
     # FiniteSamplingInputInterface
     @constraints.overload("FiniteSamplingInputInterface")
@@ -432,8 +428,8 @@ class MOGLabsFZW(DataInStreamInterface, FiniteSamplingInputInterface):
 
     @property
     def samples_in_buffer(self):
-        return 1
-    
+        return self._current_buffer_position
+
     def set_active_channels(self, _):
         pass 
 
@@ -444,26 +440,40 @@ class MOGLabsFZW(DataInStreamInterface, FiniteSamplingInputInterface):
         self._frame_size = size
 
     def start_buffered_acquisition(self):
-        self._set_oneshot_acquisition()
+        self.instream_running = self.module_state() == "locked"
+        if self.instream_running:
+            self.stop_stream()
+        if self.module_state() == "idle":
+            self.module_state.lock()
+            with self._lock:
+                self._set_trig("on")
+                self._prepare_buffers()
+            self._start_continuous_read()
+        else:
+            self.log.warning('Unable to start input stream. It is already running.')
 
     def stop_buffered_acquisition(self):
-        pass
+        self.log.info("Requested stop.")
+        if self.module_state() == 'locked':
+            self._stop_continuous_read()
+            self.module_state.unlock()
+            if self.instream_running:
+                self.start_stream()
+        else:
+            self.log.warning('Unable to stop wavemeter input stream as nothing is running.')
 
     def get_buffered_samples(self, number_of_samples: Optional[int] =None):
+        if number_of_samples is None:
+            number_of_samples = self.samples_in_buffer
+        if number_of_samples > len(self._data_buffer):
+            raise ValueError(f"You are asking for too many samples ({number_of_samples} for a maximum of {self.frame_size}.")
+        while self.samples_in_buffer < number_of_samples:
+            time.sleep(self.poll_time/1000)
         with self._lock:
-            if number_of_samples is None:
-                buffer_data, _, l = self._dump_data()
-                return {"wavelength": buffer_data}
-            elif number_of_samples > self.frame_size:
-                raise ValueError(f"You are asking for too many samples ({number_of_samples} for a maximum of {self.frame_size}.")
-            else:
-                buffer_data, _, l = self._dump_data()
-                while l < number_of_samples:
-                    time.sleep(0.1)
-                    added_buffer_data, added_buffer_timestamp, added_l = self._dump_data()
-                    l += added_l
-                    buffer_data = np.concatenate(buffer_data, added_buffer_data)
-                return {"wavelength": buffer_data[:number_of_samples]}
+            data_buffer = np.empty(number_of_samples,dtype=np.float64)
+            data_buffer[:number_of_samples] = self._data_buffer[:number_of_samples]
+            self._roll_buffers(number_of_samples)
+            return {"wavelength": data_buffer}
 
     def acquire_frame(self, frame_size=None):
         old_frame_size = self.frame_size

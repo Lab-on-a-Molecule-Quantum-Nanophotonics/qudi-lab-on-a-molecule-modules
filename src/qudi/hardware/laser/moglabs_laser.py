@@ -27,17 +27,162 @@ from typing import Union, Optional, Tuple, Sequence
 
 from PySide2 import QtCore
 
+import serial
 import numpy as np
 
 from qudi.core.configoption import ConfigOption
 # from qudi.interface.scanning_laser_interface import ScanningLaserInterface, ScanningState, ScanningLaserReturnError
 from qudi.interface.data_instream_interface import DataInStreamInterface, DataInStreamConstraints, SampleTiming, StreamingMode, ScalarConstraint
+from qudi.interface.process_control_interface import ProcessControlConstraints, ProcessControlInterface
+from qudi.interface.switch_interface import SwitchInterface
 from qudi.interface.finite_sampling_input_interface import FiniteSamplingInputInterface, FiniteSamplingInputConstraints
-from qudi.interface.motor_interface import MotorInterface
 from qudi.util.mutex import Mutex
 from qudi.util.overload import OverloadedAttribute
 
-class MOGLabsLaser(DataInStreamInterface, FiniteSamplingInputInterface, MotorInterface):
+class MOGLABSMotorizedLaserDriver(SwitchInterface):
+    """
+    Control the Laser diode driver directly.
+    """
+    port = ConfigOption("port")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.serial = serial.Serial()
+
+    # Qudi activation / deactivation
+    def on_activate(self):
+        """Activate module.
+        """
+        self.serial.baudrate=115200
+        self.serial.bytesize=8
+        self.serial.parity='N'
+        self.serial.stopbits=1
+        self.serial.timeout=1
+        self.serial.writeTimeout=0
+        self.serial.port=self.port
+        self.serial.open()
+
+    def on_deactivate(self):
+        """Deactivate module.
+        """
+        self.serial.close()
+
+    @property
+    def name(self):
+        return "LDD"
+    @property
+    def available_states(self):
+        return {
+                "HV,MOD":("EXT", "RAMP")
+        }
+    def get_state(self, switch):
+        return self._mod_status()
+    def set_state(self, switch, state):
+        self._set_mod_status(state)
+
+    # Internal communication facilities
+    def send_and_recv(self, value, check_ok=True):
+        if not value.endswith("\r\n"):
+            value += "\r\n"
+        self.serial.write(value.encode("utf8"))
+        ret = self.serial.readline().decode('utf8')
+        if check_ok and not ret.startswith("OK"):
+            self.log.error(f"Command \"{value}\" errored: \"{ret}\"")
+        return ret
+
+    def _mod_status(self):
+        return self.send_and_recv("hv,mod", check_ok=False).rstrip()
+        
+    def _set_mod_status(self, val):
+        return self.send_and_recv(f"hv,mod,{val}")
+
+class MOGLABSCateyeLaser(ProcessControlInterface):
+    port = ConfigOption("port")
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.serial = serial.Serial()
+
+    # Qudi activation / deactivation
+    def on_activate(self):
+        """Activate module.
+        """
+        self.serial.baudrate=115200
+        self.serial.bytesize=8
+        self.serial.parity='N'
+        self.serial.stopbits=1
+        self.serial.timeout=1
+        self.serial.writeTimeout=0
+        self.serial.port=self.port
+        self.serial.open()
+
+    def on_deactivate(self):
+        """Deactivate module.
+        """
+        self.serial.close()
+    def set_setpoint(self, channel, value):
+        self._set_motor_position(value)
+
+    def get_setpoint(self, channel):
+        return self._get_motor_setpoint()
+
+    def get_process_value(self, channel):
+        return self._motor_position()
+
+    def set_activity_state(self, channel, active):
+        """ Set activity state for given channel.
+        State is bool type and refers to active (True) and inactive (False).
+        """
+        pass
+
+    def get_activity_state(self, channel):
+        """ Get activity state for given channel.
+        State is bool type and refers to active (True) and inactive (False).
+        """
+        return True
+
+    def constraints(self):
+        """ Read-Only property holding the constraints for this hardware module.
+        See class ProcessControlConstraints for more details.
+        """
+        return ProcessControlConstraints(
+            ["grating"],
+            ["grating"],
+            {"grating":"step"},
+            {"grating":self._motor_range()},
+            {"grating":int},
+        )
+        
+    # Internal communication facilities
+    def send_and_recv(self, value, check_ok=True):
+        if not value.endswith("\r\n"):
+            value += "\r\n"
+        self.serial.write(value.encode("utf8"))
+        ret = self.serial.readline().decode('utf8')
+        if check_ok and not ret.startswith("OK"):
+            self.log.error(f"Command \"{value}\" errored: \"{ret}\"")
+        return ret
+
+    def _motor_range(self):
+        mini,maxi = self.send_and_recv("motor,travel", check_ok=False).split(" ")
+        return int(mini), int(maxi)
+    
+    def _motor_position(self):
+        return int(self.send_and_recv("motor,position", check_ok=False))
+        
+    def _set_motor_position(self, value):
+        return self.send_and_recv(f"motor,dest,{value}")
+        
+    def _get_motor_setpoint(self):
+        return int(self.send_and_recv(f"motor,dest", check_ok=False))
+        
+    def _move_motor_rel(self, value):
+        return self.send_and_recv(f"motor,step,{value}")
+
+    def _motor_status(self):
+        return self.send_and_recv("motor,status").rstrip()
+        
+
+class MOGLabsLaser(DataInStreamInterface, FiniteSamplingInputInterface):
     """A class to control our MOGLabs laser to perform excitation spectroscopy.
 
     Example config:
