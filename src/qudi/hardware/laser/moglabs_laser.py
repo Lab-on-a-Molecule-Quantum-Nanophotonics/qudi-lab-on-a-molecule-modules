@@ -74,11 +74,24 @@ class MOGLABSMotorizedLaserDriver(SwitchInterface):
     def available_states(self):
         return {
                 "HV,MOD":("EXT", "RAMP")
+                "Temp. control":("OFF", "ON")
+                "Curr. control":("OFF", "ON")
         }
     def get_state(self, switch):
-        return self._mod_status()
+        if switch == "HV,MOD":
+            return self._mod_status()
+        elif switch == "Temp. control":
+            return self._temp_status()
+        else:
+            return self._current_status()
+
     def set_state(self, switch, state):
-        self._set_mod_status(state)
+        if switch == "HV,MOD":
+            self._set_mod_status(state)
+        elif switch == "Temp. control":
+            self._set_temp_status(state)
+        else:
+            self._set_current_status(state)
 
     # Internal communication facilities
     def send_and_recv(self, value, check_ok=True):
@@ -95,6 +108,18 @@ class MOGLABSMotorizedLaserDriver(SwitchInterface):
         
     def _set_mod_status(self, val):
         return self.send_and_recv(f"hv,mod,{val}")
+
+    def _temp_status(self):
+        return self.send_and_recv("TEC,ONOFF", check_ok=False).rstrip()
+        
+    def _set_temp_status(self, val):
+        return self.send_and_recv(f"TEC,ONOFF,{val}")
+
+    def _current_status(self):
+        return self.send_and_recv("CURRENT,ONOFF", check_ok=False).rstrip()
+        
+    def _set_current_status(self, val):
+        return self.send_and_recv(f"CURRENT,ONOFF,{val}")
 
 class MOGLABSCateyeLaser(ProcessControlInterface):
     port = ConfigOption("port")
