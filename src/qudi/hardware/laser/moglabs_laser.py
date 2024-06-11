@@ -36,8 +36,11 @@ from qudi.interface.data_instream_interface import DataInStreamInterface, DataIn
 from qudi.interface.process_control_interface import ProcessControlConstraints, ProcessControlInterface
 from qudi.interface.switch_interface import SwitchInterface
 from qudi.interface.finite_sampling_input_interface import FiniteSamplingInputInterface, FiniteSamplingInputConstraints
+from qudi.interface.scanning_probe_interface import ScanningProbeInterface, ScanData, ScannerChannel, ScannerAxis, ScanConstraints
 from qudi.util.mutex import Mutex
+from qudi.core.connector import Connector
 from qudi.util.overload import OverloadedAttribute
+from qudi.util.helpers import in_range
 
 class MOGLABSMotorizedLaserDriver(SwitchInterface):
     """
@@ -59,7 +62,7 @@ class MOGLABSMotorizedLaserDriver(SwitchInterface):
         self.serial.stopbits=1
         self.serial.timeout=1
         self.serial.writeTimeout=0
-        self.serial.port=self.port
+     self.serial.port=self.port
         self.serial.open()
 
     def on_deactivate(self):
@@ -207,514 +210,619 @@ class MOGLABSCateyeLaser(ProcessControlInterface):
         return self.send_and_recv("motor,status").rstrip()
         
 
-class MOGLabsLaser(DataInStreamInterface, FiniteSamplingInputInterface):
+class MOGLabsConfocalScanningLaserInterfuse(ScanningProbeInterface):
     """A class to control our MOGLabs laser to perform excitation spectroscopy.
 
     Example config:
 
     """
-    address = ConfigOption('address', "127.0.0.1")
-    port = ConfigOption('port', 7805)
-    timeout_seconds = ConfigOption('timeout_seconds', 0.2)
-    set_mode = ConfigOption('set_mode', "fast")
-    refresh_rate = ConfigOption('refresh_rate', 10)
-    _grating_steps = ConfigOption('grating_steps', 100)
+    cem = Connector(name="cateye_laser", interface="ProcessControlInterface")
+    ldd = Connector(name="laser_driver", interface="SwitchInterface")
+    fzw_sampling = Connector(name="wavemeter_sampling", interface="FiniteSamplingInputInterface")
+    fzw_switch = Connector(name="wavemeter_switch", interface="SwitchInterface")
+    ni_sampling = Connector(name="dac", interface="FiniteSamplingIOInterface")
+    ni_ao = Connector(name='analog_output', interface='ProcessSetpointInterface')
 
-    sig_connect_cem = QtCore.Signal()
-    sig_scan_done = QtCore.Signal()
-    _sig_next_frame = QtCore.Signal()
-    _sig_send_data = QtCore.Signal(str)
+    _ni_piezo_channel = ConfigOption(name="ni_piezo_channel", missing="error")
+    _ni_apd_channel = ConfigOption(name="ni_apd_channel", missing="error")
+
+    _threaded = True  # Interfuse is by default not threaded.
+
+    sigNextDataChunk = QtCore.Signal()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._constraints: Optional[DataInStreamConstraints] = None
-        #self.socket_thread = QtCore.QThread()
-        #self._socket_handler = SocketHandler(self)
-        self._lock = Mutex()
-        self._data_buffer: Optional[np.ndarray] = None
-        self._timestamp_buffer: Optional[np.ndarray] = None
-        self._current_buffer_position = 0
-        self._time_offset = 0
-        self._last_read = 0
-        self._frame_size = 1
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.timeouted = False
 
-    # Qudi activation / deactivation
+        self.axes=[]
+        self.channels=[]
+        self.constraints=None
+        self.scan_settings=None
+        self._scan_data = None
+
+        self._current_scan_frequency = -1
+        self._current_scan_ranges = [tuple(), tuple()]
+        self._current_scan_axes = tuple()
+        self._current_scan_resolution = tuple()
+
+        self._target_pos = dict()
+        self._stored_target_pos = dict()
+
+        self._min_step_interval = 1e-3
+        self._scanner_distance_atol = 1e-9
+        self._start_scan_after_cursor = False
+        self._abort_cursor_move = True
+        self.__t_last_follow = None
+        
+        self._grating_positions = None
+        self._is_moving_grating = False
+        self._grating_position_index = 0
+
+        self.__ni_ao_write_timer = None
+        self._thread_lock_cursor = Mutex()
+        self._thread_lock_data = Mutex()
+
     def on_activate(self):
-        """Activate module.
-        """
-        self.log.info("Starting the MOGLabs laser.")
-        #self._socket_handler.moveToThread(self.socket_thread)
-        #self.response_queue = queue.Queue()
-        #self.sig_connect_cem.connect(self._socket_handler.run, QtCore.Qt.QueuedConnection)
-        #self._socket_handler.response_received.connect(self.on_receive, QtCore.Qt.QueuedConnection)
-        #self._sig_send_data.connect(self._socket_handler.send, QtCore.Qt.QueuedConnection)
-        # Enable external modulation once connected to the interface.
-        #self._socket_handler.connection_established.connect(self._external_modulation, QtCore.Qt.QueuedConnection)
-        #self.socket_thread.start()
-        #self.sig_connect_cem.emit()
-        self._time_offset = 0
+        self.axes = [
+            ScannerAxis(
+                name="grating",
+                unit="step",
+                value_range=(100, 20000),
+                step_range=(0, 200),
+            ),
+            ScannerAxis(
+                name="piezo",
+                unit="V",
+                value_range=(-10,10),
+                step_range=(0, 10),
+                resolution_range=(1e-4, 10),
+            ),
+        ]
+        self.channels = [
+            ScannerChannel(
+                name="APD",
+                unit="c/s",
+            ),
+            ScannerChannel(
+                name="wavelength",
+                unit="m",
+            )
+        ]
+        self.constraints = ScanConstraints(
+            axes=self.axes,
+            channels=self.channels,
+            backscan_configurable=False,
+            has_position_feedback=True,
+            square_px_only=False,
+        )
 
-        self._constraints = DataInStreamConstraints(
-            channel_units = {
-                'wavelength': 'nm',
-            },
-            sample_timing=SampleTiming.TIMESTAMP,
-            streaming_modes = [StreamingMode.CONTINUOUS],
-            data_type=np.float64,
-            channel_buffer_size=ScalarConstraint(default=2**16,
-                                                 bounds=(2, (2**32)//10),
-                                                 increment=1,
-                                                 enforce_int=True),
-            sample_rate=ScalarConstraint(default=2,bounds=(2,2),increment=0),
-        )
-        self._constraints_finite_sampling = FiniteSamplingInputConstraints(
-            channel_units = {
-                'wavelength': 'm',
-            },
-            frame_size_limits=(1,2**16),
-            sample_rate_limits=(1,1e3),
-        )
-        self.log.info("Connecting to MOGLabs interface.")
-        self.socket.connect((self.address, self.port))
-        self.timeouted = False
-        self.socket.settimeout(1)
-        self._external_modulation()
+        self._target_pos = self.get_position()  
+        self._toggle_piezo_setpoint_channel(False)  # And free ao resources after that
+        self._t_last_move = time.perf_counter()
+        self.sigNextDataChunk.connect(self._fetch_data_chunk, QtCore.Qt.QueuedConnection)
 
     def on_deactivate(self):
-        """Deactivate module.
-        """
-        self._external_modulation(False)
-        #self.socket_thread.quit()
-        #self._socket_handler.response_received.disconnect()
-        #self.sig_connect_cem.disconnect()
-        self.log.info("Disconnecting from MOGLabs interface.")
-        self.socket.close()
-        self.stop_stream()
-        self._data_buffer = None
-        self._timestamp_buffer = None
+        self._abort_cursor_movement()
+        if self.ni_sampling().is_running:
+            self.ni_sampling().stop_buffered_frame()
+        if self.fzw_sampling().is_running:
+            self.fzw_sampling().stop_buffered_frame()
 
-    # Internal communication facilities
-    def send_and_recv(self, value, timeout_s=1, check_ok=True):
-        if self.timeouted:
-            self.timeouted = False
-            self.socket.settimeout(0)
-            chunk = self.socket.recv(1024)
-            while chunk is not None:
-                chunk = self.socket.recv(1024)
-            
-        self.socket.settimeout(timeout_s)
-        self.socket.sendall(value.encode("utf8"))
-        recv = None
-        try:
-            recv = self.socket.recv(1024)
-        except TimeoutError:
-            self.log.warning("Timeout while waiting for a response to %s", value)
-            self.timeouted = True
-        if check_ok:
-            if recv is None:
-                self.log.error(f"Command \"{value}\" did not return.")
-            elif not recv.decode("utf8").startswith("OK"):
-                self.log.error(f"Command \"{value}\" errored: \"{recv}\"")
-                recv = None
-        return recv
-            
-    def _external_modulation(self, on=True):
-        if on:
-            self.log.info("Enabling external modulation for the piezo.")
-            self.send_and_recv("mld,hv,mod,ext", timeout_s=2)
-        else:
-            self.log.info("Disabling external modulation for the piezo.")
-            self.send_and_recv("mld,hv,mod,ramp", timeout_s=2)
+    # Internal facilities
+    def _toggle_piezo_setpoint_channel(self, enable):
+        ni_ao = self._ni_ao()
+        ni_ao.set_activity_state(self._ni_piezo_channel, enable)
 
-    def _set_continuous_acquisition(self):
-        self.log.info("Disabling external triggering of the wavemeter.")
-        ret = self.send_and_recv("fzw,meas,extrig,off")
-        if ret is None:
-            return
-        self.send_and_recv("fzw,meas,clear")
+    @property
+    def _piezo_setpoint_channel_active(self) -> bool:
+        mapped_channels = set(self._ni_channel_mapping.values())
+        return self._ni_ao().activity_states[self._ni_piezo_channel]
 
-    def _set_oneshot_acquisition(self):
-        self.log.info("Enabling external triggering of the wavemeter.")
-        ret = self.send_and_recv("fzw,meas,extrig,on")
-        if ret is None:
-            return
-        self.send_and_recv("fzw,meas,clear")
+    def _shrink_scan_ranges(self, ranges, factor=0.01):
+        lenghts = [stop - start for (start, stop) in ranges]
+        return [(start + factor* lenghts[idx], stop - factor* lenghts[idx]) for idx, (start, stop) in enumerate(ranges)]
 
-    def _dump_data(self, buffer_data : Optional[np.ndarray] = None , buffer_timestamp : Optional[np.ndarray] = None, timeout=0.5) -> Tuple[np.ndarray, np.ndarray, int]:
-        if self.timeouted:
-            self.timeouted = False
-            self.socket.settimeout(0)
-            chunk = self.socket.recv(1)
-            while chunk is not None:
-                chunk = self.socket.recv(1)
-        self.socket.settimeout(timeout)
-        self.socket.sendall(b"fzw,meas,dump")
-        recv = b''
-        while True:
+    def _create_scan_data(self, axes, ranges, resolution, frequency):
+        valid_scan_grid = False
+        i_trial, n_max_trials = 0, 25
+
+        while not valid_scan_grid and i_trial < n_max_trials:
+            if i_trial > 0:
+                ranges = self._shrink_scan_ranges(ranges)
+            scan_data = ScanData(
+                channels=tuple(self._constraints.channels.values()),
+                scan_axes=tuple(self._constraints.axes[ax] for ax in axes),
+                scan_range=ranges,
+                scan_resolution=tuple(resolution),
+                scan_frequency=frequency,
+                position_feedback_axes=None)
             try:
-                recv += self.socket.recv(1024)
-            except TimeoutError:
-                self.log.warning("Timeout while waiting for dump response")
-                self.timeouted = True
-                break
-            if recv[-2:] == b'\r\n':
-                break
-        if len(recv) < 0:
-            return np.empty(0),np.empty(0),0
+                ni_scan_dict,grating_scan_array = self._init_scan_arrays(scan_data)
+                valid_scan_grid = True
+            except ValueError:
+                valid_scan_grid = False
+            i_trial += 1
+        if not valid_scan_grid:
+            raise ValueError("Couldn't create scan grid. ")
+        if i_trial > 1:
+            self.log.warning(f"Adapted out-of-bounds scan range to {ranges}")
+        # self.log.debug(f"New scanData created: {self._scan_data.data}")
+        return scan_data
+
+    def _init_scan_arrays(self, scan_data):
+        """
+        @param ScanData scan_data: The desired ScanData instance
+        """
+        assert isinstance(scan_data, ScanData), 'This function requires a scan_data object as input'
+
+        scan_coords = self._init_scan_grid(scan_data)
+        scan_coord = dict()
+        axes = {ax.name: (i,ax) for (i,ax) in enumerate(scan_data.scan_axes)}["piezo"]
+        for index,axis in enumerate(scan_data.scan_axes):
+            resolution = scan_data.scan_resolution[index]
+            stop_points = np.linspace(scan_data.scan_range[index][0], scan_data.scan_range[index][1],
+                                     resolution)
+            scan_coord[axis.name] = stop_points
+        self._check_scan_grid(scan_coords)
+        scan_voltages = {self._ni_piezo_channel: scan_coords["piezo"]}
+        grating_positions = scan_coords["grating"]
+
+        return scan_voltages, grating_positions
+
+    def _check_scan_grid(self, scan_coords):
+        for ax, coords in scan_coords.items():
+            position_min = self.get_constraints().axes[ax].min_value
+            position_max = self.get_constraints().axes[ax].max_value
+            out_of_range = any(coords < position_min) or any(coords > position_max)
+            if out_of_range:
+                raise ValueError(f"Scan axis {ax} out of range [{position_min}, {position_max}]")
+
+    @property
+    def scan_settings(self):
+
+        settings = {'axes': tuple(self._current_scan_axes),
+                    'range': tuple(self._current_scan_ranges),
+                    'resolution': tuple(self._current_scan_resolution),
+                    'frequency': self._current_scan_frequency}
+        return settings
+
+    @property
+    def is_scan_running(self):
+        """
+        Read-only flag indicating the module state.
+
+        @return bool: scanning probe is running (True) or not (False)
+        """
+        # module state used to indicate hw timed scan running
+        #self.log.debug(f"Module in state: {self.module_state()}")
+        #assert self.module_state() in ('locked', 'idle')  # TODO what about other module states?
+        if self.module_state() == 'locked':
+            return True
+        else:
+            return False
+
+    @property
+    def is_move_running(self):
+        with self._thread_lock_cursor:
+            running = self.__t_last_follow is not None
+            return running
+
+    def __wait_on_move_done(self):
         try:
-            recv = eval(recv)
+            t_start = time.perf_counter()
+            while self.is_move_running:
+                self.log.debug(f"Waiting for move done: {self.is_move_running}, {1e3*(time.perf_counter()-t_start)} ms")
+                QGuiApplication.processEvents()
+                time.sleep(self._min_step_interval)
+
+            #self.log.debug(f"Move_abs finished after waiting {1e3*(time.perf_counter()-t_start)} ms ")
         except:
-            self.log.warning("Could not parse the response.")
-            return np.empty(0),np.empty(0),0
+            self.log.exception("")
 
-        size = struct.unpack("<I", recv[:4])[0]
-        number_of_measurements = size//10
-        if buffer_data is None:
-            buffer_data = np.empty(number_of_measurements, dtype=np.float64)
-        if buffer_timestamp is None:
-            buffer_timestamp = np.empty(number_of_measurements, dtype=np.float64)
-        dump_stop = min(number_of_measurements, len(buffer_timestamp))
-        
-        recv = recv[4:]
+    def _prepare_movement(self, position, velocity=None):
+        """
+        Clips values of position to allowed range and fills up the write queue.
+        If re-entered from a different thread, clears current write queue and start
+        a new movement.
+        """
 
-        dump_index = 0
-        remaining_bytes = size
-        d,_ = divmod(len(recv),10)
-        for i in range(0,d*10,10):
-            time,wavelength,_,_,_,_=struct.unpack("<HIbbbb", recv[i:(i+10)])
-            remaining_bytes -= 10
-            if dump_index < dump_stop:
-                buffer_timestamp[dump_index] = time / 1000
-                buffer_data[dump_index] = (wavelength * 1200.0 / (2**32 - 1)) * 1e-9
-                dump_index += 1
+        with self._thread_lock_cursor:
+            self._abort_cursor_move = False
+            if not self._piezo_setpoint_channel_active:
+                self._toggle_piezo_setpoint_channel(True)
 
-        if buffer_timestamp.max() < self._time_offset:
-            buffer_timestamp = buffer_timestamp + self._time_offset
-        self._time_offset += buffer_timestamp.max()
-        perm = np.argsort(buffer_timestamp)
+            constr = self.get_constraints()
 
-        return buffer_data[perm],buffer_timestamp[perm],dump_index+1
-        
-    def _fzw_pid_enabled():
-        r = self.send_and_recv("fzw,pid,status")
-        return r == "ENABLED"
-        
-    def _set_fzw_pid_enabled(state : bool):
-        if state:
-            self.send_and_recv("fzw,pid,enable")
-        else:
-            self.send_and_recv("fzw,pid,disable")
-            
-    def _mod_status(self):
-        return self.send_and_recv("mld,hv,mod", check_ok=False).decode("utf8").rstrip()
-        
-    def _set_mod_status(self, val):
-        return self.send_and_recv(f"mld,hv,mod,{val}")
-        
-    def _motor_range(self):
-        mini,maxi = self.send_and_recv("cem,motor,travel", check_ok=False).decode("utf8").split(" ")
-        return int(mini), int(maxi)
-    
-    def _motor_position(self):
-        return int(self.send_and_recv("cem,motor,position", check_ok=False))
-        
-    def _set_motor_position(self, value):
-        return self.send_and_recv(f"cem,motor,dest,{value}")
-        
-    def _move_motor_rel(self, value):
-        return self.send_and_recv(f"cem,motor,step,{value}")
-        
-    def _frequency(self):
-        f = self.send_and_recv("freq", check_ok=False)
-        if f is None:
-            return np.empty(0)
+            for axis, pos in position.items():
+                in_range_flag, _ = in_range(pos, *constr.axes[axis].value_range)
+                if not in_range_flag:
+                    position[axis] = float(constr.axes[axis].clip_value(position[axis]))
+                    self.log.warning(f'Position {pos} out of range {constr.axes[axis].value_range} '
+                                     f'for axis {axis}. Value clipped to {position[axis]}')
+                # TODO Adapt interface to use "in_range"?
+                self._target_pos[axis] = position[axis]
+
+            #self.log.debug(f"New target pos: {self._target_pos}")
+
+            # TODO Add max velocity as a hardware constraint/ Calculate from scan_freq etc?
+            # if velocity is None:
+            #     velocity = self.__max_move_velocity
+            # v_in_range, velocity = in_range(velocity, 0, self.__max_move_velocity)
+            # if not v_in_range:
+            #     self.log.warning(f'Requested velocity is exceeding the maximum velocity of {self.__max_move_velocity} '
+            #                      f'm/s. Move will be done at maximum velocity')
+            #
+            # self._follow_velocity = velocity
+
+        #self.log.debug("Movement prepared")
+        # TODO Keep other axis constant?
+
+    def __init_ao_timer(self):
+        self.__ni_ao_write_timer = QtCore.QTimer(parent=self)
+
+        self.__ni_ao_write_timer.setSingleShot(True)
+        self.__ni_ao_write_timer.timeout.connect(self.__ao_cursor_write_loop, QtCore.Qt.QueuedConnection)
+        self.__ni_ao_write_timer.setInterval(1e3*self._min_step_interval)  # (ms), dynamically calculated during write loop
+
+    def __start_ao_write_timer(self):
+        #self.log.debug(f"ao start write timer in thread {self.thread()}, QT.QThread {QtCore.QThread.currentThread()} ")
         try:
-            return np.array(float(f)),None 
-        except ValueError:
-            return np.empty(0), None
-        
-    def _calibration_scan(self):    
-        mod_status = self._mod_status()
-        self._set_mod_status("none")
-        mini,maxi = self._motor_range()
-        self._motor_positions = np.arange(start=mini, stop=maxi, step=500, dtype=int)
-        self._frequencies = np.empty(len(self._motor_positions), dtype=np.float64)
-        self.log.info("Starting calibration scan...")
-        for i in range(len(self._motor_positions)):
-            self._set_motor_position(self._motor_positions[i])
-            while self._motor_position() != self._motor_positions[i]:
-                time.sleep(0.1)
-            self.send_and_recv("fzw,meas,softrig")
-            f = self.send_and_recv("freq", check_ok=False)
-            if f is None:
-                self._frequencies[i] = np.nan
+            if not self.is_move_running:
+                #self.log.debug("Starting AO write timer...")
+                if self.thread() is not QtCore.QThread.currentThread():
+                    QtCore.QMetaObject.invokeMethod(self.__ni_ao_write_timer,
+                                                    'start',
+                                                    QtCore.Qt.BlockingQueuedConnection)
+                else:
+                    self.__ni_ao_write_timer.start()
+            else:
+                pass
+                #self.log.debug("Dropping timer start, already running")
+
+        except:
+            self.log.exception("")
+
+    def __ao_cursor_write_loop(self):
+
+        t_start = time.perf_counter()
+        try:
+            current_pos_vec = self._pos_dict_to_vec(self.get_position(self))
+
+            with self._thread_lock_cursor:
+                stop_loop = self._abort_cursor_move
+                target_pos_vec = self._pos_dict_to_vec(self._target_pos)
+                connecting_vec = target_pos_vec - current_pos_vec
+                distance_to_target = np.linalg.norm(connecting_vec)
+
+                # Terminate follow loop if target is reached
+                if distance_to_target < self._scanner_distance_atol:
+                    stop_loop = True
+
+                if not stop_loop:
+                    if not self.__t_last_follow:
+                        self.__t_last_follow = time.perf_counter()
+                    if not self._piezo_setpoint_channel_active:
+                        self._toggle_piezo_setpoint_channel(True)
+                    self.ni_ao().set_setpoint(self._ni_piezo_channel, self._target_pos["piezo"])
+                    self.cem().set_setpoint("grating", self._target_pos["grating"])
+                    self.__ni_ao_write_timer.start(int(round(1000 * self._min_step_interval)))
+            if stop_loop:
+                #self.log.debug(f'Cursor_write_loop stopping at {current_pos_vec}, dist= {distance_to_target}')
+                self._abort_cursor_movement()
+
+                if self._start_scan_after_cursor:
+                    self._start_hw_timed_scan()
+        except:
+            self.log.exception("Error in ao write loop: ")
+
+    def _pos_dict_to_vec(self, position):
+        pos_list = [el[1] for el in sorted(position.items())]
+        return np.asarray(pos_list)
+
+    def _abort_cursor_movement(self):
+        """
+        Abort the movement and release ni_ao resources.
+        """
+
+        #self.log.debug(f"Aborting move.")
+        self._target_pos = self.get_position(self)
+
+        with self._thread_lock_cursor:
+            self._abort_cursor_move = True
+            self.__t_last_follow = None
+            self._toggle_piezo_setpoint_channel(False)
+
+    def _move_to_and_start_scan(self, position):
+        self._prepare_movement(position)
+        self._start_scan_after_cursor = True
+        #self.log.debug("Starting timer to move to scan position")
+        self.__start_ao_write_timer()
+
+    def _start_hw_timed_scan(self):
+        try:
+            self.ni_sampling().start_buffered_frame()
+            self.fzw_sampling().start_buffered_frame()
+            self.sigNextDataChunk.emit()
+        except Exception as e:
+            self.log.error(f'Could not start frame due to {str(e)}')
+            self.module_state.unlock()
+
+        self._start_scan_after_cursor = False
+
+    def _fetch_data_chunk(self):
+        if self._is_moving_grating:
+            if self.cem().get_setpoint("grating") == self.cem().get_process_value("grating"):
+self._is_moving_grating = False
+                self.ni_sampling().start_buffered_frame()
+                self.fzw_sampling().start_buffered_frame()
+            self.sigNextDataChunk.emit()
+            return
+        try:
+            # self.log.debug(f'fetch chunk: {self._ni_finite_sampling_io().samples_in_buffer}, {self.is_scan_running}')
+            # chunk_size = self._scan_data.scan_resolution[0] + self.__backwards_line_resolution
+            chunk_size = 10  # TODO Hardcode or go line by line as commented out above?
+            # Request a minimum of chunk_size samples per loop
             try:
-                self._frequencies[i] = float(f) 
-            except ValueError:
-                self._frequencies[i] = np.nan
-        self._motor_positions = self._motor_positions[self._frequencies != np.nan]
-        self._frequencies = self._frequencies[self._frequencies != np.nan]
-        self._set_mod_status(mod_status)        
-        self.log.info("Calibration scan done.")
-        
-    # DataInStreamInterface
-    constraints = OverloadedAttribute()
-    @constraints.overload("DataInStreamInterface")
-    @property
-    def constraints(self) -> DataInStreamConstraints:
-        if self._constraints is None:
-            raise ValueError("Constraints have not yet been initialized.")
-        return self._constraints
-
-    def start_stream(self) -> None:
-        """ Start the data acquisition/streaming """
-        with self._lock:
-            if self.module_state() == 'idle':
-                self.module_state.lock()
-                self._set_continuous_acquisition()
-            else:
-                self.log.warning('Unable to start input stream. It is already running.')
-
-    def stop_stream(self) -> None:
-        """ Stop the data acquisition/streaming """
-        with self._lock:
-            if self.module_state() == 'locked':
-                self.module_state.unlock()
-            else:
-                self.log.warning('Unable to stop wavemeter input stream as nothing is running.')
-
-    def read_data_into_buffer(self,
-                              data_buffer: np.ndarray,
-                              samples_per_channel: int,
-                              timestamp_buffer: Optional[np.ndarray] = None) -> None:
-        """ Read data from the stream buffer into a 1D numpy array given as parameter.
-        Samples of all channels are stored interleaved in contiguous memory.
-        In case of a multidimensional buffer array, this buffer will be flattened before written
-        into.
-        The 1D data_buffer can be unraveled into channel and sample indexing with:
-
-            data_buffer.reshape([<samples_per_channel>, <channel_count>])
-
-        The data_buffer array must have the same data type as self.constraints.data_type.
-
-        In case of SampleTiming.TIMESTAMP a 1D numpy.float64 timestamp_buffer array has to be
-        provided to be filled with timestamps corresponding to the data_buffer array. It must be
-        able to hold at least <samples_per_channel> items:
-
-        If the number of available samples is too low, you will get zeros at the end.
-        """
-        with self._lock:
-            if self.module_state() != 'locked':
-                raise RuntimeError('Unable to read data. Stream is not running.')
-            self._dump_data(data_buffer, timestamp_buffer)
-
-    def read_available_data_into_buffer(self,
-                                        data_buffer: np.ndarray,
-                                        timestamp_buffer: Optional[np.ndarray] = None) -> int:
-        """ Read data from the stream buffer into a 1D numpy array given as parameter.
-        All samples for each channel are stored in consecutive blocks one after the other.
-        The number of samples read per channel is returned and can be used to slice out valid data
-        from the buffer arrays like:
-
-            valid_data = data_buffer[:<channel_count> * <return_value>]
-            valid_timestamps = timestamp_buffer[:<return_value>]
-
-        See "read_data_into_buffer" documentation for more details.
-
-        This method will read all currently available samples into buffer. If number of available
-        samples exceeds buffer size, read only as many samples as fit into the buffer and drop the rest.
-        """
-        with self._lock:
-            if self.module_state() != 'locked':
-                raise RuntimeError('Unable to read data. Stream is not running.')
-            if timestamp_buffer is None:
-                raise RuntimeError(
-                    'SampleTiming.TIMESTAMP mode requires a timestamp buffer array'
-                )
-
-            return self._dump_data(data_buffer, timestamp_buffer)[-1]
-
-    def read_data(self,
-                  samples_per_channel: Optional[int] = None
-                  ) -> Tuple[np.ndarray, Union[np.ndarray, None]]:
-        """ Read data from the stream buffer into a 1D numpy array and return it.
-        All samples for each channel are stored in consecutive blocks one after the other.
-        The returned data_buffer can be unraveled into channel samples with:
-
-            data_buffer.reshape([<samples_per_channel>, <channel_count>])
-
-        The numpy array data type is the one defined in self.constraints.data_type.
-
-        In case of SampleTiming.TIMESTAMP a 1D numpy.float64 timestamp_buffer array will be
-        returned as well with timestamps corresponding to the data_buffer array.
-
-        If samples_per_channel is omitted all currently available samples are read from buffer.
-        This method will not return until all requested samples have been read or a timeout occurs.
-        """
-        with self._lock:
-            if self.module_state() != 'locked':
-                raise RuntimeError('Unable to read data. Stream is not running.')
-
-            buffer_data, buffer_timestamp, l = self._dump_data()
-            if samples_per_channel is not None and l > samples_per_channel:
-                buffer_data = buffer_data[:samples_per_channel]
-                buffer_timestamp = buffer_timestamp[:samples_per_channel]
-            return buffer_data, buffer_timestamp
-
-    def read_single_point(self) -> Tuple[np.ndarray, Union[None, np.float64]]:
-        """ This method will initiate a single sample read on each configured data channel.
-        In general this sample may not be acquired simultaneous for all channels and timing in
-        general can not be assured. Us this method if you want to have a non-timing-critical
-        snapshot of your current data channel input.
-        May not be available for all devices.
-        The returned 1D numpy array will contain one sample for each channel.
-
-        In case of SampleTiming.TIMESTAMP a single numpy.float64 timestamp value will be returned
-        as well.
-        """
-        with self._lock:
-            if self.module_state() != 'locked':
-                raise RuntimeError('Unable to read data. Stream is not running.')
-            self.send_and_recv("fzw,meas,softrig")
-            f = self.send_and_recv("freq", check_ok=False)
-            if f is None:
-                return np.empty(0),None
+                samples_dict_ni = self.ni_sampling().get_buffered_samples(chunk_size) \
+                    if self.ni_sampling().samples_in_buffer < chunk_size\
+                    else self.ni_sampling().get_buffered_samples()
+            except ValueError:  # ValueError is raised, when more samples are requested then pending or still to get
+                # after HW stopped
+                samples_dict_ni = self.ni_sampling().get_buffered_samples()
             try:
-                return np.array(float(f)),None 
-            except ValueError:
-                return np.empty(0), None
+                samples_dict_fzw = self.fzw_sampling().get_buffered_samples(chunk_size) \
+                    if self.fzw_sampling().samples_in_buffer < chunk_size\
+                    else self.fzw_sampling().get_buffered_samples()
+            except ValueError:  # ValueError is raised, when more samples are requested then pending or still to get
+                samples_dict_fzw = self.fzw_sampling().get_buffered_samples()
+            new_data = {samples_dict_ni**, samples_dict_fzw**}
+            with self._thread_lock_data:
+                data = self._scan_data.data
+                first_nan_idx = np.sum(~np.isnan(next(iter(data.values()))))
+                for key,samples in new_data.items():
+                    data[key][first_nan_idx:first_nan_idx+len(samples)] = samples
+                self._scan_data.data = data
 
-    @property
-    def available_samples(self) -> int:
-        # self.log.warning("Available samples reading is not available on the MOGLabs FZW.")
-        return 1
+                first_nan_idx = np.sum(~np.isnan(next(iter(data.values()))))
+                line_finished = first_nan_idx == self._number_of_datapoints
+                end_reached = line_finished && self._grating_position_index == len(self._grating_positions)
 
-    @property
-    def sample_rate(self) -> float:
-        # self.log.warning("Sample rate reading is not available on the MOGLabs FZW.")
-        return 1e3
+                if end_reached:
+                    self.stop_scan()
+                elif line_finished:
+                    self._is_moving_grating = True
+                    self.cem().set_setpoint("grating", self._grating_positions[self._grating_position_index])
+                    self._grating_position_index += 1
+                    self.sigNextDataChunk.emit()
+                elif not self.is_scan_running:
+                    return
+                else:
+                    self.sigNextDataChunk.emit()
 
-    @property
-    def channel_buffer_size(self) -> int:
-        return (2**32)/10
+        except:
+            self.log.exception("")
+            self.stop_scan()
 
-    @property 
-    def streaming_mode(self) -> StreamingMode:
-        return StreamingMode.CONTINUOUS
-
-    @property
-    def active_channels(self):
-        return ['wavelength']
-
-    def configure(self,
-                  active_channels: Sequence[str],
-                  streaming_mode: Union[StreamingMode, int],
-                  channel_buffer_size: int,
-                  sample_rate: float) -> None:
-        """ Configure a data stream. See read-only properties for information on each parameter. """
-        # self.log.warning("There is nothing to configure on the MOGLabs FZW!")
-
-    # FiniteSamplingInputInterface
-    @constraints.overload("FiniteSamplingInputInterface")
-    @property
-    def constraints(self):
-        return self._constraints_finite_sampling
-
-    @property 
-    def frame_size(self):
-        return self._frame_size
-
-    @property
-    def samples_in_buffer(self):
-        return 1
-    
-    def set_active_channels(self, _):
-        pass 
-
-    def set_sample_rate(self, rate):
-        pass
-
-    def set_frame_size(self, size):
-        self._frame_size = size
-
-    def start_buffered_acquisition(self):
-        self._set_oneshot_acquisition()
-
-    def stop_buffered_acquisition(self):
-        self._set_continuous_acquisition()
-
-    def get_buffered_samples(self, number_of_samples: Optional[int] =None):
-        with self._lock:
-            if number_of_samples is None:
-                buffer_data, _, l = self._dump_data(timeout=3)
-                return {"wavelength": buffer_data}
-            elif number_of_samples > self.frame_size:
-                raise ValueError(f"You are asking for too many samples ({number_of_samples} for a maximum of {self.frame_size}.")
-            else:
-                buffer_data, _, l = self._dump_data(timeout=3)
-                while l < number_of_samples:
-                    time.sleep(0.1)
-                    added_buffer_data, added_buffer_timestamp, added_l = self._dump_data(timeout=3)
-                    l += added_l
-                    buffer_data = np.concatenate(buffer_data, added_buffer_data)
-                return {"wavelength": buffer_data[:number_of_samples]}
-
-    def acquire_frame(self, frame_size=None):
-        old_frame_size = self.frame_size
-        if frame_size is not None:
-            self.set_frame_size(frame_size)
-        self.start_buffered_acquisition()
-        data = self.get_buffered_samples(self.frame_size)
-        self.stop_buffered_acquisition()
-        if frame_size is not None:
-            self.set_frame_size(old_frame_size)
-        return data
-
-    # MotorInterface
-    
+    # ScanningProbeInterface
     def get_constraints(self):
-        axis0 = {}
-        axis0['label'] = 'grating'
-        axis0['unit'] = None
-        axis0['ramp'] = None
-        mini,maxi = self._motor_range()
-        axis0['pos_min'] = mini
-        axis0['pos_max'] = maxi
-        axis0['pos_step'] = self._grating_steps
-        axis0['vel_min'] = None
-        axis0['vel_max'] = None
-        axis0['vel_step'] = None
-        axis0['acc_min'] = None
-        axis0['acc_max'] = None
-        axis0['acc_step'] = None
-        constraints = {}
-        constraints[axis0['label']] = axis0
-        return constraints
-        
-    def move_rel(self,  param_dict):
-        rel = param_dict['grating']
-        self._move_motor_rel(rel)
-        
-    def move_abs(self, param_dict):
-        rel = param_dict['grating']
-        self._set_motor_position(rel)
-        
-    def abort(self):
+        return self.constraints
+    def reset(self):
+        pass
+    def configure_scan(self, settings):
+        if self.is_scan_running:
+            self.log.error("Cannot configure scan parameters while a scan is "
+                           "running. Stop the current scan and try again.")
+            return True, self.scan_settings
+        axes = settings.get('axes', self._current_scan_axes)
+        ranges = tuple(
+            (min(r), max(r)) for r in scan_settings.get('range', self._current_scan_ranges)
+        )
+        resolution = scan_settings.get('resolution', self._current_scan_resolution)
+        frequency = float(scan_settings.get('frequency', self._current_scan_frequency))
+        if not set(axes).issubset(["piezo", "grating"]):
+            self.log.error('Unknown axes names encountered. Valid axes are "piezo" and "grating".')
+            return True, self.scan_settings
+        if len(axes) != len(ranges) or len(axes) != len(resolution):
+            self.log.error('"axes", "range" and "resolution" must have same length.')
+            return True, self.scan_settings
+        for i, ax in enumerate(axes):
+            for axis_constr in self.constraints.axes.values():
+                if ax == axis_constr.name:
+                    break
+            if ranges[i][0] < axis_constr.min_value or ranges[i][1] > axis_constr.max_value:
+                self.log.error('Scan range out of bounds for axis "{0}". Maximum possible range'
+                               ' is: {1}'.format(ax, axis_constr.value_range))
+                return True, self.scan_settings
+            if resolution[i] < axis_constr.min_resolution or resolution[i] > axis_constr.max_resolution:
+                self.log.error('Scan resolution out of bounds for axis "{0}". Maximum possible '
+                               'range is: {1}'.format(ax, axis_constr.resolution_range))
+                return True, self.scan_settings
+            if i == 0:
+                if frequency < axis_constr.min_frequency or frequency > axis_constr.max_frequency:
+                    self.log.error('Scan frequency out of bounds for fast axis "{0}". Maximum '
+                                   'possible range is: {1}'
+                                   ''.format(ax, axis_constr.frequency_range))
+                    return True, self.scan_settings
+        with self._thread_lock_data:
+            try:
+                self._scan_data = self._create_scan_data(axes, ranges, resolution, frequency)
+                ni_scan_dict, grating_positions = self._init_scan_arrays(self._scan_data)
+                self._grating_positions = grating_positions
+                self._is_moving_grating = False
+                self._grating_position_index = 0
+
+            except:
+                self.log.exception("")
+                return True, self.scan_settings
+
+        try:
+            self.ni_sampling().set_sample_rate(frequency)
+            self.ni_sampling().set_active_channels(
+                input_channels=(self._ni_apd_channel,),
+                output_channels=(self._ni_apd_channel,)
+            )
+
+            self.ni_sampling().set_output_mode(SamplingOutputMode.JUMP_LIST)
+            self.ni_sampling().set_frame_data(ni_scan_dict)
+
+        except:
+            self.log.exception("")
+            return True, self.scan_settings
+
+        self._current_scan_resolution = tuple(resolution)
+        self._current_scan_ranges = ranges
+        self._current_scan_axes = tuple(axes)
+        self._current_scan_frequency = frequency
+
+        return False, self.scan_settings
+
+    def move_absolute(self, position, velocity=None, blocking=False):
+        if self.is_scan_running:
+            self.log.error('Cannot move the scanner while, scan is running')
+            return self.get_target(self)
+        if not set(position).issubset(self.get_constraints().axes):
+            self.log.error('Invalid axes name in position')
+            return self.get_target(self)
+        try:
+            self._prepare_movement(position, velocity=velocity)
+
+            self.__start_ao_write_timer()
+            if blocking:
+                self.__wait_on_move_done()
+
+            self._t_last_move = time.perf_counter()
+
+            return self.get_target(self)
+        except:
+            self.log.exception("Couldn't move: ")
+
+    def move_relative(self, position, velocity=None, blocking=False):
+        """ Move the scanning probe by a relative distance from the current target position as fast
+        as possible or with a defined velocity.
+
+        Log error and return current target position if something fails or a 1D/2D scan is in
+        progress.
+        """
+        current_position = self.bare_scanner.get_position(self)
+        end_pos = {ax: current_position[ax] + distance[ax] for ax in distance}
+        self.move_absolute(end_pos, velocity=velocity, blocking=blocking)
+
+        return end_pos
+    def get_target(self):
+        if self.is_scan_running:
+            return self._stored_target_pos
+        else:
+            return self._target_pos
+    def get_position(self):
+        """ Get a snapshot of the actual scanner position (i.e. from position feedback sensors).
+        For the same target this value can fluctuate according to the scanners positioning accuracy.
+
+        For scanning devices that do not have position feedback sensors, simply return the target
+        position (see also: ScanningProbeInterface.get_target).
+
+        @return dict: current position per axis.
+        """
+        with self._thread_lock_cursor:
+            if not self._piezo_setpoint_channel_active:
+                self._toggle_piezo_setpoint_channel(True)
+            ao_positions = self.ni_ao().setpoints
+            piezo_voltage = ao_positions[self._ni_piezo_channel.lower()]
+            grating_position = self.cem().setpoints["grating"]
+
+            pos = {
+                "piezo": piezo_voltage,
+                "grating": grating_position
+            }
+
+            return pos
+    def start_scan(self):
+        try:
+            #self.log.debug(f"Start scan in thread {self.thread()}, QT.QThread {QtCore.QThread.currentThread()}... ")
+            if self.thread() is not QtCore.QThread.currentThread():
+                QtCore.QMetaObject.invokeMethod(self, '_start_scan',
+                                                QtCore.Qt.BlockingQueuedConnection)
+            else:
+                self._start_scan()
+        except:
+            self.log.exception("")
+            return -1
+        return 0
+
+    @QtCore.Slot()
+    def _start_scan(self):
+        """
+
+        @return (bool): Failure indicator (fail=True)
+        """
+        try:
+            if self._scan_data is None:
+                # todo: raising would be better, but from this delegated thread exceptions get lost
+                self.log.error('Scan Data is None. Scan settings need to be configured before starting')
+
+            if self.is_scan_running:
+                self.log.error('Cannot start a scan while scanning probe is already running')
+
+            with self._thread_lock_data:
+                self._scan_data.new_scan()
+                #self.log.debug(f"New scan data: {self._scan_data.data}, position {self._scan_data._position_data}")
+                self._stored_target_pos = self.get_target().copy()
+                self.log.debug(f"Target pos at scan start: {self._stored_target_pos}")
+                self._scan_data.scanner_target_at_start = self._stored_target_pos
+
+            # todo: scanning_probe_logic exits when scanner not locked right away
+            # should rather ignore/wait until real hw timed scanning starts
+            self.module_state.lock()
+
+            first_scan_position = {ax: pos[0] for ax, pos
+                                   in zip(self.scan_settings['axes'], self.scan_settings['range'])}
+            self._move_to_and_start_scan(first_scan_position)
+        except Exception:
+            self.module_state.unlock()
+            self.log.exception("Starting scan failed: ")
+    def stop_scan(self):
+        """
+        @return bool: Failure indicator (fail=True)
+        # todo: return values as error codes are deprecated
+        """
+        if self.thread() is not QtCore.QThread.currentThread():
+            QtCore.QMetaObject.invokeMethod(self, '_stop_scan',
+                                            QtCore.Qt.BlockingQueuedConnection)
+        else:
+            self._stop_scan()
+
+        return 0
+
+    @QtCore.Slot()
+    def _stop_scan(self):
+        # self.log.debug("Stopping scan...")
+        self._start_scan_after_cursor = False  # Ensure Scan HW is not started after movement
+        if self._piezo_setpoint_channel_active:
+            self._abort_cursor_movement()
+            # self.log.debug("Move aborted")
+
+        if self.ni_sampling().is_running:
+            self.ni_sampling().stop_buffered_frame()
+            # self.log.debug("Frame stopped")
+        if self.fzw_sampling().is_running:
+            self.fzw_sampling().stop_buffered_frame()
+
+        self.module_state.unlock()
+        # self.log.debug("Module unlocked")
+
+        self.log.debug(f"Finished scan, move to stored target: {self._stored_target_pos}")
+        self.move_absolute(self._stored_target_pos)
+        self._stored_target_pos = dict()
+    def get_scan_data(self):
+        """
+        @return (ScanData): ScanData instance used in the scan
+        """
+        if self._scan_data is None:
+            raise RuntimeError('ScanData is not yet configured, please call "configure_scan" first')
+        try:
+            with self._thread_lock_data:
+                return self._scan_data.copy()
+        except:
+            self.log.exception("")
+    def emergency_stop(self):
+        # There's never an emergency.
         pass
         
-    def get_pos(self, param_list=None):
-        return {'grating': self._motor_position()}
-        
-    def get_status(self, param_list=None):
-        pass
-        
-    def calibrate(self, param_list=None):
-        pass
-        
-    def get_velocity(self, param_list=None):
-        pass
-        
-    def set_velocity(self, param_dict):
-        pass
