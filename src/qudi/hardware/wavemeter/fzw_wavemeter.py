@@ -199,6 +199,7 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
 
     @QtCore.Slot()
     def _instream_buffers_callback(self):
+        t_start = time.perf_counter()
         with self._lock:
             if self._instream_offset < len(self._instream_data_buffer):
                 t = time.time()
@@ -210,7 +211,9 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
                     self._roll_buffers(self._current_buffer_position)
                     self._instream_offset += 1
         if self.module_state() == 'locked':
-            QtCore.QTimer.singleShot(1000/self.instream_rate, self._instream_buffers_callback)
+            t_overhead = time.perf_counter() - t_start
+            QtCore.QTimer.singleShot(int(round(1000 * max(0, 1/self.instream_rate - t_overhead))), self._instream_buffers_callback)
+
     def _roll_instream_buffers(self, n_read):
         np.roll(self._instream_data_buffer, -n_read)
         np.roll(self._instream_timestamp_buffer, -n_read)
