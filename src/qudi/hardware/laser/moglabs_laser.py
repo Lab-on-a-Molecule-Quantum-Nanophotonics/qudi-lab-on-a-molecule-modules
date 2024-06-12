@@ -62,7 +62,7 @@ class MOGLABSMotorizedLaserDriver(SwitchInterface):
         self.serial.stopbits=1
         self.serial.timeout=1
         self.serial.writeTimeout=0
-     self.serial.port=self.port
+        self.serial.port=self.port
         self.serial.open()
 
     def on_deactivate(self):
@@ -76,9 +76,9 @@ class MOGLABSMotorizedLaserDriver(SwitchInterface):
     @property
     def available_states(self):
         return {
-                "HV,MOD":("EXT", "RAMP")
-                "Temp. control":("OFF", "ON")
-                "Curr. control":("OFF", "ON")
+                "HV,MOD":("EXT", "RAMP"),
+                "Temp. control":("OFF", "ON"),
+                "Curr. control":("OFF", "ON"),
         }
     def get_state(self, switch):
         if switch == "HV,MOD":
@@ -236,7 +236,6 @@ class MOGLabsConfocalScanningLaserInterfuse(ScanningProbeInterface):
         self.axes=[]
         self.channels=[]
         self.constraints=None
-        self.scan_settings=None
         self._scan_data = None
 
         self._current_scan_frequency = -1
@@ -268,6 +267,7 @@ class MOGLabsConfocalScanningLaserInterfuse(ScanningProbeInterface):
                 unit="step",
                 value_range=(100, 20000),
                 step_range=(0, 200),
+                resolution_range=(1,10000),
             ),
             ScannerAxis(
                 name="piezo",
@@ -309,13 +309,12 @@ class MOGLabsConfocalScanningLaserInterfuse(ScanningProbeInterface):
 
     # Internal facilities
     def _toggle_piezo_setpoint_channel(self, enable):
-        ni_ao = self._ni_ao()
+        ni_ao = self.ni_ao()
         ni_ao.set_activity_state(self._ni_piezo_channel, enable)
 
     @property
     def _piezo_setpoint_channel_active(self) -> bool:
-        mapped_channels = set(self._ni_channel_mapping.values())
-        return self._ni_ao().activity_states[self._ni_piezo_channel]
+        return self.ni_ao().activity_states[self._ni_piezo_channel]
 
     def _shrink_scan_ranges(self, ranges, factor=0.01):
         lenghts = [stop - start for (start, stop) in ranges]
@@ -551,7 +550,7 @@ class MOGLabsConfocalScanningLaserInterfuse(ScanningProbeInterface):
     def _fetch_data_chunk(self):
         if self._is_moving_grating:
             if self.cem().get_setpoint("grating") == self.cem().get_process_value("grating"):
-self._is_moving_grating = False
+                self._is_moving_grating = False
                 self.ni_sampling().start_buffered_frame()
                 self.fzw_sampling().start_buffered_frame()
             self.sigNextDataChunk.emit()
@@ -574,7 +573,7 @@ self._is_moving_grating = False
                     else self.fzw_sampling().get_buffered_samples()
             except ValueError:  # ValueError is raised, when more samples are requested then pending or still to get
                 samples_dict_fzw = self.fzw_sampling().get_buffered_samples()
-            new_data = {samples_dict_ni**, samples_dict_fzw**}
+            new_data = {**samples_dict_ni, **samples_dict_fzw}
             with self._thread_lock_data:
                 data = self._scan_data.data
                 first_nan_idx = np.sum(~np.isnan(next(iter(data.values()))))
@@ -584,7 +583,7 @@ self._is_moving_grating = False
 
                 first_nan_idx = np.sum(~np.isnan(next(iter(data.values()))))
                 line_finished = first_nan_idx == self._number_of_datapoints
-                end_reached = line_finished && self._grating_position_index == len(self._grating_positions)
+                end_reached = line_finished and self._grating_position_index == len(self._grating_positions)
 
                 if end_reached:
                     self.stop_scan()
@@ -724,9 +723,8 @@ self._is_moving_grating = False
         with self._thread_lock_cursor:
             if not self._piezo_setpoint_channel_active:
                 self._toggle_piezo_setpoint_channel(True)
-            ao_positions = self.ni_ao().setpoints
-            piezo_voltage = ao_positions[self._ni_piezo_channel.lower()]
-            grating_position = self.cem().setpoints["grating"]
+            piezo_voltage = self.ni_ao().get_setpoint(self._ni_piezo_channel.lower())
+            grating_position = self.cem().get_setpoint("grating")
 
             pos = {
                 "piezo": piezo_voltage,
