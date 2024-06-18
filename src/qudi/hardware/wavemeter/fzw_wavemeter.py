@@ -13,13 +13,14 @@ from qudi.core.statusvariable import StatusVar
 # from qudi.interface.scanning_laser_interface import ScanningLaserInterface, ScanningState, ScanningLaserReturnError
 from qudi.interface.data_instream_interface import DataInStreamInterface, DataInStreamConstraints, SampleTiming, StreamingMode, ScalarConstraint
 from qudi.interface.finite_sampling_input_interface import FiniteSamplingInputInterface, FiniteSamplingInputConstraints
+from qudi.interface.process_control_interface import ProcessControlConstraints, ProcessControlInterface
 from qudi.interface.switch_interface import SwitchInterface
 from qudi.util.mutex import Mutex
 from qudi.util.overload import OverloadedAttribute
 
 CRLF=b"\r\n"
 
-class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInterface):
+class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInterface, ProcessControlInterface):
     """A class to control our MOGLabs laser to perform excitation spectroscopy.
 
     Example config:
@@ -78,6 +79,13 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
             frame_size_limits = (1, self.default_buffer_size),
             sample_rate_limits = (1, 4000)
         )
+        self._constraints_process_control = ProcessControlConstraints(
+            ["tension"],
+            ["frequency", "wavelength"],
+            {"tension":"V", "frequency":"THz", "wavelength":"nm"},
+            {"tension":(-2.5,2.5)},
+            {"tension":float, "wavelength":float, "frequency":float},
+        )
         self.serial.baudrate=115200
         self.serial.bytesize=8
         self.serial.parity='N'
@@ -86,6 +94,7 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
         self.serial.writeTimeout=0
         self.serial.port=self.port
         self.serial.open()
+        self._set_offset(0.0)
         if self.auto_start_acquisition :
             self._watchdog_active = True
             self._prepare_buffers()
@@ -129,6 +138,12 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
         return self.send_and_recv("meas,pulse", check_ok=False)
     def _set_pulse(self, st):
         return self.send_and_recv(f"meas,pulse,{st}")
+    def _get_pid_value(self):
+        return float(self.send_and_recv("pid,value", check_ok=False).split()[0])
+    def _set_pid_value(self, v):
+        return self.send_and_recv(f"pid,write,{v}")
+    def _set_offset(self,v):
+        return self.send_and_recv(f"pid,offset,{v}")
     def _dump(self, buffer_data : Optional[np.ndarray] = None , buffer_timestamp : Optional[np.ndarray] = None, dump_start = 0) -> Tuple[np.ndarray, np.ndarray, int]:
         self.serial.reset_input_buffer()
         self.serial.write("meas,dump\r\n".encode("utf8"))
@@ -369,7 +384,7 @@ TypeError: only integer scalar arrays can be converted to a scalar index
             raise RuntimeError('Unable to read data. Stream is not running.')
         with self._lock:
             self._softrig()
-            f = self.send_and_recv("freq", check_ok=False)
+            f = self.send_and_recv("meas,freq", check_ok=False)
             if f is None:
                 return np.empty(0),None
             try:
@@ -495,6 +510,8 @@ TypeError: only integer scalar arrays can be converted to a scalar index
         if number_of_samples > len(self._data_buffer):
             raise ValueError(f"You are asking for too many samples ({number_of_samples} for a maximum of {self.frame_size}.")
         while self.samples_in_buffer < number_of_samples:
+            with self._lock:
+                self._softrig()
             time.sleep(self.poll_time/1000)
         with self._lock:
             data_buffer = np.empty(number_of_samples,dtype=np.float64)
@@ -514,3 +531,44 @@ TypeError: only integer scalar arrays can be converted to a scalar index
         if frame_size is not None:
             self.set_frame_size(old_frame_size)
         return data
+
+    # ProcessControlInterface
+    def set_setpoint(self, channel, value):
+        with self._lock:
+            return self._set_pid_value(value)
+
+    def get_setpoint(self, channel):
+        with self._lock:
+            return self._get_pid_value()
+
+    def get_process_value(self, channel):
+        with self._lock:
+            self._softrig()
+            if channel=="frequency":
+                f = self.send_and_recv("meas,freq", check_ok=False)
+            else:
+                f = self.send_and_recv("meas,wl,nm(vac)", check_ok=False)
+        try:
+            return np.float64(f.split()[0])
+        except ValueError:
+            return np.nan
+
+    def set_activity_state(self, channel, active):
+        """ Set activity state for given channel.
+        State is bool type and refers to active (True) and inactive (False).
+        """
+        pass
+
+    def get_activity_state(self, channel):
+        """ Get activity state for given channel.
+        State is bool type and refers to active (True) and inactive (False).
+        """
+        return True
+
+    @constraints.overload("ProcessControlInterface")
+    @property
+    def constraints(self):
+        """ Read-Only property holding the constraints for this hardware module.
+        See class ProcessControlConstraints for more details.
+        """
+        return self._constraints_process_control
