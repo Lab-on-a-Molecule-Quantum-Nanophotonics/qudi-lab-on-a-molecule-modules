@@ -31,6 +31,7 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
     auto_start_acquisition = ConfigOption("auto_start_acquisition", False)
 
     instream_rate = StatusVar("instream_rate", default=20)
+    _threaded = True
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -95,10 +96,10 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
     def on_deactivate(self):
         """Deactivate module.
         """
-        self.log.info("Stopping continuous acquisition.")
+        self.log.debug("Stopping continuous acquisition.")
         self._stop_continuous_read()
         time.sleep(self.poll_time/1000)
-        self.log.info("Closing serial port.")
+        self.log.debug("Closing serial port.")
         self.serial.close()
 
     # Internal communication facilities
@@ -116,7 +117,7 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
         ret = self.send_and_recv("cam,exp", check_ok=False)
         val = float(ret.split()[0])
         return val
-    def _clear_buffer(self):
+    def _clear_hw_buffer(self):
         self.send_and_recv("meas,clear")
     def _get_trig(self):
         return self.send_and_recv("meas,extrig", check_ok=False)
@@ -124,6 +125,10 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
         return self.send_and_recv(f"meas,extrig,{value}")
     def _softrig(self):
         return self.send_and_recv(f"meas,softrig")
+    def _get_pulse(self):
+        return self.send_and_recv("meas,pulse", check_ok=False)
+    def _set_pulse(self, st):
+        return self.send_and_recv(f"meas,pulse,{st}")
     def _dump(self, buffer_data : Optional[np.ndarray] = None , buffer_timestamp : Optional[np.ndarray] = None, dump_start = 0) -> Tuple[np.ndarray, np.ndarray, int]:
         self.serial.reset_input_buffer()
         self.serial.write("meas,dump\r\n".encode("utf8"))
@@ -163,7 +168,10 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
         self._watchdog_active = True
         self._time_offset=0
         self._first_time = None
-        QtCore.QMetaObject.invokeMethod(self, '_continuous_read_callback', QtCore.Qt.QueuedConnection)
+        if self.thread() is not QtCore.QThread.currentThread():
+            QtCore.QMetaObject.invokeMethod(self, '_continuous_read_callback', QtCore.Qt.BlockingQueuedConnection)
+        else:
+            self._continuous_read_callback()
     @QtCore.Slot()
     def _stop_continuous_read(self):
         self._watchdog_active = False
@@ -173,6 +181,7 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
             _,_,n_read = self._dump(self._data_buffer, self._timestamp_buffer, self._current_buffer_position)
             self._current_buffer_position += n_read
             if n_read > 0:
+                #self.log.debug(f"continuous read callback read {n_read} samples.")
                 self._fix_time()
             if self._watchdog_active:
                 QtCore.QTimer.singleShot(self.poll_time, self._continuous_read_callback)
@@ -192,7 +201,7 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
         unwrapped = np.unwrap(wrapped, period=2**10)
         b = np.diff(unwrapped, prepend=self._time_offset)
         if np.any(b<0):
-            self.log.info(f"problematic unwrapping {wrapped}")
+            self.log.debug(f"problematic unwrapping {wrapped}")
         self._timestamp_buffer[self._corrected_time_offset_position:self._current_buffer_position] = unwrapped[1:]
         self._time_offset = self._timestamp_buffer[self._current_buffer_position-1]
         self._corrected_time_offset_position = self._current_buffer_position
@@ -244,9 +253,10 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
 
     def stop_stream(self) -> None:
         """ Stop the data acquisition/streaming """
-        self.log.info("Requested stop.")
+        self.log.debug("Requested stop.")
         if self.module_state() == 'locked':
             self._stop_continuous_read()
+            self.log.debug("unlocking")
             self.module_state.unlock()
         else:
             self.log.warning('Unable to stop wavemeter input stream as nothing is running.')
@@ -406,18 +416,25 @@ TypeError: only integer scalar arrays can be converted to a scalar index
     @property
     def available_states(self):
         return {
-                "MEAS,EXTRIG":("OFF", "ON")
+                "MEAS,EXTRIG":("OFF", "ON"),
+                "MEAS,PULSE":("OFF", "ON")
         }
     def get_state(self, switch):
         with self._lock:
-            st = self._get_trig()
+            if switch == "MEAS,EXTRIG":
+                st = self._get_trig()
+            else:
+                st = self._get_pulse()
             if "ON" in st:
                 return "ON"
             else:
                 return "OFF"
     def set_state(self, switch, state):
         with self._lock:
-            self._set_trig(state)
+            if switch == "MEAS,EXTRIG":
+                self._set_trig(state)
+            else:
+                self._set_pulse(state)
 
     # FiniteSamplingInputInterface
     @constraints.overload("FiniteSamplingInputInterface")
@@ -449,17 +466,24 @@ TypeError: only integer scalar arrays can be converted to a scalar index
         if self.module_state() == "idle":
             self.module_state.lock()
             with self._lock:
-                self._set_trig("on")
+                self._set_trig("low")
+                self._clear_hw_buffer()
+                # To avoid missing the first frame, we trigger some exposures manually so that the autoexposure algorithm does its job.
+                for _ in range(5):
+                    self._softrig()
+                    time.sleep(1e-3)
+                self._dump()
                 self._prepare_buffers()
             self._start_continuous_read()
         else:
             self.log.warning('Unable to start input stream. It is already running.')
 
     def stop_buffered_acquisition(self):
-        self.log.info("Requested stop.")
+        self.log.debug("Requested stop.")
         if self.module_state() == 'locked':
             self._stop_continuous_read()
             self.module_state.unlock()
+            self.log.debug("unlocked")
             if self.instream_running:
                 self.start_stream()
         else:
@@ -474,9 +498,11 @@ TypeError: only integer scalar arrays can be converted to a scalar index
             time.sleep(self.poll_time/1000)
         with self._lock:
             data_buffer = np.empty(number_of_samples,dtype=np.float64)
+            timestamp_buffer = np.empty(number_of_samples,dtype=np.float64)
             data_buffer[:number_of_samples] = self._data_buffer[:number_of_samples]
+            timestamp_buffer[:number_of_samples] = self._timestamp_buffer[:number_of_samples]
             self._roll_buffers(number_of_samples)
-            return {"wavelength": data_buffer}
+            return {"wavelength": data_buffer, "timestamp": timestamp_buffer}
 
     def acquire_frame(self, frame_size=None):
         old_frame_size = self.frame_size

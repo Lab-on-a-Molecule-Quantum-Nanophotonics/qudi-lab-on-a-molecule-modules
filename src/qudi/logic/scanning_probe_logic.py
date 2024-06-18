@@ -504,6 +504,7 @@ class ScanningProbeLogic(LogicBase):
                         'resolution': tuple(self._scan_resolution[ax] for ax in scan_axes),
                         'frequency': self._scan_frequency[scan_axes[0]]}
             fail, new_settings = self._scanner().configure_scan(settings)
+            self.log.debug(f"scanner responded {fail}, {new_settings}")
             if fail:
                 self.module_state.unlock()
                 self.sigScanStateChanged.emit(False, None, self._curr_caller_id)

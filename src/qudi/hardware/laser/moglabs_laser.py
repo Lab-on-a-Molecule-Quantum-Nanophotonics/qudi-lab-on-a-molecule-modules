@@ -26,6 +26,7 @@ import time
 from typing import Union, Optional, Tuple, Sequence
 
 from PySide2 import QtCore
+from PySide2.QtGui import QGuiApplication
 
 import serial
 import numpy as np
@@ -41,6 +42,7 @@ from qudi.util.mutex import Mutex
 from qudi.core.connector import Connector
 from qudi.util.overload import OverloadedAttribute
 from qudi.util.helpers import in_range
+from qudi.util.enums import SamplingOutputMode
 
 class MOGLABSMotorizedLaserDriver(SwitchInterface):
     """
@@ -168,6 +170,7 @@ class MOGLABSCateyeLaser(ProcessControlInterface):
         """
         return True
 
+    @property
     def constraints(self):
         """ Read-Only property holding the constraints for this hardware module.
         See class ProcessControlConstraints for more details.
@@ -260,12 +263,14 @@ class MOGLabsConfocalScanningLaserInterfuse(ScanningProbeInterface):
         self._thread_lock_cursor = Mutex()
         self._thread_lock_data = Mutex()
 
+        self._last_timestamp_finite_sampling = None
+
     def on_activate(self):
         self.axes = [
             ScannerAxis(
                 name="grating",
                 unit="step",
-                value_range=(100, 20000),
+                value_range=self.cem().constraints.channel_limits["grating"],
                 step_range=(0, 200),
                 resolution_range=(1,10000),
             ),
@@ -274,7 +279,7 @@ class MOGLabsConfocalScanningLaserInterfuse(ScanningProbeInterface):
                 unit="V",
                 value_range=(-10,10),
                 step_range=(0, 10),
-                resolution_range=(1e-4, 10),
+                resolution_range=(1, 1e9),
             ),
         ]
         self.channels = [
@@ -298,14 +303,13 @@ class MOGLabsConfocalScanningLaserInterfuse(ScanningProbeInterface):
         self._target_pos = self.get_position()  
         self._toggle_piezo_setpoint_channel(False)  # And free ao resources after that
         self._t_last_move = time.perf_counter()
+        self.__init_ao_timer()
         self.sigNextDataChunk.connect(self._fetch_data_chunk, QtCore.Qt.QueuedConnection)
 
     def on_deactivate(self):
         self._abort_cursor_movement()
         if self.ni_sampling().is_running:
             self.ni_sampling().stop_buffered_frame()
-        if self.fzw_sampling().is_running:
-            self.fzw_sampling().stop_buffered_frame()
 
     # Internal facilities
     def _toggle_piezo_setpoint_channel(self, enable):
@@ -328,8 +332,8 @@ class MOGLabsConfocalScanningLaserInterfuse(ScanningProbeInterface):
             if i_trial > 0:
                 ranges = self._shrink_scan_ranges(ranges)
             scan_data = ScanData(
-                channels=tuple(self._constraints.channels.values()),
-                scan_axes=tuple(self._constraints.axes[ax] for ax in axes),
+                channels=tuple(self.constraints.channels.values()),
+                scan_axes=tuple(self.constraints.axes[ax] for ax in axes),
                 scan_range=ranges,
                 scan_resolution=tuple(resolution),
                 scan_frequency=frequency,
@@ -353,17 +357,16 @@ class MOGLabsConfocalScanningLaserInterfuse(ScanningProbeInterface):
         """
         assert isinstance(scan_data, ScanData), 'This function requires a scan_data object as input'
 
-        scan_coords = self._init_scan_grid(scan_data)
-        scan_coord = dict()
-        axes = {ax.name: (i,ax) for (i,ax) in enumerate(scan_data.scan_axes)}["piezo"]
+        scan_coords = dict()
         for index,axis in enumerate(scan_data.scan_axes):
             resolution = scan_data.scan_resolution[index]
             stop_points = np.linspace(scan_data.scan_range[index][0], scan_data.scan_range[index][1],
                                      resolution)
-            scan_coord[axis.name] = stop_points
+            scan_coords[axis] = stop_points
         self._check_scan_grid(scan_coords)
         scan_voltages = {self._ni_piezo_channel: scan_coords["piezo"]}
-        grating_positions = scan_coords["grating"]
+
+        grating_positions = scan_coords.get("grating", [self.get_position()["grating"]])
 
         return scan_voltages, grating_positions
 
@@ -484,25 +487,33 @@ class MOGLabsConfocalScanningLaserInterfuse(ScanningProbeInterface):
 
         t_start = time.perf_counter()
         try:
-            current_pos_vec = self._pos_dict_to_vec(self.get_position(self))
+            current_pos_vec = self._pos_dict_to_vec(self.get_position())
+            self.log.debug("loooooping")
 
             with self._thread_lock_cursor:
+                self.log.debug("Got lock")
                 stop_loop = self._abort_cursor_move
+                self.log.debug(f"Abort is {stop_loop}")
                 target_pos_vec = self._pos_dict_to_vec(self._target_pos)
                 connecting_vec = target_pos_vec - current_pos_vec
                 distance_to_target = np.linalg.norm(connecting_vec)
+                self.log.debug(f"distance to target {distance_to_target}.")
 
                 # Terminate follow loop if target is reached
                 if distance_to_target < self._scanner_distance_atol:
                     stop_loop = True
+
+                self.log.debug(f"stop_loop is {stop_loop}")
 
                 if not stop_loop:
                     if not self.__t_last_follow:
                         self.__t_last_follow = time.perf_counter()
                     if not self._piezo_setpoint_channel_active:
                         self._toggle_piezo_setpoint_channel(True)
+                    self.log.debug("Setting setpoint.")
                     self.ni_ao().set_setpoint(self._ni_piezo_channel, self._target_pos["piezo"])
                     self.cem().set_setpoint("grating", self._target_pos["grating"])
+                    self.log.debug("Time to stqrt the timer.")
                     self.__ni_ao_write_timer.start(int(round(1000 * self._min_step_interval)))
             if stop_loop:
                 #self.log.debug(f'Cursor_write_loop stopping at {current_pos_vec}, dist= {distance_to_target}')
@@ -523,7 +534,7 @@ class MOGLabsConfocalScanningLaserInterfuse(ScanningProbeInterface):
         """
 
         #self.log.debug(f"Aborting move.")
-        self._target_pos = self.get_position(self)
+        self._target_pos = self.get_position()
 
         with self._thread_lock_cursor:
             self._abort_cursor_move = True
@@ -538,8 +549,10 @@ class MOGLabsConfocalScanningLaserInterfuse(ScanningProbeInterface):
 
     def _start_hw_timed_scan(self):
         try:
+            self.log.debug("start hw scan.")
             self.ni_sampling().start_buffered_frame()
-            self.fzw_sampling().start_buffered_frame()
+            self.fzw_sampling().start_buffered_acquisition()
+            self._last_timestamp_finite_sampling = 0
             self.sigNextDataChunk.emit()
         except Exception as e:
             self.log.error(f'Could not start frame due to {str(e)}')
@@ -547,12 +560,24 @@ class MOGLabsConfocalScanningLaserInterfuse(ScanningProbeInterface):
 
         self._start_scan_after_cursor = False
 
+    def _current_data_index(self, chunk_size):
+        scan_axes = set(self._scan_data.scan_axes)
+        first_nan_idx = np.sum(~np.isnan(next(iter(self._scan_data.data.values()))))
+        if len(scan_axes & {"grating", "piezo"}) == 2:
+            return (slice(first_nan_idx, first_nan_idx+chunk_size), self._grating_position_index-1)
+        elif len(scan_axes & {"grating", "piezo"}) == 1:
+            return slice(first_nan_idx, first_nan_idx+chunk_size)
+        else:
+            raise ValueError(f"Inconsistent scan_axes for indexing: {scan_axes}")
+
     def _fetch_data_chunk(self):
+        self.log.debug("fetch data chunk.")
         if self._is_moving_grating:
+            self.log.debug("grating is moving")
             if self.cem().get_setpoint("grating") == self.cem().get_process_value("grating"):
                 self._is_moving_grating = False
                 self.ni_sampling().start_buffered_frame()
-                self.fzw_sampling().start_buffered_frame()
+                self.fzw_sampling().start_buffered_acquisition()
             self.sigNextDataChunk.emit()
             return
         try:
@@ -560,39 +585,71 @@ class MOGLabsConfocalScanningLaserInterfuse(ScanningProbeInterface):
             # chunk_size = self._scan_data.scan_resolution[0] + self.__backwards_line_resolution
             chunk_size = 10  # TODO Hardcode or go line by line as commented out above?
             # Request a minimum of chunk_size samples per loop
+            self.log.debug(f"There are {self.ni_sampling().samples_in_buffer} samples available in NI, and {self.fzw_sampling().samples_in_buffer} samples available in FZW")
             try:
+                self.log.debug("Reading buffered samples for the NI")
                 samples_dict_ni = self.ni_sampling().get_buffered_samples(chunk_size) \
                     if self.ni_sampling().samples_in_buffer < chunk_size\
                     else self.ni_sampling().get_buffered_samples()
             except ValueError:  # ValueError is raised, when more samples are requested then pending or still to get
                 # after HW stopped
                 samples_dict_ni = self.ni_sampling().get_buffered_samples()
+            samples_apd = samples_dict_ni[self._ni_apd_channel]
+            chunk_size = len(samples_apd)
+            available_samples_fzw = self.fzw_sampling().samples_in_buffer
+            chunk_size_reading = min(chunk_size, available_samples_fzw)
+            complete_with_nan = chunk_size - chunk_size_reading
+            self.log.debug(f"I will try to read {chunk_size_reading} samples from fzw and i will complete with {complete_with_nan} nan.")
             try:
-                samples_dict_fzw = self.fzw_sampling().get_buffered_samples(chunk_size) \
-                    if self.fzw_sampling().samples_in_buffer < chunk_size\
-                    else self.fzw_sampling().get_buffered_samples()
+                self.log.debug("Reading buffered samples for the FZW")
+                samples_dict_fzw = self.fzw_sampling().get_buffered_samples(chunk_size)
             except ValueError:  # ValueError is raised, when more samples are requested then pending or still to get
                 samples_dict_fzw = self.fzw_sampling().get_buffered_samples()
-            new_data = {**samples_dict_ni, **samples_dict_fzw}
-            with self._thread_lock_data:
-                data = self._scan_data.data
-                first_nan_idx = np.sum(~np.isnan(next(iter(data.values()))))
-                for key,samples in new_data.items():
-                    data[key][first_nan_idx:first_nan_idx+len(samples)] = samples
-                self._scan_data.data = data
 
-                first_nan_idx = np.sum(~np.isnan(next(iter(data.values()))))
-                line_finished = first_nan_idx == self._number_of_datapoints
+            firstindex_fzw = 0
+            timestamps = samples_dict_fzw["timestamp"]
+            wavelengths = np.concatenate((samples_dict_fzw["wavelength"], np.full(complete_with_nan, np.nan)))
+            # jump_dt = 1000 / self.ni_sampling().sample_rate / 2
+            # while timestamps[firstindex_fzw] - self._last_timestamp_finite_sampling < jump_dt/2:
+            #     firstindex_fzw += 1
+            # timestamps = timestamps[firstindex_fzw:]
+            # wavelengths = wavelengths[firstindex_fzw:]
+            # down_sampled_timestamps = [timestamps[0]]
+            # down_sampled_wavelengths = [wavelengths[0]]
+            # for i in range(len(timestamps)):
+            #     if timestamps[i] - down_sampled_timestamps[-1] > jump_dt:
+            #         down_sampled_timestamps.append(timestamps[i])
+            #         down_sampled_wavelengths.append(wavelengths[i])
+            self._last_timestamp_finite_sampling = timestamps[-1]
+
+            self.log.debug(f"Read {len(wavelengths)} wavelength and {len(samples_dict_ni[self._ni_apd_channel])} datapoints.")
+            sample_size = len(samples_apd)
+            data_index = self._current_data_index(sample_size)
+            self.log.debug(f"data index is {data_index}")
+            with self._thread_lock_data:
+                self._scan_data.data["APD"][data_index] = samples_apd
+                self._scan_data.data["wavelength"][data_index] = wavelengths
+
+                first_nan_idx = np.sum(~np.isnan(next(iter(self._scan_data.data.values()))))
+                line_finished = first_nan_idx == self._number_of_points_piezo
                 end_reached = line_finished and self._grating_position_index == len(self._grating_positions)
 
                 if end_reached:
+                    self.log.debug("finished scan")
                     self.stop_scan()
                 elif line_finished:
+                    self.log.debug("finished line")
+                    if self.ni_sampling().is_running:
+                        self.ni_sampling().stop_buffered_frame()
+                        # self.log.debug("Frame stopped")
+                    if self.fzw_sampling().module_state() == "locked":
+                        self.fzw_sampling().stop_buffered_acquisition()
                     self._is_moving_grating = True
                     self.cem().set_setpoint("grating", self._grating_positions[self._grating_position_index])
                     self._grating_position_index += 1
                     self.sigNextDataChunk.emit()
                 elif not self.is_scan_running:
+                    self.log.debug("scan is not running, I quit.")
                     return
                 else:
                     self.sigNextDataChunk.emit()
@@ -606,12 +663,13 @@ class MOGLabsConfocalScanningLaserInterfuse(ScanningProbeInterface):
         return self.constraints
     def reset(self):
         pass
-    def configure_scan(self, settings):
+    def configure_scan(self, scan_settings):
+        self.log.debug(f"configuring scan zith settings {scan_settings}")
         if self.is_scan_running:
             self.log.error("Cannot configure scan parameters while a scan is "
                            "running. Stop the current scan and try again.")
             return True, self.scan_settings
-        axes = settings.get('axes', self._current_scan_axes)
+        axes = scan_settings.get('axes', self._current_scan_axes)
         ranges = tuple(
             (min(r), max(r)) for r in scan_settings.get('range', self._current_scan_ranges)
         )
@@ -641,27 +699,31 @@ class MOGLabsConfocalScanningLaserInterfuse(ScanningProbeInterface):
                                    'possible range is: {1}'
                                    ''.format(ax, axis_constr.frequency_range))
                     return True, self.scan_settings
+        self.log.info("Waiting for lock.")
         with self._thread_lock_data:
             try:
                 self._scan_data = self._create_scan_data(axes, ranges, resolution, frequency)
                 ni_scan_dict, grating_positions = self._init_scan_arrays(self._scan_data)
                 self._grating_positions = grating_positions
                 self._is_moving_grating = False
-                self._grating_position_index = 0
+                self._grating_position_index = 1
 
             except:
                 self.log.exception("")
                 return True, self.scan_settings
 
         try:
+            self.log.debug("It is time to configure the NI finite sampling hardware.")
             self.ni_sampling().set_sample_rate(frequency)
             self.ni_sampling().set_active_channels(
                 input_channels=(self._ni_apd_channel,),
-                output_channels=(self._ni_apd_channel,)
+                output_channels=(self._ni_piezo_channel,)
             )
 
             self.ni_sampling().set_output_mode(SamplingOutputMode.JUMP_LIST)
+            self.log.debug(f"ni scan dict is {ni_scan_dict}.")
             self.ni_sampling().set_frame_data(ni_scan_dict)
+            self._number_of_points_piezo = len(ni_scan_dict[self._ni_piezo_channel])
 
         except:
             self.log.exception("")
@@ -672,15 +734,17 @@ class MOGLabsConfocalScanningLaserInterfuse(ScanningProbeInterface):
         self._current_scan_axes = tuple(axes)
         self._current_scan_frequency = frequency
 
+        self.log.debug("configured!")
+
         return False, self.scan_settings
 
     def move_absolute(self, position, velocity=None, blocking=False):
         if self.is_scan_running:
             self.log.error('Cannot move the scanner while, scan is running')
-            return self.get_target(self)
+            return self.get_target()
         if not set(position).issubset(self.get_constraints().axes):
             self.log.error('Invalid axes name in position')
-            return self.get_target(self)
+            return self.get_target()
         try:
             self._prepare_movement(position, velocity=velocity)
 
@@ -690,7 +754,7 @@ class MOGLabsConfocalScanningLaserInterfuse(ScanningProbeInterface):
 
             self._t_last_move = time.perf_counter()
 
-            return self.get_target(self)
+            return self.get_target()
         except:
             self.log.exception("Couldn't move: ")
 
@@ -701,7 +765,7 @@ class MOGLabsConfocalScanningLaserInterfuse(ScanningProbeInterface):
         Log error and return current target position if something fails or a 1D/2D scan is in
         progress.
         """
-        current_position = self.bare_scanner.get_position(self)
+        current_position = self.bare_scanner.get_position()
         end_pos = {ax: current_position[ax] + distance[ax] for ax in distance}
         self.move_absolute(end_pos, velocity=velocity, blocking=blocking)
 
@@ -734,6 +798,7 @@ class MOGLabsConfocalScanningLaserInterfuse(ScanningProbeInterface):
             return pos
     def start_scan(self):
         try:
+            self.log.debug("start_scan")
             #self.log.debug(f"Start scan in thread {self.thread()}, QT.QThread {QtCore.QThread.currentThread()}... ")
             if self.thread() is not QtCore.QThread.currentThread():
                 QtCore.QMetaObject.invokeMethod(self, '_start_scan',
@@ -752,6 +817,7 @@ class MOGLabsConfocalScanningLaserInterfuse(ScanningProbeInterface):
         @return (bool): Failure indicator (fail=True)
         """
         try:
+            self.log.debug("scanning requested.")
             if self._scan_data is None:
                 # todo: raising would be better, but from this delegated thread exceptions get lost
                 self.log.error('Scan Data is None. Scan settings need to be configured before starting')
@@ -772,6 +838,7 @@ class MOGLabsConfocalScanningLaserInterfuse(ScanningProbeInterface):
 
             first_scan_position = {ax: pos[0] for ax, pos
                                    in zip(self.scan_settings['axes'], self.scan_settings['range'])}
+            self.log.debug("calling move and start.")
             self._move_to_and_start_scan(first_scan_position)
         except Exception:
             self.module_state.unlock()
@@ -800,8 +867,8 @@ class MOGLabsConfocalScanningLaserInterfuse(ScanningProbeInterface):
         if self.ni_sampling().is_running:
             self.ni_sampling().stop_buffered_frame()
             # self.log.debug("Frame stopped")
-        if self.fzw_sampling().is_running:
-            self.fzw_sampling().stop_buffered_frame()
+        if self.fzw_sampling().module_state() == "locked":
+            self.fzw_sampling().stop_buffered_acquisition()
 
         self.module_state.unlock()
         # self.log.debug("Module unlocked")
