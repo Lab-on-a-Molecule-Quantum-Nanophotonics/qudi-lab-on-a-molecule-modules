@@ -144,13 +144,7 @@ class MOGLABSCateyeLaser(ProcessControlInterface):
         self.serial.writeTimeout=0
         self.serial.port=self.port
         self.serial.open()
-        old_position = self._motor_position()
-        self.send_and_recv("motor,home")
-        self.log.debug("homing cem")
-        while self._motor_status() != "STABILISING":
-            time.sleep(0.01)
-        self.log.debug(f"Seting CEM setpoint to {old_position}")
-        self._set_motor_position(old_position)
+        self._reset_motor()
         self._lock = Mutex()
         
 
@@ -213,16 +207,27 @@ class MOGLABSCateyeLaser(ProcessControlInterface):
         return int(self.send_and_recv("motor,position", check_ok=False))
         
     def _set_motor_position(self, value):
-        return self.send_and_recv(f"motor,dest,{value}")
+        return self.send_and_recv(f"motor,dest,{int(value)}")
         
     def _get_motor_setpoint(self):
         return int(self.send_and_recv(f"motor,dest", check_ok=False))
         
     def _move_motor_rel(self, value):
-        return self.send_and_recv(f"motor,step,{value}")
+        return self.send_and_recv(f"motor,step,{int(value)}")
 
     def _motor_status(self):
         return self.send_and_recv("motor,status", check_ok=False).rstrip()
+        
+    def _reset_motor(self):
+        old_setpoint = self._get_motor_setpoint()
+        self.send_and_recv("motor,home")
+        self.log.debug("homing cem")
+        while self._motor_status() != "STABILISING":
+            time.sleep(0.01)
+        self.log.debug(f"Seting CEM setpoint to {old_setpoint}")
+        self._set_motor_position(old_setpoint)
+        while np.abs(self._motor_position() - old_setpoint) > 1:
+            time.sleep(0.01)
         
 
 class MOGLabsConfocalScanningLaserInterfuse(ScanningProbeInterface):
@@ -1119,6 +1124,19 @@ class MOGLabsFZWScanner(ScanningProbeInterface):
                                      f'for axis {axis}. Value clipped to {position[axis]}')
                 # TODO Adapt interface to use "in_range"?
                 self._target_pos[axis] = position[axis]
+            
+                
+            if self.fzw_process_control().get_setpoint("tension") != self._target_pos["tension"]:
+                self.fzw_process_control().set_setpoint("tension", self._target_pos["tension"])
+            if self.cem().get_setpoint("grating") != self._target_pos["grating"]:
+                now = time.perf_counter()
+                if now - self._t_last_move < 0.05: # Don't flood the motor with commands
+                    time.sleep(0.05)
+                self.cem().set_setpoint("grating", self._target_pos["grating"])
+                self._t_last_move = time.perf_counter()
+                
+    def _reset_motor(self):
+        self.cem()._reset_motor()
 
     def __init_write_timer(self):
         self.__write_timer = QtCore.QTimer(parent=self)
@@ -1144,38 +1162,31 @@ class MOGLabsFZWScanner(ScanningProbeInterface):
 
         except:
             self.log.exception("")
+    
+    def _setpoint_reached(self):    
+        current_pos = self.get_position()
+        with self._thread_lock_cursor:
+            grating_setpoint = self._target_pos["grating"]
+            grating_pos = current_pos["grating"]
+            distance_to_target = np.abs(grating_setpoint - grating_pos)
+            reached = distance_to_target <= self._scanner_distance_atol
+            #if not reached:
+            #    self.log.debug(f"Setpoint not reached. Delta: {distance_to_target}")
+            return reached
 
     def __cursor_write_loop(self):
-
         t_start = time.perf_counter()
         try:
-            current_pos = self.get_position()
-            self.log.debug("loooooping")
-
+            stop_loop = self._setpoint_reached()
             with self._thread_lock_cursor:
-                self.log.debug("Got lock")
-                stop_loop = self._abort_cursor_move
-                self.log.debug(f"Abort is {stop_loop}")
-                grating_setpoint = self._target_pos["grating"]
-                grating_pos = current_pos["grating"]
-                distance_to_target = np.abs(grating_setpoint - grating_pos)
-                self.log.debug(f"distance to target {distance_to_target}.")
-
-                # Terminate follow loop if target is reached
-                if distance_to_target < self._scanner_distance_atol:
-                    stop_loop = True
-
-                self.log.debug(f"stop_loop is {stop_loop}")
-
+                stop_loop = stop_loop or self._abort_cursor_move
                 if not stop_loop:
                     if not self.__t_last_follow:
                         self.__t_last_follow = t_start
                     t_overhead = time.perf_counter() - t_start
                     self.__write_timer.start(int(round(1000 * max(0, self._min_step_interval - t_overhead))))
-            if stop_loop:
-                #self.log.debug(f'Cursor_write_loop stopping at {current_pos_vec}, dist= {distance_to_target}')
+            if stop_loop:              
                 self._abort_cursor_movement()
-
                 if self._start_scan_after_cursor:
                     self._start_hw_timed_scan()
         except:
@@ -1214,8 +1225,10 @@ class MOGLabsFZWScanner(ScanningProbeInterface):
         self._start_scan_after_cursor = False
 
     def _current_data_index(self):
-        scan_axes = set(self._scan_data.scan_axes)
-        if len(scan_axes & {"grating", "tension"}) == 2:
+        scan_axes = self._scan_data.scan_axes
+        if scan_axes == ("grating", "tension"):
+            return (self._grating_position_index, self._tension_position_index)
+        if scan_axes == ("tension", "grating"):
             return (self._tension_position_index, self._grating_position_index)
         elif "grating" in scan_axes:
             return self._grating_position_index
@@ -1226,16 +1239,17 @@ class MOGLabsFZWScanner(ScanningProbeInterface):
 
     def _next_setpoint_indices(self):
         scan_axes = set(self._scan_data.scan_axes)
-        if len(scan_axes & {"grating", "tension"}) == 2:
-            if self._tension_position_index >= len(self._tension_positions):
+        if len(scan_axes) == 2:
+            if self._tension_position_index >= len(self._tension_positions)-1:
+                self.log.debug("finished a line!")
                 self._tension_position_index = 0
                 self._grating_position_index += 1
             else:
                 self._tension_position_index += 1
-        elif "grating" in scan_axes:
-            self._grating_position_index += 1
         elif "tension" in scan_axes:
             self._tension_position_index += 1
+        elif "grating" in scan_axes:
+            self._grating_position_index += 1
         else:
             raise ValueError(f"Un-handled scan axes {scan_axes}")
             
@@ -1243,17 +1257,28 @@ class MOGLabsFZWScanner(ScanningProbeInterface):
         return self._tension_position_index >= len(self._tension_positions) or self._grating_position_index >= len(self._grating_positions)
 
     def _fetch_data_chunk(self):
-        self.log.debug("fetch data chunk.")
         try:
-            if self.is_move_running:
-                self.log.debug("waiting for movement to finish before acquiring.")
+            if not self._setpoint_reached():
+                # We are taking a suspicious amount of time to move. Let's reset the motor.
+                now = time.perf_counter()
+                if np.abs(self.cem().get_setpoint("grating") - self.cem().get_process_value("grating")) > 1 and now - self._t_last_move > 10:
+                    self.log.debug("The motor is stuck, I will reset it.")
+                    self._reset_motor()
+                    time.sleep(0.05)
+                if not self.is_move_running and now - self._t_last_move > 2:
+                    self.log.debug("setpoint not reached but no move is running.")
+                    self._prepare_movement({
+                        "grating" : self._grating_positions[self._grating_position_index],
+                        "tension" : self._tension_positions[self._tension_position_index],
+                    })
+                    self.__start_write_timer()
                 self.sigNextDataChunk.emit()
                 return
             else:
                 constraints_process_control = self.fzw_process_control().constraints
                 process_channels = constraints_process_control.process_channels
+                counts = self.counter().acquire_frame(frame_size=self._apd_oversampling)
                 process_values = {ch: self.fzw_process_control().get_process_value(ch) for ch in process_channels}
-                counts = self.counter().acquire_frame(frame_size=self._apd_oversampling) # todo: allow oversampling
                 counts = counts[self._counter_apd_channel].mean()
                 data_index = self._current_data_index()
                 with self._thread_lock_data:
@@ -1272,11 +1297,7 @@ class MOGLabsFZWScanner(ScanningProbeInterface):
                             "grating" : self._grating_positions[self._grating_position_index],
                             "tension" : self._tension_positions[self._tension_position_index],
                         })
-                        self.log.debug("Setting setpoint.")
-                        self.fzw_process_control().set_setpoint("tension", self._target_pos["tension"])
-                        self.cem().set_setpoint("grating", self._target_pos["grating"])
                         self.__start_write_timer()
-                        self._t_last_move = time.perf_counter()
                         self.sigNextDataChunk.emit()
         except:
             self.log.exception("")
@@ -1361,13 +1382,10 @@ class MOGLabsFZWScanner(ScanningProbeInterface):
         try:
             self._prepare_movement(position, velocity=velocity)
             self.log.debug("Setting setpoint.")
-            self.fzw_process_control().set_setpoint("tension", self._target_pos["tension"])
-            self.cem().set_setpoint("grating", self._target_pos["grating"])
             self.__start_write_timer()
             if blocking:
                 self.__wait_on_move_done()
 
-            self._t_last_move = time.perf_counter()
 
             return self.get_target()
         except:
@@ -1475,7 +1493,8 @@ class MOGLabsFZWScanner(ScanningProbeInterface):
         self._abort_cursor_movement()
         if self.counter().module_state() == "locked":
             self.fzw_sampling().stop_buffered_acquisition()
-        self.module_state.unlock()
+        if self.module_state() == "locked":
+            self.module_state.unlock()
         # self.log.debug("Module unlocked")
         self.log.debug(f"Finished scan, move to stored target: {self._stored_target_pos}")
         self.move_absolute(self._stored_target_pos)
