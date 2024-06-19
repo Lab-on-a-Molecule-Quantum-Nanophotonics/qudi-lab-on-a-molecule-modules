@@ -144,19 +144,31 @@ class MOGLABSCateyeLaser(ProcessControlInterface):
         self.serial.writeTimeout=0
         self.serial.port=self.port
         self.serial.open()
+        old_position = self._motor_position()
+        self.send_and_recv("motor,home")
+        self.log.debug("homing cem")
+        while self._motor_status() != "STABILISING":
+            time.sleep(0.01)
+        self.log.debug(f"Seting CEM setpoint to {old_position}")
+        self._set_motor_position(old_position)
+        self._lock = Mutex()
+        
 
     def on_deactivate(self):
         """Deactivate module.
         """
         self.serial.close()
     def set_setpoint(self, channel, value):
-        self._set_motor_position(value)
+        with self._lock:
+            self._set_motor_position(value)
 
     def get_setpoint(self, channel):
-        return self._get_motor_setpoint()
+        with self._lock:
+            return self._get_motor_setpoint()
 
     def get_process_value(self, channel):
-        return self._motor_position()
+        with self._lock:
+            return self._motor_position()
 
     def set_activity_state(self, channel, active):
         """ Set activity state for given channel.
@@ -210,7 +222,7 @@ class MOGLABSCateyeLaser(ProcessControlInterface):
         return self.send_and_recv(f"motor,step,{value}")
 
     def _motor_status(self):
-        return self.send_and_recv("motor,status").rstrip()
+        return self.send_and_recv("motor,status", check_ok=False).rstrip()
         
 
 class MOGLabsConfocalScanningLaserInterfuse(ScanningProbeInterface):
@@ -250,7 +262,7 @@ class MOGLabsConfocalScanningLaserInterfuse(ScanningProbeInterface):
         self._stored_target_pos = dict()
 
         self._min_step_interval = 1e-3
-        self._scanner_distance_atol = 1e-9
+        self._scanner_distance_atol = 1
         self._start_scan_after_cursor = False
         self._abort_cursor_move = True
         self.__t_last_follow = None
@@ -488,12 +500,9 @@ class MOGLabsConfocalScanningLaserInterfuse(ScanningProbeInterface):
         t_start = time.perf_counter()
         try:
             current_pos_vec = self._pos_dict_to_vec(self.get_position())
-            self.log.debug("loooooping")
 
             with self._thread_lock_cursor:
-                self.log.debug("Got lock")
                 stop_loop = self._abort_cursor_move
-                self.log.debug(f"Abort is {stop_loop}")
                 target_pos_vec = self._pos_dict_to_vec(self._target_pos)
                 connecting_vec = target_pos_vec - current_pos_vec
                 distance_to_target = np.linalg.norm(connecting_vec)
@@ -887,6 +896,603 @@ class MOGLabsConfocalScanningLaserInterfuse(ScanningProbeInterface):
                 return self._scan_data.copy()
         except:
             self.log.exception("")
+    def emergency_stop(self):
+        # There's never an emergency.
+        pass
+        
+
+class MOGLabsFZWScanner(ScanningProbeInterface):
+    """A class to control our MOGLabs laser to perform excitation spectroscopy.
+
+    Example config:
+
+    """
+    cem = Connector(name="cateye_laser", interface="ProcessControlInterface")
+    ldd = Connector(name="laser_driver", interface="SwitchInterface")
+    fzw_process_control = Connector(name="wavemeter_process", interface="ProcessControlInterface")
+    counter = Connector(name="counter", interface="FiniteSamplingInputInterface")
+
+    _counter_apd_channel = ConfigOption(name="counter_apd_channel", missing="error")
+    _apd_oversampling = ConfigOption(name="apd_oversampling", default=2)
+
+    _threaded = True  # Interfuse is by default not threaded.
+
+    sigNextDataChunk = QtCore.Signal()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.axes=[]
+        self.channels=[]
+        self.constraints=None
+        self._scan_data = None
+
+        self._current_scan_frequency = -1
+        self._current_scan_ranges = [tuple(), tuple()]
+        self._current_scan_axes = tuple()
+        self._current_scan_resolution = tuple()
+
+        self._target_pos = dict()
+        self._stored_target_pos = dict()
+
+        self._min_step_interval = 1e-3
+        self._scanner_distance_atol = 1
+        self._start_scan_after_cursor = False
+        self._abort_cursor_move = True
+        self.__t_last_follow = None
+        
+        self._grating_positions = None
+        self._tension_positions = None
+        self._grating_position_index = 0
+        self._tension_position_index = 0
+
+        self.__write_timer = None
+        self._thread_lock_cursor = Mutex()
+        self._thread_lock_data = Mutex()
+
+    def on_activate(self):
+        assert self._apd_oversampling >= 2, "APD oversampling should be at least 2."
+        constraints_process_control = self.fzw_process_control().constraints
+        self.axes = [
+            ScannerAxis(
+                name="grating",
+                unit="step",
+                value_range=self.cem().constraints.channel_limits["grating"],
+                step_range=(0, 200),
+                resolution_range=(1,10000),
+            ),
+            ScannerAxis(
+                name="tension",
+                unit="V",
+                value_range=constraints_process_control.channel_limits["tension"],
+                step_range=(0, 2.5),
+                resolution_range=(1, 1e9),
+            ),
+        ]
+        self.channels = [
+            ScannerChannel(
+                name="APD",
+                unit="c/s",
+            ),
+        ]
+        for channel in constraints_process_control.process_channels:
+            self.channels.append(
+                ScannerChannel(
+                    name=channel,
+                    unit=constraints_process_control.channel_units[channel],
+                )
+              )
+        self.constraints = ScanConstraints(
+            axes=self.axes,
+            channels=self.channels,
+            backscan_configurable=False,
+            has_position_feedback=True,
+            square_px_only=False,
+        )
+
+        self._target_pos = self.get_position()  
+        self._t_last_move = time.perf_counter()
+        self.__init_write_timer()
+        self.sigNextDataChunk.connect(self._fetch_data_chunk, QtCore.Qt.QueuedConnection)
+
+    def on_deactivate(self):
+        self._abort_cursor_movement()
+        if self.counter().module_state() == "locked":
+            self.counter().stop_buffered_frame()
+
+    # Internal facilities
+    def _shrink_scan_ranges(self, ranges, factor=0.01):
+        lenghts = [stop - start for (start, stop) in ranges]
+        return [(start + factor* lenghts[idx], stop - factor* lenghts[idx]) for idx, (start, stop) in enumerate(ranges)]
+
+    def _create_scan_data(self, axes, ranges, resolution, frequency):
+        valid_scan_grid = False
+        i_trial, n_max_trials = 0, 25
+
+        while not valid_scan_grid and i_trial < n_max_trials:
+            if i_trial > 0:
+                ranges = self._shrink_scan_ranges(ranges)
+            scan_data = ScanData(
+                channels=tuple(self.constraints.channels.values()),
+                scan_axes=tuple(self.constraints.axes[ax] for ax in axes),
+                scan_range=ranges,
+                scan_resolution=tuple(resolution),
+                scan_frequency=frequency,
+                position_feedback_axes=None)
+            try:
+                tension_scan_array,grating_scan_array = self._init_scan_arrays(scan_data)
+                valid_scan_grid = True
+            except ValueError:
+                valid_scan_grid = False
+            i_trial += 1
+        if not valid_scan_grid:
+            raise ValueError("Couldn't create scan grid. ")
+        if i_trial > 1:
+            self.log.warning(f"Adapted out-of-bounds scan range to {ranges}")
+        # self.log.debug(f"New scanData created: {self._scan_data.data}")
+        return scan_data
+
+    def _init_scan_arrays(self, scan_data):
+        """
+        @param ScanData scan_data: The desired ScanData instance
+        """
+        assert isinstance(scan_data, ScanData), 'This function requires a scan_data object as input'
+
+        scan_coords = dict()
+        for index,axis in enumerate(scan_data.scan_axes):
+            resolution = scan_data.scan_resolution[index]
+            stop_points = np.linspace(scan_data.scan_range[index][0], scan_data.scan_range[index][1],
+                                     resolution)
+            scan_coords[axis] = stop_points
+        self._check_scan_grid(scan_coords)
+        tension_positions = scan_coords.get("tension", [self.get_position()["tension"]])
+        grating_positions = scan_coords.get("grating", [self.get_position()["grating"]])
+
+        return tension_positions, grating_positions
+
+    def _check_scan_grid(self, scan_coords):
+        for ax, coords in scan_coords.items():
+            position_min = self.get_constraints().axes[ax].min_value
+            position_max = self.get_constraints().axes[ax].max_value
+            out_of_range = any(coords < position_min) or any(coords > position_max)
+            if out_of_range:
+                raise ValueError(f"Scan axis {ax} out of range [{position_min}, {position_max}]")
+
+    @property
+    def scan_settings(self):
+
+        settings = {'axes': tuple(self._current_scan_axes),
+                    'range': tuple(self._current_scan_ranges),
+                    'resolution': tuple(self._current_scan_resolution),
+                    'frequency': self._current_scan_frequency}
+        return settings
+
+    @property
+    def is_scan_running(self):
+        """
+        Read-only flag indicating the module state.
+
+        @return bool: scanning probe is running (True) or not (False)
+        """
+        # module state used to indicate hw timed scan running
+        #self.log.debug(f"Module in state: {self.module_state()}")
+        #assert self.module_state() in ('locked', 'idle')  # TODO what about other module states?
+        if self.module_state() == 'locked':
+            return True
+        else:
+            return False
+
+    @property
+    def is_move_running(self):
+        with self._thread_lock_cursor:
+            running = self.__t_last_follow is not None
+            return running
+
+    def __wait_on_move_done(self):
+        try:
+            t_start = time.perf_counter()
+            while self.is_move_running:
+                self.log.debug(f"Waiting for move done: {self.is_move_running}, {1e3*(time.perf_counter()-t_start)} ms")
+                QGuiApplication.processEvents()
+                time.sleep(self._min_step_interval)
+
+            #self.log.debug(f"Move_abs finished after waiting {1e3*(time.perf_counter()-t_start)} ms ")
+        except:
+            self.log.exception("")
+
+    def _prepare_movement(self, position, velocity=None):
+        """
+        Clips values of position to allowed range and fills up the write queue.
+        If re-entered from a different thread, clears current write queue and start
+        a new movement.
+        """
+
+        with self._thread_lock_cursor:
+            self._abort_cursor_move = False
+            constr = self.get_constraints()
+
+            for axis, pos in position.items():
+                in_range_flag, _ = in_range(pos, *constr.axes[axis].value_range)
+                if not in_range_flag:
+                    position[axis] = float(constr.axes[axis].clip_value(position[axis]))
+                    self.log.warning(f'Position {pos} out of range {constr.axes[axis].value_range} '
+                                     f'for axis {axis}. Value clipped to {position[axis]}')
+                # TODO Adapt interface to use "in_range"?
+                self._target_pos[axis] = position[axis]
+
+    def __init_write_timer(self):
+        self.__write_timer = QtCore.QTimer(parent=self)
+
+        self.__write_timer.setSingleShot(True)
+        self.__write_timer.timeout.connect(self.__cursor_write_loop, QtCore.Qt.QueuedConnection)
+        self.__write_timer.setInterval(1e3*self._min_step_interval)  # (ms), dynamically calculated during write loop
+
+    def __start_write_timer(self):
+        #self.log.debug(f"ao start write timer in thread {self.thread()}, QT.QThread {QtCore.QThread.currentThread()} ")
+        try:
+            if not self.is_move_running:
+                #self.log.debug("Starting AO write timer...")
+                if self.thread() is not QtCore.QThread.currentThread():
+                    QtCore.QMetaObject.invokeMethod(self.__write_timer,
+                                                    'start',
+                                                    QtCore.Qt.BlockingQueuedConnection)
+                else:
+                    self.__write_timer.start()
+            else:
+                pass
+                #self.log.debug("Dropping timer start, already running")
+
+        except:
+            self.log.exception("")
+
+    def __cursor_write_loop(self):
+
+        t_start = time.perf_counter()
+        try:
+            current_pos = self.get_position()
+            self.log.debug("loooooping")
+
+            with self._thread_lock_cursor:
+                self.log.debug("Got lock")
+                stop_loop = self._abort_cursor_move
+                self.log.debug(f"Abort is {stop_loop}")
+                grating_setpoint = self._target_pos["grating"]
+                grating_pos = current_pos["grating"]
+                distance_to_target = np.abs(grating_setpoint - grating_pos)
+                self.log.debug(f"distance to target {distance_to_target}.")
+
+                # Terminate follow loop if target is reached
+                if distance_to_target < self._scanner_distance_atol:
+                    stop_loop = True
+
+                self.log.debug(f"stop_loop is {stop_loop}")
+
+                if not stop_loop:
+                    if not self.__t_last_follow:
+                        self.__t_last_follow = t_start
+                    t_overhead = time.perf_counter() - t_start
+                    self.__write_timer.start(int(round(1000 * max(0, self._min_step_interval - t_overhead))))
+            if stop_loop:
+                #self.log.debug(f'Cursor_write_loop stopping at {current_pos_vec}, dist= {distance_to_target}')
+                self._abort_cursor_movement()
+
+                if self._start_scan_after_cursor:
+                    self._start_hw_timed_scan()
+        except:
+            self.log.exception("Error in ao write loop: ")
+
+    def _pos_dict_to_vec(self, position):
+        pos_list = [el[1] for el in sorted(position.items())]
+        return np.asarray(pos_list)
+
+    def _abort_cursor_movement(self):
+        """
+        Abort the movement.
+        """
+
+        #self.log.debug(f"Aborting move.")
+        self._target_pos = self.get_position()
+
+        with self._thread_lock_cursor:
+            self._abort_cursor_move = True
+            self.__t_last_follow = None
+
+    def _move_to_and_start_scan(self, position):
+        self._prepare_movement(position)
+        self._start_scan_after_cursor = True
+        #self.log.debug("Starting timer to move to scan position")
+        self.__start_write_timer()
+
+    def _start_hw_timed_scan(self):
+        try:
+            self.log.debug("start hw scan.")
+            self.sigNextDataChunk.emit()
+        except Exception as e:
+            self.log.error(f'Could not start frame due to {str(e)}')
+            self.module_state.unlock()
+
+        self._start_scan_after_cursor = False
+
+    def _current_data_index(self):
+        scan_axes = set(self._scan_data.scan_axes)
+        if len(scan_axes & {"grating", "tension"}) == 2:
+            return (self._tension_position_index, self._grating_position_index)
+        elif "grating" in scan_axes:
+            return self._grating_position_index
+        elif "tension" in scan_axes:
+            return self._tension_position_index
+        else:
+            raise ValueError(f"Inconsistent scan_axes for indexing: {scan_axes}")
+
+    def _next_setpoint_indices(self):
+        scan_axes = set(self._scan_data.scan_axes)
+        if len(scan_axes & {"grating", "tension"}) == 2:
+            if self._tension_position_index >= len(self._tension_positions):
+                self._tension_position_index = 0
+                self._grating_position_index += 1
+            else:
+                self._tension_position_index += 1
+        elif "grating" in scan_axes:
+            self._grating_position_index += 1
+        elif "tension" in scan_axes:
+            self._tension_position_index += 1
+        else:
+            raise ValueError(f"Un-handled scan axes {scan_axes}")
+            
+    def _all_points_scanned(self):
+        return self._tension_position_index >= len(self._tension_positions) or self._grating_position_index >= len(self._grating_positions)
+
+    def _fetch_data_chunk(self):
+        self.log.debug("fetch data chunk.")
+        try:
+            if self.is_move_running:
+                self.log.debug("waiting for movement to finish before acquiring.")
+                self.sigNextDataChunk.emit()
+                return
+            else:
+                constraints_process_control = self.fzw_process_control().constraints
+                process_channels = constraints_process_control.process_channels
+                process_values = {ch: self.fzw_process_control().get_process_value(ch) for ch in process_channels}
+                counts = self.counter().acquire_frame(frame_size=self._apd_oversampling) # todo: allow oversampling
+                counts = counts[self._counter_apd_channel].mean()
+                data_index = self._current_data_index()
+                with self._thread_lock_data:
+                    self._scan_data.data["APD"][data_index] = counts
+                    for (k,v) in process_values.items():
+                        self._scan_data.data[k][data_index] = v
+                    self._next_setpoint_indices()
+                    if self._all_points_scanned():
+                        self.log.debug("Scan is over.")
+                        self.stop_scan()
+                    elif not self.is_scan_running:
+                        self.log.debug("Scan was interrupted, not looping back.")
+                        self.stop_scan()
+                    else:
+                        self._prepare_movement({
+                            "grating" : self._grating_positions[self._grating_position_index],
+                            "tension" : self._tension_positions[self._tension_position_index],
+                        })
+                        self.log.debug("Setting setpoint.")
+                        self.fzw_process_control().set_setpoint("tension", self._target_pos["tension"])
+                        self.cem().set_setpoint("grating", self._target_pos["grating"])
+                        self.__start_write_timer()
+                        self._t_last_move = time.perf_counter()
+                        self.sigNextDataChunk.emit()
+        except:
+            self.log.exception("")
+            self.stop_scan()
+
+    # ScanningProbeInterface
+    def get_constraints(self):
+        return self.constraints
+    def reset(self):
+        pass
+    def configure_scan(self, scan_settings):
+        self.log.debug(f"configuring scan with settings {scan_settings}")
+        if self.is_scan_running:
+            self.log.error("Cannot configure scan parameters while a scan is "
+                           "running. Stop the current scan and try again.")
+            return True, self.scan_settings
+        axes = scan_settings.get('axes', self._current_scan_axes)
+        ranges = tuple(
+            (min(r), max(r)) for r in scan_settings.get('range', self._current_scan_ranges)
+        )
+        resolution = scan_settings.get('resolution', self._current_scan_resolution)
+        frequency = float(scan_settings.get('frequency', self._current_scan_frequency))
+        if not set(axes).issubset(["tension", "grating"]):
+            self.log.error('Unknown axes names encountered. Valid axes are "tension" and "grating".')
+            return True, self.scan_settings
+        if len(axes) != len(ranges) or len(axes) != len(resolution):
+            self.log.error('"axes", "range" and "resolution" must have same length.')
+            return True, self.scan_settings
+        for i, ax in enumerate(axes):
+            for axis_constr in self.constraints.axes.values():
+                if ax == axis_constr.name:
+                    break
+            if ranges[i][0] < axis_constr.min_value or ranges[i][1] > axis_constr.max_value:
+                self.log.error('Scan range out of bounds for axis "{0}". Maximum possible range'
+                               ' is: {1}'.format(ax, axis_constr.value_range))
+                return True, self.scan_settings
+            if resolution[i] < axis_constr.min_resolution or resolution[i] > axis_constr.max_resolution:
+                self.log.error('Scan resolution out of bounds for axis "{0}". Maximum possible '
+                               'range is: {1}'.format(ax, axis_constr.resolution_range))
+                return True, self.scan_settings
+            if i == 0:
+                if frequency < axis_constr.min_frequency or frequency > axis_constr.max_frequency:
+                    self.log.error('Scan frequency out of bounds for fast axis "{0}". Maximum '
+                                   'possible range is: {1}'
+                                   ''.format(ax, axis_constr.frequency_range))
+                    return True, self.scan_settings
+        self.log.info("Waiting for lock.")
+        with self._thread_lock_data:
+            try:
+                self._scan_data = self._create_scan_data(axes, ranges, resolution, frequency)
+                self._tension_positions,self._grating_positions = self._init_scan_arrays(self._scan_data)
+                self._grating_position_index = 0
+                self._tension_position_index = 0
+            except:
+                self.log.exception("")
+                return True, self.scan_settings
+
+        try:
+            self.log.debug("It is time to configure the NI finite sampling hardware.")
+            self.counter().set_sample_rate(frequency)
+            self.counter().set_active_channels((self._counter_apd_channel,))
+        except:
+            self.log.exception("")
+            return True, self.scan_settings
+
+        self._current_scan_resolution = tuple(resolution)
+        self._current_scan_ranges = ranges
+        self._current_scan_axes = tuple(axes)
+        self._current_scan_frequency = frequency
+
+        self.log.debug("configured!")
+
+        return False, self.scan_settings
+
+    def move_absolute(self, position, velocity=None, blocking=False):
+        if self.is_scan_running:
+            self.log.error('Cannot move the scanner while, scan is running')
+            return self.get_target()
+        if not set(position).issubset(self.get_constraints().axes):
+            self.log.error('Invalid axes name in position')
+            return self.get_target()
+        try:
+            self._prepare_movement(position, velocity=velocity)
+            self.log.debug("Setting setpoint.")
+            self.fzw_process_control().set_setpoint("tension", self._target_pos["tension"])
+            self.cem().set_setpoint("grating", self._target_pos["grating"])
+            self.__start_write_timer()
+            if blocking:
+                self.__wait_on_move_done()
+
+            self._t_last_move = time.perf_counter()
+
+            return self.get_target()
+        except:
+            self.log.exception("Couldn't move: ")
+
+    def move_relative(self, position, velocity=None, blocking=False):
+        """ Move the scanning probe by a relative distance from the current target position as fast
+        as possible or with a defined velocity.
+
+        Log error and return current target position if something fails or a 1D/2D scan is in
+        progress.
+        """
+        current_position = self.bare_scanner.get_position()
+        end_pos = {ax: current_position[ax] + distance[ax] for ax in distance}
+        self.move_absolute(end_pos, velocity=velocity, blocking=blocking)
+
+        return end_pos
+    def get_target(self):
+        if self.is_scan_running:
+            return self._stored_target_pos
+        else:
+            return self._target_pos
+    def get_position(self):
+        """ Get a snapshot of the actual scanner position (i.e. from position feedback sensors).
+        For the same target this value can fluctuate according to the scanners positioning accuracy.
+
+        For scanning devices that do not have position feedback sensors, simply return the target
+        position (see also: ScanningProbeInterface.get_target).
+
+        @return dict: current position per axis.
+        """
+        with self._thread_lock_cursor:
+            tension_position = self.fzw_process_control().get_setpoint("tension")
+            grating_position = self.cem().get_process_value("grating")
+        pos = {
+            "tension": tension_position,
+            "grating": grating_position
+        }
+        return pos
+        
+    def start_scan(self):
+        try:
+            self.log.debug("start_scan")
+            #self.log.debug(f"Start scan in thread {self.thread()}, QT.QThread {QtCore.QThread.currentThread()}... ")
+            if self.thread() is not QtCore.QThread.currentThread():
+                QtCore.QMetaObject.invokeMethod(self, '_start_scan',
+                                                QtCore.Qt.BlockingQueuedConnection)
+            else:
+                self._start_scan()
+        except:
+            self.log.exception("")
+            return -1
+        return 0
+
+    @QtCore.Slot()
+    def _start_scan(self):
+        """
+
+        @return (bool): Failure indicator (fail=True)
+        """
+        try:
+            self.log.debug("scanning requested.")
+            if self._scan_data is None:
+                # todo: raising would be better, but from this delegated thread exceptions get lost
+                self.log.error('Scan Data is None. Scan settings need to be configured before starting')
+
+            if self.is_scan_running:
+                self.log.error('Cannot start a scan while scanning probe is already running')
+
+            with self._thread_lock_data:
+                self._scan_data.new_scan()
+                #self.log.debug(f"New scan data: {self._scan_data.data}, position {self._scan_data._position_data}")
+                self._stored_target_pos = self.get_target().copy()
+                self.log.debug(f"Target pos at scan start: {self._stored_target_pos}")
+                self._scan_data.scanner_target_at_start = self._stored_target_pos
+
+            # todo: scanning_probe_logic exits when scanner not locked right away
+            # should rather ignore/wait until real hw timed scanning starts
+            self.module_state.lock()
+
+            first_scan_position = {ax: pos[0] for ax, pos
+                                   in zip(self.scan_settings['axes'], self.scan_settings['range'])}
+            self.log.debug("calling move and start.")
+            self._move_to_and_start_scan(first_scan_position)
+        except Exception:
+            self.module_state.unlock()
+            self.log.exception("Starting scan failed: ")
+    def stop_scan(self):
+        """
+        @return bool: Failure indicator (fail=True)
+        # todo: return values as error codes are deprecated
+        """
+        if self.thread() is not QtCore.QThread.currentThread():
+            QtCore.QMetaObject.invokeMethod(self, '_stop_scan',
+                                            QtCore.Qt.BlockingQueuedConnection)
+        else:
+            self._stop_scan()
+
+        return 0
+
+    @QtCore.Slot()
+    def _stop_scan(self):
+        # self.log.debug("Stopping scan...")
+        self._start_scan_after_cursor = False  # Ensure Scan HW is not started after movement
+        self._abort_cursor_movement()
+        if self.counter().module_state() == "locked":
+            self.fzw_sampling().stop_buffered_acquisition()
+        self.module_state.unlock()
+        # self.log.debug("Module unlocked")
+        self.log.debug(f"Finished scan, move to stored target: {self._stored_target_pos}")
+        self.move_absolute(self._stored_target_pos)
+        self._stored_target_pos = dict()
+        
+    def get_scan_data(self):
+        """
+        @return (ScanData): ScanData instance used in the scan
+        """
+        if self._scan_data is None:
+            raise RuntimeError('ScanData is not yet configured, please call "configure_scan" first')
+        try:
+            with self._thread_lock_data:
+                return self._scan_data.copy()
+        except:
+            self.log.exception("")
+            
     def emergency_stop(self):
         # There's never an emergency.
         pass
