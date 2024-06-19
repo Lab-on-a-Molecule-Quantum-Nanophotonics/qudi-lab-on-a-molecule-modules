@@ -308,7 +308,7 @@ class NIXSeriesFiniteSamplingInput(FiniteSamplingInputInterface):
             assert self.module_state() == 'idle', \
                 'Unable to set frame size. Data acquisition in progress.'
             self._frame_size = samples
-            self.log.debug(f'set frame_size to {self._frame_size}')
+            #self.log.debug(f'set frame_size to {self._frame_size}')
 
     def start_buffered_acquisition(self):
         """ Will start the acquisition of a data frame in a non-blocking way.
