@@ -145,8 +145,7 @@ class MOGLABSCateyeLaser(ProcessControlInterface):
         self.serial.port=self.port
         self.serial.open()
         self._reset_motor()
-        self._lock = Mutex()
-        
+        self._lock = Mutex()     
 
     def on_deactivate(self):
         """Deactivate module.
@@ -221,13 +220,14 @@ class MOGLABSCateyeLaser(ProcessControlInterface):
     def _reset_motor(self):
         old_setpoint = self._get_motor_setpoint()
         self.send_and_recv("motor,home")
-        self.log.debug("homing cem")
+        self.log.info("Please wait while the grating is being homed.")
         while self._motor_status() != "STABILISING":
             time.sleep(0.01)
         self.log.debug(f"Seting CEM setpoint to {old_setpoint}")
         self._set_motor_position(old_setpoint)
         while np.abs(self._motor_position() - old_setpoint) > 1:
             time.sleep(0.01)
+        self.log.info("Homing done.")
         
 
 class MOGLabsConfocalScanningLaserInterfuse(ScanningProbeInterface):
