@@ -1,5 +1,10 @@
 from PySide2 import QtCore
 import numpy as np
+import functools
+import operator
+import matplotlib.pyplot as plt
+from datetime import datetime
+import traceback
 from qudi.core.module import LogicBase
 
 from qudi.core.connector import Connector
@@ -7,17 +12,26 @@ from qudi.core.configoption import ConfigOption
 from qudi.core.statusvariable import StatusVar
 from qudi.util.datastorage import TextDataStorage
 from qudi.util.datafitting import FitContainer, FitConfigurationsModel
+from qudi.util.mutex import Mutex
 
 class SpectrometerLogic(LogicBase):
     _scan_logic = Connector(name='scan_logic', interface='ScanningProbeLogic')
+    _wavelength_channel = ConfigOption(name="wavelength_channel", default="wavelength")
+    _count_channel = ConfigOption(name="count_channel", default="APD")
 
     _spectrum = StatusVar(name='spectrum', default=[None, None])
+    _background = StatusVar(name='background', default=None)
+    _wavelength = StatusVar(name='wavelength', default=None)
     _constant_acquisition = StatusVar(name='constant_acquisition', default=False)
+    _differential_spectrum = StatusVar(name='differential_spectrum', default=False)
+    _background_correction = StatusVar(name='background_correction', default=False)
     _fit_region = StatusVar(name='fit_region', default=[0, 1])
     _axis_type_frequency = StatusVar(name='axis_type_frequency', default=False)
+    max_repetitions = StatusVar(name='max_repetitions', default=0)
     _fit_config = StatusVar(name='fit_config', default=dict())
 
     _sig_get_spectrum = QtCore.Signal(bool, bool, bool)
+    
     sig_data_updated = QtCore.Signal()
     sig_state_updated = QtCore.Signal()
     sig_fit_updated = QtCore.Signal(str, object)
@@ -35,12 +49,18 @@ class SpectrometerLogic(LogicBase):
         # locking for thread safety
         self._lock = Mutex()
 
-        self._spectrum = [None, None]
+        self._spectrum = None
+        self._currently_running_spectrum = None
         self._wavelength = None
         self._stop_acquisition = False
         self._acquisition_running = False
         self._fit_results = None
         self._fit_method = ''
+        self._scan_settings = {
+            'range': {},
+            'resolution': {},
+            'frequency': None
+        }
 
     def on_activate(self):
         """ Initialisation performed during activation of the module.
@@ -72,6 +92,26 @@ class SpectrometerLogic(LogicBase):
             self.log.warning("Differential spectra are not available in scqnning excitation spectroscopy.")
         self._sig_get_spectrum.emit(self._constant_acquisition, False, reset)
 
+    def get_spectrum(self, constant_acquisition=None, differential_spectrum=None, reset=True):
+        if constant_acquisition is not None:
+            self.constant_acquisition = bool(constant_acquisition)
+        self._stop_acquisition = False
+
+        if reset:
+            self._spectrum = None
+            self._currently_running_spectrum = None
+            self._wavelength = None
+            self._repetitions_spectrum = 0
+
+        self._acquisition_running = True
+        self.sig_state_updated.emit()
+
+        number_of_datapoints = functools.reduce(operator.mul, self._scan_logic().scan_resolution.values())
+        self._currently_running_spectrum = np.zeros((2, number_of_datapoints))
+        self._scan_logic().toggle_scan(True, self._scan_logic().scanner_axes, self.module_uuid)
+        
+        return self.spectrum
+
     def run_get_background(self, constant_acquisition=None, reset=True):
         self.log.warning("Background acquisition is not available for scanning excitation spectroscopy.")
 
@@ -81,11 +121,13 @@ class SpectrometerLogic(LogicBase):
 
     @property
     def spectrum(self):
-        if self._spectrum[0] is None:
+        if self._acquisition_running:
+            return np.copy(self._currently_running_spectrum[1,:])
+        if self._spectrum is None:
             return None
-        data = np.copy(self._spectrum[0])
-        if self._repetitions_spectrum != 0:
-            data /= self._repetitions_spectrum
+        return np.copy(self._spectrum)
+        #if self._repetitions_spectrum != 0:
+        #    data /= self._repetitions_spectrum
         return data
 
     def get_spectrum_at_x(self, x):
@@ -102,11 +144,15 @@ class SpectrometerLogic(LogicBase):
 
     @property
     def x_data(self):
-        if self._axis_type_frequency:
-            if self._wavelength is not None:
-                return self.speed_of_light / self._wavelength
+        if self._acquisition_running:
+            w = self._currently_running_spectrum[0,:]
         else:
-            return self._wavelength
+            w = self._wavelength
+        if self._axis_type_frequency:
+            if w is not None:
+                return self.speed_of_light / w
+        else:
+            return w
 
     @property
     def repetitions(self):
@@ -118,7 +164,6 @@ class SpectrometerLogic(LogicBase):
 
     @background_correction.setter
     def background_correction(self, value):
-        self.log.warning("Background correction is not available for scanning excitation spectroscopy.")
         self._background_correction = False
         self.sig_state_updated.emit()
         self.sig_data_updated.emit()
@@ -142,7 +187,6 @@ class SpectrometerLogic(LogicBase):
 
     @differential_spectrum.setter
     def differential_spectrum(self, value):
-        self.log.warning(f'differential_spectrum was requested, but it is not supported in scanning excitation spectroscopy.')
         self.sig_state_updated.emit()
 
     def save_spectrum_data(self, background=False, name_tag='', root_dir=None, parameter=None):
@@ -160,7 +204,13 @@ class SpectrometerLogic(LogicBase):
         parameters = {'acquisition repetitions': self.repetitions,
                       'differential_spectrum'  : self.differential_spectrum,
                       'background_correction'  : self.background_correction,
-                      'constant_acquisition'   : self.constant_acquisition}
+                      'constant_acquisition'   : self.constant_acquisition,
+                      'scan frequency'         : self._scan_settings["frequency"]
+                      }
+        for ax in self._scan_settings["range"].keys():
+            parameters[f"scan axis {ax} range"] = self._scan_settings["range"][ax]
+            parameters[f"scan axis {ax} resolution"] = self._scan_settings["resolution"][ax]
+        
         # TODO: report the scanning parameters here.
         if self.fit_method != 'No Fit' and self.fit_results is not None:
             parameters['fit_method'] = self.fit_method
@@ -204,13 +254,6 @@ class SpectrometerLogic(LogicBase):
                 data.append(self.spectrum)
                 self._background_correction = True
                 header.append('Signal raw')
-
-            # If the differential spectra arrays are not empty, save them as raw data
-            if self._differential_spectrum and self._spectrum[1] is not None:
-                data.append(self._spectrum[0])
-                header.append('Signal ON')
-                data.append(self._spectrum[1])
-                header.append('Signal OFF')
 
         # save the date to file
         ds = TextDataStorage(root_dir=self.module_default_data_dir if root_dir is None else root_dir)
@@ -280,12 +323,14 @@ class SpectrometerLogic(LogicBase):
         self.sig_data_updated.emit()
 
     @property
-    def exposure_time(self): # TODO: act on the scanning_logic here.
-        return self.spectrometer().exposure_time
+    def exposure_time(self):
+        return 1/list(self._scan_logic().scan_frequency.values())[0]
 
     @exposure_time.setter
-    def exposure_time(self, value): # TODO: act on the scanning_logic here.
-        self.spectrometer().exposure_time = float(value)
+    def exposure_time(self, value):
+        d = {k:float(value) for k in self._scan_logic().scan_frequency.keys()}
+        self._scan_logic().set_scan_frequency(d)
+        self.sig_state_updated.emit()
 
     ################
     # Fitting things
@@ -356,3 +401,41 @@ class SpectrometerLogic(LogicBase):
         new_region = (max(min(self.x_data), fit_region[0]), min(max(self.x_data), fit_region[1]))
         self._fit_region = new_region
         self.sig_state_updated.emit()
+
+    # Handling of new scan data 
+    def _update_scan_state(self, running, data, caller_id):
+        # Only treat spectra for scans started by the 
+        if caller_id not in (self._logic_id, self.module_uuid):
+            #self.log.debug(f"update_scan_state called with caller_id {caller_id}, not in {self._logic_id} {self.module_uuid}")
+            return
+        with self._lock:
+            self._scan_settings = {
+                'range': {ax: data.scan_range[i] for i, ax in enumerate(data.scan_axes)},
+                'resolution': {ax: data.scan_resolution[i] for i, ax in enumerate(data.scan_axes)},
+                'frequency': data.scan_frequency
+            }
+            wavelengths = data.data[self._wavelength_channel]
+            counts = data.data[self._count_channel]
+            indices = np.isfinite(wavelengths)
+            wavelengths = wavelengths[indices]
+            counts = counts[indices]
+            sorted_indices = np.argsort(wavelengths)
+            wavelengths = wavelengths[sorted_indices]
+            counts = counts[sorted_indices]
+            self._currently_running_spectrum[0,:len(wavelengths)] = wavelengths * 1e-9
+            self._currently_running_spectrum[1,:len(counts)] = counts
+            self.sig_data_updated.emit()
+            if not running: # When the scan finishes
+                self.log.debug("Scan is over.")
+                self._repetitions_spectrum += 1
+                self._spectrum = self._currently_running_spectrum[1,:]
+                self._wavelength = self._currently_running_spectrum[0,:]
+                if self._constant_acquisition and not self._stop_acquisition \
+                        and (not self.max_repetitions or self._repetitions_spectrum < self.max_repetitions):
+                    self.log.debug("Starting a new spectrum.")
+                    self.run_get_spectrum(reset=False)
+                else:
+                    self._acquisition_running = False
+                    self.fit_region = self._fit_region
+                    self.log.debug("Sending signal state update to notify end of scan.")
+                    self.sig_state_updated.emit()
