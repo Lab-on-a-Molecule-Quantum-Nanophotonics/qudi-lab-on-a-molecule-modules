@@ -107,7 +107,7 @@ class SpectrometerLogic(LogicBase):
         self.sig_state_updated.emit()
 
         number_of_datapoints = functools.reduce(operator.mul, self._scan_logic().scan_resolution.values())
-        self._currently_running_spectrum = np.zeros((2, number_of_datapoints))
+        self._currently_running_spectrum = np.full((2, number_of_datapoints), np.nan)
         self._scan_logic().toggle_scan(True, self._scan_logic().scanner_axes, self.module_uuid)
         
         return self.spectrum
@@ -122,7 +122,8 @@ class SpectrometerLogic(LogicBase):
     @property
     def spectrum(self):
         if self._acquisition_running:
-            return np.copy(self._currently_running_spectrum[1,:])
+            roi = np.isfinite(self._currently_running_spectrum[0,:])
+            return np.copy(self._currently_running_spectrum[1,roi])
         if self._spectrum is None:
             return None
         return np.copy(self._spectrum)
@@ -145,7 +146,8 @@ class SpectrometerLogic(LogicBase):
     @property
     def x_data(self):
         if self._acquisition_running:
-            w = self._currently_running_spectrum[0,:]
+            roi = np.isfinite(self._currently_running_spectrum[0,:])
+            w = self._currently_running_spectrum[0,roi]
         else:
             w = self._wavelength
         if self._axis_type_frequency:
@@ -428,8 +430,9 @@ class SpectrometerLogic(LogicBase):
             if not running: # When the scan finishes
                 self.log.debug("Scan is over.")
                 self._repetitions_spectrum += 1
-                self._spectrum = self._currently_running_spectrum[1,:]
-                self._wavelength = self._currently_running_spectrum[0,:]
+                roi = np.isfinite(self._currently_running_spectrum[0,:])
+                self._spectrum = self._currently_running_spectrum[1,roi]
+                self._wavelength = self._currently_running_spectrum[0,roi]
                 if self._constant_acquisition and not self._stop_acquisition \
                         and (not self.max_repetitions or self._repetitions_spectrum < self.max_repetitions):
                     self.log.debug("Starting a new spectrum.")
