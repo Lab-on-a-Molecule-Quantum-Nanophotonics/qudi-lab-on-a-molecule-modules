@@ -36,6 +36,7 @@ from qudi.core.statusvariable import StatusVar
 # from qudi.interface.scanning_laser_interface import ScanningLaserInterface, ScanningState, ScanningLaserReturnError
 from qudi.interface.data_instream_interface import DataInStreamInterface, DataInStreamConstraints, SampleTiming, StreamingMode, ScalarConstraint
 from qudi.interface.process_control_interface import ProcessControlConstraints, ProcessControlInterface
+from qudi.interface.autoscan_interface import AutoScanInterface, AutoScanConstraints
 from qudi.interface.switch_interface import SwitchInterface
 from qudi.interface.finite_sampling_input_interface import FiniteSamplingInputInterface, FiniteSamplingInputConstraints
 from qudi.interface.scanning_probe_interface import ScanningProbeInterface, ScanData, ScannerChannel, ScannerAxis, ScanConstraints
@@ -263,9 +264,11 @@ class MOGLABSMotorizedLaserDriver(SwitchInterface, ProcessControlInterface):
     def _set_current_mod(self, value):
         return self.send_and_recv(f"CURRENT,MOD,{value}")
 
-class MOGLABSCateyeLaser(ProcessControlInterface):
+class MOGLABSCateyeLaser(ProcessControlInterface, AutoScanInterface):
     port = ConfigOption("port")
     __sigResetMotor = QtCore.Signal()
+    _last_scan_pd = StatusVar(name="last_scan_pd", default=np.zeros(0, dtype=float))
+    _last_scan_piezo = StatusVar(name="last_scan_piezo", default=np.zeros(0, dtype=int))
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.serial = serial.Serial()
@@ -317,6 +320,8 @@ class MOGLABSCateyeLaser(ProcessControlInterface):
         """
         return True
 
+    constraints = OverloadedAttribute()
+    @constraints.overload("ProcessControlInterface")
     @property
     def constraints(self):
         """ Read-Only property holding the constraints for this hardware module.
@@ -329,6 +334,27 @@ class MOGLABSCateyeLaser(ProcessControlInterface):
             {"grating":self._motor_range()},
             {"grating":int, "photodiode":float},
         )
+
+    # AutoScanInterface
+    @constraints.overload("AutoScanInterface")
+    @property
+    def constraints(self):
+        return AutoScanConstraints(
+            channels=["photodiode", "piezo"],
+            units={"photodiode":"V", "piezo":""},
+            limits={"photodiode":(0,5), "piezo":(0,2**16)},
+            dtypes={"photodiode":float, "piezo":int}
+        )
+    def trigger_scan(self):
+        vals = self._scan_pd()
+        self._last_scan_pd = vals[0,:]*5.0/(2**12-1)
+        self._last_scan_piezo = vals[1,:]
+
+    def get_last_scan(self, channel):
+        if channel == "photodiode":
+            return self._last_scan_pd
+        else:
+            return self._last_scan_piezo
         
     # Internal communication facilities
     def send_and_recv(self, value, check_ok=True):
@@ -381,10 +407,15 @@ class MOGLABSCateyeLaser(ProcessControlInterface):
     def _get_pd(self):
         return float(self.send_and_recv("pd,read,0", check_ok=False).split()[0])
         
-    def _scan_pd(self,duration):
+    def _scan_pd(self,duration=1):
         cmd = f"pd,scan,{duration}\r\n"
         self.serial.write(cmd.encode("utf8"))
-
+        l = struct.unpack("<I", self.serial.read(4))
+        vals = np.empty(l//2, int)
+        binary_data = self.serial.read(l)
+        for i in range(0, l, 2):
+            vals[i//2] = struct.unpack("<H", binary_data[i:i+2])
+        return np.reshape(vals, (2, len(vals)//2), 'F')
 
 class MOGLabsFZWScanner(ScanningProbeInterface):
     """A class to control our MOGLabs laser to perform excitation spectroscopy.
