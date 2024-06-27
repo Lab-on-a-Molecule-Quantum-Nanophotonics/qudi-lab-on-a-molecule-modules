@@ -32,6 +32,7 @@ import serial
 import numpy as np
 
 from qudi.core.configoption import ConfigOption
+from qudi.core.statusvariable import StatusVar
 # from qudi.interface.scanning_laser_interface import ScanningLaserInterface, ScanningState, ScanningLaserReturnError
 from qudi.interface.data_instream_interface import DataInStreamInterface, DataInStreamConstraints, SampleTiming, StreamingMode, ScalarConstraint
 from qudi.interface.process_control_interface import ProcessControlConstraints, ProcessControlInterface
@@ -44,7 +45,7 @@ from qudi.util.overload import OverloadedAttribute
 from qudi.util.helpers import in_range
 from qudi.util.enums import SamplingOutputMode
 
-class MOGLABSMotorizedLaserDriver(SwitchInterface):
+class MOGLABSMotorizedLaserDriver(SwitchInterface, ProcessControlInterface):
     """
     Control the Laser diode driver directly.
     """
@@ -65,13 +66,18 @@ class MOGLABSMotorizedLaserDriver(SwitchInterface):
         self.serial.timeout=1
         self.serial.writeTimeout=0
         self.serial.port=self.port
+        self._ramp_running = False
+        self._ramp_halt = 0.0
+        self._lock = Mutex()     
         self.serial.open()
+        self._set_ramp_status("OFF")
 
     def on_deactivate(self):
         """Deactivate module.
         """
         self.serial.close()
 
+    # SwitchInterface
     @property
     def name(self):
         return "LDD"
@@ -81,23 +87,113 @@ class MOGLABSMotorizedLaserDriver(SwitchInterface):
                 "HV,MOD":("EXT", "RAMP"),
                 "Temp. control":("OFF", "ON"),
                 "Curr. control":("OFF", "ON"),
+                "RAMP":("OFF", "ON"),
+                "CURRENT,MOD":("OFF", "+RAMP"),
         }
     def get_state(self, switch):
-        if switch == "HV,MOD":
-            return self._mod_status()
-        elif switch == "Temp. control":
-            return self._temp_status()
-        else:
-            return self._current_status()
+        with self._lock:
+            if switch == "HV,MOD":
+                return self._mod_status()
+            elif switch == "Temp. control":
+                return self._temp_status()
+            elif switch == "RAMP":
+                return self._ramp_status()
+            elif switch == "CURRENT,MOD":
+                return self._get_current_mod()
+            else:
+                return self._current_status()
 
     def set_state(self, switch, state):
-        if switch == "HV,MOD":
-            self._set_mod_status(state)
-        elif switch == "Temp. control":
-            self._set_temp_status(state)
-        else:
-            self._set_current_status(state)
+        with self._lock:
+            if switch == "HV,MOD":
+                self._set_mod_status(state)
+            elif switch == "Temp. control":
+                self._set_temp_status(state)
+            elif switch == "RAMP":
+                self._set_ramp_status(state)
+            elif switch == "CURRENT,MOD":
+                return self._set_current_mod(state)
+            else:
+                self._set_current_status(state)
+            
+    # ProcessControlInterface
+    def set_setpoint(self, channel, value):
+        with self._lock:
+            if channel == "frequency":
+                return self._set_freq(value)
+            elif channel == "span":
+                return self._set_span(value)
+            elif channel == "offset":
+                return self._set_offset(value)
+            elif channel == "bias":
+                return self._set_bias(value)
+            elif channel == "duty":
+                return self._set_duty(value)
 
+    def get_setpoint(self, channel):
+        with self._lock:
+            if channel == "frequency":
+                return self._get_freq()
+            elif channel == "span":
+                return self._get_span()
+            elif channel == "offset":
+                return self._get_offset()
+            elif channel == "bias":
+                return self._get_bias()
+            elif channel == "duty":
+                return self._get_duty()
+
+    def get_process_value(self, channel):
+        with self._lock:
+            return self._get_current()
+
+    def set_activity_state(self, channel, active):
+        """ Set activity state for given channel.
+        State is bool type and refers to active (True) and inactive (False).
+        """
+        pass
+
+    def get_activity_state(self, channel):
+        """ Get activity state for given channel.
+        State is bool type and refers to active (True) and inactive (False).
+        """
+        return True
+
+    @property
+    def constraints(self):
+        """ Read-Only property holding the constraints for this hardware module.
+        See class ProcessControlConstraints for more details.
+        """
+        with self._lock:
+            return ProcessControlConstraints(
+                ["frequency", "span", "offset", "bias", "duty"],
+                ["current"],
+                {
+                    "frequency":"Hz",
+                    "span":"",
+                    "offset":"",
+                    "bias":"mA",
+                    "duty":"",
+                    "current":"mA"
+                },
+                {
+                    "frequency":(0.0, 50),
+                    "span":(0.0,1.0),
+                    "offset":(0.0,1.0),
+                    "bias":(0.0,50.0),
+                    "duty":(0.0,1.0),
+                    "current":(0.0,self._get_current_lim()),
+                },
+                {
+                    "frequency":float,
+                    "span":float,
+                    "offset":float,
+                    "bias":float,
+                    "duty":float,
+                    "current":float,
+                },
+            )
+        
     # Internal communication facilities
     def send_and_recv(self, value, check_ok=True):
         if not value.endswith("\r\n"):
@@ -125,6 +221,47 @@ class MOGLABSMotorizedLaserDriver(SwitchInterface):
         
     def _set_current_status(self, val):
         return self.send_and_recv(f"CURRENT,ONOFF,{val}")
+
+    def _set_freq(self, val):
+        return self.send_and_recv(f"RAMP,FREQ,{val}")
+    def _get_freq(self):
+        return float(self.send_and_recv(f"RAMP,FREQ", check_ok=False).split()[0])
+    def _set_span(self, val):
+        return self.send_and_recv(f"RAMP,SPAN,{val}")
+    def _get_span(self):
+        return float(self.send_and_recv(f"RAMP,SPAN", check_ok=False).split()[0])
+    def _set_offset(self, val):
+        return self.send_and_recv(f"RAMP,OFFSET,{val}")
+    def _get_offset(self):
+        return float(self.send_and_recv(f"RAMP,OFFSET", check_ok=False).split()[0])
+    def _set_bias(self, val):
+        return self.send_and_recv(f"RAMP,BIAS,{val}")
+    def _get_bias(self):
+        return float(self.send_and_recv(f"RAMP,BIAS", check_ok=False).split()[0])
+    def _set_duty(self, val):
+        return self.send_and_recv(f"RAMP,DUTY,{val}")
+    def _get_duty(self):
+        return float(self.send_and_recv(f"RAMP,DUTY", check_ok=False).split()[0])
+    def _get_current_lim(self):
+        return float(self.send_and_recv(f"current,ilim", check_ok=False).split()[0])
+    def _get_current(self):
+        return float(self.send_and_recv(f"current,meas", check_ok=False).split()[0])
+    def _set_ramp_status(self, st):
+        if st == "OFF":
+            self._ramp_running = False
+            self.send_and_recv(f"ramp,halt,{self._ramp_halt}", check_ok=False)
+        else:
+            self._ramp_running = True
+            self.send_and_recv(f"ramp,resume")
+    def _ramp_status(self):
+        if self._ramp_running:
+            return "ON"
+        else:
+            return "OFF"
+    def _get_current_mod(self):
+        return self.send_and_recv("CURRENT,MOD", check_ok=False).rstrip()
+    def _set_current_mod(self, value):
+        return self.send_and_recv(f"CURRENT,MOD,{value}")
 
 class MOGLABSCateyeLaser(ProcessControlInterface):
     port = ConfigOption("port")
@@ -249,9 +386,6 @@ class MOGLabsFZWScanner(ScanningProbeInterface):
     ldd = Connector(name="laser_driver", interface="SwitchInterface")
     fzw_process_control = Connector(name="wavemeter_process", interface="ProcessControlInterface")
     counter = Connector(name="counter", interface="FiniteSamplingInputInterface")
-
-    _counter_apd_channel = ConfigOption(name="counter_apd_channel", missing="error")
-    _apd_oversampling = ConfigOption(name="apd_oversampling", default=2)
 
     _threaded = True  # Interfuse is by default not threaded.
 
