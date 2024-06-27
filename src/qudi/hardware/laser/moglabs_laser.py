@@ -300,7 +300,10 @@ class MOGLABSCateyeLaser(ProcessControlInterface):
 
     def get_process_value(self, channel):
         with self._lock:
-            return self._motor_position()
+            if channel=="grating":
+                return self._motor_position()
+            else:
+                return self._get_pd()
 
     def set_activity_state(self, channel, active):
         """ Set activity state for given channel.
@@ -321,10 +324,10 @@ class MOGLABSCateyeLaser(ProcessControlInterface):
         """
         return ProcessControlConstraints(
             ["grating"],
-            ["grating"],
-            {"grating":"step"},
+            ["grating", "photodiode"],
+            {"grating":"step", "photodiode":"V"},
             {"grating":self._motor_range()},
-            {"grating":int},
+            {"grating":int, "photodiode":float},
         )
         
     # Internal communication facilities
@@ -374,6 +377,13 @@ class MOGLABSCateyeLaser(ProcessControlInterface):
                 while np.abs(self._motor_position() - old_setpoint) > 1:
                     time.sleep(0.01)
                 self.log.info("Homing done.")
+                
+    def _get_pd(self):
+        return float(self.send_and_recv("pd,read,0", check_ok=False).split()[0])
+        
+    def _scan_pd(self,duration):
+        cmd = f"pd,scan,{duration}\r\n"
+        self.serial.write(cmd.encode("utf8"))
 
 
 class MOGLabsFZWScanner(ScanningProbeInterface):
@@ -387,6 +397,29 @@ class MOGLabsFZWScanner(ScanningProbeInterface):
     fzw_process_control = Connector(name="wavemeter_process", interface="ProcessControlInterface")
     counter = Connector(name="counter", interface="FiniteSamplingInputInterface")
 
+    _counter_apd_channel = ConfigOption(name="counter_apd_channel", missing="error")
+    _apd_oversampling = ConfigOption(name="apd_oversampling", default=2)
+    
+    _calibration_grating_positions = StatusVar(name="calibration_grating_positions", default=None)
+    _calibration_bias = StatusVar(name="calibration_bias", default=None)
+    _callibration_center_offset = StatusVar(name="calibration_center_offset", default=None)
+    _calibration_center_frequencies = StatusVar(name="calibration_center_frequencies", default=None)
+    _calibration_mini_frequencies = StatusVar(name="calibration_mini_frequencies", default=None)
+    _calibration_maxi_frequencies = StatusVar(name="calibration_maxi_frequencies", default=None)
+    
+    _calibration_scan_width = StatusVar(name="calibration_scan_width", default=0.8)
+    _calibration_scan_frequency = StatusVar(name="calibration_scan_frequency", default=5)
+    _calibration_scan_duration = StatusVar(name="calibration_scan_frequency", default=5)
+    _calibration_encoder_start = StatusVar(name="calibration_encoder_start", default=4400)
+    _calibration_encoder_stop = StatusVar(name="calibration_encoder_stop", default=16400)
+    _calibration_encoder_step = StatusVar(name="calibration_encoder_step", default=10)
+    _calibration_bias_start = StatusVar(name="calibration_encoder_start", default=0.0)
+    _calibration_bias_stop = StatusVar(name="calibration_encoder_stop", default=50.0)
+    _calibration_bias_step = StatusVar(name="calibration_encoder_step", default=5.0)
+    _calibration_ramp_duty = StatusVar(name="calibration_ramp_duty", default=1.0)
+    
+    _current_stiteched_scan = StatusVar(name="current_stitched_scan", default=None)
+    
     _threaded = True  # Interfuse is by default not threaded.
 
     sigNextDataChunk = QtCore.Signal()
