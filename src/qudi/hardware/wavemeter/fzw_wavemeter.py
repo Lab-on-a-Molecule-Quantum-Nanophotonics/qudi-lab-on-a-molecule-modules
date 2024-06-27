@@ -15,12 +15,13 @@ from qudi.interface.data_instream_interface import DataInStreamInterface, DataIn
 from qudi.interface.finite_sampling_input_interface import FiniteSamplingInputInterface, FiniteSamplingInputConstraints
 from qudi.interface.process_control_interface import ProcessControlConstraints, ProcessControlInterface
 from qudi.interface.switch_interface import SwitchInterface
+from qudi.interface.pid_controller_interface import PIDControllerInterface
 from qudi.util.mutex import Mutex
 from qudi.util.overload import OverloadedAttribute
 
 CRLF=b"\r\n"
 
-class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInterface, ProcessControlInterface):
+class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInterface, ProcessControlInterface, PIDControllerInterface):
     """A class to control our MOGLabs laser to perform excitation spectroscopy.
 
     Example config:
@@ -144,6 +145,8 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
         return self.send_and_recv(f"pid,write,{v}")
     def _set_offset(self,v):
         return self.send_and_recv(f"pid,offset,{v}")
+    def _is_pid_disabled(self):
+        return "DISABLED" in self.send_and_recv("pid,status", check_ok=False)
     def _dump(self, buffer_data : Optional[np.ndarray] = None , buffer_timestamp : Optional[np.ndarray] = None, dump_start = 0) -> Tuple[np.ndarray, np.ndarray, int]:
         self.serial.reset_input_buffer()
         self.serial.write("meas,dump\r\n".encode("utf8"))
@@ -432,14 +435,18 @@ TypeError: only integer scalar arrays can be converted to a scalar index
     def available_states(self):
         return {
                 "MEAS,EXTRIG":("OFF", "ON"),
-                "MEAS,PULSE":("OFF", "ON")
+                "MEAS,PULSE":("OFF", "ON"),
+                "PID,ENABLED": ("OFF", "ON"),
         }
     def get_state(self, switch):
         with self._lock:
             if switch == "MEAS,EXTRIG":
                 st = self._get_trig()
-            else:
+            elif switch == "MEAS,PULSE":
                 st = self._get_pulse()
+            else:
+                enabled = not self._is_pid_disabled()
+                st = "ON" if enabled else "OFF"
             if "ON" in st:
                 return "ON"
             else:
@@ -448,8 +455,10 @@ TypeError: only integer scalar arrays can be converted to a scalar index
         with self._lock:
             if switch == "MEAS,EXTRIG":
                 self._set_trig(state)
-            else:
+            elif switch == "MEAS,PULSE":
                 self._set_pulse(state)
+            else:
+                self.set_enabled(state == "ON")
 
     # FiniteSamplingInputInterface
     @constraints.overload("FiniteSamplingInputInterface")
@@ -533,14 +542,20 @@ TypeError: only integer scalar arrays can be converted to a scalar index
         return data
 
     # ProcessControlInterface
+    set_setpoint = OverloadedAttribute()
+    @set_setpoint.overload("ProcessControlInterface")
     def set_setpoint(self, channel, value):
         with self._lock:
             return self._set_pid_value(value)
 
+    get_setpoint = OverloadedAttribute()
+    @get_setpoint.overload("ProcessControlInterface")
     def get_setpoint(self, channel):
         with self._lock:
             return self._get_pid_value()
 
+    get_process_value = OverloadedAttribute()
+    @get_process_value.overload("ProcessControlInterface")
     def get_process_value(self, channel):
         with self._lock:
             self._softrig()
@@ -572,3 +587,75 @@ TypeError: only integer scalar arrays can be converted to a scalar index
         See class ProcessControlConstraints for more details.
         """
         return self._constraints_process_control
+        
+    # PIDControllerInterface
+    def get_kp(self):
+        with self._lock:
+            return float(self.send_and_recv("pid,kp", check_ok=False))
+    def set_kp(self, kp):
+        with self._lock:
+            self.send_and_recv(f"pid,kp,{kp}")
+    def get_ki(self):
+        with self._lock:
+            return float(self.send_and_recv("pid,ki", check_ok=False))
+    def set_ki(self, ki):
+        with self._lock:
+            self.send_and_recv(f"pid,ki,{ki}")
+    def get_kd(self):
+        with self._lock:
+            return float(self.send_and_recv("pid,kd", check_ok=False))
+    def set_kd(self, kd):
+        with self._lock:
+            self.send_and_recv(f"pid,kd,{kd}")
+    @get_setpoint.overload("PIDControllerInterface")
+    def get_setpoint(self):
+        with self._lock:
+            return float(self.send_and_recv(f"pid,setpoint", check_ok=False).split()[0])
+    @set_setpoint.overload("PIDControllerInterface")
+    def set_setpoint(self, setpoint):
+        with self._lock:
+            self.send_and_recv(f"pid,setpoint,{setpoint}")
+    def get_manual_value(self):
+        with self._lock:
+            return self._get_pid_value()
+    def set_manual_value(self, manual_value):
+        with self._lock:
+            return self._set_pid_value(manual_value)
+    def get_enabled(self):
+        with self._lock:
+            ret = not self._is_pid_disabled()
+            self.log.debug(f"enabled={ret}")
+            return ret
+    def set_enabled(self, enabled):
+        with self._lock:
+            currently_disabled = self._is_pid_disabled()
+            if enabled and currently_disabled:
+                self.send_and_recv("pid,enable,on")
+            elif not enabled and not currently_disabled:
+                self.send_and_recv("pid,disable")
+    def get_control_limits(self):
+        return (-2.5, 2.5)
+    def set_control_limits(self, limits):
+        pass
+    @get_process_value.overload("PIDControllerInterface")
+    def get_process_value(self):
+        with self._lock:
+            self._softrig()
+            f = self.send_and_recv("meas,freq", check_ok=False)
+        try:
+            return np.float64(f.split()[0])
+        except ValueError:
+            return np.nan
+    def process_value_unit(self) -> str:
+        return "THz"
+    def get_control_value(self):
+        with self._lock:
+            return self._get_pid_value()
+    def control_value_unit(self) -> str:
+        return "V"
+    def get_extra(self):
+        return {
+            "P":self.get_kp(),
+            "I":self.get_ki(),
+            "D":self.get_kd(),
+        }
