@@ -130,6 +130,8 @@ class MOGLABSMotorizedLaserDriver(SwitchInterface, ProcessControlInterface):
                 return self._set_bias(value)
             elif channel == "duty":
                 return self._set_duty(value)
+            elif channel == "ramp_halt": 
+                return self._ramp_halt=value
 
     def get_setpoint(self, channel):
         with self._lock:
@@ -143,6 +145,8 @@ class MOGLABSMotorizedLaserDriver(SwitchInterface, ProcessControlInterface):
                 return self._get_bias()
             elif channel == "duty":
                 return self._get_duty()
+            elif channel == "ramp_halt": 
+                return self._ramp_halt
 
     def get_process_value(self, channel):
         with self._lock:
@@ -167,7 +171,7 @@ class MOGLABSMotorizedLaserDriver(SwitchInterface, ProcessControlInterface):
         """
         with self._lock:
             return ProcessControlConstraints(
-                ["frequency", "span", "offset", "bias", "duty"],
+                ["frequency", "span", "offset", "bias", "duty", "ramp_halt"],
                 ["current"],
                 {
                     "frequency":"Hz",
@@ -175,7 +179,8 @@ class MOGLABSMotorizedLaserDriver(SwitchInterface, ProcessControlInterface):
                     "offset":"",
                     "bias":"mA",
                     "duty":"",
-                    "current":"mA"
+                    "current":"mA",
+                    "ramp_halt":"",
                 },
                 {
                     "frequency":(0.0, 50),
@@ -184,6 +189,7 @@ class MOGLABSMotorizedLaserDriver(SwitchInterface, ProcessControlInterface):
                     "bias":(0.0,50.0),
                     "duty":(0.0,1.0),
                     "current":(0.0,self._get_current_lim()),
+                    "ramp_halt":(0.0,1.0),
                 },
                 {
                     "frequency":float,
@@ -192,6 +198,7 @@ class MOGLABSMotorizedLaserDriver(SwitchInterface, ProcessControlInterface):
                     "bias":float,
                     "duty":float,
                     "current":float,
+                    "ramp_halt":float,
                 },
             )
         
@@ -430,26 +437,6 @@ class MOGLabsFZWScanner(ScanningProbeInterface):
 
     _counter_apd_channel = ConfigOption(name="counter_apd_channel", missing="error")
     _apd_oversampling = ConfigOption(name="apd_oversampling", default=2)
-    
-    _calibration_grating_positions = StatusVar(name="calibration_grating_positions", default=None)
-    _calibration_bias = StatusVar(name="calibration_bias", default=None)
-    _callibration_center_offset = StatusVar(name="calibration_center_offset", default=None)
-    _calibration_center_frequencies = StatusVar(name="calibration_center_frequencies", default=None)
-    _calibration_mini_frequencies = StatusVar(name="calibration_mini_frequencies", default=None)
-    _calibration_maxi_frequencies = StatusVar(name="calibration_maxi_frequencies", default=None)
-    
-    _calibration_scan_width = StatusVar(name="calibration_scan_width", default=0.8)
-    _calibration_scan_frequency = StatusVar(name="calibration_scan_frequency", default=5)
-    _calibration_scan_duration = StatusVar(name="calibration_scan_frequency", default=5)
-    _calibration_encoder_start = StatusVar(name="calibration_encoder_start", default=4400)
-    _calibration_encoder_stop = StatusVar(name="calibration_encoder_stop", default=16400)
-    _calibration_encoder_step = StatusVar(name="calibration_encoder_step", default=10)
-    _calibration_bias_start = StatusVar(name="calibration_encoder_start", default=0.0)
-    _calibration_bias_stop = StatusVar(name="calibration_encoder_stop", default=50.0)
-    _calibration_bias_step = StatusVar(name="calibration_encoder_step", default=5.0)
-    _calibration_ramp_duty = StatusVar(name="calibration_ramp_duty", default=1.0)
-    
-    _current_stiteched_scan = StatusVar(name="current_stitched_scan", default=None)
     
     _threaded = True  # Interfuse is by default not threaded.
 
