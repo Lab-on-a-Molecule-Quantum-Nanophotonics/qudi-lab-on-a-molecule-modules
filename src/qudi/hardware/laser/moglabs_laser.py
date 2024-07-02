@@ -46,6 +46,8 @@ from qudi.util.overload import OverloadedAttribute
 from qudi.util.helpers import in_range
 from qudi.util.enums import SamplingOutputMode
 
+from qudi.hardware.laser.moglabs_helper import MOGLABSDeviceFinder
+
 class MOGLABSMotorizedLaserDriver(SwitchInterface, ProcessControlInterface):
     """
     Control the Laser diode driver directly.
@@ -60,13 +62,8 @@ class MOGLABSMotorizedLaserDriver(SwitchInterface, ProcessControlInterface):
     def on_activate(self):
         """Activate module.
         """
-        self.serial.baudrate=115200
-        self.serial.bytesize=8
-        self.serial.parity='N'
-        self.serial.stopbits=1
-        self.serial.timeout=1
-        self.serial.writeTimeout=0
-        self.serial.port=self.port
+        device_finder = MOGLABSDeviceFinder()
+        self.serial = device_finder.ldd
         self._ramp_running = False
         self._ramp_halt = 0.0
         self._lock = Mutex()     
@@ -272,7 +269,6 @@ class MOGLABSMotorizedLaserDriver(SwitchInterface, ProcessControlInterface):
         return self.send_and_recv(f"CURRENT,MOD,{value}")
 
 class MOGLABSCateyeLaser(ProcessControlInterface, AutoScanInterface):
-    port = ConfigOption("port")
     _scan_duration = StatusVar(name="scan_duration", default=1.0)
     __sigResetMotor = QtCore.Signal()
     _last_scan_pd = StatusVar(name="last_scan_pd", default=np.zeros(0, dtype=float))
@@ -285,13 +281,8 @@ class MOGLABSCateyeLaser(ProcessControlInterface, AutoScanInterface):
     def on_activate(self):
         """Activate module.
         """
-        self.serial.baudrate=115200
-        self.serial.bytesize=8
-        self.serial.parity='N'
-        self.serial.stopbits=1
-        self.serial.timeout=1
-        self.serial.writeTimeout=0
-        self.serial.port=self.port
+        device_finder = MOGLABSDeviceFinder()
+        self.serial = device_finder.cem
         self.serial.open()
         self._lock = Mutex()     
         self.__sigResetMotor.connect(self.__reset_motor, QtCore.Qt.QueuedConnection)
