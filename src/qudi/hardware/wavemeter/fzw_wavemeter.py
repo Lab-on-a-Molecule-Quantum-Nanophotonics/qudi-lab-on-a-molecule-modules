@@ -19,6 +19,8 @@ from qudi.interface.pid_controller_interface import PIDControllerInterface
 from qudi.util.mutex import Mutex
 from qudi.util.overload import OverloadedAttribute
 
+from qudi.hardware.laser.moglabs_helper import MOGLABSDeviceFinder
+
 CRLF=b"\r\n"
 
 class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInterface, ProcessControlInterface, PIDControllerInterface):
@@ -87,13 +89,8 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
             {"tension":(-2.5,2.5)},
             {"tension":float, "wavelength":float, "frequency":float},
         )
-        self.serial.baudrate=115200
-        self.serial.bytesize=8
-        self.serial.parity='N'
-        self.serial.stopbits=1
-        self.serial.timeout=1
-        self.serial.writeTimeout=0
-        self.serial.port=self.port
+        device_finder = MOGLABSDeviceFinder()
+        self.serial = device_finder.fzw
         self.serial.open()
         self._set_offset(0.0)
         if self.auto_start_acquisition :
