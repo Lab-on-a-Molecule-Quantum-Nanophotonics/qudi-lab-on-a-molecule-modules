@@ -310,8 +310,10 @@ class MOGLABSCateyeLaser(ProcessControlInterface, AutoScanInterface):
         with self._lock:
             if channel=="grating":
                 return self._motor_position()
-            else:
+            elif channel=="photodiode":
                 return self._get_pd()
+            else:
+                return self._get_piezo()
 
     def set_activity_state(self, channel, active):
         """ Set activity state for given channel.
@@ -334,10 +336,10 @@ class MOGLABSCateyeLaser(ProcessControlInterface, AutoScanInterface):
         """
         return ProcessControlConstraints(
             ["grating", "scan_duration"],
-            ["grating", "photodiode"],
-            {"grating":"step", "photodiode":"V", "scan_duration":"s"},
+            ["grating", "photodiode", "piezo"],
+            {"grating":"step", "photodiode":"V", "piezo":"V", "scan_duration":"s"},
             {"grating":self._motor_range(), "scan_duration":(0.1,20)},
-            {"grating":int, "photodiode":float, "scan_duration":float},
+            {"grating":int, "photodiode":float, "piezo":float, "scan_duration":float},
         )
 
     # AutoScanInterface
@@ -412,6 +414,9 @@ class MOGLABSCateyeLaser(ProcessControlInterface, AutoScanInterface):
                 
     def _get_pd(self):
         return float(self.send_and_recv("pd,read,0", check_ok=False).split()[0])
+
+    def _get_piezo(self):
+        return float(self.send_and_recv("pd,read,1", check_ok=False).split()[0])
         
     def _scan_pd(self,duration=None):
         if duration is None:

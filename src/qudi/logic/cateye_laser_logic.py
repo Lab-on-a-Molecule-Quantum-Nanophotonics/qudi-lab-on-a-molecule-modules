@@ -28,17 +28,18 @@ class CateyeLaserLogic(LogicBase):
     scan_data_history_length = ConfigOption(name="scan_data_history_length", default=10)
 
     _calibration_scan_span = StatusVar(name="calibration_scan_span", default=0.8)
-    _calibration_scan_frequency = StatusVar(name="calibration_scan_frequency", default=5.0)
-    _calibration_scan_duration = StatusVar(name="calibration_scan_duration", default=5.0)
+    _calibration_scan_frequency = StatusVar(name="calibration_scan_frequency", default=0.05)
+    _calibration_sample_time = StatusVar(name="calibration_sample_time", default=2e-3)
+    _calibration_offset = StatusVar(name="calibration_offset", default=0)
     _calibration_encoder_start = StatusVar(name="calibration_encoder_start", default=4400)
     _calibration_encoder_stop = StatusVar(name="calibration_encoder_stop", default=16400)
     _calibration_encoder_step = StatusVar(name="calibration_encoder_step", default=10)
-    _calibration_bias_start = StatusVar(name="calibration_encoder_start", default=0.0)
-    _calibration_bias_stop = StatusVar(name="calibration_encoder_stop", default=50.0)
-    _calibration_bias_step = StatusVar(name="calibration_encoder_step", default=5.0)
+    _calibration_bias_start = StatusVar(name="calibration_bias_start", default=0.0)
+    _calibration_bias_stop = StatusVar(name="calibration_bias_stop", default=50.0)
+    _calibration_bias_step = StatusVar(name="calibration_bias_step", default=5.0)
     _calibration_ramp_duty = StatusVar(name="calibration_ramp_duty", default=1.0)
 
-    _mode_hop_threshold = StatusVar(name="mode_hop_threshold", default=0.1)
+    _mode_hop_threshold = StatusVar(name="mode_hop_threshold", default=1e-3)
     
     _current_scan_index = StatusVar(name="current_scan_index", default=None)
     _scan_history = StatusVar(name="scan_history", default=[])
@@ -54,6 +55,7 @@ class CateyeLaserLogic(LogicBase):
     sigPositionUpdated = QtCore.Signal(dict)
     sigScanningUpdated = QtCore.Signal(bool)
     sigCurrentScanUpdated = QtCore.Signal()
+    sigCurrentStepUpdated = QtCore.Signal(int)
     sigProgressUpdated = QtCore.Signal(float)
     sigScanListUpdated = QtCore.Signal()
     sigCurrentDataUpdated = QtCore.Signal()
@@ -78,16 +80,15 @@ class CateyeLaserLogic(LogicBase):
                 {"name":"start_idle", "src":"prepare_idle", "dst":"idle"},
                 {"name":"start_idle", "src":"stopped", "dst":"prepare_idle"},
 
-                {"name":"start_scan", "src":"idle", "dst":"prepare_step"},
+                {"name":"start_scan", "src":"idle", "dst":"prepare_scan"},
+                {"name":"start_prepare_step", "src":"prepare_scan", "dst":"prepare_step"},
                 {"name":"position_grating", "src":"prepare_step", "dst":"grating_moving"},
                 {"name":"start_scan_step", "src":"grating_moving", "dst":"record_scan_step"},
-                {"name":"start_calibration_step", "src":"grating_moving", "dst":"record_calibration_step"},
-                {"name":"start_center_frequency_measurement", "src":"record_calibration_step", "dst":"record_center_frequency"},
-                {"name":"start_span_frequency_measurement", "src":"record_center_frequency", "dst":"record_span_frequency"},
-                {"name":"step_done", "src":["record_scan_step", "record_span_frequency", "record_calibration_step"], "dst":"prepare_step"},
+                {"name":"start_calculate_calibration", "src":"record_scan_step", "dst":"calculate_calibration"},
+                {"name":"step_done", "src":["record_scan_step", "calculate_calibration"], "dst":"prepare_step"},
                 {"name":"end_scan", "src":"prepare_step", "dst":"prepare_idle"},
 
-                {"name":"interrupt_scan", "src":["prepare_step","grating_moving","record_scan_step","record_calibration_step"], "dst":"prepare_idle"},
+                {"name":"interrupt_scan", "src":["prepare_scan","prepare_step","grating_moving","record_scan_step","calculate_calibration"], "dst":"prepare_idle"},
 
                 {"name":"stop_watchdog", "src":"*", "dst":"stopped"},
             ],
@@ -124,6 +125,7 @@ class CateyeLaserLogic(LogicBase):
                 "frequency": self.fzw_control().constraints.channel_units[self.frequency_channel],
                 "photodiode": self.cem_control().constraints.channel_units[self.photodiode_channel],
                 "grating": self.cem_control().constraints.channel_units[self.grating_channel],
+                "piezo": "V",
             },
             "values": {},
             "state": "",
@@ -131,12 +133,19 @@ class CateyeLaserLogic(LogicBase):
         self.start_watchdog()
 
     def on_deactivate(self):
-        if self._current_scan is not None:
-            self._scan_history[self._current_scan_index] = self._current_scan.to_dict()
+        self.save_current_scan()
         self.watchdog_event("stop_watchdog")
         while not self.watchdog_state == "stopped":
             time.sleep(0.1)
         self._sigWatchDog.disconnect()
+
+    def save_current_scan(self):
+        if self._current_scan is not None:
+            if self._current_scan_index >= len(self._scan_history):
+                self._scan_history.append(self._current_scan.to_dict())
+                self._current_scan_index = len(self._scan_history)-1
+            else:
+                self._scan_history[self._current_scan_index] = self._current_scan.to_dict()
 
     @property
     def watchdog_state(self):
@@ -233,12 +242,14 @@ class CateyeLaserLogic(LogicBase):
     def read_status(self):
         frequency = self.fzw_control().get_process_value(self.frequency_channel)
         photodiode = self.cem_control().get_process_value(self.photodiode_channel)
+        piezo = self.cem_control().get_process_value("piezo")
         grating = self.cem_control().get_process_value(self.grating_channel)
         self._last_report_time = time.perf_counter()
         self._report["values"].update({
             "frequency":frequency,
             "photodiode":photodiode,
             "grating":grating,
+            "piezo":piezo,
         })
         self._report["state"] = self.watchdog_state
         return self._report
@@ -260,8 +271,7 @@ class CateyeLaserLogic(LogicBase):
         self.sigScanningUpdated.emit(False)
 
     def _on_step_done(self, *args, **kwargs):
-        if not self._single_step_scan_started:
-            self._current_scan.next()
+        pass
 
     def _watchdog_callback(self):
         try:
@@ -276,29 +286,34 @@ class CateyeLaserLogic(LogicBase):
                 self.watchdog_event("start_idle")
             elif watchdog_state == "idle":
                 pass
-            elif watchdog_state == "prepare_step":
-                if self._single_step_scan_started:
-                    self.log.info("Single step scan finished.")
-                    self._single_step_scan_started = False
-                    self.watchdog_event("end_scan")
-                elif self._current_scan is None:
+            elif watchdog_state == "prepare_scan":
+                if self._current_scan is None:
                     self.log.error("Cannot scan when no scan has been prepared!")
                     self.watchdog_event("interrupt_scan")
-                elif self._current_scan.finished():
-                    self.log.info("Scan finished.")
-                    self.watchdog_event("end_scan")
                 else:
-                    if self._current_scan.is_first_step() or self._single_step_scan_requested:
-                        if self._current_scan.calibration:
-                            with self._data_lock:
-                                self._current_calibration = Calibration.from_scan_configuration(self._current_scan.to_dict())                            
-                        else:
-                            with self._data_lock:
-                                self._current_scan_data = ScanData(self._current_scan.to_dict())
+                    if self._current_scan.calibration:
+                        with self._data_lock:
+                            self._current_calibration = Calibration.from_scan_configuration(self._current_scan.to_dict())                            
+                    with self._data_lock:
+                        self._current_scan_data = ScanData(self._current_scan.to_dict())
                     if self._single_step_scan_requested:
                         self.log.debug("single step scan.")
                         self._single_step_scan_requested = False
                         self._single_step_scan_started = True
+                        self._current_scan.start_scan(firststep=self._single_step_no, laststep=self._single_step_no)
+                    else:
+                        self._current_scan.start_scan()
+                    self.sigCurrentStepUpdated.emit(self._current_scan.step_no)
+                    self.watchdog_event("start_prepare_step")
+            elif watchdog_state == "prepare_step":
+                if self._current_scan.finished():
+                    if self._single_step_scan_started:
+                        self.log.info("Single step scan finished.")
+                        self._single_step_scan_started = False
+                    else:
+                        self.log.info("Scan finished.")
+                    self.watchdog_event("end_scan")
+                else:
                     config = self._current_scan.current_step()
                     self.ldd_switches().set_state("RAMP", "OFF")
                     self.ldd_switches().set_state("HV,MOD", "RAMP")
@@ -330,65 +345,41 @@ class CateyeLaserLogic(LogicBase):
                 elif setpoint_reached:
                     self.log.debug("Grating position reached, starting the ramp.")
                     self.ldd_switches().set_state("RAMP", "ON")
-                    if self._current_scan.calibration:
-                        self.watchdog_event("start_calibration_step")
-                    else:
-                        self._step_start = time.perf_counter()
-                        self.watchdog_event("start_scan_step")
+                    self._step_start = time.perf_counter()
+                    self.watchdog_event("start_scan_step")
             elif watchdog_state == "record_scan_step":
                 if new_status_read:
                     self._current_scan_data.append(
                         frequency=self._report['values']["frequency"],
                         photodiode=self._report['values']["photodiode"],
+                        piezo=self._report['values']["piezo"],
                         step=self._current_scan.step_no,
                         repeat=self._current_scan.repeat_no,
                     )
                     self.sigCurrentDataUpdated.emit()
                 step_finished = start - self._step_start > 1/self._current_scan.frequency
                 if step_finished:
-                    self.watchdog_event("step_done")
-            elif watchdog_state == "record_calibration_step":
-                # TODO scan the frequencies and look for mode-hops there.
-                self.log.debug("recording calibration step")
-                self.mode_scan()
-                self.find_mode_hops()
-                offset, span = self.find_best_scan_offset_span()
-                # TODO: this is imperfect, a wide range of piezo scan does not mean we have a wide range of wavelengths available.
-                if span > self._current_calibration.span[self._current_calibration.step_no]: 
-                    self._current_calibration.grating[self._current_calibration.step_no] = self._current_scan.grating
-                    self._current_calibration.bias[self._current_calibration.step_no] = self._current_scan.bias
-                    self._current_calibration.offset[self._current_calibration.step_no] = offset
-                    self._current_calibration.span[self._current_calibration.step_no] = span
-                    self.ldd_control().set_setpoint("ramp_halt", offset)
-                    self.ldd_switches().set_state("RAMP", "OFF")
-                    self.watchdog_event("start_center_frequency_measurement")
-                else:
-                    self.watchdog_event("step_done")
-            elif watchdog_state == "record_center_frequency":
-                self.log.debug("reading center frequency")                
-                freq = self._report['values']["frequency"]
-                self._current_calibration.center_frequencies[self._current_calibration.step_no] = freq
-                self.ldd_switches().set_state("RAMP", "ON")
-                self._step_start = time.perf_counter()
-                self.watchdog_event("start_span_frequency_measurement")
-            elif watchdog_state == "record_span_frequency":
-                if new_status_read:
-                    self.log.debug("reading span frequency")
-                    freq = self._report['values']["frequency"]
-                    current_mini = self._current_calibration.mini_frequencies[self._current_calibration.step_no]
-                    if current_mini == 0:
-                        self._current_calibration.mini_frequencies[self._current_calibration.step_no] = freq 
+                    old_grating = self._current_scan.grating
+                    self._current_scan.next()
+                    if not self._current_scan.finished():
+                        self.sigCurrentStepUpdated.emit(self._current_scan.step_no)
+                    grating_scan_done = self._current_scan.finished() or (old_grating != self._current_scan.grating)
+                    if self._current_scan.calibration and grating_scan_done:
+                        self.watchdog_event("start_calculate_calibration") 
                     else:
-                        self._current_calibration.mini_frequencies[self._current_calibration.step_no] = min(current_mini, freq)
-                    current_maxi = self._current_calibration.maxi_frequencies[self._current_calibration.step_no]
-                    if current_maxi == 0:
-                        self._current_calibration.maxi_frequencies[self._current_calibration.step_no] = freq 
-                    else:
-                        self._current_calibration.maxi_frequencies[self._current_calibration.step_no] = max(current_maxi, freq)
-                step_finished = start - self._step_start > 1/self._current_scan.frequency
-                if step_finished:
-                    self.sigCurrentCalibrationUpdated.emit()
-                    self.watchdog_event("step_done")
+                        self.watchdog_event("step_done")
+            elif watchdog_state == "calculate_calibration":
+                i = self._current_calibration.step_no
+                grating_calibrated = self._current_calibration.grating[i]
+                best_configuration = self.find_best_configuration_for_grating(grating_calibrated)
+                self._current_calibration.bias[i] = best_configuration["bias"]
+                self._current_calibration.offset[i] = best_configuration["offset"]
+                self._current_calibration.span[i] = best_configuration["span"]
+                self._current_calibration.center_frequencies[i] = best_configuration["center_frequency"]
+                self._current_calibration.mini_frequencies[i] = best_configuration["mini_frequency"]
+                self._current_calibration.maxi_frequencies[i] = best_configuration["maxi_frequency"]
+                self._current_calibration.step_no += 1
+                self.watchdog_event("step_done")
             elif watchdog_state == "stopped":
                 return
             else: 
@@ -396,6 +387,79 @@ class CateyeLaserLogic(LogicBase):
             self._sigWatchDog.emit()
         except:
             self.log.exception("")
+
+    def find_best_configuration_for_grating(self, grating):
+        # First, we find the biggest segment of continuous frequencies for each bias
+        i = self._current_scan.step_no-1
+        all_biases = []
+        all_mini_freq = []
+        all_maxi_freq = []
+        all_center_freq = []
+        all_center_tension = []
+        all_freq_span = []
+        all_tension_span = []
+        while i >= 0 and self._current_scan[i]["grating"] == grating:
+            bias = self._current_scan[i]["bias"]
+            all_biases.append(bias)
+            step = self._current_scan[i]["step_no"]
+            roi = (self._current_scan_data.step == step) & (self._current_scan_data.repeat == 0) & np.isfinite(self._current_scan_data.frequency)# TODO, how to improve by repeating measurement?
+            frequencies = self._current_scan_data.frequency[roi]
+            span = self._current_scan[i]["span"]
+            offset = self._current_scan[i]["offset"]
+            scanned_positions = np.linspace(start=0, stop=1, num=len(frequencies))*span + offset
+            photodiode = self._current_scan_data.photodiode[roi]
+            self._last_mode_scan = np.vstack((scanned_positions, photodiode))
+            self.sigNewModeScanAvailable.emit()
+            frequency_segments = []
+            tension_segments = []
+            current_frequency_segment_start = None
+            current_frequency_segment_stop = None
+            current_tension_segment_start = None
+            current_tension_segment_stop = None
+            previous_f = None
+            previous_u = None
+            for (u,f) in zip(scanned_positions, frequencies):
+                if previous_f is None: # first iteration
+                    current_frequency_segment_start = f
+                    current_frequency_segment_stop = f
+                    current_tension_segment_start = u
+                    current_tension_segment_stop = u
+                elif np.abs(f - previous_f) > self._mode_hop_threshold: # mode jump
+                    self.log.debug(f"Found mode hop {np.abs(f - previous_f)}, tension hop was {u-previous_u}.")
+                    frequency_segments.append((current_frequency_segment_start, current_frequency_segment_stop))
+                    tension_segments.append((current_tension_segment_start, current_tension_segment_stop))
+                    current_frequency_segment_start = f
+                    current_frequency_segment_stop = f
+                    current_tension_segment_start = u
+                    current_tension_segment_stop = u
+                else:
+                    if f >= current_frequency_segment_stop:
+                        current_frequency_segment_stop = f 
+                        current_tension_segment_stop = u
+                    elif f <= current_frequency_segment_start:
+                        current_frequency_segment_start = f 
+                        current_tension_segment_start = u
+                previous_f = f
+                previous_u = u
+            self.log.debug(f"Found frequency spans {frequency_segments}")
+            frequency_spans = list(map(lambda x: np.abs(x[1]-x[0]), frequency_segments))
+            index_of_best_segment = np.argmax(frequency_spans)
+            all_mini_freq.append(frequency_segments[index_of_best_segment][0])
+            all_maxi_freq.append(frequency_segments[index_of_best_segment][1])
+            all_center_freq.append((frequency_segments[index_of_best_segment][0] + frequency_segments[index_of_best_segment][1])/2)
+            all_center_tension.append((tension_segments[index_of_best_segment][0] + tension_segments[index_of_best_segment][1])/2)
+            all_tension_span.append(np.abs(tension_segments[index_of_best_segment][0] - tension_segments[index_of_best_segment][1]))
+            i -= 1
+        # Now we select the best bias
+        index_of_best_bias = np.argmax(np.abs(np.array(all_maxi_freq) -  np.array(all_mini_freq)))
+        return dict(span=all_tension_span[index_of_best_bias], 
+                    offset=all_center_tension[index_of_best_bias],
+                    mini_frequency=all_mini_freq[index_of_best_bias],
+                    maxi_frequency=all_maxi_freq[index_of_best_bias],
+                    center_frequency=all_center_freq[index_of_best_bias],
+                    bias=all_biases[index_of_best_bias],
+                    )
+
 
     @property
     def current_scan(self):
@@ -414,8 +478,7 @@ class CateyeLaserLogic(LogicBase):
         self.sigCurrentScanUpdated.emit()
     def create_new_scan(self):
         self.log.debug("Create new scan.")
-        if self._current_scan is not None:
-            self._scan_history[self._current_scan_index] = self._current_scan.to_dict()
+        self.save_current_scan()
         self._current_scan = ScanConfiguration()
         self._current_scan.create_zero_step()
         self._scan_history.append(self._current_scan.to_dict())
@@ -424,17 +487,18 @@ class CateyeLaserLogic(LogicBase):
         self.sigCurrentScanUpdated.emit()
     def start_scan(self):
         self.watchdog_event("start_scan")
+    def stop_scan(self):
+        self.watchdog_event("interrupt_scan")
     def set_current_scan(self, i):
         self.log.debug("set current scan")
         # Save the current scan
-        if self._current_scan is not None:
-            self._scan_history[self._current_scan_index] = self._current_scan.to_dict()
+        self.save_current_scan()
         self._current_scan_index = min(max(i, 0), len(self._scan_history)-1)
         self._current_scan = ScanConfiguration.from_dict(self._scan_history[self._current_scan_index])
         self.sigCurrentScanUpdated.emit()
     def set_current_scan_name(self, name):
         self._current_scan.name = name
-        self._scan_history[self._current_scan_index] = self._current_scan.to_dict()
+        self.save_current_scan()
         self.sigScanListUpdated.emit()
     def set_current_scan_calibration(self, calibration):
         self._current_scan.calibration = calibration
@@ -478,13 +542,47 @@ class CateyeLaserLogic(LogicBase):
         self.sigCurrentScanUpdated.emit()
     def scan_step(self, step_no):
         self._single_step_scan_requested = True
+        self._single_step_no = step_no
         self.watchdog_event("start_scan")
     def set_position_to(self, step_no, val):
         pass
     @property 
     def scan_history_names(self):
         return [f"{scan['date_created']}: {scan['name']}" for scan in self._scan_history]
-        
+    def prepare_calibration_scan(self, start_grating=None, stop_grating=None, step_grating=None, start_bias=None, stop_bias=None, step_bias=None):
+        if start_grating is None:
+            start_grating = self._calibration_encoder_start
+        if stop_grating is None:
+            stop_grating = self._calibration_encoder_stop
+        if step_grating is None:
+            step_grating = self._calibration_encoder_step
+        if start_bias is None:
+            start_bias = self._calibration_bias_start
+        if stop_bias is None:
+            stop_bias = self._calibration_bias_stop
+        if step_bias is None:
+            step_bias = self._calibration_bias_step
+        all_gratings = np.arange(start=start_grating, stop=stop_grating, step=step_grating, dtype=int)
+        all_biases = np.arange(start=start_bias, stop=stop_bias, step=step_bias, dtype=float)
+        number_of_steps = len(all_gratings)*len(all_biases)
+        span = np.repeat(self._calibration_scan_span, number_of_steps)
+        frequency = np.repeat(self._calibration_scan_frequency, number_of_steps)
+        sample_time = np.repeat(self._calibration_sample_time, number_of_steps)
+        offset = np.repeat(self._calibration_offset, number_of_steps)
+        gratings = np.repeat(all_gratings, len(all_biases))
+        biases = np.tile(all_biases, len(all_gratings))
+        self.save_current_scan()
+        self._current_scan = ScanConfiguration(
+            grating=gratings, span=span, offset=offset, frequency=frequency,
+            bias=biases, sample_time=sample_time, repeat=np.repeat(1, number_of_steps),
+            calibration=True, name=f"Calibration for gratings {start_grating} to {stop_grating}"
+        )
+        self._current_scan_index += 1
+        self.save_current_scan()
+        self.log.debug(f"Created new calibration scan spanning {start_grating}-{stop_grating} with {number_of_steps} steps ({len(all_biases)} biases, {len(all_gratings)} gratings).")
+        self.sigScanListUpdated.emit()
+        self.sigCurrentScanUpdated.emit()
+
 
 # TODO: handle scanning in the background. The phases of scanning are:
 # 1. set grating
@@ -520,6 +618,7 @@ class ScanConfiguration:
         self.calibration = calibration
         self.i = 0
         self.j = 0
+        self._stopstep = len(self._grating)
         if date_created is None:
             self.date_created = datetime.datetime.now()
         else:
@@ -532,8 +631,12 @@ class ScanConfiguration:
         self._bias[i], self._bias[j] = self._bias[j], self._bias[i]
         self._sample_time[i], self._sample_time[j] = self._sample_time[j], self._sample_time[i]
         self._repeat[i], self._repeat[j] = self._repeat[j], self._repeat[i]
-    def start_scan(self):
-        self.i = 0
+    def start_scan(self, firststep=0, laststep=None):
+        self.i = firststep
+        if laststep is None:
+            self._stopstep = len(self._grating)
+        else:
+            self._stopstep = laststep + 1
         self.j = 0
     def step(self, i):
         return {"grating":     self._grating[i], 
@@ -563,7 +666,7 @@ class ScanConfiguration:
             self.j = 0
             self.i += 1
     def finished(self):
-        return self.i >= len(self._grating)
+        return self.i >= self._stopstep
     def is_first_step(self):
         return self.i == 0 and self.j == 0
     def to_dict(self):
@@ -658,31 +761,37 @@ class ScanData:
     photodiode_col = 1
     step_col = 2
     repeat_col = 3
+    piezo_col = 4
     def __init__(self, configuration, date_started=datetime.datetime.now()):
         self.configuration = configuration
-        self._data = np.empty((0, 4), dtype=float)
+        self._data = np.empty((0, 5), dtype=float)
         self.date_started = date_started
-    def append(self, frequency, photodiode, step, repeat):
-        np.append(self._data, [[frequency, photodiode, step, repeat]])
+    def append(self, frequency, photodiode, step, repeat, piezo):
+        self._data = np.vstack((self._data, [frequency, photodiode, step, repeat, piezo]))
     @property
     def data(self):
         return self._data
     @property
     def frequency(self):
-        return self._data[:, self._frequency_col]
+        return self._data[:, self.frequency_col]
     @property
     def photodiode(self):
-        return self._data[:, self._photodiode_col]
+        return self._data[:, self.photodiode_col]
     @property
     def step(self):
-        return self._data[:, self._step_col]
+        return self._data[:, self.step_col]
     @property
     def repeat(self):
-        return self._data[:, self._repeat_col]
+        return self._data[:, self.repeat_col]
+    @property
+    def piezo(self):
+        return self._data[:, self.piezo_col]
     def to_dict(self):
         return {"data":     self._data, 
                 "configuration": self.configuration,
                 "date_started": self.date_started,
+                "columns": ["frequency", "photodiode", "step", "repeat", "piezo"],
+                "units": ["THz", "V", "", "", "V"],
                 } 
     @classmethod
     def from_dict(cls, d):
