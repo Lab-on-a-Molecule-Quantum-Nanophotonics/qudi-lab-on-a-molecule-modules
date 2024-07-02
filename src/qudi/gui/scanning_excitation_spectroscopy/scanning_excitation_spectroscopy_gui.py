@@ -39,6 +39,7 @@ class ScanningExcitationSpectroscopyGui(GuiBase):
         scanning_logic.sigScanningUpdated.connect(self.set_scanning_state)
         scanning_logic.sigCurrentScanUpdated.connect(self.update_current_scan)
         scanning_logic.sigScanListUpdated.connect(self.update_scan_list)
+        scanning_logic.sigCurrentStepUpdated.connect(self._mw.scan_settings_widget.set_current_step)
         # window -> logic
         # scan management
         self._mw.scan_settings_widget.sigNewScan.connect(scanning_logic.create_new_scan)
