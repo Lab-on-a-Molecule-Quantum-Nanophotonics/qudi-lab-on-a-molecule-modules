@@ -33,13 +33,13 @@ class ScanningExcitationSpectroscopyMainWindow(QtWidgets.QMainWindow):
         self.setDockNestingEnabled(True)
         self.setTabPosition(QtCore.Qt.AllDockWidgetAreas, QtWidgets.QTabWidget.North)
         icon_path = os.path.join(get_artwork_dir(), 'icons')
-        dockwidgets = [
+        self._dockwidgets = [
             ("scan_settings", "Scan Settings", cateye_settings.CateyeScanSettingsWidget),
             ("laser_report", "Laser report", cateye_report.CateyeReportWidget),
             ("mode_scan", "Latest mode scan", mode_scan.ModeScanWidget),
 
         ]
-        for name,title,cls in dockwidgets:
+        for name,title,cls in self._dockwidgets:
             self._add_dockwidget(name,title,cls)
         # Create QActions
         close_icon = QtGui.QIcon(os.path.join(icon_path, 'application-exit'))
@@ -74,7 +74,7 @@ class ScanningExcitationSpectroscopyMainWindow(QtWidgets.QMainWindow):
         menu = menu_bar.addMenu('View')
         menu.addAction(self.action_show_fit_settings)
         menu.addSeparator()
-        for name,_,_ in dockwidgets:
+        for name,_,_ in self._dockwidgets:
             menu.addAction(getattr(self, f"action_show_{name}"))
         menu.addSeparator()
         menu.addAction(self.action_measurement_mode)
@@ -84,6 +84,10 @@ class ScanningExcitationSpectroscopyMainWindow(QtWidgets.QMainWindow):
         self.action_close.triggered.connect(self.close)
         self.action_measurement_mode.triggered.connect(self.set_measurement_mode)
         self.action_calibration_mode.triggered.connect(self.set_calibration_mode)
+        
+        self.reset_docks()
+        
+        self.show()
 
     def _toggle_dock_visibility(self, visible, hidden):
         for name in visible:
@@ -98,6 +102,10 @@ class ScanningExcitationSpectroscopyMainWindow(QtWidgets.QMainWindow):
         visible = ["laser_report", "scan_settings", "mode_scan"]
         hidden = []
         self._toggle_dock_visibility(visible, hidden)
+    def reset_docks(self):
+        for name,_,_ in self._dockwidgets:
+            getattr(self, f"{name}_dockwidget").setFloating(False)
+            self.addDockWidget(QtCore.Qt.BottomDockWidgetArea, getattr(self, f"{name}_dockwidget"))
     def _add_dockwidget(self, name, title, cls):
         setattr(self, name + "_widget", cls())
         setattr(self, name + "_dockwidget", AdvancedDockWidget(title, parent=self))

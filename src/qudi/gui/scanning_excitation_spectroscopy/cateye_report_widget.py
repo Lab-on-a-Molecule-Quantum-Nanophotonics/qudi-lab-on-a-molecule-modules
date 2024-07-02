@@ -16,5 +16,5 @@ class CateyeReportWidget(QtWidgets.QWidget):
         main_layout.addRow("Scanner state :" ,self.state)
     def update(self, report):
         for k in ("grating", "photodiode", "frequency"):
-            getattr(self, k).setText(report["values"][k] + " " + report["units"][k])
+            getattr(self, k).setText(f"{report['values'][k]} {report['units'][k]}")
         self.state.setText(report["state"])
