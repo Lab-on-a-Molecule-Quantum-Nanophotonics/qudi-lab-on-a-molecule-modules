@@ -11,10 +11,11 @@ class CateyeScanSettingsWidget(QtWidgets.QWidget):
     sigSetCurrentScan = QtCore.Signal(int)
     sigSetScanName = QtCore.Signal(str)
     sigSetCalibration = QtCore.Signal(bool)
-    sigNewStep = QtCore.Signal()
+    sigNewStep = QtCore.Signal(int)
     sigDelStep = QtCore.Signal(int)
     sigMoveStepUp = QtCore.Signal(int)
     sigMoveStepDown = QtCore.Signal(int)
+    sigScanStep = QtCore.Signal(int)
     sigSetStepGrating    = QtCore.Signal(int, int)
     sigSetStepSpan       = QtCore.Signal(int, float)
     sigSetStepOffset     = QtCore.Signal(int, float)
@@ -58,7 +59,7 @@ class CateyeScanSettingsWidget(QtWidgets.QWidget):
         self.scan_name_line_edit = QtWidgets.QLineEdit()
         self.scan_creation_date = QtWidgets.QLabel()
         self.calibration_check_box = QtWidgets.QCheckBox()
-        self.scan_name_line_edit.editingFinished.connect(self.sigSetScanName.emit)
+        self.scan_name_line_edit.textEdited.connect(self.sigSetScanName.emit)
         self.calibration_check_box.stateChanged.connect(self.sigSetCalibration.emit)
         scan_edit_form_layout.addRow("Scan name", self.scan_name_line_edit)
         scan_edit_form_layout.addRow("Scan creation", self.scan_creation_date)
@@ -73,15 +74,20 @@ class CateyeScanSettingsWidget(QtWidgets.QWidget):
         self.del_step_button = QtWidgets.QPushButton("Del step")
         self.up_step_button = QtWidgets.QPushButton("Move step up")
         self.down_step_button = QtWidgets.QPushButton("Move step down")
+        self.scan_step_button = QtWidgets.QPushButton("Scan this step")
         step_choice_controls.addWidget(self.new_step_button)
         step_choice_controls.addWidget(self.del_step_button)
         step_choice_controls.addWidget(self.up_step_button)
         step_choice_controls.addWidget(self.down_step_button)
+        step_choice_controls.addWidget(self.scan_step_button)
+        scan_edit_layout.addLayout(step_choice_controls)
         self.all_steps_list_widget = QtWidgets.QListWidget()
-        self.new_step_button.clicked.connect(lambda : self.sigNewStep.emit)
+        scan_edit_layout.addWidget(self.all_steps_list_widget)
+        self.new_step_button.clicked.connect(lambda : self.sigNewStep.emit(self.all_steps_list_widget.currentRow()))
         self.del_step_button.clicked.connect(lambda : self.sigDelStep.emit(self.all_steps_list_widget.currentRow()))
         self.up_step_button.clicked.connect(lambda : self.sigMoveStepUp.emit(self.all_steps_list_widget.currentRow()))
         self.down_step_button.clicked.connect(lambda : self.sigMoveStepDown.emit(self.all_steps_list_widget.currentRow()))
+        self.scan_step_button.clicked.connect(lambda : self.sigScanStep.emit(self.all_steps_list_widget.currentRow()))
         self.all_steps_list_widget.currentRowChanged.connect(self.populate_current_step)
         # Step edit
         step_edit_layout = QtWidgets.QFormLayout()
@@ -130,16 +136,16 @@ class CateyeScanSettingsWidget(QtWidgets.QWidget):
         step_edit_layout.addRow("Number of repeat", self.number_repeat_spin_box)
         self.number_repeat_spin_box.valueChanged.connect(self._emit_sig_set_step_repeat)
 
-    def set_scan_list(self, scan_names):
+    def set_scan_list(self, scan_names, current_index=0):
         self.blockSignals(True)
         self.all_scans_list_widget.clear()
         self.all_scans_list_widget.addItems(scan_names)
+        self.all_scans_list_widget.setCurrentRow(current_index, QtCore.QItemSelectionModel.SelectCurrent)
         self.blockSignals(False)
     def set_current_scan(self, scan_index, scan):
         old_scan = self.all_scans_list_widget.currentRow()
         old_step = self.all_steps_list_widget.currentRow()
         self.blockSignals(True)
-        self.all_scans_list_widget.setCurrentRow(scan_index)
         self.all_steps_list_widget.clear()
         for i in range(len(scan)):
             step = scan[i]
@@ -149,6 +155,7 @@ class CateyeScanSettingsWidget(QtWidgets.QWidget):
         self.scan_name_line_edit.setText(scan.name)
         self.scan_creation_date.setText(str(scan.date_created))
         self.calibration_check_box.setChecked(scan.calibration)
+        #self.all_scans_list_widget.setCurrentRow(scan_index, QtCore.QItemSelectionModel.SelectCurrent)
         self.blockSignals(False)
         if old_scan == scan_index:
             self.all_steps_list_widget.setCurrentRow(old_step)
@@ -157,18 +164,21 @@ class CateyeScanSettingsWidget(QtWidgets.QWidget):
     def generate_step_name(self, step_dict):
         return f"#{step_dict['step_no']}: grating {step_dict['grating']}, offset {step_dict['offset']}, span {step_dict['span']}, bias {step_dict['bias']}"
     def set_current_step(self, step_index):
-        self.all_steps_list_widget.setCurrentRow(step_index)
+        self.all_steps_list_widget.setCurrentRow(step_index, QtCore.QItemSelectionModel.SelectCurrent)
     def populate_current_step(self, i):
-        step = self.all_steps_list_widget.currentItem().data(QtCore.Qt.UserRole)
-        self.blockSignals(True)
-        self.grating_spin_box.setValue(step["grating"])
-        self.span_spin_box.setValue(step["span"])
-        self.offset_spin_box.setValue(step["offset"])
-        self.frequency_spin_box.setValue(step["frequency"])
-        self.bias_spin_box.setValue(step["bias"])
-        self.sample_time_spin_box.setValue(step["sample_time"])
-        self.number_repeat_spin_box.setValue(step["repeat"])
-        self.blockSignals(False)
+        current_item = self.all_steps_list_widget.currentItem()
+        if current_item is not None:
+            step = current_item.data(QtCore.Qt.UserRole)
+            self.blockSignals(True)
+            self.grating_spin_box.setValue(step["grating"])
+            self.span_spin_box.setValue(step["span"])
+            self.offset_spin_box.setValue(step["offset"])
+            self.frequency_spin_box.setValue(step["frequency"])
+            self.bias_spin_box.setValue(step["bias"])
+            self.sample_time_spin_box.setValue(step["sample_time"])
+            self.number_repeat_spin_box.setValue(step["repeat"])
+            self.all_steps_list_widget.setCurrentRow(i, QtCore.QItemSelectionModel.SelectCurrent)
+            self.blockSignals(False)
     def _emit_sig_set_step(self, sig, value):
         step = self.all_steps_list_widget.currentItem().data(QtCore.Qt.UserRole)
         sig.emit(step["step_no"], value)

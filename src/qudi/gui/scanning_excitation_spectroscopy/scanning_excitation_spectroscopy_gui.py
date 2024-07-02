@@ -8,6 +8,7 @@ __all__ = ['ScanningExcitationSpectroscopyGui']
 import importlib
 from time import perf_counter
 from PySide2 import QtCore
+from PySide2 import QtWidgets
 
 from qudi.core.module import GuiBase
 from qudi.core.connector import Connector
@@ -34,20 +35,23 @@ class ScanningExcitationSpectroscopyGui(GuiBase):
         scanning_logic = self._scanning_logic()
         scanning_logic.sigNewModeScanAvailable.connect(self.display_latest_mode_scan)
         scanning_logic.sigNewModeHopsAvailable.connect(self.display_latest_mode_hops)
-        scanning_logic.sigPositionUpdated.connect(self._mw.laser_report_widget.update_data)
+        scanning_logic.sigPositionUpdated.connect(self._mw.laser_report_widget.update)
         scanning_logic.sigScanningUpdated.connect(self.set_scanning_state)
         scanning_logic.sigCurrentScanUpdated.connect(self.update_current_scan)
-        scanning_logic.sigCurrentScanUpdated.connect(self.update_scan_list)
+        scanning_logic.sigScanListUpdated.connect(self.update_scan_list)
         # window -> logic
         # scan management
         self._mw.scan_settings_widget.sigNewScan.connect(scanning_logic.create_new_scan)
         self._mw.scan_settings_widget.sigDelScan.connect(scanning_logic.delete_current_scan)
         self._mw.scan_settings_widget.sigStartScan.connect(scanning_logic.start_scan)
         self._mw.scan_settings_widget.sigSetCurrentScan.connect(scanning_logic.set_current_scan)
-        self._mw.scan_settings_widget.sigNewStep.connect(scanning_logic.create_new_step)
+        self._mw.scan_settings_widget.sigSetScanName.connect(scanning_logic.set_current_scan_name)
+        self._mw.scan_settings_widget.sigSetCalibration.connect(scanning_logic.set_current_scan_calibration)
+        self._mw.scan_settings_widget.sigNewStep.connect(scanning_logic.insert_new_step)
         self._mw.scan_settings_widget.sigDelStep.connect(scanning_logic.delete_step)
         self._mw.scan_settings_widget.sigMoveStepUp.connect(scanning_logic.move_step_up)
         self._mw.scan_settings_widget.sigMoveStepDown.connect(scanning_logic.move_step_down)
+        self._mw.scan_settings_widget.sigScanStep.connect(scanning_logic.scan_step)
         self._mw.scan_settings_widget.sigSetStepGrating.connect(scanning_logic.set_step_grating)
         self._mw.scan_settings_widget.sigSetStepSpan.connect(scanning_logic.set_step_span)
         self._mw.scan_settings_widget.sigSetStepOffset.connect(scanning_logic.set_step_offset)
@@ -55,6 +59,19 @@ class ScanningExcitationSpectroscopyGui(GuiBase):
         self._mw.scan_settings_widget.sigSetStepBias.connect(scanning_logic.set_step_bias)
         self._mw.scan_settings_widget.sigSetStepSampleTime.connect(scanning_logic.set_step_sample_time)
         self._mw.scan_settings_widget.sigSetStepRepeat.connect(scanning_logic.set_step_repeat)
+        
+        self.update_scan_list()
+        self.update_current_scan()
+    
+    def on_deactivate(self):
+        self._mw.close()
+    
+    def show(self):
+        """Make window visible and put it above all other windows.
+        """
+        QtWidgets.QMainWindow.show(self._mw)
+        self._mw.activateWindow()
+        self._mw.raise_()
 
     def display_latest_mode_scan(self):
         self._mw.mode_scan_widget.update_data(self._scanning_logic().last_mode_scan)
@@ -67,10 +84,12 @@ class ScanningExcitationSpectroscopyGui(GuiBase):
 
     def update_current_scan(self):
         scan = self._scanning_logic().current_scan
+        self.log.debug(f"Update current scan {scan}")
         scan_index = self._scanning_logic().current_scan_index
         self._mw.scan_settings_widget.set_current_scan(scan_index, scan)
 
     def update_scan_list(self):
         names = self._scanning_logic().scan_history_names
-        self._mw.scan_settings_widget.set_scan_list(names)
+        scan_index = self._scanning_logic().current_scan_index
+        self._mw.scan_settings_widget.set_scan_list(names, scan_index)
 

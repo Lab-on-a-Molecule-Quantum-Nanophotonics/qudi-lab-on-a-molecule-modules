@@ -131,7 +131,7 @@ class MOGLABSMotorizedLaserDriver(SwitchInterface, ProcessControlInterface):
             elif channel == "duty":
                 return self._set_duty(value)
             elif channel == "ramp_halt": 
-                return self._ramp_halt=value
+                self._ramp_halt=value
 
     def get_setpoint(self, channel):
         with self._lock:
@@ -273,6 +273,7 @@ class MOGLABSMotorizedLaserDriver(SwitchInterface, ProcessControlInterface):
 
 class MOGLABSCateyeLaser(ProcessControlInterface, AutoScanInterface):
     port = ConfigOption("port")
+    _scan_duration = StatusVar(name="scan_duration", default=1.0)
     __sigResetMotor = QtCore.Signal()
     _last_scan_pd = StatusVar(name="last_scan_pd", default=np.zeros(0, dtype=float))
     _last_scan_piezo = StatusVar(name="last_scan_piezo", default=np.zeros(0, dtype=int))
@@ -302,11 +303,17 @@ class MOGLABSCateyeLaser(ProcessControlInterface, AutoScanInterface):
         self.serial.close()
     def set_setpoint(self, channel, value):
         with self._lock:
-            self._set_motor_position(value)
+            if channel=="grating":
+                self._set_motor_position(value)
+            else:
+                self._scan_duration=value
 
     def get_setpoint(self, channel):
         with self._lock:
-            return self._get_motor_setpoint()
+            if channel=="grating":
+                return self._get_motor_setpoint()
+            else:
+                return self._scan_duration
 
     def get_process_value(self, channel):
         with self._lock:
@@ -335,11 +342,11 @@ class MOGLABSCateyeLaser(ProcessControlInterface, AutoScanInterface):
         See class ProcessControlConstraints for more details.
         """
         return ProcessControlConstraints(
-            ["grating"],
+            ["grating", "scan_duration"],
             ["grating", "photodiode"],
-            {"grating":"step", "photodiode":"V"},
-            {"grating":self._motor_range()},
-            {"grating":int, "photodiode":float},
+            {"grating":"step", "photodiode":"V", "scan_duration":"s"},
+            {"grating":self._motor_range(), "scan_duration":(0.1,20)},
+            {"grating":int, "photodiode":float, "scan_duration":float},
         )
 
     # AutoScanInterface
@@ -353,9 +360,10 @@ class MOGLABSCateyeLaser(ProcessControlInterface, AutoScanInterface):
             dtypes={"photodiode":float, "piezo":int}
         )
     def trigger_scan(self):
-        vals = self._scan_pd()
-        self._last_scan_pd = vals[0,:]*5.0/(2**12-1)
-        self._last_scan_piezo = vals[1,:]
+        with self._lock:
+            vals = self._scan_pd()
+            self._last_scan_pd = vals[0,:]*5.0/(2**12-1)
+            self._last_scan_piezo = vals[1,:]
 
     def get_last_scan(self, channel):
         if channel == "photodiode":
@@ -414,14 +422,28 @@ class MOGLABSCateyeLaser(ProcessControlInterface, AutoScanInterface):
     def _get_pd(self):
         return float(self.send_and_recv("pd,read,0", check_ok=False).split()[0])
         
-    def _scan_pd(self,duration=1):
+    def _scan_pd(self,duration=None):
+        if duration is None:
+            duration = self._scan_duration
+        self.send_and_recv("pd,rate,1")
+        self.serial.read(self.serial.in_waiting)
+        old_timeout = self.serial.timeout
+        self.serial.timeout = duration * 1.5
         cmd = f"pd,scan,{duration}\r\n"
         self.serial.write(cmd.encode("utf8"))
-        l = struct.unpack("<I", self.serial.read(4))
+        l = struct.unpack("<I", self.serial.read(4))[0]
         vals = np.empty(l//2, int)
         binary_data = self.serial.read(l)
+        if len(binary_data) == 0:
+            self.log.warning(f"I read 0")
+            binary_data = self.serial.read(l)
+        if len(binary_data) < l:
+            self.log.warning(f"I did not read everything. read {len(binary_data)}/{l}.")
+            binary_data += self.serial.read(l)
+        self.log.debug(f"Read {len(binary_data)}/{l}")
         for i in range(0, l, 2):
-            vals[i//2] = struct.unpack("<H", binary_data[i:i+2])
+            vals[i//2] = struct.unpack("<H", binary_data[i:i+2])[0]
+        self.serial.timeout = old_timeout
         return np.reshape(vals, (2, len(vals)//2), 'F')
 
 class MOGLabsFZWScanner(ScanningProbeInterface):
