@@ -1,5 +1,6 @@
 import time
 import datetime
+import os
 
 from PySide2 import QtCore
 from fysom import Fysom
@@ -10,6 +11,7 @@ from qudi.core.connector import Connector
 from qudi.core.configoption import ConfigOption
 from qudi.core.statusvariable import StatusVar
 from qudi.util.mutex import Mutex
+from qudi.util.datastorage import TextDataStorage
 
 
 class CateyeLaserLogic(LogicBase):
@@ -45,10 +47,9 @@ class CateyeLaserLogic(LogicBase):
     _scan_history = StatusVar(name="scan_history", default=[])
     _last_mode_scan = StatusVar(name="last_mode_scan", default=None)
     _mode_hops_indices = StatusVar(name="mode_hops", default=[])
-    _current_scan_data_index = StatusVar(name="current_scan_data_index", default=None)
-    _scan_data_history = StatusVar(name="scan_data_history", default=[])
     _current_calibration_index = StatusVar(name="current_calibration_index", default=None)
     _calibration_history = StatusVar(name="calibration_history", default=[])
+    _current_scan_data_history = StatusVar(name="current_scan", default=None)
 
     sigNewModeScanAvailable = QtCore.Signal()
     sigNewModeHopsAvailable = QtCore.Signal()
@@ -65,13 +66,14 @@ class CateyeLaserLogic(LogicBase):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._current_scan = None
         self._report = {}
         self._last_report_time = time.perf_counter()
         self._grating_movement_start = time.perf_counter()
         self._step_start = time.perf_counter()
         self._grating_movement_retry = 0
+        self._current_scan = None
         self._current_scan_data = None
+        self._scan_data_history = []
         self._current_calibration = None
         self._data_lock = Mutex()
         self._watchdog_state = Fysom({
@@ -113,10 +115,8 @@ class CateyeLaserLogic(LogicBase):
             if self._current_calibration_index is None:
                 self._current_calibration_index = len(self._calibration_history) - 1
             self.set_current_calibration(self._current_calibration_index)
-        if len(self._scan_data_history) > 0:
-            if self._current_scan_data_index is None:
-                self._current_scan_data_index = len(self._calibration_history) - 1
-            self.set_current_scan_data(self._current_scan_data_index)
+        if self._current_scan_data_history is not None:
+            self._current_scan_data = ScanData.from_dict(self._current_scan_data_history)
             
         self._sigWatchDog.connect(self._watchdog_callback, QtCore.Qt.QueuedConnection)
             
@@ -134,19 +134,35 @@ class CateyeLaserLogic(LogicBase):
 
     def on_deactivate(self):
         self.save_current_scan()
+        self.save_current_calibration()
         self.watchdog_event("stop_watchdog")
         while not self.watchdog_state == "stopped":
             time.sleep(0.1)
         self._sigWatchDog.disconnect()
 
     def save_current_scan(self):
-        if self._current_scan is not None:
-            if self._current_scan_index >= len(self._scan_history):
-                self._scan_history.append(self._current_scan.to_dict())
-                self._current_scan_index = len(self._scan_history)-1
+        if self._current_scan_data is not None:
+            self._current_scan_data.save(self.module_default_data_dir)
+                
+    def save_current_calibration(self):
+        if self._current_calibration is not None:
+            if self._current_calibration.changed_since_saved:
+                self._current_calibration.save(self.module_default_data_dir)
+            if self._current_calibration_index >= len(self._calibration_history):
+                self._calibration_history.append(self._current_calibration.synopsis_dict())
+                self._current_calibration_index = len(self._calibration_history)-1
             else:
-                self._scan_history[self._current_scan_index] = self._current_scan.to_dict()
-
+                self._calibration_history[self._current_calibration_index] = self._current_calibration.synopsis_dict()
+    def save_current_scan_data(self):
+        if self._current_calibration is not None:
+            if self._current_calibration.changed_since_saved:
+                self._current_calibration.save(self.module_default_data_dir)
+            if self._current_calibration_index >= len(self._calibration_history):
+                self._calibration_history.append(self._current_calibration.synopsis_dict())
+                self._current_calibration_index = len(self._calibration_history)-1
+            else:
+                self._calibration_history[self._current_calibration_index] = self._current_calibration.synopsis_dict()
+        
     @property
     def watchdog_state(self):
         with self._watchdog_lock:
@@ -378,6 +394,7 @@ class CateyeLaserLogic(LogicBase):
                 self._current_calibration.center_frequencies[i] = best_configuration["center_frequency"]
                 self._current_calibration.mini_frequencies[i] = best_configuration["mini_frequency"]
                 self._current_calibration.maxi_frequencies[i] = best_configuration["maxi_frequency"]
+                self._current_calibration.changed_since_saved = True
                 self._current_calibration.step_no += 1
                 self.watchdog_event("step_done")
             elif watchdog_state == "stopped":
@@ -473,7 +490,7 @@ class CateyeLaserLogic(LogicBase):
             return
         self._scan_history.pop(self._current_scan_index)
         self._current_scan_index = max(0, self._current_scan_index-1)
-        self._current_scan = ScanConfiguration.from_dict(self._scan_history[self._current_scan_index])
+        self._current_scan = ScanConfiguration.from_file(self._scan_history[self._current_scan_index]['path'])
         self.sigScanListUpdated.emit()
         self.sigCurrentScanUpdated.emit()
     def create_new_scan(self):
@@ -481,8 +498,7 @@ class CateyeLaserLogic(LogicBase):
         self.save_current_scan()
         self._current_scan = ScanConfiguration()
         self._current_scan.create_zero_step()
-        self._scan_history.append(self._current_scan.to_dict())
-        self._current_scan_index = len(self._scan_history)-1
+        self.save_current_scan()
         self.sigScanListUpdated.emit()
         self.sigCurrentScanUpdated.emit()
     def start_scan(self):
@@ -494,8 +510,15 @@ class CateyeLaserLogic(LogicBase):
         # Save the current scan
         self.save_current_scan()
         self._current_scan_index = min(max(i, 0), len(self._scan_history)-1)
-        self._current_scan = ScanConfiguration.from_dict(self._scan_history[self._current_scan_index])
+        self._current_scan = ScanConfiguration.from_file(self._scan_history[self._current_scan_index]['path'])
         self.sigCurrentScanUpdated.emit()
+    def set_current_calibration(self, i):
+        self.log.debug("set current calibration")
+        # Save the current scan
+        self.save_current_calibration()
+        self._current_calibration_index = min(max(i, 0), len(self._calibration_history)-1)
+        self._current_calibration = Calibration.from_file(self._calibration_history[self._current_calibration_index]['path'])
+        self.sigCurrentCalibrationUpdated.emit()
     def set_current_scan_name(self, name):
         self._current_scan.name = name
         self.save_current_scan()
@@ -582,6 +605,64 @@ class CateyeLaserLogic(LogicBase):
         self.log.debug(f"Created new calibration scan spanning {start_grating}-{stop_grating} with {number_of_steps} steps ({len(all_biases)} biases, {len(all_gratings)} gratings).")
         self.sigScanListUpdated.emit()
         self.sigCurrentScanUpdated.emit()
+    def create_scan_from_calibration(self, start_frequency, stop_frequency, frequency_rate, sample_step, repeat):
+        # from the calibration, we want to create a tiling of configurations that spans the desired frequencies
+        # frequency_rate gives the number MHz per s for the scan, and sample_step gives the size in MHz of one datapoint
+        mini_frequencies = self._current_calibration.mini_frequencies.copy()
+        maxi_frequencies = self._current_calibration.maxi_frequencies.copy()
+        indices = np.array(range(len(mini_frequencies)))
+        sortperm = np.argsort(mini_frequencies)
+        indices = indices[sortperm]
+        mini_frequencies = mini_frequencies[sortperm]
+        maxi_frequencies = maxi_frequencies[sortperm]
+        maximum_possible_frequency = np.max(maxi_frequencies)
+        minimum_possible_frequency = mini_frequencies[0]
+        if stop_frequency > maximum_possible_frequency:
+            stop_frequency = maximum_possible_frequency
+        if start_frequency < minimum_possible_frequency:
+            i_start = 0
+        else:
+            i_start = np.max(np.argwhere(mini_frequencies < start_frequency))
+        selected_indices = [indices[i_start]]
+        highest_frequency = maxi_frequencies[i_start]
+        lowest_frequency = mini_frequencies[i_start]
+        i = i_start 
+        while i < len(mini_frequencies)-1 and highest_frequency < stop_frequency:
+            candidates_indices = np.argwhere((mini_frequencies < highest_frequency) & (indices > i))
+            if len(candidates_indices) <= 0:
+                self.log.warning(f"Calibration is discontinuous at {highest_frequency} THz. Starting again at {mini_frequencies[i+1]}")
+                sorted_index_to_add = i+1
+            else:
+                biggest_interval_among_selected = np.argmax(maxi_frequencies[candidates_indices])
+                sorted_index_to_add = candidates_indices[biggest_interval_among_selected][0]
+            selected_indices.append(sorted_index_to_add)
+            i = sorted_index_to_add
+            highest_frequency = maxi_frequencies[i]
+        scan_gratings = self._current_calibration.grating[selected_indices]
+        scan_span = self._current_calibration.span[selected_indices]
+        scan_offset = self._current_calibration.offset[selected_indices]
+        scan_bias = self._current_calibration.bias[selected_indices]
+        scan_repeat = np.repeat(repeat,len(selected_indices))
+        frequency_spans = maxi_frequencies[selected_indices] - mini_frequencies[selected_indices]
+        scan_frequency = (frequency_rate * 1e-6) / frequency_spans
+        scan_sample_time = np.repeat(sample_step/frequency_rate,len(selected_indices))
+        self.save_current_scan()
+        self._current_scan = ScanConfiguration(
+            grating=scan_gratings, 
+            span=scan_span, 
+            offset=scan_offset, 
+            frequency=scan_frequency,
+            bias=scan_bias, 
+            sample_time=scan_sample_time, 
+            repeat=scan_repeat, 
+            calibration=False, 
+            name=f"Scan from {highest_frequency} THz to {lowest_frequency} THz, {sample_step} MHz step, {frequency_rate} MHz/s"
+           )
+        self._current_scan_index += 1
+        self.save_current_scan()
+        self.sigScanListUpdated.emit()
+        self.sigCurrentScanUpdated.emit()            
+            
 
 
 # TODO: handle scanning in the background. The phases of scanning are:
@@ -601,7 +682,7 @@ class CateyeLaserLogic(LogicBase):
 
 class ScanConfiguration:
     count = 0
-    def __init__(self, grating=np.empty(0,dtype=int), span=np.empty(0,dtype=float), offset=np.empty(0,dtype=float), frequency=np.empty(0,dtype=float), bias=np.empty(0,dtype=float), sample_time=np.empty(0,dtype=float), repeat=np.empty(0,dtype=int), calibration=False, date_created=None, name=None):
+    def __init__(self, grating=np.empty(0,dtype=int), span=np.empty(0,dtype=float), offset=np.empty(0,dtype=float), frequency=np.empty(0,dtype=float), bias=np.empty(0,dtype=float), sample_time=np.empty(0,dtype=float), repeat=np.empty(0,dtype=int), calibration=False, date_created=None, name=None, file_saved=None):
         assert len(grating) == len(span) == len(offset) == len(frequency) == len(bias) == len(sample_time) == len(repeat)
         if name is None:
             self.name = f"Scan {ScanConfiguration.count}"
@@ -623,6 +704,8 @@ class ScanConfiguration:
             self.date_created = datetime.datetime.now()
         else:
             self.date_created = date_created
+        self.file_saved = file_saved
+        self.changed_since_saved = file_saved is None
     def swap_steps(self, i, j):
         self._grating[i], self._grating[j] = self._grating[j], self._grating[i]
         self._span[i], self._span[j] = self._span[j], self._span[i]
@@ -755,6 +838,54 @@ class ScanConfiguration:
         return len(self._grating)
     def __getitem__(self, i):
         return self.step(i)
+    def save(self, root_dir):
+        data_storage = TextDataStorage(root_dir=os.path.join(root_dir, "ScanConfigurations"))
+        metadata = {
+            "name": self.name,
+            "date_created": self.date_created.isofornat(),
+            "units": {
+                "grating":"step",
+                "span":"norm. tension",
+                "offset":"norm. tension",
+                "frequency":"Hz",
+                "bias":"mA",
+                "sample_time":"s",
+                "repeat":"",
+            }
+        }
+        column_headers = ("grating","span","offset","frequency","bias","sample_time","repeat")
+        column_dtypes=(float, float, float, float, float, float, float)
+        nametag = "scan_configuration"
+        data = np.vstack((self._grating,self._span,self._offset,self._frequency,self._bias,self._sample_time,self._repeat)).transpose()
+        self.file_saved, *_ = data_storage.save_data(
+            data,
+            metadata=metadata,
+            nametag=nametag,
+            column_headers=column_headers,
+            column_dtypes=column_dtypes,
+        )
+        self.changed_since_saved = False
+        return self.file_saved
+    @classmethod
+    def from_file(cls, path):
+        data,metadata,header = TextDataStorage.load_data(path)
+        v = cls(
+            grating=data[:,0], 
+            span=data[:,1], 
+            offset=data[:,2], 
+            frequency=data[:,3], 
+            bias=data[:,4], 
+            sample_time=data[:,5], 
+            repeat=data[:,6], 
+            name=metadata["name"], date_created=datetime.datetime.fromisoformat(metadata["date_created"]),
+            file_saved=path
+        )
+        return v
+    def synopsis_dict(self):
+        return dict(name=self.name, path=self.file_saved, date_created=self.date_created)
+    @property
+    def estimated_duration(self):
+        return np.sum(1/self._frequency)
    
 class ScanData:
     frequency_col = 0
@@ -798,10 +929,34 @@ class ScanData:
         v = cls(d["configuration"], d["date_started"])
         v._data = d["data"]
         return v
+    def save(self, root_dir):
+        data_storage = TextDataStorage(root_dir=os.path.join(root_dir, "Scans"))
+        metadata = {
+            "configuration": self.configuration,
+            "date_started": self.date_started.isoformat(),
+            "units": {
+                "frequency":"THz",
+                "photodiode":"V",
+                "step":"",
+                "repeat":"",
+                "piezo":"V",
+            }
+        }
+        column_headers = ("frequency", "photodiode", "step", "repeat", "piezo")
+        column_dtypes=(float, float, float, float, float)
+        nametag = "scan"
+        self.file_saved, *_ = data_storage.save_data(
+            self._data,
+            metadata=metadata,
+            nametag=nametag,
+            column_headers=column_headers,
+            column_dtypes=column_dtypes,
+        )
+        return self.file_saved
 
 class Calibration:
     count = 0
-    def __init__(self, grating=None, bias=None, offset=None, span=None, center_frequencies=None, mini_frequencies=None, maxi_frequencies=None, name=None, date_created=None):
+    def __init__(self, grating=None, bias=None, offset=None, span=None, center_frequencies=None, mini_frequencies=None, maxi_frequencies=None, name=None, date_created=None, file_saved=None):
         if name is None:
             self.name = f"Calibration {Calibration.count}"
             Calibration.count += 1
@@ -819,6 +974,8 @@ class Calibration:
             self.date_created = datetime.datetime.now()
         else:
             self.date_created = date_created
+        self.file_saved = file_saved
+        self.changed_since_saved = file_saved is None
         self.step_no = 0
     def to_dict(self):
         return {"grating": self.grating, 
@@ -847,5 +1004,49 @@ class Calibration:
                     mini_frequencies = np.zeros(len(grating)),
                     maxi_frequencies = np.zeros(len(grating))
                     )
-            
-    
+    def save(self, root_dir):
+        data_storage = TextDataStorage(root_dir=os.path.join(root_dir, "Calibrations"))
+        metadata = {
+            "name": self.name,
+            "date_created": self.date_created.isoformat(),
+            "units": {
+                "grating":"step",
+                "bias":"mA",
+                "offset":"norm. tension",
+                "span":"norm. tension",
+                "center_frequency":"THz",
+                "mini_frequency":"THz",
+                "maxi_frequency":"THz",
+            }
+        }
+        column_headers = ("grating" ,"bias","offset","span","center_frequency","mini_frequency","maxi_frequency")
+        column_dtypes=(float, float, float, float, float, float, float)
+        nametag = "calibration"
+        data = np.vstack((self.grating,self.bias,self.offset,self.span,self.center_frequencies,self.mini_frequencies,self.maxi_frequencies)).transpose()
+        self.file_saved, *_ = data_storage.save_data(
+            data,
+            metadata=metadata,
+            nametag=nametag,
+            column_headers=column_headers,
+            column_dtypes=column_dtypes,
+        )
+        self.changed_since_saved = False
+        return self.file_saved
+        
+    @classmethod
+    def from_file(cls, path):
+        data,metadata,header = TextDataStorage.load_data(path)
+        v = cls(
+            grating=data[:,0], 
+            bias=data[:,1], 
+            offset=data[:,2], 
+            span=data[:,3], 
+            center_frequencies=data[:,4], 
+            mini_frequencies=data[:,5], 
+            maxi_frequencies=data[:,6], 
+            name=metadata["name"], date_created=datetime.datetime.fromisoformat(metadata["date_created"]),
+            file_saved=path
+        )
+        return v
+    def synopsis_dict(self):
+        return dict(name=self.name, path=self.file_saved, date_created=self.date_created)
