@@ -561,7 +561,7 @@ TypeError: only integer scalar arrays can be converted to a scalar index
             else:
                 f = self.send_and_recv("meas,wl,nm(vac)", check_ok=False)
         try:
-            return np.float64(f.split()[0])
+            return float(f.split()[0])
         except ValueError:
             return np.nan
 
