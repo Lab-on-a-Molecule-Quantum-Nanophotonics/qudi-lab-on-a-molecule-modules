@@ -129,6 +129,8 @@ class MOGLABSMotorizedLaserDriver(SwitchInterface, ProcessControlInterface):
                 return self._set_duty(value)
             elif channel == "ramp_halt": 
                 self._ramp_halt=value
+            elif channel == "current":
+                self._set_current(value)
 
     def get_setpoint(self, channel):
         with self._lock:
@@ -144,6 +146,8 @@ class MOGLABSMotorizedLaserDriver(SwitchInterface, ProcessControlInterface):
                 return self._get_duty()
             elif channel == "ramp_halt": 
                 return self._ramp_halt
+            elif channel == "current":
+                return self._get_current_setpoint()
 
     def get_process_value(self, channel):
         with self._lock:
@@ -168,7 +172,7 @@ class MOGLABSMotorizedLaserDriver(SwitchInterface, ProcessControlInterface):
         """
         with self._lock:
             return ProcessControlConstraints(
-                ["frequency", "span", "offset", "bias", "duty", "ramp_halt"],
+                ["frequency", "span", "offset", "bias", "duty", "ramp_halt", "current"],
                 ["current"],
                 {
                     "frequency":"Hz",
@@ -251,6 +255,10 @@ class MOGLABSMotorizedLaserDriver(SwitchInterface, ProcessControlInterface):
         return float(self.send_and_recv(f"current,ilim", check_ok=False).split()[0])
     def _get_current(self):
         return float(self.send_and_recv(f"current,meas", check_ok=False).split()[0])
+    def _get_current_setpoint(self):
+        return float(self.send_and_recv(f"current,iset", check_ok=False).split()[0])
+    def _set_current(self,value):
+        return self.send_and_recv(f"current,iset,{value}")
     def _set_ramp_status(self, st):
         if st == "OFF":
             self._ramp_running = False
