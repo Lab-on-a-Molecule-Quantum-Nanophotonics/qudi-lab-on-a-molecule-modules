@@ -1,6 +1,7 @@
 from abc import abstractmethod
 from typing import Iterable, Union, Tuple, Dict, Type
 import numpy as np
+
 from qudi.core.module import Base
 _Variable_Type = Union[int, float, bool]
 
@@ -26,6 +27,11 @@ class ExcitationScannerConstraints:
             return True
         mini,maxi=self.control_variable_limits[i]
         return mini <= value <= maxi
+    def set_limits(name:str,mini:_Variable_Type,maxi:_Variable_Type):
+        if name not in self.control_variables:
+            raise KeyError(f"Unknown variable {name}")
+        i = self.control_variables.index(name)
+        self.control_variable_limits[i] = mini,maxi
     def exposure_in_range(self, value):
         mini,maxi = self.exposure_limits
         return mini <= value <= maxi
@@ -64,6 +70,10 @@ class ExcitationScannerInterface(Base):
     def get_control(self, variable: str) -> _Variable_Type:
         "Get a control variable value."
         pass
+    @property 
+    def control_dict(self):
+        "Get a dict with all the control variables."
+        return {k:self.get_control(k) for k in self.constraints.control_variables}
     @abstractmethod
     def get_current_data(self) -> np.ndarray:
         "Return current scan data."
