@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from collections import OrderedDict
 from typing import Iterable, Union, Tuple, Dict, Type
 import numpy as np
 
@@ -6,7 +7,13 @@ from qudi.core.module import Base
 _Variable_Type = Union[int, float, bool]
 
 class ExcitationScannerConstraints:
-    def __init__(self, exposure_limits:Tuple[float,float], repeat_limits:Tuple[int,int], idle_value_limits:Tuple[float,float], control_variables:Iterable[str], control_variable_limits:Iterable[Tuple[_Variable_Type,_Variable_Type]], control_variable_units:Iterable[str], control_variable_types:Iterable[Type[_Variable_Type]]):
+    def __init__(self, exposure_limits:Tuple[float,float], 
+                 repeat_limits:Tuple[int,int], 
+                 idle_value_limits:Tuple[float,float], 
+                 control_variables:Iterable[str], 
+                 control_variable_limits:Iterable[Tuple[_Variable_Type,_Variable_Type]], 
+                 control_variable_units:Iterable[str], 
+                 control_variable_types:Iterable[Type[_Variable_Type]]):
         self.exposure_limits=exposure_limits
         self.repeat_limits=repeat_limits
         self.idle_value_limits=idle_value_limits
@@ -49,6 +56,11 @@ class ExcitationScannerInterface(Base):
     def scan_running(self) -> bool:
         "Return True if a scan can be launched."
         pass
+    @property 
+    @abstractmethod
+    def state_display(self) -> str:
+        "Return a string that gives the current operation running for display purposes."
+        pass
     @abstractmethod
     def start_scan(self) -> None:
         "Start scanning in a non_blocking way."
@@ -73,7 +85,15 @@ class ExcitationScannerInterface(Base):
     @property 
     def control_dict(self):
         "Get a dict with all the control variables."
-        return {k:self.get_control(k) for k in self.constraints.control_variables}
+        c = self.constraints.get_control_variables()
+        return OrderedDict([(k,
+                             dict(name=k, 
+                                  limits=c[k]['limits'], 
+                                  type=c[k]['type'], 
+                                  unit=c[k]['unit'], 
+                                  value=self.get_control(k))
+                             ) for k in self.constraints.control_variables])
+
     @abstractmethod
     def get_current_data(self) -> np.ndarray:
         "Return current scan data."

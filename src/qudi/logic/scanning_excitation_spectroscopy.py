@@ -1,12 +1,10 @@
 from PySide2 import QtCore
 import numpy as np
-import functools
-import operator
 import matplotlib.pyplot as plt
 from datetime import datetime
 import traceback
-from qudi.core.module import LogicBase
 
+from qudi.core.module import LogicBase
 from qudi.core.connector import Connector
 from qudi.core.configoption import ConfigOption
 from qudi.core.statusvariable import StatusVar
@@ -15,9 +13,8 @@ from qudi.util.datafitting import FitContainer, FitConfigurationsModel
 from qudi.util.mutex import Mutex
 
 class ScanningExcitationLogic(LogicBase):
-    # TODO: add a watchdog for the scanner that updates the data and updates the state
-    _scan_logic = Connector(name='scan_logic', interface='ExcitationScannerInterface')
-
+    _scanner = Connector(name='scanner', interface='ExcitationScannerInterface')
+    _watchdog_repeat_time = ConfigOption(name="watchdog_repeat_time_ms", default=50)
     _spectrum = StatusVar(name='spectrum', default=[None, None, None])
     _fit_region = StatusVar(name='fit_region', default=[0, 1])
     _fit_config = StatusVar(name='fit_config', default=dict())
@@ -26,6 +23,8 @@ class ScanningExcitationLogic(LogicBase):
     
     sig_data_updated = QtCore.Signal()
     sig_state_updated = QtCore.Signal()
+    sig_scanner_state_updated = QtCore.Signal(str)
+    sig_scanner_variables_updated = QtCore.Signal()
     sig_fit_updated = QtCore.Signal(str, object)
 
     def __init__(self, *args, **kwargs):
@@ -43,6 +42,7 @@ class ScanningExcitationLogic(LogicBase):
         self._acquisition_running = False
         self._fit_results = None
         self._fit_method = ''
+        self._watchdog_timer = QtCore.QTimer(parent=self)
 
     def on_activate(self):
         """ Initialisation performed during activation of the module.
@@ -53,6 +53,9 @@ class ScanningExcitationLogic(LogicBase):
         self.fit_region = self._fit_region
 
         self._sig_get_spectrum.connect(self.get_spectrum, QtCore.Qt.QueuedConnection)
+        self._watchdog_timer.setSingleShot(True)
+        self._watchdog_timer.timeout.connect(self._watchdog, QtCore.Qt.QueuedConnection)
+        self._watchdog_timer.start(100)
     
     def on_deactivate(self):
         """ Reverse steps of activation
@@ -69,49 +72,64 @@ class ScanningExcitationLogic(LogicBase):
     def get_spectrum(self, reset=True):
         self._stop_acquisition = False
         if reset:
-            self._spectrum = [None,None,None]
+            with self._lock:
+                self._spectrum = [None,None,None]
         self.sig_state_updated.emit()
 
-        self._scan_logic().start_scan()
+        self._scanner().start_scan()
+        self.__start_watchdog_timer()
         
         return self.spectrum
 
+    def __start_watchdog_timer(self):
+        # A timer can only be started from its own thread, so this method ensures
+        # that it is being started in the thread of the logic.
+        try:
+            if self.thread() is not QtCore.QThread.currentThread():
+                self._watchdog_timer.setInterval(self._watchdog_repeat_time)
+                QtCore.QMetaObject.invokeMethod(self._watchdog_timer,
+                                                "start",
+                                                QtCore.Qt.BlockingQueuedConnection)
+            else:
+                pass
+
+        except:
+            self.log.exception("")
+
     @property
     def acquisition_running(self):
-        return self._scan_logic().scan_running
+        return self._scanner().scan_running
 
     @property
     def spectrum(self):
-        if self._spectrum[0] is None:
-            return None
-        return np.copy(self._spectrum[0])
+        with self._lock:
+            if self._spectrum[1] is None:
+                return None
+            return np.copy(self._spectrum[1])
 
-    def get_spectrum_at_x(self, x):
+    def get_spectrum_at_x(self, x, step_num=0):
         if self.frequency is None or self.spectrum is None:
             return -1
-        return np.interp(x, self.frequency, self.spectrum)
+        roi = self.step_number==step_num
+        return np.interp(x, self.frequency[roi], self.spectrum[roi])
 
     @property
     def frequency(self):
-        if self._spectrum[1] is None:
-            return None
-        return np.copy(self._spectrum[1])
+        with self._lock:
+            if self._spectrum[0] is None:
+                return None
+            return np.copy(self._spectrum[0])
         
     @property
     def step_number(self):
-        if self._spectrum[2] is None:
-            return None
-        return np.copy(self._spectrum[2])
+        with self._lock:
+            if self._spectrum[2] is None:
+                return None
+            return np.copy(self._spectrum[2])
 
-    @property
-    def repetitions(self):
-        return self._scan_logic().get_repeat_number()
-
-
-    def save_spectrum_data(self, background=False, name_tag='', root_dir=None, parameter=None):
+    def save_spectrum_data(self, name_tag='', root_dir=None, parameter=None):
         """ Saves the current spectrum data to a file.
 
-        @param bool background: Whether this is a background spectrum (dark field) or not.
         @param string name_tag: postfix name tag for saved filename.
         @param string root_dir: overwrite the file position in necessary
         @param dict parameter: additional parameters to add to the saved file
@@ -122,23 +140,25 @@ class ScanningExcitationLogic(LogicBase):
         # write experimental parameters
         parameters = {'repetitions': self.repetitions,
                       'exposure' : self.exposure_time,
-                      'control_variables' : self._scan_logic().control_dict
+                      'control_variables' : self._scanner().control_dict
                       }
                 
-        # TODO: report the scanning parameters here.
         if self.fit_method != 'No Fit' and self.fit_results is not None:
             parameters['fit_method'] = self.fit_method
             parameters['fit_results'] = self.fit_results.params
             parameters['fit_region'] = self.fit_region
+
         if parameter:
             parameters.update(parameter)
 
-        if self.x_data is None:
+        if self.frequency is None:
             self.log.error('No data to save.')
             return
+        
+        rescale_factor_freq, prefix_freq = self._get_si_scaling(np.max(self.frequency))
 
-        data = [self.x_data * 1e-12, ]
-        header = ['Frequency (THz)', ]
+        data = [self.frequency, ]
+        header = [f'Frequency (Hz)', ]
         
         # prepare the data
         if self.spectrum is None:
@@ -166,25 +186,39 @@ class ScanningExcitationLogic(LogicBase):
         figure, ax1 = plt.subplots()
         rescale_factor, prefix = self._get_si_scaling(np.max(data[1]))
 
-        ax1.plot(data[0],
-                 data[1] / rescale_factor,
-                 linestyle=':',
-                 linewidth=0.5
-                 )
-
-        if self.fit_method != 'No Fit' and self.fit_results is not None:
-            if self._axis_type_frequency:
-                x_data = self.fit_results.high_res_best_fit[0] * 1e-12
-            else:
-                x_data = self.fit_results.high_res_best_fit[0] * 1e9
-
-            ax1.plot(x_data,
-                     self.fit_results.high_res_best_fit[1] / rescale_factor,
+        n_step = np.unique(self.step_number)
+        for i in n_step:
+            roi = self.step_number == n_step
+            ax1.plot(data[0][roi] / rescale_factor_freq,
+                     data[1][roi] / rescale_factor,
                      linestyle=':',
-                     linewidth=0.5
+                     linewidth=0.5,
+                     label=f"Step {i}",
                      )
 
-        ax1.set_xlabel(header[0])
+        fit_displayed = self.fit_method != 'No Fit' and self.fit_results is not None
+        if fit_displayed:
+            frequency = self.fit_results.high_res_best_fit[0] / rescale_factor_freq
+
+            ax1.plot(frequency,
+                     self.fit_results.high_res_best_fit[1] / rescale_factor,
+                     linestyle=':',
+                     linewidth=0.5,
+                     label="Fit",
+                     )
+            # these are matplotlib.patch.Patch properties
+            props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+            textstr = f"""fit method: {self.fit_method}
+            fit results: {self.fit_results.params}
+            fit region: {self.fit_region}
+            """
+            # place a text box in upper left in axes coords
+            ax1.text(0.05, 0.95, textstr, transform=ax1.transAxes, fontsize=14,
+        verticalalignment='top', bbox=props)
+        if len(n_step) > 1 or fit_displayed:
+            ax1.legend()
+
+        ax1.set_xlabel(f"Frequency ({prefix_freq}Hz)")
         ax1.set_ylabel('Intensity ({} count)'.format(prefix))
         figure.tight_layout()
 
@@ -209,12 +243,46 @@ class ScanningExcitationLogic(LogicBase):
 
     @property
     def exposure_time(self):
-        return self.scan_logic().get_exposure_time()
+        return self._scanner().get_exposure_time()
 
     @exposure_time.setter
     def exposure_time(self, value):
-        self.scan_logic().set_exposure_time(value)
+        self._scanner().set_exposure_time(value)
         self.sig_state_updated.emit()
+
+    @property
+    def repetitions(self):
+        return self._scanner().get_repeat_number()
+    @repetitions.setter
+    def repetitions(self, v):
+        self._scanner().set_repeat_number(v)
+
+    @property 
+    def variables(self):
+        return self._scanner().control_dict
+    def set_variable(self, name, value):
+        self._scanner().set_control(name, value)
+        self.sig_scanner_variables_updated.emit()
+
+    def _watchdog(self):
+        try:
+            with self._lock:
+                data = self._scanner().get_current_data()
+                self._spectrum = [data[:,0], data[:,1], data[:,2]]
+            self.sig_data_updated.emit()
+            st = self._scanner().state_display
+            self.sig_scanner_state_updated.emit(st)
+            if self._scanner().scan_running:
+                if self._stop_acquisition:
+                    self._scanner().stop_scan()
+                    self._stop_acquisition = False
+                self._watchdog_timer.start(self._watchdog_repeat_time)
+            else:
+                self.sig_state_updated.emit()
+        except:
+            self.log.exception("")
+
+
 
     ################
     # Fitting things
@@ -227,30 +295,32 @@ class ScanningExcitationLogic(LogicBase):
     def fit_container(self):
         return self._fit_container
 
-    def do_fit(self, fit_method):
+    def do_fit(self, fit_method, step_num):
         if fit_method == 'No Fit':
             self.sig_fit_updated.emit('No Fit', None)
             return 'No Fit', None
 
         self.fit_region = self._fit_region
-        if self.x_data is None or self.spectrum is None:
+        if self.frequency is None or self.spectrum is None:
             self.log.error('No data to fit.')
             self.sig_fit_updated.emit('No Fit', None)
             return 'No Fit', None
 
-        start = len(self.x_data) - np.searchsorted(self.x_data, self._fit_region[1], 'left')
-        end = len(self.x_data) - np.searchsorted(self.x_data, self._fit_region[0], 'right')
+        roi = self.step_number == step_num
+        frequency = self.frequency[roi]
+        start = len(frequency) - np.searchsorted(frequency, self._fit_region[1], 'left')
+        end = len(frequency) - np.searchsorted(frequency, self._fit_region[0], 'right')
 
         if end - start < 2:
             self.log.error('Fit region limited the data to less than two points. Fit not possible.')
             self.sig_fit_updated.emit('No Fit', None)
             return 'No Fit', None
 
-        x_data = self.x_data[start:end]
-        y_data = self.spectrum[start:end]
+        frequency = self.frequency[start:end]
+        y_data = self.spectrum[roi][start:end]
 
         try:
-            self._fit_method, self._fit_results = self._fit_container.fit_data(fit_method, x_data, y_data)
+            self._fit_method, self._fit_results = self._fit_container.fit_data(fit_method, frequency, y_data)
         except:
             self.log.exception(f'Data fitting failed:\n{traceback.format_exc()}')
             self.sig_fit_updated.emit('No Fit', None)
@@ -275,9 +345,9 @@ class ScanningExcitationLogic(LogicBase):
     def fit_region(self, fit_region):
         assert len(fit_region) == 2, f'fit_region has to be of length 2 but was {type(fit_region)}'
 
-        if self.x_data is None:
+        if self.frequency is None:
             return
         fit_region = fit_region if fit_region[0] <= fit_region[1] else (fit_region[1], fit_region[0])
-        new_region = (max(min(self.x_data), fit_region[0]), min(max(self.x_data), fit_region[1]))
+        new_region = (max(min(self.frequency), fit_region[0]), min(max(self.frequency), fit_region[1]))
         self._fit_region = new_region
         self.sig_state_updated.emit()
