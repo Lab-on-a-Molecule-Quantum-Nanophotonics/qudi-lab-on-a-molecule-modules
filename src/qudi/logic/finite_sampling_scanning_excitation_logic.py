@@ -180,6 +180,9 @@ class FiniteSamplingScanningExcitationLogic(LogicBase, ExcitationScannerInterfac
     def scan_running(self) -> bool:
         "Return True if a scan can be launched."
         return self.watchdog_state in self._scanning_states
+    @property
+    def state_display(self) -> str:
+        return self.watchdof_state.replace("_", " ")
     def start_scan(self) -> None:
         "Start scanning in a non_blocking way."
         if not self.scan_running:
