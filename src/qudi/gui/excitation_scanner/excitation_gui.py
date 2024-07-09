@@ -244,6 +244,7 @@ class ScanningExcitationGui(GuiBase):
     def set_repetitions(self, v):
         self._excitation_logic().repetitions = v
     def set_variable(self, name, v):
+        self.log.debug(f"gui got {name}: {v}")
         self._excitation_logic().set_variable(name, v)
 
     def populate_settings(self):
@@ -257,11 +258,12 @@ class ScanningExcitationGui(GuiBase):
         self._mw.control_widget.repetitions_spinbox.blockSignals(False)
         self._mw.control_widget.progress_bar.setRange(0, round(100 * exposure_time * repetitions))
         variables = self._excitation_logic().variables
+        self.log.debug(f"Creating variables {variables}")
         self._mw.control_widget.create_variable_widgets(variables)
 
     def target_changed(self):
         frequency = self._excitation_logic().frequency
-        if frequency is None:
+        if frequency is None or len(frequency)==0:
             return
         self._target_x = self._mw.data_widget.target_point.pos()[0]
 

@@ -116,7 +116,7 @@ class ScanningExcitationControlWidget(QtWidgets.QWidget):
                 widget.setChecked(value)
             else:
                 widget.setValue(value)
-            getattr(widget, _signal_mapping[type(widget)]).connect(lambda v:self.sig_variable_set.emit(name, v))
+            getattr(widget, _signal_mapping[type(widget)]).connect(lambda v,name=name:self.sig_variable_set.emit(name, v))
             if t != bool:
                 widget.setSuffix(unit)
                 widget.setMinimum(limits[0])
