@@ -30,11 +30,11 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
 
     """
     port = ConfigOption('port', 'COM6')
-    poll_time = StatusVar('poll_time', 100)
-    default_buffer_size = ConfigOption("buffer_size", 1024)
+    poll_time = StatusVar('poll_time', 1e-3)
+    default_buffer_size = ConfigOption("buffer_size", 2**16)
     auto_start_acquisition = ConfigOption("auto_start_acquisition", False)
 
-    instream_rate = StatusVar("instream_rate", default=20)
+    instream_rate = StatusVar("instream_rate", default=50)
     _threaded = True
 
     def __init__(self, *args, **kwargs):
@@ -53,6 +53,7 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
         self._time_start = time.perf_counter()
         self._instream_offset = 0
         self._frame_size = 1
+        self.instream_running = False
 
     # Qudi activation / deactivation
     def on_activate(self):
@@ -70,7 +71,7 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
                                                  bounds=(2, (2**32)//10),
                                                  increment=1,
                                                  enforce_int=True),
-            sample_rate=ScalarConstraint(default=self.instream_rate,bounds=(1,20),increment=1),
+            sample_rate=ScalarConstraint(default=self.instream_rate,bounds=(1,100),increment=1),
         )
         self._constraints_finite_sampling = FiniteSamplingInputConstraints(
             channel_units = {
@@ -163,6 +164,7 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
         self._watchdog_active = False
     @QtCore.Slot()
     def _continuous_read_callback(self):
+        # self.log.debug("continuous callback")
         time_start = time.perf_counter()
         try:
             with self._lock:
@@ -190,20 +192,24 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
 
     @QtCore.Slot()
     def _instream_buffers_callback(self):
+        # self.log.debug("instream callback")
         t_start = time.perf_counter()
-        with self._lock:
-            if self._instream_offset < len(self._instream_data_buffer):
-                t = time.perf_counter()
-                view = self._data_buffer[:self._current_buffer_position]
-                view = view[~np.isnan(view)]
-                if len(view) > 0:
-                    self._instream_data_buffer[self._instream_offset] = view.mean()
-                    self._instream_timestamp_buffer[self._instream_offset] = t - self._time_start_instream
-                    self._roll_buffers(self._current_buffer_position)
-                    self._instream_offset += 1
-        if self.module_state() == 'locked':
-            t_overhead = time.perf_counter() - t_start
-            QtCore.QTimer.singleShot(int(round(1000 * max(0, 1/self.instream_rate - t_overhead))), self._instream_buffers_callback)
+        try:
+            with self._lock:
+                if self._instream_offset < len(self._instream_data_buffer):
+                    t = time.perf_counter()
+                    view = self._data_buffer[:self._current_buffer_position]
+                    view = view[~np.isnan(view)]
+                    if len(view) > 0:
+                        self._instream_data_buffer[self._instream_offset] = view.mean()
+                        self._instream_timestamp_buffer[self._instream_offset] = t - self._time_start_instream
+                        self._roll_buffers(self._current_buffer_position)
+                        self._instream_offset += 1
+            if self.module_state() == 'locked':
+                t_overhead = time.perf_counter() - t_start
+                QtCore.QTimer.singleShot(int(round(1000 * max(0, 1/self.instream_rate - t_overhead))), self._instream_buffers_callback)
+        except:
+            self.log.exception("")
 
     def _roll_instream_buffers(self, n_read):
         np.roll(self._instream_data_buffer, -n_read)
@@ -377,7 +383,7 @@ TypeError: only integer scalar arrays can be converted to a scalar index
 
     @property
     def active_channels(self):
-        return ['wavelength']
+        return ['frequency']
 
     def configure(self,
                   active_channels: Sequence[str],

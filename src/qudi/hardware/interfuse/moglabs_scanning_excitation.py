@@ -13,13 +13,14 @@ import numpy as np
 
 class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
     # TODO: the sampling of the wavemeter is a bit unreliable, as it will occur at unprecise times> Maybe we can reconstruct the correct frequencies through interpolation....
+    # TODO: need to add a waiting step to reach the first value.
     _finite_sampling_input = Connector(name='input', interface='FiniteSamplingInputInterface')
     _ldd_switches = Connector(name="ldd_switches", interface="SwitchInterface")
     _ldd_control = Connector(name="ldd_control", interface="ProcessControlInterface")
     _cem_control = Connector(name="cem_control", interface="ProcessControlInterface")
     _fzw_sampling = Connector(name="fzw_sampling", interface="FiniteSamplingInputInterface")
 
-    _input_channel = ConfigOption(name="input_channel")
+    _input_channel = ConfigOption(name="input_channel", missing="error")
     _chunk_size = ConfigOption(name="chunk_size", default=10)
     _watchdog_delay = ConfigOption(name="watchdog_delay", default=0.2)
 
@@ -181,13 +182,14 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
 
     def on_deactivate(self):
         self.watchdog_event("stop_watchdog")
+        time.sleep(3*self._watchdog_delay)
     @property
     def scan_running(self) -> bool:
         "Return True if a scan can be launched."
         return self.watchdog_state in self._scanning_states
     @property
     def state_display(self) -> str:
-        return self.watchdof_state.replace("_", " ")
+        return self.watchdog_state.replace("_", " ")
     def start_scan(self) -> None:
         "Start scanning in a non_blocking way."
         if not self.scan_running:
@@ -202,6 +204,7 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
         return self._constraints
     def set_control(self, variable: str, value) -> None:
         "Set a control variable value."
+        self.log.debug(f"hardware got {variable}: {value}")
         if not self.constraints.variable_in_range(variable, value):
             raise ValueError(f"Cannot set {variable}={value}")
         if variable == "grating":

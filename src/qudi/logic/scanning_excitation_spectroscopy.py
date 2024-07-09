@@ -261,6 +261,7 @@ class ScanningExcitationLogic(LogicBase):
     def variables(self):
         return self._scanner().control_dict
     def set_variable(self, name, value):
+        self.log.debug(f"logic got {name}: {value}")
         self._scanner().set_control(name, value)
         self.sig_scanner_variables_updated.emit()
 
@@ -268,7 +269,8 @@ class ScanningExcitationLogic(LogicBase):
         try:
             with self._lock:
                 data = self._scanner().get_current_data()
-                self._spectrum = [data[:,0], data[:,1], data[:,2]]
+                if len(data) > 0:
+                    self._spectrum = [data[:,0], data[:,1], data[:,2]]
             self.sig_data_updated.emit()
             st = self._scanner().state_display
             self.sig_scanner_state_updated.emit(st)

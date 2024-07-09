@@ -33,6 +33,7 @@ from qudi.core.configoption import ConfigOption
 class SimulationMode(Enum):
     RANDOM = 0
     ODMR = 1
+    LORENTZ = 2
 
 
 class FiniteSamplingInputDummy(FiniteSamplingInputInterface):
@@ -167,6 +168,8 @@ class FiniteSamplingInputDummy(FiniteSamplingInputInterface):
                 self.__simulate_odmr(self._frame_size)
             elif self._simulation_mode is SimulationMode.RANDOM:
                 self.__simulate_random(self._frame_size)
+            elif self._simulation_mode is SimulationMode.LORENTZ:
+                self.__simulate_lorentz(self._frame_size)
 
             self.__returned_samples = 0
             self.__start_time = time.time()
@@ -244,3 +247,12 @@ class FiniteSamplingInputDummy(FiniteSamplingInputInterface):
             data[ch] = offset + (np.random.rand(length) - 0.5) * noise - amp * gamma ** 2 / (
                     (x - pos) ** 2 + gamma ** 2)
         self.__simulated_samples = data
+
+    def __simulate_lorentz(self, length):
+        if length < 3:
+            self.__simulate_random(length)
+            return
+        offset = np.clip(np.random.rand(length) * 10, 0, np.inf)
+        x = np.arange(length, dtype=np.float64)
+        data = 1000 / (1 + ((length/2 - x)/(2*length/100))**2) + offset
+        self.__simulated_samples = {ch:data for ch in self._active_channels}
