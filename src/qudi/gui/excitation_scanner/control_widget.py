@@ -28,12 +28,12 @@ from qudi.util.widgets.toggle_switch import ToggleSwitch
 from qudi.util.widgets.scientific_spinbox import ScienDSpinBox
 
 _widget_mapping = {
-    bool: ToggleSwitch,
+    bool: QtWidgets.QCheckBox,
     int: QtWidgets.QSpinBox,
     float: ScienDSpinBox,
 }
 _signal_mapping = {
-    ToggleSwitch:"stateChanged",
+    QtWidgets.QCheckBox:"stateChanged",
     QtWidgets.QSpinBox:"valueChanged",
     ScienDSpinBox:"valueChanged",
 }

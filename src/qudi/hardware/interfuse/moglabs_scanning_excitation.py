@@ -12,7 +12,6 @@ from fysom import Fysom
 import numpy as np
 
 class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
-    # TODO: the sampling of the wavemeter is a bit unreliable, as it will occur at unprecise times> Maybe we can reconstruct the correct frequencies through interpolation....
     # TODO: need to add a waiting step to reach the first value.
     _finite_sampling_input = Connector(name='input', interface='FiniteSamplingInputInterface')
     _ldd_switches = Connector(name="ldd_switches", interface="SwitchInterface")
@@ -33,6 +32,7 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
     _offset = StatusVar(name='offset', default=0.5)
     _span = StatusVar(name='span', default=0.5)
     _frequency = StatusVar(name='frequency', default=5)
+    _interpolate_frequencies = StatusVar(name='interpolate_frequencies', default=True)
     
     _threaded = True
     def __init__(self, *args, **kwargs):
@@ -63,6 +63,8 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
         self._data_row_index = 0
         self._frequency_row_index = 0
         self._watchdog_timer = QtCore.QTimer(parent=self)
+        self._scan_data = np.zeros((0, 3))
+        self._measurement_time = np.zeros(0)
     # Internal utilities
     @property
     def watchdog_state(self):
@@ -92,6 +94,7 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
                 with self._data_lock:
                     self._scan_data = np.zeros((n*self._n_repeat, 3))
                     self._scan_data[:,2] = np.repeat(range(self._n_repeat), n)
+                    self._measurement_time = np.zeros(n*self._n_repeat)
                 self._repeat_no = 0
                 self._data_row_index = 0
                 self._frequency_row_index = 0
@@ -126,6 +129,18 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
                 if samples_missing_data <= 0 and samples_missing_frequency <= 0:
                     self._repeat_no += 1
                     self.log.debug("Step done.")
+                    if self._interpolate_frequencies:
+                        delta = np.diff(self._measurement_time)
+                        neg_delta = np.nonzero(delta < 0)[0]
+                        self._measurement_time[neg_delta+1] = self._measurement_time[neg_delta]
+                        n = self._number_of_samples_per_frame
+                        actual_times = np.linspace(start=0, stop=self._exposure_time*(n-1), num=n)
+                        for i in range(self._n_repeat):
+                            roi = self._scan_data[:,2] == i
+                            self._scan_data[roi,0] = np.interp(actual_times, 
+                                self._measurement_time, 
+                                self._scan_data[roi,0]
+                            )
                     self.watchdog_event("step_done")
                 else:
                     if samples_missing_data > 0 and self._finite_sampling_input().samples_in_buffer >= min(self._chunk_size, samples_missing_data):
@@ -135,13 +150,17 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
                             self._scan_data[i:i+len(new_data),1] = new_data
                             self._data_row_index += len(new_data)
                     if samples_missing_frequency > 0 and self._fzw_sampling().samples_in_buffer >= min(self._chunk_size, samples_missing_frequency):
-                        new_data = self._fzw_sampling().get_buffered_samples()["frequency"]
+                        new_data = self._fzw_sampling().get_buffered_samples()
+                        new_frequencies = new_data["frequency"]
+                        new_timestamps = new_data["timestamp"]
                         i = self._frequency_row_index
-                        data_size = min(self._scan_data.shape[0]-i, len(new_data))
-                        new_data = new_data[:data_size]
+                        data_size = min(self._scan_data.shape[0]-i, len(new_frequencies))
+                        new_frequencies = new_frequencies[:data_size]
+                        new_timestamps = new_timestamps[:data_size]
                         with self._data_lock:
-                            self._scan_data[i:i+len(new_data),0] = new_data
-                            self._frequency_row_index += len(new_data)
+                            self._scan_data[i:i+len(new_frequencies),0] = new_frequencies
+                            self._measurement_time[i:i+len(new_frequencies)] = new_timestamps
+                            self._frequency_row_index += len(new_frequencies)
             elif watchdog_state == "stopped": 
                 self.log.debug("stopped")
                 self._finite_sampling_input().stop_buffered_acquisition()
@@ -165,10 +184,10 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
             exposure_limits=(1e-4,1),
             repeat_limits=(1,100),
             idle_value_limits=(0.0, 400e12),
-            control_variables=("grating", "current", "offset", "span", "bias", "duty", "frequency"),
-            control_variable_limits=(cem_limits["grating"], ldd_limits["current"], ldd_limits["offset"], ldd_limits["span"], ldd_limits["bias"], ldd_limits["duty"], ldd_limits["frequency"]),
-            control_variable_types=(int, float, float, float, float, float, float, float),
-            control_variable_units=(cem_units["grating"], ldd_units["current"], ldd_units["offset"], ldd_units["span"], ldd_units["bias"], ldd_units["duty"], ldd_units["frequency"])
+            control_variables=("grating", "current", "offset", "span", "bias", "duty", "frequency", "interpolate_frequencies"),
+            control_variable_limits=(cem_limits["grating"], ldd_limits["current"], ldd_limits["offset"], ldd_limits["span"], ldd_limits["bias"], ldd_limits["duty"], ldd_limits["frequency"], (False, True)),
+            control_variable_types=(int, float, float, float, float, float, float, bool),
+            control_variable_units=(cem_units["grating"], ldd_units["current"], ldd_units["offset"], ldd_units["span"], ldd_units["bias"], ldd_units["duty"], ldd_units["frequency"], None)
         )
         self._ldd_control().set_setpoint("frequency", self._frequency)
         self._ldd_control().set_setpoint("duty", self._duty)
@@ -226,6 +245,8 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
         elif variable == "frequency":
             self._ldd_control().set_setpoint("frequency", value)
             self._frequency = value
+        elif variable == "interpolate_frequencies":
+            self._interpolate_frequencies = bool(value)
         
     def get_control(self, variable: str):
         "Get a control variable value."
@@ -243,6 +264,8 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
             return self._ldd_control().get_setpoint("duty")
         elif variable == "frequency":
             return self._ldd_control().get_setpoint("frequency")
+        elif variable == "interpolate_frequencies":
+            return self._interpolate_frequencies
         else:
             raise ValueError(f"Unknown variable {variable}")
     def get_current_data(self) -> np.ndarray:
