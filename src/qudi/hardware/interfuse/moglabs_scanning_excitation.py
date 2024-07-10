@@ -144,9 +144,6 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
                     self._repeat_no += 1
                     self.log.debug("Step done.")
                     if self._interpolate_frequencies:
-                        delta = np.diff(self._measurement_time)
-                        neg_delta = np.nonzero(delta < 0)[0]
-                        self._measurement_time[neg_delta+1] = self._measurement_time[neg_delta]
                         n = self._number_of_samples_per_frame
                         actual_times = np.linspace(start=0, stop=self._exposure_time*(n-1), num=n)
                         for i in range(self._n_repeat):
