@@ -256,6 +256,12 @@ class ScanningExcitationLogic(LogicBase):
     @repetitions.setter
     def repetitions(self, v):
         self._scanner().set_repeat_number(v)
+    @property
+    def idle(self):
+        return self._scanner().get_idle_value()
+    @idle.setter
+    def idle(self, v):
+        self._scanner().set_idle_value(v)
 
     @property 
     def variables(self):
