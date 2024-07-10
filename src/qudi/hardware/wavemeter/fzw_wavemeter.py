@@ -50,7 +50,7 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
         self.buffer_size = 0
         self.serial = serial.Serial()
         self._watchdog_active = False
-        self._time_start = time.perf_counter()
+        self._time_start = time.monotonic()
         self._instream_offset = 0
         self._frame_size = 1
         self.instream_running = False
@@ -154,7 +154,7 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
     @QtCore.Slot()
     def _start_continuous_read(self):
         self._watchdog_active = True
-        self._time_start = time.perf_counter()
+        self._time_start = time.monotonic()
         if self.thread() is not QtCore.QThread.currentThread():
             QtCore.QMetaObject.invokeMethod(self, '_continuous_read_callback', QtCore.Qt.BlockingQueuedConnection)
         else:
@@ -164,17 +164,19 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
         self._watchdog_active = False
     @QtCore.Slot()
     def _continuous_read_callback(self):
-        # self.log.debug("continuous callback")
-        time_start = time.perf_counter()
         try:
             with self._lock:
+                t = time.monotonic()
                 try:
                     val = float(self.send_and_recv("meas,freq", check_ok=False).split()[0])
                 except ValueError:
                     val = np.nan
                 if self._current_buffer_position < len(self._data_buffer):
-                    self._data_buffer[self._current_buffer_position] = val
-                    self._timestamp_buffer[self._current_buffer_position] = time_start - self._time_start
+                    i = self._current_buffer_position
+                    self._data_buffer[i] = val
+                    self._timestamp_buffer[i] = t - self._time_start
+                    if i > 0 and self._timestamp_buffer[i-1] > self._timestamp_buffer[i]:
+                        self._timestamp_buffer[i] = self._timestamp_buffer[i-1]
                     self._current_buffer_position += 1
                 else:
                     # self.log.warning("buffer overflow!")
@@ -182,8 +184,7 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
         except:
             self.log.exception("")
         if self._watchdog_active:
-            t_overhead = time.perf_counter() - time_start
-            QtCore.QTimer.singleShot(int(round(1000 * max(0, self.poll_time - t_overhead))), self._continuous_read_callback)
+            QtCore.QTimer.singleShot(int(round(1000*self.poll_time)), self._continuous_read_callback)
     def _roll_buffers(self, n_read):
         np.roll(self._data_buffer, -n_read)
         np.roll(self._timestamp_buffer, -n_read)
@@ -197,7 +198,7 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
         try:
             with self._lock:
                 if self._instream_offset < len(self._instream_data_buffer):
-                    t = time.perf_counter()
+                    t = time.monotonic()
                     view = self._data_buffer[:self._current_buffer_position]
                     view = view[~np.isnan(view)]
                     if len(view) > 0:
@@ -231,7 +232,7 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
             self.module_state.lock()
             with self._lock:
                 self._prepare_buffers()
-            self._time_start_instream = time.perf_counter()
+            self._time_start_instream = time.monotonic()
             self._instream_offset = 0
             self._start_continuous_read()
             QtCore.QMetaObject.invokeMethod(self, '_instream_buffers_callback', QtCore.Qt.QueuedConnection)
@@ -482,14 +483,14 @@ TypeError: only integer scalar arrays can be converted to a scalar index
         if number_of_samples > len(self._data_buffer):
             raise ValueError(f"You are asking for too many samples ({number_of_samples} for a maximum of {self.frame_size}.")
         while self.samples_in_buffer < number_of_samples:
-            time.sleep(self.poll_time)
+            time.sleep(0.1)
+        data_buffer = np.empty(number_of_samples,dtype=np.float64)
+        timestamp_buffer = np.empty(number_of_samples,dtype=np.float64)
         with self._lock:
-            data_buffer = np.empty(number_of_samples,dtype=np.float64)
-            timestamp_buffer = np.empty(number_of_samples,dtype=np.float64)
             data_buffer[:number_of_samples] = self._data_buffer[:number_of_samples]
             timestamp_buffer[:number_of_samples] = self._timestamp_buffer[:number_of_samples]
             self._roll_buffers(number_of_samples)
-            return {"frequency": data_buffer, "timestamp": timestamp_buffer}
+        return {"frequency": data_buffer, "timestamp": timestamp_buffer}
 
     def acquire_frame(self, frame_size=None):
         old_frame_size = self.frame_size
