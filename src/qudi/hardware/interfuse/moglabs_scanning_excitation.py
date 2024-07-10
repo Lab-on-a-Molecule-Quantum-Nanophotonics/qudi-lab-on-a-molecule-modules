@@ -124,7 +124,7 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
                     self._ldd_control().set_setpoint("duty", self._duty)
                     self._ldd_control().set_setpoint("ramp_halt", self._offset-self._span/2)
                     self._ldd_switches().set_state("RAMP", "ON")
-                    self.log.debug("Step prepared.")
+                    self.log.debug(f"Step {self._repeat_no} prepared.")
                     self._waiting_start = time.perf_counter()
                     self.watchdog_event("start_wait_ready")
             elif watchdog_state == "wait_ready":
@@ -138,8 +138,8 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
                 elif time_start - self._waiting_start > 0.02:
                     self._ldd_switches().set_state("RAMP", "OFF")
             elif watchdog_state == "record_scan_step": 
-                samples_missing_data = self._number_of_samples_per_frame - self._data_row_index
-                samples_missing_frequency = self._number_of_samples_per_frame - self._frequency_row_index
+                samples_missing_data = self._number_of_samples_per_frame * (self._repeat_no+1) - self._data_row_index
+                samples_missing_frequency = self._number_of_samples_per_frame * (self._repeat_no+1) - self._frequency_row_index
                 if samples_missing_data <= 0 and samples_missing_frequency <= 0:
                     self._repeat_no += 1
                     self.log.debug("Step done.")

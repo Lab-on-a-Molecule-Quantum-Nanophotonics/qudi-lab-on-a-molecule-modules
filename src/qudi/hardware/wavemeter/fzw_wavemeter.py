@@ -51,6 +51,7 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
         self.serial = serial.Serial()
         self._watchdog_active = False
         self._time_start = time.monotonic()
+        self._time_last_read = time.monotonic() 
         self._instream_offset = 0
         self._frame_size = 1
         self.instream_running = False
@@ -64,7 +65,7 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
         self.buffer_size = self.default_buffer_size
         self._constraints = DataInStreamConstraints(
             channel_units = {
-                'frequency': 'THz',
+                'frequency': 'Hz',
             },
             sample_timing=SampleTiming.TIMESTAMP,
             streaming_modes = [StreamingMode.CONTINUOUS],
@@ -77,7 +78,7 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
         )
         self._constraints_finite_sampling = FiniteSamplingInputConstraints(
             channel_units = {
-                'frequency': 'THz',
+                'frequency': 'Hz',
             },
             frame_size_limits = (1, self.default_buffer_size),
             sample_rate_limits = (1, 4000)
@@ -159,22 +160,29 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
             QtCore.QMetaObject.invokeMethod(self, '_continuous_read_callback', QtCore.Qt.BlockingQueuedConnection)
         else:
             self._time_start = time.monotonic()
+            self._time_last_read = self._time_start
             self._continuous_read_callback()
     @QtCore.Slot()
     def _stop_continuous_read(self):
         self._watchdog_active = False
     @QtCore.Slot()
     def _continuous_read_callback(self):
+        time_start = time.perf_counter()
         try:
             with self._lock:
                 t = time.monotonic()
+                delta_t = t - self._time_last_read
+                if delta_t < self.poll_time:
+                    QtCore.QTimer.singleShot(int(round(1000*max(0, self.poll_time-delta_t))), self._continuous_read_callback)
+                    return
+                self._time_last_read = t
                 try:
                     val = float(self.send_and_recv("meas,freq", check_ok=False).split()[0])
                 except ValueError:
                     val = np.nan
                 if self._current_buffer_position < len(self._data_buffer):
                     i = self._current_buffer_position
-                    self._data_buffer[i] = val
+                    self._data_buffer[i] = val * 1e12
                     self._timestamp_buffer[i] = t - self._time_start
                     if i > 0 and self._timestamp_buffer[i-1] > self._timestamp_buffer[i]:
                         self._timestamp_buffer[i] = self._timestamp_buffer[i-1]
@@ -185,7 +193,8 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
         except:
             self.log.exception("")
         if self._watchdog_active:
-            QtCore.QTimer.singleShot(int(round(1000*self.poll_time)), self._continuous_read_callback)
+            overhead_time = time.perf_counter() - time_start
+            QtCore.QTimer.singleShot(int(round(1000*max(0, self.poll_time - overhead_time))), self._continuous_read_callback)
     def _roll_buffers(self, n_read):
         self._data_buffer = np.roll(self._data_buffer, -n_read)
         self._timestamp_buffer = np.roll(self._timestamp_buffer, -n_read)
