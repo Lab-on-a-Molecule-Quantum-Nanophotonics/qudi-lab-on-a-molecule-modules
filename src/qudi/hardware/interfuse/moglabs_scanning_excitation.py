@@ -12,7 +12,6 @@ from fysom import Fysom
 import numpy as np
 
 class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
-    # TODO: need to add a waiting step to reach the first value.
     _finite_sampling_input = Connector(name='input', interface='FiniteSamplingInputInterface')
     _ldd_switches = Connector(name="ldd_switches", interface="SwitchInterface")
     _ldd_control = Connector(name="ldd_control", interface="ProcessControlInterface")
@@ -45,11 +44,12 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
 
                 {"name":"start_scan", "src":"idle", "dst":"prepare_scan"},
                 {"name":"start_prepare_step", "src":"prepare_scan", "dst":"prepare_step"},
-                {"name":"start_scan_step", "src":"prepare_step", "dst":"record_scan_step"},
+                {"name":"start_wait_ready", "src":"prepare_step", "dst":"wait_ready"},
+                {"name":"start_scan_step", "src":"wait_ready", "dst":"record_scan_step"},
                 {"name":"step_done", "src":"record_scan_step", "dst":"prepare_step"},
                 {"name":"end_scan", "src":"prepare_step", "dst":"prepare_idle"},
 
-                {"name":"interrupt_scan", "src":["prepare_scan","prepare_step","record_scan_step"], "dst":"prepare_idle"},
+                {"name":"interrupt_scan", "src":["prepare_scan","prepare_step","wait_ready","record_scan_step"], "dst":"prepare_idle"},
 
                 {"name":"stop_watchdog", "src":"*", "dst":"stopped"},
             ],
@@ -89,6 +89,11 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
             elif watchdog_state == "idle": 
                 if self._ldd_control().get_setpoint("ramp_halt") != self._idle_value:
                     self._ldd_control().set_setpoint("ramp_halt", self._idle_value)
+                    self._ldd_control().set_setpoint("frequency", 10)
+                    self._ldd_switches().set_state("RAMP", "ON")
+                    time.sleep(0.1)
+                    self._ldd_switches().set_state("RAMP", "OFF")
+                    self._ldd_control().set_setpoint("frequency", self._frequency)
             elif watchdog_state == "prepare_scan": 
                 n = self._number_of_samples_per_frame
                 with self._data_lock:
@@ -112,20 +117,29 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
                 else:
                     self._finite_sampling_input().stop_buffered_acquisition()
                     self._fzw_sampling().stop_buffered_acquisition()
-                    self.log.debug("Step prepared.")
-                    self._ldd_control().set_setpoint("frequency", self._frequency)
+                    self._ldd_control().set_setpoint("frequency", 10)
                     self._ldd_control().set_setpoint("span", self._span)
                     self._ldd_control().set_setpoint("offset", self._offset)
                     self._ldd_control().set_setpoint("bias", self._bias)
                     self._ldd_control().set_setpoint("duty", self._duty)
+                    self._ldd_control().set_setpoint("ramp_halt", self._offset-self._span/2)
+                    self._ldd_switches().set_state("RAMP", "ON")
+                    self.log.debug("Step prepared.")
+                    self._waiting_start = time.perf_counter()
+                    self.watchdog_event("start_wait_ready")
+            elif watchdog_state == "wait_ready":
+                if time_start - self._waiting_start > 0.12:
+                    self._ldd_control().set_setpoint("frequency", self._frequency)
                     self._ldd_switches().set_state("RAMP", "ON")
                     self._finite_sampling_input().start_buffered_acquisition()
                     self._fzw_sampling().start_buffered_acquisition()
+                    self.log.debug("Ready to start acquisition.")
                     self.watchdog_event("start_scan_step")
+                elif time_start - self._waiting_start > 0.02:
+                    self._ldd_switches().set_state("RAMP", "OFF")
             elif watchdog_state == "record_scan_step": 
                 samples_missing_data = self._number_of_samples_per_frame - self._data_row_index
                 samples_missing_frequency = self._number_of_samples_per_frame - self._frequency_row_index
-                self.log.debug(f"missing_data:{samples_missing_data} missing_frequency:{samples_missing_frequency}")
                 if samples_missing_data <= 0 and samples_missing_frequency <= 0:
                     self._repeat_no += 1
                     self.log.debug("Step done.")
