@@ -277,6 +277,8 @@ class ScanningExcitationGui(GuiBase):
         self._mw.data_widget.target_y.setValue(new_y)
 
         self._mw.data_widget.target_point.setPos(self._target_x)
+        if self._mw.data_widget.laser_follow_cursor.current_state == "Yes":
+            self._excitation_logic().idle = self._target_x
 
     def target_updated(self):
         self._target_x = self._mw.data_widget.target_x.value()
