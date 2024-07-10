@@ -54,6 +54,8 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
         self._instream_offset = 0
         self._frame_size = 1
         self.instream_running = False
+        self._instream_consume_buffer = True
+        self._instream_read_start = 0
 
     # Qudi activation / deactivation
     def on_activate(self):
@@ -199,12 +201,16 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
             with self._lock:
                 if self._instream_offset < len(self._instream_data_buffer):
                     t = time.monotonic()
-                    view = self._data_buffer[:self._current_buffer_position]
+                    view = self._data_buffer[self._instream_read_start:self._current_buffer_position]
                     view = view[~np.isnan(view)]
                     if len(view) > 0:
                         self._instream_data_buffer[self._instream_offset] = view.mean()
                         self._instream_timestamp_buffer[self._instream_offset] = t - self._time_start_instream
-                        self._roll_buffers(self._current_buffer_position)
+                        if self._instream_consume_buffer:
+                            self._roll_buffers(self._current_buffer_position)
+                            self._instream_read_start = 0
+                        else:
+                            self._instream_read_start = self._current_buffer_position
                         self._instream_offset += 1
             if self.module_state() == 'locked':
                 t_overhead = time.perf_counter() - t_start
@@ -234,6 +240,7 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
                 self._prepare_buffers()
             self._time_start_instream = time.monotonic()
             self._instream_offset = 0
+            self.instream_running = True
             self._start_continuous_read()
             QtCore.QMetaObject.invokeMethod(self, '_instream_buffers_callback', QtCore.Qt.QueuedConnection)
         else:
@@ -246,6 +253,7 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
             self._stop_continuous_read()
             self.log.debug("unlocking")
             self.module_state.unlock()
+            self.instream_running = False
         else:
             self.log.warning('Unable to stop wavemeter input stream as nothing is running.')
 
@@ -455,25 +463,23 @@ TypeError: only integer scalar arrays can be converted to a scalar index
         self.buffer_size = size
 
     def start_buffered_acquisition(self):
-        self.instream_running = self.module_state() == "locked"
-        if self.instream_running:
-            self.stop_stream()
+        self._instream_consume_buffer = False
         if self.module_state() == "idle":
             self.module_state.lock()
-            with self._lock:
-                self._prepare_buffers()
-            self._start_continuous_read()
-        else:
-            self.log.warning('Unable to start input stream. It is already running.')
+        with self._lock:
+            self._prepare_buffers()
+        self._start_continuous_read()
 
     def stop_buffered_acquisition(self):
         self.log.debug("Requested stop.")
         if self.module_state() == 'locked':
-            self._stop_continuous_read()
-            self.module_state.unlock()
-            self.log.debug("unlocked")
-            if self.instream_running:
-                self.start_stream()
+            self.log.debug(f"stop_buffered_acquisition. instream_running={self.instream_running}")
+            if not self.instream_running:
+                self._stop_continuous_read()
+                self.module_state.unlock()
+                self.log.debug("unlocked")
+            with self._lock:
+                self._instream_consume_buffer = True
         else:
             self.log.warning('Unable to stop wavemeter input stream as nothing is running.')
 
