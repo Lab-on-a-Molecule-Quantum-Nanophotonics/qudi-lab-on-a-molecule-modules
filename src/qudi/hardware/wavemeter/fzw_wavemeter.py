@@ -152,14 +152,13 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
         self._instream_data_buffer = np.empty(self.buffer_size, dtype=np.float64)
         self._instream_timestamp_buffer = np.empty(self.buffer_size, dtype=np.float64)
         self._current_buffer_position = 0
-        self._corrected_time_offset_position = 0
     @QtCore.Slot()
     def _start_continuous_read(self):
         self._watchdog_active = True
-        self._time_start = time.monotonic()
         if self.thread() is not QtCore.QThread.currentThread():
             QtCore.QMetaObject.invokeMethod(self, '_continuous_read_callback', QtCore.Qt.BlockingQueuedConnection)
         else:
+            self._time_start = time.monotonic()
             self._continuous_read_callback()
     @QtCore.Slot()
     def _stop_continuous_read(self):
@@ -188,10 +187,9 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
         if self._watchdog_active:
             QtCore.QTimer.singleShot(int(round(1000*self.poll_time)), self._continuous_read_callback)
     def _roll_buffers(self, n_read):
-        np.roll(self._data_buffer, -n_read)
-        np.roll(self._timestamp_buffer, -n_read)
+        self._data_buffer = np.roll(self._data_buffer, -n_read)
+        self._timestamp_buffer = np.roll(self._timestamp_buffer, -n_read)
         self._current_buffer_position -= n_read
-        self._corrected_time_offset_position -= n_read
 
     @QtCore.Slot()
     def _instream_buffers_callback(self):
@@ -219,8 +217,8 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
             self.log.exception("")
 
     def _roll_instream_buffers(self, n_read):
-        np.roll(self._instream_data_buffer, -n_read)
-        np.roll(self._instream_timestamp_buffer, -n_read)
+        self._instream_data_buffer = np.roll(self._instream_data_buffer, -n_read)
+        self._instream_timestamp_buffer = np.roll(self._instream_timestamp_buffer, -n_read)
         self._instream_offset -= n_read
 
     # DataInStreamInterface
