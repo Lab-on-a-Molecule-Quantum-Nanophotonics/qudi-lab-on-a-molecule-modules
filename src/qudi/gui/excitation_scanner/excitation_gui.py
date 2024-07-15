@@ -57,6 +57,9 @@ class ScanningExcitationGui(GuiBase):
     _progress_poll_interval = ConfigOption(name='progress_poll_interval',
                                            default=1,
                                            missing='nothing')
+    _status_poll_interval = ConfigOption(name='status_poll_interval',
+                                           default=1,
+                                           missing='nothing')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -64,6 +67,7 @@ class ScanningExcitationGui(GuiBase):
         self._fsd = None
         self._start_acquisition_timestamp = 0
         self._progress_timer = None
+        self._status_update_timer = None
 
     def on_activate(self):
         """ Definition and initialisation of the GUI.
@@ -74,6 +78,10 @@ class ScanningExcitationGui(GuiBase):
         self._progress_timer.setSingleShot(True)
         self._progress_timer.setInterval(round(1000 * self._progress_poll_interval))
         self._progress_timer.timeout.connect(self._update_progress_bar)
+        self._status_update_timer = QtCore.QTimer(parent=self)
+        self._status_update_timer.setSingleShot(False)
+        self._status_update_timer.setInterval(round(1000 * self._status_poll_interval))
+        self._status_update_timer.timeout.connect(self.update_all)
 
         # setting up the window
         self._mw = excitation_window.ScanningExcitationMainWindow()
@@ -112,7 +120,9 @@ class ScanningExcitationGui(GuiBase):
         self.populate_settings()
         self.update_state()
         self.update_data()
-
+        
+        self._status_update_timer.start()
+        
         # show the gui and update the data
         self.show()
 
@@ -123,6 +133,10 @@ class ScanningExcitationGui(GuiBase):
         self._progress_timer.timeout.disconnect()
         self._progress_timer.stop()
         self._progress_timer = None
+        self._status_update_timer.timeout.disconnect()
+        self._status_update_timer.stop()
+        self._status_update_timer = None
+        
 
         # clean up the fit
         self._mw.action_show_fit_settings.triggered.disconnect()
@@ -153,6 +167,11 @@ class ScanningExcitationGui(GuiBase):
         self._mw.show()
         self._mw.activateWindow()
         self._mw.raise_()
+        
+    def update_all(self):
+        self.update_state()
+        self.update_data()
+        self.update_scanner_variables()
 
     def update_state(self):
         # Update the text of the buttons according to logic state
@@ -225,10 +244,8 @@ class ScanningExcitationGui(GuiBase):
     def acquire_spectrum(self):
         if not self._excitation_logic().acquisition_running:
             self._excitation_logic().get_spectrum()
-            self._mw.control_widget.acquire_button.setText('Stop Spectrum')
         else:
             self._excitation_logic().stop()
-            self._mw.control_widget.acquire_button.setText('Acquire Spectrum')
 
     def save_spectrum(self):
         self._excitation_logic().save_spectrum_data()
