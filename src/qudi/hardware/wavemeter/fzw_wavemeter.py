@@ -199,6 +199,7 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
         self._data_buffer = np.roll(self._data_buffer, -n_read)
         self._timestamp_buffer = np.roll(self._timestamp_buffer, -n_read)
         self._current_buffer_position -= n_read
+        self._instream_read_start = max(0, self._instream_read_start-n_read)
 
     @QtCore.Slot()
     def _instream_buffers_callback(self):
