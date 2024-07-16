@@ -155,7 +155,8 @@ class ScanningExcitationLogic(LogicBase):
             self.log.error('No data to save.')
             return
         
-        rescale_factor_freq, prefix_freq = self._get_si_scaling(np.max(self.frequency))
+        med = np.median(self.frequency)
+        rescale_factor_freq, prefix_freq = self._get_si_scaling(np.max(self.frequency)-med)
 
         data = [self.frequency, ]
         header = [f'Frequency (Hz)', ]
@@ -188,9 +189,11 @@ class ScanningExcitationLogic(LogicBase):
 
         n_step = np.unique(self.step_number)
         for i in n_step:
-            roi = self.step_number == n_step
-            ax1.plot(data[0][roi] / rescale_factor_freq,
-                     data[1][roi] / rescale_factor,
+            roi = self.step_number == i
+            freq = (data[0][roi] - med) / rescale_factor_freq
+            count = data[1][roi] / rescale_factor
+            ax1.plot(freq,
+                     count,
                      linestyle=':',
                      linewidth=0.5,
                      label=f"Step {i}",
@@ -198,7 +201,7 @@ class ScanningExcitationLogic(LogicBase):
 
         fit_displayed = self.fit_method != 'No Fit' and self.fit_results is not None
         if fit_displayed:
-            frequency = self.fit_results.high_res_best_fit[0] / rescale_factor_freq
+            frequency = (self.fit_results.high_res_best_fit[0]-med) / rescale_factor_freq
 
             ax1.plot(frequency,
                      self.fit_results.high_res_best_fit[1] / rescale_factor,
@@ -286,6 +289,8 @@ class ScanningExcitationLogic(LogicBase):
                     self._stop_acquisition = False
                 self._watchdog_timer.start(self._watchdog_repeat_time)
             else:
+                self.fit_region = (min(self.frequency), max(self.frequency))
+                self.idle = min(self.frequency)
                 self.sig_state_updated.emit()
         except:
             self.log.exception("")
