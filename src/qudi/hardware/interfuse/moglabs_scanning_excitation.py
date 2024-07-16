@@ -32,6 +32,7 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
     _span = StatusVar(name='span', default=0.5)
     _frequency = StatusVar(name='frequency', default=5)
     _interpolate_frequencies = StatusVar(name='interpolate_frequencies', default=True)
+    _idle_scan = StatusVar(name='idle_scan', default=False)
     
     _threaded = True
     def __init__(self, *args, **kwargs):
@@ -83,17 +84,11 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
             if watchdog_state == "prepare_idle": 
                 self._finite_sampling_input().stop_buffered_acquisition()
                 self._fzw_sampling().stop_buffered_acquisition()
-                self._ldd_control().set_setpoint("ramp_halt", self._idle_value)
-                self._ldd_switches().set_state("RAMP", "OFF")
+                self._ldd_switches().set_state("RAMP", "ON")
+                self.set_control("idle_scan", self._idle_scan)
                 self.watchdog_event("start_idle")
             elif watchdog_state == "idle": 
-                if self._ldd_control().get_setpoint("ramp_halt") != self._idle_value:
-                    self._ldd_control().set_setpoint("ramp_halt", self._idle_value)
-                    self._ldd_control().set_setpoint("frequency", 10)
-                    self._ldd_switches().set_state("RAMP", "ON")
-                    time.sleep(0.1)
-                    self._ldd_switches().set_state("RAMP", "OFF")
-                    self._ldd_control().set_setpoint("frequency", self._frequency)
+                pass
             elif watchdog_state == "prepare_scan": 
                 n = self._number_of_samples_per_frame
                 with self._data_lock:
@@ -195,10 +190,10 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
             exposure_limits=(1e-4,1),
             repeat_limits=(1,100),
             idle_value_limits=(0.0, 400e12),
-            control_variables=("grating", "current", "offset", "span", "bias", "duty", "frequency", "interpolate_frequencies"),
-            control_variable_limits=(cem_limits["grating"], ldd_limits["current"], ldd_limits["offset"], ldd_limits["span"], ldd_limits["bias"], ldd_limits["duty"], ldd_limits["frequency"], (False, True)),
-            control_variable_types=(int, float, float, float, float, float, float, bool),
-            control_variable_units=(cem_units["grating"], ldd_units["current"], ldd_units["offset"], ldd_units["span"], ldd_units["bias"], ldd_units["duty"], ldd_units["frequency"], None)
+            control_variables=("grating", "current", "offset", "span", "bias", "duty", "frequency", "interpolate_frequencies", "idle_scan"),
+            control_variable_limits=(cem_limits["grating"], ldd_limits["current"], ldd_limits["offset"], ldd_limits["span"], ldd_limits["bias"], ldd_limits["duty"], ldd_limits["frequency"], (False, True), (False, True)),
+            control_variable_types=(int, float, float, float, float, float, float, bool, bool),
+            control_variable_units=(cem_units["grating"], ldd_units["current"], ldd_units["offset"], ldd_units["span"], ldd_units["bias"], ldd_units["duty"], ldd_units["frequency"], None, None)
         )
         self._ldd_control().set_setpoint("frequency", self._frequency)
         self._ldd_control().set_setpoint("duty", self._duty)
@@ -242,22 +237,41 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
         elif variable == "current":
             self._ldd_control().set_setpoint("current", value)
         elif variable == "offset":
-            self._ldd_control().set_setpoint("offset", value)
+            if self.watchdog_state != 'idle' or self._idle_scan:
+                self._ldd_control().set_setpoint("offset", value)
             self._offset = value
         elif variable == "span":
-            self._ldd_control().set_setpoint("span", value)
+            if self.watchdog_state != 'idle' or self._idle_scan:
+                self._ldd_control().set_setpoint("span", value)
             self._span = value
         elif variable == "bias":
-            self._ldd_control().set_setpoint("bias", value)
+            if self.watchdog_state != 'idle' or self._idle_scan:
+                self._ldd_control().set_setpoint("bias", value)
             self._bias = value
         elif variable == "duty":
-            self._ldd_control().set_setpoint("duty", value)
+            if self.watchdog_state != 'idle' or self._idle_scan:
+                self._ldd_control().set_setpoint("duty", value)
             self._duty = value
         elif variable == "frequency":
-            self._ldd_control().set_setpoint("frequency", value)
+            if self.watchdog_state != 'idle' or self._idle_scan:
+                self._ldd_control().set_setpoint("frequency", value)
             self._frequency = value
         elif variable == "interpolate_frequencies":
             self._interpolate_frequencies = bool(value)
+        elif variable == 'idle_scan':
+            self._idle_scan = bool(value)
+            if self._idle_scan and self.watchdog_state == "idle":
+                self._ldd_control().set_setpoint("offset", self._offset)
+                self._ldd_control().set_setpoint("span", self._span)
+                self._ldd_control().set_setpoint("bias", self._bias)
+                self._ldd_control().set_setpoint("duty", self._duty)
+                self._ldd_control().set_setpoint("frequency", self._frequency)
+            elif not self._idle_scan and self.watchdog_state == "idle":
+                self._ldd_control().set_setpoint("frequency", 10)
+                self._ldd_control().set_setpoint("offset", self._idle_value)
+                self._ldd_control().set_setpoint("span", 0.0)
+                self._ldd_control().set_setpoint("ramp_halt", self._idle_value)
+                
         
     def get_control(self, variable: str):
         "Get a control variable value."
@@ -266,17 +280,34 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
         elif variable == "current":
             return self._ldd_control().get_setpoint("current")
         elif variable == "offset":
-            return self._ldd_control().get_setpoint("offset")
+            if self.watchdog_state != 'idle' or self._idle_scan:
+                return self._ldd_control().get_setpoint("offset")
+            else:
+                return self._offset
         elif variable == "span":
-            return self._ldd_control().get_setpoint("span")
+            if self.watchdog_state != 'idle' or self._idle_scan:
+                return self._ldd_control().get_setpoint("span")
+            else:
+                return self._span
         elif variable == "bias":
-            return self._ldd_control().get_setpoint("bias")
+            if self.watchdog_state != 'idle' or self._idle_scan:
+                return self._ldd_control().get_setpoint("bias")
+            else:
+                return self._bias
         elif variable == "duty":
-            return self._ldd_control().get_setpoint("duty")
+            if self.watchdog_state != 'idle' or self._idle_scan:
+                return self._ldd_control().get_setpoint("duty")
+            else:
+                return self._duty
         elif variable == "frequency":
-            return self._ldd_control().get_setpoint("frequency")
+            if self.watchdog_state != 'idle' or self._idle_scan:
+                return self._ldd_control().get_setpoint("frequency")
+            else:
+                return self._frequency
         elif variable == "interpolate_frequencies":
             return self._interpolate_frequencies
+        elif variable == 'idle_scan':
+            return self._idle_scan
         else:
             raise ValueError(f"Unknown variable {variable}")
     def get_current_data(self) -> np.ndarray:
