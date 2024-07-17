@@ -18,6 +18,7 @@ class ScanningExcitationLogic(LogicBase):
     _spectrum = StatusVar(name='spectrum', default=[None, None, None])
     _fit_region = StatusVar(name='fit_region', default=[0, 1])
     _fit_config = StatusVar(name='fit_config', default=dict())
+    _notes = StatusVar(name='notes', default="")
 
     _sig_get_spectrum = QtCore.Signal(bool)
     
@@ -140,9 +141,14 @@ class ScanningExcitationLogic(LogicBase):
         # write experimental parameters
         parameters = {'repetitions': self.repetitions,
                       'exposure' : self.exposure_time,
-                      'control_variables' : self._scanner().control_dict
+                      'notes' : self._notes,
                       }
-                
+        
+        for (variable,d) in self._scanner().control_dict.items():
+            parameters[variable+"_limits"] = d['limits']
+            parameters[variable+"_unit"] = d['unit']
+            parameters[variable+"_value"] = d['value']
+                        
         if self.fit_method != 'No Fit' and self.fit_results is not None:
             parameters['fit_method'] = self.fit_method
             parameters['fit_results'] = self.fit_results.params
@@ -174,7 +180,8 @@ class ScanningExcitationLogic(LogicBase):
         header.append('Step_Number')
 
         # save the date to file
-        ds = TextDataStorage(root_dir=self.module_default_data_dir if root_dir is None else root_dir)
+        ds = TextDataStorage(root_dir=self.module_default_data_dir if root_dir is None else root_dir,
+                             include_global_metadata=True)
 
         file_path, _, _ = ds.save_data(np.array(data).T,
                                        column_headers=header,
@@ -265,6 +272,12 @@ class ScanningExcitationLogic(LogicBase):
     @idle.setter
     def idle(self, v):
         self._scanner().set_idle_value(v)
+    @property
+    def notes(self):
+        return self._notes
+    @notes.setter
+    def notes(self, v):
+        self._notes = str(v)
 
     @property 
     def variables(self):

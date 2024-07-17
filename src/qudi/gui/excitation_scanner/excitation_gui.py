@@ -107,6 +107,7 @@ class ScanningExcitationGui(GuiBase):
         self._mw.control_widget.exposure_spinbox.valueChanged.connect(self.set_exposure)
         self._mw.control_widget.repetitions_spinbox.valueChanged.connect(self.set_repetitions)
         self._mw.control_widget.sig_variable_set.connect(self.set_variable)
+        self._mw.control_widget.notes_text_input.textChanged.connect(self.set_notes)
         self._mw.action_save_spectrum.triggered.connect(self.save_spectrum)
         self._mw.data_widget.fit_region_from.editingFinished.connect(self.fit_region_value_changed)
         self._mw.data_widget.fit_region_to.editingFinished.connect(self.fit_region_value_changed)
@@ -150,7 +151,9 @@ class ScanningExcitationGui(GuiBase):
         self._excitation_logic().sig_scanner_variables_updated.disconnect(self.update_scanner_variables)
         self._excitation_logic().sig_fit_updated.disconnect(self.update_fit)
 
+
         self._mw.control_widget.acquire_button.clicked.disconnect()
+        self._mw.control_widget.notes_text_input.textChanged.disconnect()
         self._mw.action_save_spectrum.triggered.disconnect()
         self._mw.data_widget.fit_region_from.editingFinished.disconnect()
         self._mw.data_widget.fit_region_to.editingFinished.disconnect()
@@ -230,6 +233,10 @@ class ScanningExcitationGui(GuiBase):
     def update_scanner_variables(self):
         variables = self._excitation_logic().variables
         self._mw.control_widget.update_variable_widgets(variables)
+        if not self._mw.control_widget.notes_text_input.hasFocus():
+            self._mw.control_widget.notes_text_input.blockSignals(True)
+            self._mw.control_widget.notes_text_input.setPlainText(self._excitation_logic().notes)        
+            self._mw.control_widget.notes_text_input.blockSignals(False)
 
     def update_fit(self, fit_method, fit_results):
         """ Update the drawn fit curve.
@@ -263,6 +270,8 @@ class ScanningExcitationGui(GuiBase):
     def set_variable(self, name, v):
         self.log.debug(f"gui got {name}: {v}")
         self._excitation_logic().set_variable(name, v)
+    def set_notes(self):
+        self._excitation_logic().notes = self._mw.control_widget.notes_text_input.toPlainText()
 
     def populate_settings(self):
         exposure_time = float(self._excitation_logic().exposure_time)
