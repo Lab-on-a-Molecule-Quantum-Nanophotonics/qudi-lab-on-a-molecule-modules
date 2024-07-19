@@ -86,7 +86,7 @@ class MOGLABSMotorizedLaserDriver(SwitchInterface, ProcessControlInterface):
                 "Temp. control":("OFF", "ON"),
                 "Curr. control":("OFF", "ON"),
                 "RAMP":("OFF", "ON"),
-                "CURRENT,MOD":("OFF", "+RAMP"),
+                "CURRENT,MOD":("OFF", "EXTERNAL"),
         }
     def get_state(self, switch):
         with self._lock:
