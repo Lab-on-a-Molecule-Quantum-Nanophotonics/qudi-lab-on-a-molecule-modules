@@ -283,7 +283,6 @@ class ScanningExcitationLogic(LogicBase):
     def variables(self):
         return self._scanner().control_dict
     def set_variable(self, name, value):
-        self.log.debug(f"logic got {name}: {value}")
         self._scanner().set_control(name, value)
         self.sig_scanner_variables_updated.emit()
 
