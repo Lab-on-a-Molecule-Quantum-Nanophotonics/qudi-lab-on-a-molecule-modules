@@ -81,7 +81,7 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
                 'frequency': 'Hz',
             },
             frame_size_limits = (1, self.default_buffer_size),
-            sample_rate_limits = (1, 4000)
+            sample_rate_limits = (1, 100)
         )
         self._constraints_process_control = ProcessControlConstraints(
             ["tension"],
