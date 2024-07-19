@@ -33,6 +33,7 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
     _frequency = StatusVar(name='frequency', default=5)
     _interpolate_frequencies = StatusVar(name='interpolate_frequencies', default=True)
     _idle_scan = StatusVar(name='idle_scan', default=False)
+    _fzw_rate = StatusVar(name="fzw_rate", default=10)
     
     _threaded = True
     def __init__(self, *args, **kwargs):
@@ -83,7 +84,7 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
         return round(1/ (self._exposure_time * self._frequency))
     @property 
     def _number_of_frequencies_per_frame(self):
-        return round(1/ (0.1 * self._frequency))
+        return round(self._fzw_rate / self._frequency)
     def _prepare_ramp(self):
         n = self._number_of_samples_per_frame
         ramp_values = np.linspace(start=self._offset-self._span/2, stop=self._offset+self._span/2, num=n)
@@ -91,7 +92,7 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
         self._finite_sampling_io().set_sample_rate(1/self._exposure_time)
         self._finite_sampling_io().set_output_mode(SamplingOutputMode.JUMP_LIST)
         self._finite_sampling_io().set_frame_data({self._output_channel: ramp_values})
-        self._fzw_sampling().set_sample_rate(1/0.1)
+        self._fzw_sampling().set_sample_rate(self._fzw_rate)
         self._fzw_sampling().set_frame_size(n)
     def _start_ramp(self, start_fzw=True):
         if self._finite_sampling_io().samples_in_buffer > 0:
@@ -216,14 +217,15 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
         ldd_constraints = self._ldd_control().constraints
         ldd_limits = ldd_constraints.channel_limits
         ldd_units = ldd_constraints.channel_units
+        fzw_constraints = self._fzw_sampling().constraints
         self._constraints = ExcitationScannerConstraints(
             exposure_limits=(1e-4,1),
             repeat_limits=(1,2**32-1),
             idle_value_limits=(0.0, 400e12),
-            control_variables=("grating", "current", "offset", "span", "bias", "frequency", "interpolate_frequencies", "idle_scan"),
-            control_variable_limits=(cem_limits["grating"], ldd_limits["current"], (-10, 10), (0,20), ldd_limits["bias"], ldd_limits["frequency"], (False, True), (False, True)),
-            control_variable_types=(int, float, float, float, float, float, bool, bool),
-            control_variable_units=(cem_units["grating"], ldd_units["current"], 'V', 'V', ldd_units["bias"], ldd_units["frequency"], None, None)
+            control_variables=("grating", "current", "offset", "span", "bias", "frequency", "fzw probe rate", "interpolate_frequencies", "idle_scan"),
+            control_variable_limits=(cem_limits["grating"], ldd_limits["current"], (-10, 10), (0,20), ldd_limits["bias"], ldd_limits["frequency"], fzw_constraints.sample_rate_limits, (False, True), (False, True)),
+            control_variable_types=(int, float, float, float, float, float, float, bool, bool),
+            control_variable_units=(cem_units["grating"], ldd_units["current"], 'V', 'V', ldd_units["bias"], ldd_units["frequency"], "Hz", None, None)
         )
         self._ldd_control().set_setpoint("bias", self._bias)
         self.watchdog_event("start_idle")
@@ -262,21 +264,17 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
         elif variable == "current":
             self._ldd_control().set_setpoint("current", value)
         elif variable == "offset":
-            if self.watchdog_state != 'idle' or self._idle_scan:
-                self._ldd_control().set_setpoint("offset", value)
             self._offset = value
         elif variable == "span":
-            if self.watchdog_state != 'idle' or self._idle_scan:
-                self._ldd_control().set_setpoint("span", value)
             self._span = value
         elif variable == "bias":
             if self.watchdog_state != 'idle' or self._idle_scan:
                 self._ldd_control().set_setpoint("bias", value)
             self._bias = value
         elif variable == "frequency":
-            if self.watchdog_state != 'idle' or self._idle_scan:
-                self._ldd_control().set_setpoint("frequency", value)
             self._frequency = value
+        elif variable == "fzw probe rate":
+            self._fzw_rate = value
         elif variable == "interpolate_frequencies":
             self._interpolate_frequencies = bool(value)
         elif variable == 'idle_scan':
@@ -300,6 +298,8 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
                 return self._bias
         elif variable == "frequency":
             return self._frequency
+        elif variable == "fzw probe rate":
+            return self._fzw_rate
         elif variable == "interpolate_frequencies":
             return self._interpolate_frequencies
         elif variable == 'idle_scan':
