@@ -124,6 +124,12 @@ class ScanningProbeLogic(LogicBase):
         self.__scan_poll_timer.timeout.connect(self.__scan_poll_loop, QtCore.Qt.QueuedConnection)
 
         self._scan_axes = OrderedDict(sorted(self._scanner().get_constraints().axes.items()))
+        
+        if self._save_coord_to_global_metadata:
+            pos_dict = self._scanner().get_position()
+            for (k,v) in pos_dict.items():
+                DataStorageBase.add_global_metadata("scanner_" + k, v, overwrite=True)
+        
 
     def on_deactivate(self):
         """ Reverse steps of activation

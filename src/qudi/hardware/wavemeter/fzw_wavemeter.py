@@ -81,7 +81,7 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
                 'frequency': 'Hz',
             },
             frame_size_limits = (1, self.default_buffer_size),
-            sample_rate_limits = (1, 4000)
+            sample_rate_limits = (1, 100)
         )
         self._constraints_process_control = ProcessControlConstraints(
             ["tension"],
@@ -173,7 +173,8 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
                 t = time.monotonic()
                 delta_t = t - self._time_last_read
                 if delta_t < self.poll_time:
-                    QtCore.QTimer.singleShot(int(round(1000*max(0, self.poll_time-delta_t))), self._continuous_read_callback)
+                    postpone = int(round(1000*max(0, self.poll_time-delta_t)))
+                    QtCore.QTimer.singleShot(postpone, self._continuous_read_callback)
                     return
                 self._time_last_read = t
                 try:
@@ -188,7 +189,6 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
                         self._timestamp_buffer[i] = self._timestamp_buffer[i-1]
                     self._current_buffer_position += 1
                 else:
-                    # self.log.warning("buffer overflow!")
                     pass
         except:
             self.log.exception("")
@@ -479,17 +479,13 @@ TypeError: only integer scalar arrays can be converted to a scalar index
         self._start_continuous_read()
 
     def stop_buffered_acquisition(self):
-        self.log.debug("Requested stop.")
         if self.module_state() == 'locked':
-            self.log.debug(f"stop_buffered_acquisition. instream_running={self.instream_running}")
             if not self.instream_running:
                 self._stop_continuous_read()
                 self.module_state.unlock()
                 self.log.debug("unlocked")
             with self._lock:
                 self._instream_consume_buffer = True
-        else:
-            self.log.warning('Unable to stop wavemeter input stream as nothing is running.')
 
     def get_buffered_samples(self, number_of_samples: Optional[int] =None):
         if number_of_samples is None:

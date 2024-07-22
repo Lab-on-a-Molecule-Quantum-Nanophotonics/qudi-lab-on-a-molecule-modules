@@ -177,7 +177,8 @@ class NiScanningProbeInterfuseBare(ScanningProbeInterface):
 
     def _toggle_ao_setpoint_channels(self, enable: bool) -> None:
         ni_ao = self._ni_ao()
-        for channel in ni_ao.constraints.setpoint_channels:
+        mapped_channels = set(self._ni_channel_mapping.values()) & set(ni_ao.constraints.setpoint_channels)
+        for channel in mapped_channels:
             ni_ao.set_activity_state(channel, enable)
 
     @property
@@ -370,8 +371,8 @@ class NiScanningProbeInterfuseBare(ScanningProbeInterface):
         with self._thread_lock_cursor:
             if not self._ao_setpoint_channels_active:
                 self._toggle_ao_setpoint_channels(True)
-
-            pos = self._voltage_dict_to_position_dict(self._ni_ao().setpoints)
+            mapped_channels = set(self._ni_channel_mapping.values()) & set(self._ni_ao().constraints.setpoint_channels)
+            pos = self._voltage_dict_to_position_dict({ch:self._ni_ao().get_setpoint(ch) for ch in mapped_channels})
 
             return pos
 
@@ -810,8 +811,8 @@ class NiScanningProbeInterfuseBare(ScanningProbeInterface):
                     new_pos = self._pos_vec_to_dict(new_pos_vec)
                     new_voltage = {self._ni_channel_mapping[ax]: self._position_to_voltage(ax, pos)
                                    for ax, pos in new_pos.items()}
-
-                    self._ni_ao().setpoints = new_voltage
+                    for ch, setpoint in new_voltage.items():
+                        self._ni_ao().set_setpoint(ch, setpoint)
                     #self.log.debug(f'Cursor_write_loop move to {new_pos}, Dist= {distance_to_target} '
                     #               f' to target {self._target_pos} took {1e3*(time.perf_counter()-t_start)} ms.')
 
