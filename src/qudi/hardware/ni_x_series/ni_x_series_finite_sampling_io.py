@@ -26,7 +26,7 @@ import numpy as np
 import nidaqmx as ni
 from nidaqmx._lib import lib_importer  # Due to NIDAQmx C-API bug needed to bypass property getter
 from nidaqmx.stream_readers import AnalogMultiChannelReader, CounterReader
-from nidaqmx.stream_writers import AnalogMultiChannelWriter
+from nidaqmx.stream_writers import AnalogMultiChannelWriter, DigitalSingleChannelWriter
 
 from qudi.core.configoption import ConfigOption
 from qudi.util.helpers import natural_sort
@@ -75,6 +75,8 @@ class NIXSeriesFiniteSamplingIO(FiniteSamplingIOInterface):
             default_output_mode: 'JUMP_LIST' # optional, must be name of SamplingOutputMode
             read_write_timeout: 10  # optional
             sample_clock_output: '/Dev1/PFI11' # optional: routing of sample clock to a physical connection
+            sample_gate_output: '/port0/line2' # optional: if set, a constant one zill be outputed on this 
+                                               # channel while the acquisition is running.
 
     """
 
@@ -96,6 +98,8 @@ class NIXSeriesFiniteSamplingIO(FiniteSamplingIOInterface):
                                         missing='nothing')
 
     _physical_sample_clock_output = ConfigOption(name='sample_clock_output',
+                                                 default=None)
+    _sample_gate_output = ConfigOption(name='sample_gate_output',
                                                  default=None)
 
     _adc_voltage_ranges = ConfigOption(name='adc_voltage_ranges',
@@ -121,11 +125,13 @@ class NIXSeriesFiniteSamplingIO(FiniteSamplingIOInterface):
         self._ai_task_handle = None
         self._clk_task_handle = None
         self._ao_task_handle = None
+        self._do_task_handle = None
         self._tasks_started_successfully = False
         # nidaqmx stream reader instances to help with data acquisition
         self._di_readers = list()
         self._ai_reader = None
         self._ao_writer = None
+        self._do_writer = None
 
         # Internal settings
         self.__output_mode = None
@@ -252,6 +258,11 @@ class NIXSeriesFiniteSamplingIO(FiniteSamplingIOInterface):
             self._physical_sample_clock_output = self._extract_terminal(self._physical_sample_clock_output)
             assert self._physical_sample_clock_output in self.__all_digital_terminals, \
                 f'Physical sample clock terminal specified in config is invalid'
+        # Check Physical gate output if specified
+        #if self._sample_gate_output is not None:
+        #    self._sample_gate_output = self._extract_terminal(self._sample_gate_output)
+        #    assert self._sample_gate_output in self.__all_digital_terminals, \
+        #        f'Physical sample gate terminal specified in config is invalid'
 
         # Get correct sampling frequency limits based on config specified channels
         if analog_sources and len(analog_sources) > 1:  # Probably "Slowest" case
@@ -555,6 +566,11 @@ class NIXSeriesFiniteSamplingIO(FiniteSamplingIOInterface):
                 self.module_state.unlock()
                 raise NiInitError('Analog out task initialization failed; all tasks terminated')
 
+            if self._init_digital_out_task() < 0:
+                self.terminate_all_tasks()
+                self.module_state.unlock()
+                raise NiInitError('Digital out task initialization failed; all tasks terminated')
+
             output_data = np.ndarray((len(self.active_channels[1]), self.frame_size))
 
             for num, output_channel in enumerate(self.active_channels[1]):
@@ -566,10 +582,28 @@ class NIXSeriesFiniteSamplingIO(FiniteSamplingIOInterface):
                 self.terminate_all_tasks()
                 self.module_state.unlock()
                 raise
+            
+            if self._sample_gate_output is not None:
+                try:
+                    do_data = np.repeat(np.uint32(2**32-1), self.frame_size)
+                    do_data[-1] = 0
+                    self._do_writer.write_many_sample_port_uint32(do_data)
+                except ni.DaqError:
+                    self.terminate_all_tasks()
+                    self.module_state.unlock()
+                    raise
 
             if self._ao_task_handle is not None:
                 try:
                     self._ao_task_handle.start()
+                except ni.DaqError:
+                    self.terminate_all_tasks()
+                    self.module_state.unlock()
+                    raise
+                    
+            if self._do_task_handle is not None:
+                try:
+                    self._do_task_handle.start()
                 except ni.DaqError:
                     self.terminate_all_tasks()
                     self.module_state.unlock()
@@ -1115,6 +1149,76 @@ class NIXSeriesFiniteSamplingIO(FiniteSamplingIOInterface):
         self._ao_task_handle = ao_task
         return 0
 
+    def _init_digital_out_task(self):
+        if self._sample_gate_output is None:
+            return 0
+        
+        clock_channel = '/{0}InternalOutput'.format(self._clk_task_handle.channel_names[0])
+        sample_freq = float(self._clk_task_handle.co_channels.all.co_pulse_freq)
+
+        # Set up analog input task
+        task_name = 'DigitalOut_{0:d}'.format(id(self))
+
+        try:
+            do_task = ni.Task(task_name)
+        except ni.DaqError:
+            self.log.exception('Unable to create digital-out task with name "{0}".'.format(task_name))
+            self.terminate_all_tasks()
+            return -1
+
+        try:
+            do_ch_str = '/{0}/{1}'.format(self._device_name, self._sample_gate_output)
+            do_task.do_channels.add_do_chan(do_ch_str)
+            do_task.timing.cfg_samp_clk_timing(sample_freq,
+                                               source=clock_channel,
+                                               active_edge=ni.constants.Edge.RISING,
+                                               sample_mode=ni.constants.AcquisitionType.FINITE,
+                                               samps_per_chan=self.frame_size)
+        except ni.DaqError:
+            self.log.exception(
+                'Something went wrong while configuring the analog-in task.')
+            try:
+                del do_task
+            except NameError:
+                pass
+            self.terminate_all_tasks()
+            return -1
+
+        try:
+            do_task.control(ni.constants.TaskMode.TASK_RESERVE)
+        except ni.DaqError:
+            try:
+                do_task.close()
+            except ni.DaqError:
+                self.log.exception('Unable to close task.')
+            try:
+                del do_task
+            except NameError:
+                self.log.exception('Some weird namespace voodoo happened here...')
+
+            self.log.exception('Unable to reserve resources for digital-out task.')
+            self.terminate_all_tasks()
+            return -1
+
+        try:
+            self._do_writer = DigitalSingleChannelWriter(do_task.out_stream)
+            self._do_writer.verify_array_shape = False
+        except ni.DaqError:
+            try:
+                do_task.close()
+            except ni.DaqError:
+                self.log.exception('Unable to close task.')
+            try:
+                del do_task
+            except NameError:
+                self.log.exception('Some weird namespace voodoo happened here...')
+            self.log.exception('Something went wrong while setting up the digital output zriter.')
+            self.terminate_all_tasks()
+            return -1
+
+        self._do_task_handle = do_task
+        return 0
+
     def reset_hardware(self):
         """
         Resets the NI hardware, so the connection is lost and other programs can access it.
@@ -1166,6 +1270,16 @@ class NIXSeriesFiniteSamplingIO(FiniteSamplingIOInterface):
                 self.log.exception('Error while trying to terminate analog input task.')
                 err = -1
             self._ao_task_handle = None
+            
+        if self._do_task_handle is not None:
+            try:
+                if not self._do_task_handle.is_task_done():
+                    self._do_task_handle.stop()
+                self._do_task_handle.close()
+            except ni.DaqError:
+                self.log.exception('Error while trying to terminate digital output task.')
+                err = -1
+            self._do_task_handle = None
 
         if self._clk_task_handle is not None:
             if self._physical_sample_clock_output is not None:
