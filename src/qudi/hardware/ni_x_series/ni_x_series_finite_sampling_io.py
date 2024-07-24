@@ -586,7 +586,7 @@ class NIXSeriesFiniteSamplingIO(FiniteSamplingIOInterface):
             if self._sample_gate_output is not None:
                 try:
                     do_data = np.repeat(np.uint32(2**32-1), self.frame_size)
-                    do_data[-1] = 0
+                    do_data[self.frame_size//2:-1] = 0
                     self._do_writer.write_many_sample_port_uint32(do_data)
                 except ni.DaqError:
                     self.terminate_all_tasks()
