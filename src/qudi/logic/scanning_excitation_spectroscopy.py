@@ -203,7 +203,6 @@ class ScanningExcitationLogic(LogicBase):
                      count,
                      linestyle=':',
                      linewidth=0.5,
-                     label=f"Step {i}",
                      )
 
         fit_displayed = self.fit_method != 'No Fit' and self.fit_results is not None
@@ -225,8 +224,6 @@ class ScanningExcitationLogic(LogicBase):
             # place a text box in upper left in axes coords
             ax1.text(0.05, 0.95, textstr, transform=ax1.transAxes, fontsize=14,
         verticalalignment='top', bbox=props)
-        if len(n_step) > 1 or fit_displayed:
-            ax1.legend()
 
         ax1.set_xlabel(f"Frequency ({prefix_freq}Hz)")
         ax1.set_ylabel('Intensity ({} count)'.format(prefix))
@@ -302,7 +299,7 @@ class ScanningExcitationLogic(LogicBase):
                 self._watchdog_timer.start(self._watchdog_repeat_time)
             else:
                 self.fit_region = (min(self.frequency), max(self.frequency))
-                self.idle = min(self.frequency)
+                self.idle = (min(self.frequency) + max(self.frequency)) / 2
                 self.sig_state_updated.emit()
         except:
             self.log.exception("")
