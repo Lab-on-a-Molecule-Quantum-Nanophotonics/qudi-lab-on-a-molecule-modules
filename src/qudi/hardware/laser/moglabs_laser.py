@@ -345,7 +345,7 @@ TypeError: only integer scalar arrays can be converted to a scalar index
                 "Temp. control":("OFF", "ON"),
                 "Curr. control":("OFF", "ON"),
                 "RAMP":("OFF", "ON"),
-                "CURRENT,MOD":("OFF", "EXTERNAL"),
+                "CURRENT,MOD":("OFF", "+RAMP"),
         }
     def get_state(self, switch):
         with self._lock:
