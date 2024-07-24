@@ -12,14 +12,13 @@ from fysom import Fysom
 import numpy as np
 
 class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
-    _finite_sampling_io = Connector(name='sampling_io', interface='FiniteSamplingIOInterface')
+    _finite_sampling_input = Connector(name='input', interface='FiniteSamplingInputInterface')
     _ldd_switches = Connector(name="ldd_switches", interface="SwitchInterface")
     _ldd_control = Connector(name="ldd_control", interface="ProcessControlInterface")
     _cem_control = Connector(name="cem_control", interface="ProcessControlInterface")
     _fzw_sampling = Connector(name="fzw_sampling", interface="FiniteSamplingInputInterface")
 
     _input_channel = ConfigOption(name="input_channel", missing="error")
-    _output_channel = ConfigOption(name="output_channel", missing="error")
     _chunk_size = ConfigOption(name="chunk_size", default=10)
     _watchdog_delay = ConfigOption(name="watchdog_delay", default=0.2)
 
@@ -28,12 +27,14 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
     _n_repeat = StatusVar(name="n_repeat", default=1)
     _idle_value = StatusVar(name="idle_value", default=0.0)
     _bias = StatusVar(name='bias', default=33.0)
-    _offset = StatusVar(name='offset', default=0.0)
-    _span = StatusVar(name='span', default=1)
+    _offset = StatusVar(name='offset', default=0.5)
+    _span = StatusVar(name='span', default=0.5)
     _frequency = StatusVar(name='frequency', default=5)
     _interpolate_frequencies = StatusVar(name='interpolate_frequencies', default=True)
     _idle_scan = StatusVar(name='idle_scan', default=False)
     _fzw_rate = StatusVar(name="fzw_rate", default=10)
+    _duty = StatusVar(name="duty", default=0.5)
+    _delay_start_acquitition = StatusVar(name="delay_start_acquitition", default=0.5)
     
     _threaded = True
     def __init__(self, *args, **kwargs):
@@ -85,48 +86,55 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
     @property 
     def _number_of_frequencies_per_frame(self):
         return round(self._fzw_rate / self._frequency)
-    def _prepare_ramp(self):
+    def _prepare_ramp(self, prepare_input=True):
         n = self._number_of_samples_per_frame
-        ramp_values = np.linspace(start=self._offset-self._span/2, stop=self._offset+self._span/2, num=n)
-        self._finite_sampling_io().set_active_channels((self._input_channel,), (self._output_channel,))
-        self._finite_sampling_io().set_sample_rate(1/self._exposure_time)
-        self._finite_sampling_io().set_output_mode(SamplingOutputMode.JUMP_LIST)
-        self._finite_sampling_io().set_frame_data({self._output_channel: ramp_values})
-        self._fzw_sampling().set_sample_rate(self._fzw_rate)
-        self._fzw_sampling().set_frame_size(n)
-    def _start_ramp(self, start_fzw=True):
-        if self._finite_sampling_io().samples_in_buffer > 0:
-            self._finite_sampling_io().get_buffered_samples()
-        self._finite_sampling_io().start_buffered_frame()
-        if start_fzw:
-            if self._fzw_sampling().samples_in_buffer > 0:
-                self._fzw_sampling().stop_buffered_acquisition()
-            self._fzw_sampling().start_buffered_acquisition()
+        if prepare_input:
+            self._finite_sampling_input().set_sample_rate(1/self._exposure_time)
+            self._finite_sampling_input().set_active_channels((self._input_channel,))
+            self._finite_sampling_input().set_frame_size(n)
+            self._fzw_sampling().set_sample_rate(self._fzw_rate)
+            self._fzw_sampling().set_frame_size(n)
+        self._ldd_control().set_setpoint("frequency", self._frequency)
+        self._ldd_control().set_setpoint("span", self._span)
+        self._ldd_control().set_setpoint("offset", self._offset)
+        self._ldd_control().set_setpoint("ramp_halt", 0.0)
+        self._ldd_control().set_setpoint("bias", self._bias)
+    def _start_ramp(self):
+        self._ldd_switches().set_state("RAMP", "ON")
     def _stop_ramp(self):
+        self._ldd_switches().set_state("RAMP", "OFF")
+    def _start_acquisition(self):
+        if self._finite_sampling_input().samples_in_buffer > 0:
+            self._finite_sampling_input().get_buffered_samples()
+        if self._fzw_sampling().samples_in_buffer > 0:
+            self._fzw_sampling().stop_buffered_acquisition()
+        self._finite_sampling_input().start_buffered_acquisition()
+        self._fzw_sampling().start_buffered_acquisition()
+    def _stop_acquisition(self):
         self._fzw_sampling().stop_buffered_acquisition()
-        self._finite_sampling_io().stop_buffered_frame()
+        self._finite_sampling_input().stop_buffered_acquisition()
     def _watchdog(self):
         try:
             time_start = time.perf_counter()
             watchdog_state = self.watchdog_state
             if watchdog_state == "prepare_idle": 
-                self._ldd_switches().set_state("HV,MOD", "EXT")
-                self._stop_ramp()
+                self._ldd_switches().set_state("HV,MOD", "RAMP")
+                self._ldd_switches().set_state("CURRENT,MOD", "INT")
+                if not self._idle_scan:
+                    self._stop_ramp()
                 self.watchdog_event("start_idle")
             elif watchdog_state == "prepare_idle_scan":
                 self._idle_scan_start = time.perf_counter()
-                self._stop_ramp()
-                self._prepare_ramp()
-                self._start_ramp(start_fzw=False)
+                self._prepare_ramp(prepare_input=False)
+                self._start_ramp()
                 self.watchdog_event("start_idle_scan")
             elif watchdog_state == "idle_scan":
                 if not self._idle_scan:
                     self.watchdog_event("start_idle")
                 elif time_start - self._idle_scan_start >= 1/self._frequency:
                     self._idle_scan_start = time.perf_counter()
-                    self._stop_ramp()
-                    self._prepare_ramp()
-                    self._start_ramp(start_fzw=False)
+                    self._prepare_ramp(prepare_input=False)
+                    self._start_ramp()
             elif watchdog_state == "idle": 
                 if self._idle_scan:
                     self.watchdog_event("start_idle_scan")
@@ -140,8 +148,8 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
                 self._repeat_no = 0
                 self._data_row_index = 0
                 self._frequency_row_index = 0
-                self._stop_ramp()
                 self._prepare_ramp()
+                self._start_ramp()
                 self.log.debug("Scan prepared.")
                 self.watchdog_event("start_prepare_step")
             elif watchdog_state == "prepare_step": 
@@ -155,22 +163,18 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
                                 frequency_times, 
                                 self._frequency_buffer
                             )
+                    self._idle_value = self._offset
                     self.watchdog_event("end_scan")
                     self.log.info("Scan done.")
                 else:
-                    self._ldd_control().set_setpoint("bias", self._bias)
                     self.log.debug(f"Step {self._repeat_no} prepared.")
                     self._waiting_start = time.perf_counter()
                     self.watchdog_event("start_wait_ready")
             elif watchdog_state == "wait_ready":
-                # if time_start - self._waiting_start > 1:
-                #     self._ldd_control().set_setpoint("span", self._span)
-                #     self._ldd_control().set_setpoint("offset", self._offset)
-                #     self._finite_sampling_io().start_buffered_acquisition()
-                #     self._fzw_sampling().start_buffered_acquisition()
-                #     self.log.debug("Ready to start acquisition.")
-                self._start_ramp(start_fzw=True)
-                self.watchdog_event("start_scan_step")
+                if self._repeat_no > 0 or time_start - self._waiting_start > self._delay_start_acquitition:
+                    self._start_acquisition()
+                    self.log.debug("Ready to start acquisition.")
+                    self.watchdog_event("start_scan_step")
             elif watchdog_state == "record_scan_step": 
                 samples_missing_data = self._number_of_samples_per_frame * (self._repeat_no+1) - self._data_row_index
                 samples_missing_frequency = self._number_of_frequencies_per_frame * (self._repeat_no+1) - self._frequency_row_index
@@ -180,8 +184,8 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
                     self.log.debug("Step done.")
                     self.watchdog_event("step_done")
                 else:
-                    if samples_missing_data > 0 and self._finite_sampling_io().samples_in_buffer >= min(self._chunk_size, samples_missing_data):
-                        new_data = self._finite_sampling_io().get_buffered_samples()[self._input_channel]
+                    if samples_missing_data > 0 and self._finite_sampling_input().samples_in_buffer >= min(self._chunk_size, samples_missing_data):
+                        new_data = self._finite_sampling_input().get_buffered_samples()[self._input_channel]
                         i = self._data_row_index
                         with self._data_lock:
                             self._scan_data[i:i+len(new_data),1] = new_data
@@ -200,8 +204,8 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
                             self._frequency_row_index += len(new_frequencies)
             elif watchdog_state == "stopped": 
                 self.log.debug("stopped")
-                self._finite_sampling_io().stop_buffered_frame()
-                self._fzw_sampling.stop_buffered_acquisition()
+                self._finite_sampling_input().stop_buffered_acquisition()
+                self._fzw_sampling().stop_buffered_acquisition()
             time_end = time.perf_counter()
             time_overhead = time_end-time_start
             new_time = max(0, self._watchdog_delay - time_overhead)
@@ -222,12 +226,16 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
             exposure_limits=(1e-4,1),
             repeat_limits=(1,2**32-1),
             idle_value_limits=(0.0, 400e12),
-            control_variables=("grating", "current", "offset", "span", "bias", "frequency", "fzw probe rate", "interpolate_frequencies", "idle_scan"),
-            control_variable_limits=(cem_limits["grating"], ldd_limits["current"], (-10, 10), (0,20), ldd_limits["bias"], ldd_limits["frequency"], fzw_constraints.sample_rate_limits, (False, True), (False, True)),
-            control_variable_types=(int, float, float, float, float, float, float, bool, bool),
-            control_variable_units=(cem_units["grating"], ldd_units["current"], 'V', 'V', ldd_units["bias"], ldd_units["frequency"], "Hz", None, None)
+            control_variables=("grating", "current", "offset", "span", "bias", "frequency", "duty", "fzw probe rate", "delay_start_acquitition", "interpolate_frequencies", "idle_scan"),
+            control_variable_limits=(cem_limits["grating"], ldd_limits["current"], ldd_limits["offset"], ldd_limits["span"], ldd_limits["bias"], ldd_limits["frequency"], ldd_limits["duty"], fzw_constraints.sample_rate_limits, (0.0, 60), (False, True), (False, True)),
+            control_variable_types=(int, float, float, float, float, float, float, float, float, bool, bool),
+            control_variable_units=(cem_units["grating"], ldd_units["current"], ldd_units["offset"], ldd_units["span"], ldd_units["bias"], ldd_units["frequency"], ldd_units["duty"], "Hz", "s", None, None)
         )
+        self._ldd_control().set_setpoint("frequency", self._frequency)
+        self._ldd_control().set_setpoint("duty", self._duty)
         self._ldd_control().set_setpoint("bias", self._bias)
+        self._ldd_control().set_setpoint("span", self._span)
+        self._ldd_control().set_setpoint("offset", self._offset)
         self.watchdog_event("start_idle")
         self._watchdog_timer.setSingleShot(True)
         self._watchdog_timer.timeout.connect(self._watchdog, QtCore.Qt.QueuedConnection)
@@ -264,14 +272,16 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
         elif variable == "current":
             self._ldd_control().set_setpoint("current", value)
         elif variable == "offset":
+            self._ldd_control().set_setpoint("offset", value)
             self._offset = value
         elif variable == "span":
+            self._ldd_control().set_setpoint("span", value)
             self._span = value
         elif variable == "bias":
-            if self.watchdog_state != 'idle' or self._idle_scan:
-                self._ldd_control().set_setpoint("bias", value)
+            self._ldd_control().set_setpoint("bias", value)
             self._bias = value
         elif variable == "frequency":
+            self._ldd_control().set_setpoint("frequency", value)
             self._frequency = value
         elif variable == "fzw probe rate":
             self._fzw_rate = value
@@ -279,6 +289,11 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
             self._interpolate_frequencies = bool(value)
         elif variable == 'idle_scan':
             self._idle_scan = bool(value)
+        elif variable == 'duty':
+            self._ldd_control().set_setpoint("duty", value)
+            self._duty = value
+        elif variable == "delay_start_acquitition":
+            self._delay_start_acquitition = value
                 
         
     def get_control(self, variable: str):
@@ -288,22 +303,23 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
         elif variable == "current":
             return self._ldd_control().get_setpoint("current")
         elif variable == "offset":
-            return self._offset
+            return self._ldd_control().get_setpoint("offset")
         elif variable == "span":
-            return self._span
+            return self._ldd_control().get_setpoint("span")
         elif variable == "bias":
-            if self.watchdog_state != 'idle' or self._idle_scan:
-                return self._ldd_control().get_setpoint("bias")
-            else:
-                return self._bias
+            return self._ldd_control().get_setpoint("bias")
         elif variable == "frequency":
-            return self._frequency
+            return self._ldd_control().get_setpoint("frequency")
         elif variable == "fzw probe rate":
             return self._fzw_rate
         elif variable == "interpolate_frequencies":
             return self._interpolate_frequencies
         elif variable == 'idle_scan':
             return self._idle_scan
+        elif variable == 'duty':
+            return self._ldd_control().get_setpoint("duty")
+        elif variable == "delay_start_acquitition":
+            return self._delay_start_acquitition
         else:
             raise ValueError(f"Unknown variable {variable}")
     def get_current_data(self) -> np.ndarray:
@@ -335,7 +351,7 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
         roi = self._scan_data[:,2] == self._scan_data[0,2]
         frequencies = self._scan_data[roi,0]
         return np.interp(self._idle_value, 
-                         np.linspace(start=max(self._offset-self._span/2,0.0), stop=min(self._offset+self._span/2, 1.0), num=len(frequencies)), 
+                         np.linspace(start=self._offset-self._span/2, stop=self._offset+self._span/2, num=len(frequencies)), 
                          frequencies
                          )
     def set_idle_value(self, v):
@@ -345,8 +361,8 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
         frequencies = self._scan_data[roi,0]
         self._idle_value =  np.interp(v, 
                                       frequencies,
-                                      np.linspace(start=max(self._offset-self._span/2,0.0), 
-                                                  stop=min(self._offset+self._span/2, 1.0), 
+                                      np.linspace(start=self._offset-self._span/2, 
+                                                  stop=self._offset+self._span/2, 
                                                   num=len(frequencies)
                                       ))
 
