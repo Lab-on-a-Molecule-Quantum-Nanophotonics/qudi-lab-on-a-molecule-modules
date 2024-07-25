@@ -179,8 +179,8 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
                 samples_missing_data = self._number_of_samples_per_frame * (self._repeat_no+1) - self._data_row_index
                 samples_missing_frequency = self._number_of_frequencies_per_frame * (self._repeat_no+1) - self._frequency_row_index
                 if samples_missing_data <= 0 and samples_missing_frequency <= 0:
+                    self._stop_acquisition()
                     self._repeat_no += 1
-                    self._stop_ramp()
                     self.log.debug("Step done.")
                     self.watchdog_event("step_done")
                 else:
