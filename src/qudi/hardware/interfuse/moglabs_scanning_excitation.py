@@ -145,11 +145,11 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
                     self._scan_data[:,2] = np.repeat(range(self._n_repeat), n)
                     self._measurement_time = np.zeros(n*self._n_repeat)
                     self._frequency_buffer = np.zeros(self._number_of_frequencies_per_frame*self._n_repeat)
-                self._repeat_no = 0
+                self._repeat_no = -1
                 self._data_row_index = 0
                 self._frequency_row_index = 0
                 self._prepare_ramp()
-                self._start_ramp()
+                self._stop_ramp()
                 self.log.debug("Scan prepared.")
                 self.watchdog_event("start_prepare_step")
             elif watchdog_state == "prepare_step": 
@@ -168,10 +168,18 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
                     self.log.info("Scan done.")
                 else:
                     self.log.debug(f"Step {self._repeat_no} prepared.")
+                    if self._repeat_no > 0:
+                        self._start_ramp()
                     self._waiting_start = time.perf_counter()
                     self.watchdog_event("start_wait_ready")
             elif watchdog_state == "wait_ready":
-                if self._repeat_no > 0 or time_start - self._waiting_start > self._delay_start_acquitition:
+                # We wait 1.1 period the first time to let the ramp reach its initial state.
+                if self._repeat_no < 0 and time_start - self._waiting_start > 1.1/self._frequency: 
+                    self._start_ramp()
+                    self._waiting_start = time_start
+                    self._repeat_no = 0
+                elif self._repeat_no >= 0 and time_start - self._waiting_start > self._delay_start_acquitition:
+                    self._stop_ramp()
                     self._start_acquisition()
                     self.log.debug("Ready to start acquisition.")
                     self.watchdog_event("start_scan_step")
