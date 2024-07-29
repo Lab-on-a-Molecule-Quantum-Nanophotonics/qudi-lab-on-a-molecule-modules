@@ -208,18 +208,21 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
         try:
             with self._lock:
                 if self._instream_offset < len(self._instream_data_buffer):
-                    t = time.monotonic()
                     view = self._data_buffer[self._instream_read_start:self._current_buffer_position]
-                    view = view[~np.isnan(view)]
+                    roi = ~np.isnan(view)
+                    view = view[roi]
+                    view_time = self._timestamp_buffer[self._instream_read_start:self._current_buffer_position]
+                    self._instream_timestamp_buffer[self._instream_offset] = view_time.mean() + self._time_start - self._time_start_instream
                     if len(view) > 0:
                         self._instream_data_buffer[self._instream_offset] = view.mean()
-                        self._instream_timestamp_buffer[self._instream_offset] = t - self._time_start_instream
-                        if self._instream_consume_buffer:
-                            self._roll_buffers(self._current_buffer_position)
-                            self._instream_read_start = 0
-                        else:
-                            self._instream_read_start = self._current_buffer_position
-                        self._instream_offset += 1
+                    else:
+                        self._instream_data_buffer[self._instream_offset] = np.nan
+                    if self._instream_consume_buffer:
+                        self._roll_buffers(self._current_buffer_position)
+                        self._instream_read_start = 0
+                    else:
+                        self._instream_read_start = self._current_buffer_position
+                    self._instream_offset += 1
             if self.module_state() == 'locked':
                 t_overhead = time.perf_counter() - t_start
                 QtCore.QTimer.singleShot(int(round(1000 * max(0, 1/self.instream_rate - t_overhead))), self._instream_buffers_callback)
