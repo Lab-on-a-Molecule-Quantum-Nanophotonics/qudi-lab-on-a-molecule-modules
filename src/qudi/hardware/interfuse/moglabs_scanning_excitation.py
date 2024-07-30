@@ -60,7 +60,7 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
                 {"name":"stop_watchdog", "src":"*", "dst":"stopped"},
             ],
         })
-        self._scanning_states = {"prepare_scan", "prepare_step", "record_scan_step"}
+        self._scanning_states = {"prepare_scan", "prepare_step", "record_scan_step", "wait_ready"}
         self._watchdog_lock = Mutex()
         self._data_lock = Mutex()
         self._constraints = ExcitationScannerConstraints((0,0),(0,0),(0,0),[],[],[],[])

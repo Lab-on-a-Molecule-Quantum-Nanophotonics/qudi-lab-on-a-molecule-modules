@@ -1,4 +1,5 @@
 from PySide2 import QtCore
+from PySide2 import QtWidgets
 import numpy as np
 import matplotlib.pyplot as plt
 from datetime import datetime
@@ -14,7 +15,8 @@ from qudi.util.mutex import Mutex
 
 class ScanningExcitationLogic(LogicBase):
     _scanner = Connector(name='scanner', interface='ExcitationScannerInterface')
-    _watchdog_repeat_time = ConfigOption(name="watchdog_repeat_time_ms", default=50)
+    _watchdog_repeat_time = ConfigOption(name="watchdog_repeat_time_ms", default=500)
+    _beep = ConfigOption(name="beep", default=True)
     _spectrum = StatusVar(name='spectrum', default=[None, None, None])
     _fit_region = StatusVar(name='fit_region', default=[0, 1])
     _fit_config = StatusVar(name='fit_config', default=dict())
@@ -44,6 +46,7 @@ class ScanningExcitationLogic(LogicBase):
         self._fit_results = None
         self._fit_method = ''
         self._watchdog_timer = QtCore.QTimer(parent=self)
+        self._scanner_start_requested = False
 
     def on_activate(self):
         """ Initialisation performed during activation of the module.
@@ -78,6 +81,7 @@ class ScanningExcitationLogic(LogicBase):
         self.sig_state_updated.emit()
 
         self._scanner().start_scan()
+        self._scanner_start_requested = True
         self.__start_watchdog_timer()
         
         return self.spectrum
@@ -292,12 +296,15 @@ class ScanningExcitationLogic(LogicBase):
             self.sig_data_updated.emit()
             st = self._scanner().state_display
             self.sig_scanner_state_updated.emit(st)
-            if self._scanner().scan_running:
+            if self._scanner_start_requested or self._scanner().scan_running:
+                self._scanner_start_requested = not self._scanner().scan_running
                 if self._stop_acquisition:
                     self._scanner().stop_scan()
                     self._stop_acquisition = False
                 self._watchdog_timer.start(self._watchdog_repeat_time)
             else:
+                if self._beep:
+                    QtWidgets.QApplication.instance().beep()
                 self.fit_region = (min(self.frequency), max(self.frequency))
                 self.idle = (min(self.frequency) + max(self.frequency)) / 2
                 self.sig_state_updated.emit()
