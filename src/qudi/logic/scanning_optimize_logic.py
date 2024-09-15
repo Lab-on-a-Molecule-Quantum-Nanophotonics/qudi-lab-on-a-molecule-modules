@@ -23,7 +23,7 @@ If not, see <https://www.gnu.org/licenses/>.
 from uuid import UUID
 
 import numpy as np
-from PySide2 import QtCore
+from PySide6 import QtCore
 import copy as cp
 from typing import Dict, Tuple, List, Optional, Union
 import itertools

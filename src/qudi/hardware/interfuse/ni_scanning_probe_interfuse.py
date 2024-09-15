@@ -26,8 +26,8 @@ import time
 from typing import Optional, Dict, List
 from dataclasses import asdict
 
-from PySide2 import QtCore
-from PySide2.QtGui import QGuiApplication
+from PySide6 import QtCore
+from PySide6.QtGui import QGuiApplication
 
 from qudi.interface.finite_sampling_io_interface import FiniteSamplingIOInterface
 from qudi.interface.process_control_interface import ProcessSetpointInterface

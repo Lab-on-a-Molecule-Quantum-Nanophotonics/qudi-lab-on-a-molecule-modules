@@ -26,7 +26,7 @@ from uuid import UUID
 import copy as cp
 from collections import OrderedDict
 
-from PySide2 import QtCore
+from PySide6 import QtCore
 import numpy as np
 
 from qudi.util.network import netobtain
