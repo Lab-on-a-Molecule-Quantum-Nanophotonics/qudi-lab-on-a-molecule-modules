@@ -127,7 +127,7 @@ class ScanningExcitationDataWidget(QtWidgets.QWidget):
 
         main_layout.addWidget(self.plot_widget, 2, 0, 1, 3)
     def add_curve(self):
-        self.data_curves.append(self.plot_widget.plot())
+        self.data_curves.append(self.plot_widget.plot(symbol='o', symbolSize=5))
         self.data_curves[-1].setPen(palette.c1, width=2)
 
 

@@ -58,7 +58,7 @@ class ScanningExcitationGui(GuiBase):
                                            default=1,
                                            missing='nothing')
     _status_poll_interval = ConfigOption(name='status_poll_interval',
-                                           default=1,
+                                           default=3,
                                            missing='nothing')
 
     def __init__(self, *args, **kwargs):
@@ -97,6 +97,12 @@ class ScanningExcitationGui(GuiBase):
         self._mw.data_widget.fit_widget.link_fit_container(self._excitation_logic().fit_container)
         self._mw.data_widget.fit_widget.sigDoFit.connect(self._excitation_logic().do_fit)
 
+        # fill initial settings
+        self._mw.data_widget.target_point.setPos(self._target_x)
+        self.populate_settings()
+        self.update_state()
+        self.update_data()
+        
         # Connect signals
         self._excitation_logic().sig_data_updated.connect(self.update_data)
         self._excitation_logic().sig_state_updated.connect(self.update_state)
@@ -116,11 +122,6 @@ class ScanningExcitationGui(GuiBase):
         self._mw.data_widget.fit_region.sigRegionChangeFinished.connect(self.fit_region_changed)
         self._mw.data_widget.target_point.sigPositionChangeFinished.connect(self.target_changed)
 
-        # fill initial settings
-        self._mw.data_widget.target_point.setPos(self._target_x)
-        self.populate_settings()
-        self.update_state()
-        self.update_data()
         
         self._status_update_timer.start()
         
@@ -175,6 +176,7 @@ class ScanningExcitationGui(GuiBase):
         self.update_state()
         self.update_data()
         self.update_scanner_variables()
+        self.update_fit(self._excitation_logic().fit_method, self._excitation_logic().fit_results)
 
     def update_state(self):
         # Update the text of the buttons according to logic state

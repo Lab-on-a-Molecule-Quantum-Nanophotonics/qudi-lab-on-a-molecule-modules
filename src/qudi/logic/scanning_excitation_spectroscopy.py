@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from datetime import datetime
 import traceback
+from uncertainties import ufloat
 
 from qudi.core.module import LogicBase
 from qudi.core.connector import Connector
@@ -221,10 +222,10 @@ class ScanningExcitationLogic(LogicBase):
                      )
             # these are matplotlib.patch.Patch properties
             props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
-            textstr = f"""fit method: {self.fit_method}
-            fit results: {self.fit_results.params}
-            fit region: {self.fit_region}
-            """
+            textstr = f"fit method: {self.fit_method}\nfit results:\n"
+            for (name,param) in self.fit_results.params.items():
+                textstr += f"  - {name} = {ufloat(param.value, param.stderr)}\n"
+            textstr += f"fit region: {self.fit_region}"
             # place a text box in upper left in axes coords
             ax1.text(0.05, 0.95, textstr, transform=ax1.transAxes, fontsize=14,
         verticalalignment='top', bbox=props)
@@ -305,9 +306,10 @@ class ScanningExcitationLogic(LogicBase):
             else:
                 if self._beep:
                     QtWidgets.QApplication.instance().beep()
-                self.fit_region = (min(self.frequency), max(self.frequency))
-                self.idle = (min(self.frequency) + max(self.frequency)) / 2
-                self.sig_state_updated.emit()
+                if self.frequency is not None:
+                    self.fit_region = (min(self.frequency), max(self.frequency))
+                    self.idle = (min(self.frequency) + max(self.frequency)) / 2
+                    self.sig_state_updated.emit()
         except:
             self.log.exception("")
 
@@ -324,7 +326,8 @@ class ScanningExcitationLogic(LogicBase):
     def fit_container(self):
         return self._fit_container
 
-    def do_fit(self, fit_method, step_num):
+    def do_fit(self, fit_method):
+        self.log.debug("do a fit")
         if fit_method == 'No Fit':
             self.sig_fit_updated.emit('No Fit', None)
             return 'No Fit', None
@@ -334,19 +337,21 @@ class ScanningExcitationLogic(LogicBase):
             self.log.error('No data to fit.')
             self.sig_fit_updated.emit('No Fit', None)
             return 'No Fit', None
-
+            
+        step_num = self.step_number[0]
         roi = self.step_number == step_num
         frequency = self.frequency[roi]
-        start = len(frequency) - np.searchsorted(frequency, self._fit_region[1], 'left')
-        end = len(frequency) - np.searchsorted(frequency, self._fit_region[0], 'right')
+        start = np.searchsorted(frequency, self._fit_region[0], 'left')
+        end = np.searchsorted(frequency, self._fit_region[1], 'right')
 
         if end - start < 2:
             self.log.error('Fit region limited the data to less than two points. Fit not possible.')
             self.sig_fit_updated.emit('No Fit', None)
             return 'No Fit', None
 
-        frequency = self.frequency[start:end]
+        frequency = frequency[start:end]
         y_data = self.spectrum[roi][start:end]
+        self.log.debug(f"Fitting from {start} to {end}")
 
         try:
             self._fit_method, self._fit_results = self._fit_container.fit_data(fit_method, frequency, y_data)
@@ -356,6 +361,7 @@ class ScanningExcitationLogic(LogicBase):
             return 'No Fit', None
 
         self.sig_fit_updated.emit(self._fit_method, self._fit_results)
+        self.log.debug("done")
         return self._fit_method, self._fit_results
 
     @property

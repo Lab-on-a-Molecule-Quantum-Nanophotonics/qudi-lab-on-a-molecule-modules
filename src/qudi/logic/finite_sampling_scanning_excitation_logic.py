@@ -25,12 +25,12 @@ class FiniteSamplingScanningExcitationLogic(LogicBase, ExcitationScannerInterfac
     _watchdog_delay = ConfigOption(name="watchdog_delay", default=0.2)
 
     _scan_data = StatusVar(name="scan_data", default=np.empty((0,3)))
-    _conversion_factor = StatusVar(name="conversion_factor", default=13.4e9)
+    _conversion_factor = StatusVar(name="conversion_factor", default=13.1378e9)
     _scan_mini = StatusVar(name="scan_mini", default=-10)
     _scan_maxi = StatusVar(name="scan_maxi", default=10)
     _exposure_time = StatusVar(name="exposure_time", default=1e-2)
     _scan_step_tension = StatusVar(name="scan_step_tension", default=1e-3)
-    _sleep_time_before_scan = StatusVar(name="sleep_time_before_scan", default=2)
+    _sleep_time_before_scan = StatusVar(name="sleep_time_before_scan", default=5)
     _n_repeat = StatusVar(name="n_repeat", default=1)
     _idle_value = StatusVar(name="idle_value", default=0.0)
     def __init__(self, *args, **kwargs):
@@ -95,9 +95,10 @@ class FiniteSamplingScanningExcitationLogic(LogicBase, ExcitationScannerInterfac
                     self._ao().set_setpoint(self._output_channel, self._idle_value)
             elif watchdog_state == "prepare_scan": 
                 n = self._number_of_samples_per_frame
+                self.log.debug(f"Preparing scan from {self._scan_mini} to {self._scan_maxi} with {n} points.")
                 with self._data_lock:
                     self._scan_data = np.zeros((n*self._n_repeat, 3))
-                    self._scan_data[:,0] = np.tile(np.linspace(start=self._scan_mini, stop=self._scan_maxi, num=n), self._n_repeat)
+                    self._scan_data[:,0] = np.tile(np.linspace(start=self._scan_mini, stop=self._scan_maxi, num=n), self._n_repeat)*self._conversion_factor
                     self._scan_data[:,2] = np.repeat(range(self._n_repeat), n)
                 self._repeat_no = 0
                 self._data_row_index = 0
@@ -132,7 +133,7 @@ class FiniteSamplingScanningExcitationLogic(LogicBase, ExcitationScannerInterfac
                     self.watchdog_event("start_scan_step")
             elif watchdog_state == "record_scan_step": 
                 running = self._finite_sampling_io().is_running
-                samples_missing = self._number_of_samples_per_frame - self._data_row_index
+                samples_missing = self._number_of_samples_per_frame * (self._repeat_no+1) - self._data_row_index
                 if samples_missing <= 0:
                     self._repeat_no += 1
                     self.log.debug("Step done.")
@@ -164,10 +165,10 @@ class FiniteSamplingScanningExcitationLogic(LogicBase, ExcitationScannerInterfac
             exposure_limits=(1e-4,1),
             repeat_limits=(1,100),
             idle_value_limits=(self._minimum_tension*self._conversion_factor, self._maximum_tension*self._conversion_factor),
-            control_variables=("Conversion factor", "Minimum tension", "Maximum tension", "Tension step", "Minimum frequency", "Maximum frequency", "Frequency step", "Sleep before scan"),
-            control_variable_limits=((0.0, 1e10), (self._minimum_tension, self._maximum_tension), (self._minimum_tension, self._maximum_tension), (self._minimum_tension_step,self._maximum_tension-self._minimum_tension), (-100e9, 100e9), (-100e9, 100e9), (0.0, 100e9), (0.0, 10.0)),
-            control_variable_types=(float, float, float, float, float, float, float, float),
-            control_variable_units=("Hz/V", "V", "V", "V", "Hz", "Hz", "Hz", "s")
+            control_variables=("Conversion factor", "Minimum tension", "Maximum tension", "Tension step", "Minimum frequency", "Maximum frequency", "Frequency step", "Sleep before scan", "Idle tension", "Idle frequency"),
+            control_variable_limits=((0.0, 1e11), (self._minimum_tension, self._maximum_tension), (self._minimum_tension, self._maximum_tension), (self._minimum_tension_step,self._maximum_tension-self._minimum_tension), (-10e12, 10e12), (-10e12, 10e12), (0.0, 10e12), (0.0, 10.0), (self._minimum_tension, self._maximum_tension), (-10e12, 10e12)),
+            control_variable_types=(float, float, float, float, float, float, float, float, float, float),
+            control_variable_units=("Hz/V", "V", "V", "V", "Hz", "Hz", "Hz", "s", "V", "Hz")
         )
         self.watchdog_event("start_idle")
         self._watchdog_timer.setSingleShot(True)
@@ -182,7 +183,7 @@ class FiniteSamplingScanningExcitationLogic(LogicBase, ExcitationScannerInterfac
         return self.watchdog_state in self._scanning_states
     @property
     def state_display(self) -> str:
-        return self.watchdof_state.replace("_", " ")
+        return self.watchdog_state.replace("_", " ")
     def start_scan(self) -> None:
         "Start scanning in a non_blocking way."
         if not self.scan_running:
@@ -203,18 +204,20 @@ class FiniteSamplingScanningExcitationLogic(LogicBase, ExcitationScannerInterfac
             freq_mini = self.get_control("Minimum frequency")
             freq_maxi = self.get_control("Maximum frequency")
             freq_step = self.get_control("Frequency step")
+            idle_value = self.get_control("Idle frequency")
             self._conversion_factor = value
-            self._scan_mini = max(self._minimum_tension, self._conversion_factor*freq_mini)
-            self._scan_maxi = max(self._maximum_tension, self._conversion_factor*freq_maxi)
-            self._scan_step_tension = max(self._minimum_tension_step, self._conversion_factor*freq_step)
+            self._scan_mini = max(self._minimum_tension, freq_mini/self._conversion_factor)
+            self._scan_maxi = min(self._maximum_tension, freq_maxi/self._conversion_factor)
+            self._scan_step_tension = max(self._minimum_tension_step, freq_step/self._conversion_factor)
+            self._idle_value = min(self._maximum_tension, max(self._minimum_tension, idle_value/self._conversion_factor))
             lims = (self._minimum_tension/self._conversion_factor, self._maximum_tension/self._conversion_factor)
             self._constraints.set_limits("Minimum frequency", *lims)
             self._constraints.set_limits("Maximum frequency", *lims)
             self._constraints.set_limits("Frequency step", 0, lims[1])
         elif variable == "Minimum tension":
-            self._minimum_tension = value
-        elif variable == "Maximum tension":
             self._scan_mini = value
+        elif variable == "Maximum tension":
+            self._scan_maxi = value
         elif variable == "Tension step":
             self._scan_step_tension = value
         elif variable == "Minimum frequency":
@@ -225,6 +228,10 @@ class FiniteSamplingScanningExcitationLogic(LogicBase, ExcitationScannerInterfac
             self.set_control("Tension step", value/self._conversion_factor)
         elif variable == "Sleep before scan":
             self._sleep_time_before_scan = value
+        elif variable == "Idle tension":
+            self._idle_value = value
+        elif variable == "Idle frequency":
+            self.set_control("Idle tension", value/self._conversion_factor)
     def get_control(self, variable: str):
         "Get a control variable value."
         if variable == "Conversion factor":
@@ -243,6 +250,10 @@ class FiniteSamplingScanningExcitationLogic(LogicBase, ExcitationScannerInterfac
             return self._scan_step_tension*self._conversion_factor
         elif variable == "Sleep before scan":
             return self._sleep_time_before_scan
+        elif variable == "Idle tension":
+            return self._idle_value
+        elif variable == "Idle frequency":
+            return self._idle_value*self._conversion_factor
         else:
             raise ValueError(f"Unknown variable {variable}")
     def get_current_data(self) -> np.ndarray:
