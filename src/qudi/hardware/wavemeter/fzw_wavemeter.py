@@ -144,8 +144,7 @@ class MOGLabsFZW(DataInStreamInterface, SwitchInterface, FiniteSamplingInputInte
     def _set_offset(self,v):
         return self.send_and_recv(f"pid,offset,{v}")
     def _is_pid_disabled(self):
-        return "DISABLED" in self.send_and_recv("pid,status", check_ok=False)
-        
+        return "DISABLED" in self.send_and_recv("pid,status", check_ok=False)        
     # Internal management of buffers
     def _prepare_buffers(self):
         self._data_buffer = np.empty(self.buffer_size, dtype=np.float64)

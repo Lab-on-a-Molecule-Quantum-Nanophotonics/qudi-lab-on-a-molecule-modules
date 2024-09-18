@@ -117,6 +117,7 @@ class ScanningExcitationGui(GuiBase):
         self._mw.action_save_spectrum.triggered.connect(self.save_spectrum)
         self._mw.data_widget.fit_region_from.editingFinished.connect(self.fit_region_value_changed)
         self._mw.data_widget.fit_region_to.editingFinished.connect(self.fit_region_value_changed)
+        self._mw.data_widget.scan_no_fit.editingFinished.connect(self.fit_region_value_changed)
         self._mw.data_widget.target_x.editingFinished.connect(self.target_updated)
 
         self._mw.data_widget.fit_region.sigRegionChangeFinished.connect(self.fit_region_changed)
@@ -264,7 +265,9 @@ class ScanningExcitationGui(GuiBase):
 
     def fit_region_value_changed(self):
         self._excitation_logic().fit_region = (self._mw.data_widget.fit_region_from.value(),
-                                                 self._mw.data_widget.fit_region_to.value())
+                                                 self._mw.data_widget.fit_region_to.value(),
+                                                 self._mw.data_widget.scan_no_fit.value(),
+                                                 )
     def set_exposure(self, v):
         self._excitation_logic().exposure_time = v
     def set_repetitions(self, v):

@@ -170,6 +170,8 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
                     self.log.debug(f"Step {self._repeat_no} prepared.")
                     if self._repeat_no > 0:
                         self._start_ramp()
+                    else:
+                        self._stop_ramp()
                     self._waiting_start = time.perf_counter()
                     self.watchdog_event("start_wait_ready")
             elif watchdog_state == "wait_ready":

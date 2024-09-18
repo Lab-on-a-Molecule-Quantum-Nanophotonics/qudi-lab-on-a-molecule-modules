@@ -338,7 +338,7 @@ class ScanningExcitationLogic(LogicBase):
             self.sig_fit_updated.emit('No Fit', None)
             return 'No Fit', None
             
-        step_num = self.step_number[0]
+        step_num = self._fit_region[2]
         roi = self.step_number == step_num
         frequency = self.frequency[roi]
         start = np.searchsorted(frequency, self._fit_region[0], 'left')
@@ -378,11 +378,13 @@ class ScanningExcitationLogic(LogicBase):
 
     @fit_region.setter
     def fit_region(self, fit_region):
-        assert len(fit_region) == 2, f'fit_region has to be of length 2 but was {type(fit_region)}'
+        if len(fit_region) == 2:
+            fit_region = (fit_region[0], fit_region[1], 0)
+        #assert len(fit_region) == 3, f'fit_region has to be of length 3 but was {len(fit_region)}'
 
         if self.frequency is None:
             return
-        fit_region = fit_region if fit_region[0] <= fit_region[1] else (fit_region[1], fit_region[0])
-        new_region = (max(min(self.frequency), fit_region[0]), min(max(self.frequency), fit_region[1]))
+        fit_region = fit_region if fit_region[0] <= fit_region[1] else (fit_region[1], fit_region[0], fit_region[2])
+        new_region = (max(min(self.frequency), fit_region[0]), min(max(self.frequency), fit_region[1]), fit_region[2])
         self._fit_region = new_region
         self.sig_state_updated.emit()
