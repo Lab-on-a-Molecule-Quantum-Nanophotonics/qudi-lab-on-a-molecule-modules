@@ -219,7 +219,9 @@ class ScanningExcitationGui(GuiBase):
         # erase previous fit line
         if self._delete_fit:
             self._mw.data_widget.fit_curve.setData(x=[], y=[])
-
+            
+        self._target_x = self._excitation_logic().idle
+        self._mw.data_widget.target_point.setPos(self._target_x)
         self.target_changed()
         missing_curves = len(all_steps) - len(self._mw.data_widget.data_curves) 
         if missing_curves > 0:

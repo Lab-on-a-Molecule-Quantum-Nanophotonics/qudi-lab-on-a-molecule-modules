@@ -229,8 +229,10 @@ class FiniteSamplingScanningExcitationLogic(LogicBase, ExcitationScannerInterfac
         elif variable == "Sleep before scan":
             self._sleep_time_before_scan = value
         elif variable == "Idle tension":
+            self.log.debug(f"Setting idle tension to {value}")
             self._idle_value = value
         elif variable == "Idle frequency":
+            self.log.debug(f"Setting idle frequency to {value}")
             self.set_control("Idle tension", value/self._conversion_factor)
     def get_control(self, variable: str):
         "Get a control variable value."

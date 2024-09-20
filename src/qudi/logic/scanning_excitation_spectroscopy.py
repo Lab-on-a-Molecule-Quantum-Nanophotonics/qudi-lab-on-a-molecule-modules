@@ -237,6 +237,7 @@ class ScanningExcitationLogic(LogicBase):
         ds.save_thumbnail(figure, file_path=file_path.rsplit('.', 1)[0])
 
         self.log.debug(f'Spectrum saved to:{file_path}')
+        return file_path
 
     @staticmethod
     def _get_si_scaling(number):
