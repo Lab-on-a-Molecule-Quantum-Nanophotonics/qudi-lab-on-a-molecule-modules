@@ -51,7 +51,10 @@ def ai_channel_names(device_name: str) -> List[str]:
     """ Extracts available physical analog input channel names from device """
     channel_names = ni.system.Device(device_name).ai_physical_chans.channel_names
     return [normalize_channel_name(channel) for channel in channel_names]
-
+    
+def do_line_names(device_name: str) -> List[str]:
+    channel_names = ni.system.Device(device_name).do_lines.channel_names
+    return [normalize_channel_name(channel) for channel in channel_names]
 
 def ao_voltage_range(device_name: str) -> Tuple[float, float]:
     """ Extracts the biggest available analog output voltage range from device """
