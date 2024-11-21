@@ -1,38 +1,43 @@
 import time
+from enum import Enum
 
 from qudi.core.connector import Connector
 from qudi.core.configoption import ConfigOption
 from qudi.core.statusvariable import StatusVar
 from qudi.util.mutex import Mutex
-from qudi.core.module import LogicBase
 from qudi.util.enums import SamplingOutputMode
 from qudi.interface.excitation_scanner_interface import ExcitationScannerInterface, ExcitationScannerConstraints
+from qudi.util.network import netobtain
 
 from PySide2 import QtCore
 from fysom import Fysom
 import numpy as np
 
-class FiniteSamplingScanningExcitationLogic(LogicBase, ExcitationScannerInterface):
-    _finite_sampling_io = Connector(name='scan_hardware', interface='FiniteSamplingIOInterface')
-    _ao = Connector(name='analog_output', interface='ProcessSetpointInterface')
 
-    _maximum_tension = ConfigOption(name="maximum_tension", default=10)
-    _minimum_tension = ConfigOption(name="minimum_tension", default=-10)
-    _minimum_tension_step = ConfigOption(name="minimum_tension", default=1e-4)
-    _output_channel = ConfigOption(name="output_channel")
+class MatisseScanMode(Enum):
+    INCREASE_VOLTAGE_STOP_NEITHER = 0
+    DECREASE_VOLTAGE_STOP_NEITHER = 1
+    INCREASE_VOLTAGE_STOP_LOW = 2
+    DECREASE_VOLTAGE_STOP_LOW = 3
+    INCREASE_VOLTAGE_STOP_UP = 4
+    DECREASE_VOLTAGE_STOP_UP = 5
+    INCREASE_VOLTAGE_STOP_EITHER = 6
+    DECREASE_VOLTAGE_STOP_EITHER = 7
+
+class RemoteMatisseScanner(ExcitationScannerInterface):
+    _finite_sampling_input = Connector(name='input', interface='FiniteSamplingInputInterface')
+    _matisse = Connector(name='matisse', interface='ProcessControlInterface')
+    _matisse_sw = Connector(name='matisse_sw', interface='SwitchInterface')
+
     _input_channel = ConfigOption(name="input_channel")
     _chunk_size = ConfigOption(name="chunk_size", default=10)
     _watchdog_delay = ConfigOption(name="watchdog_delay", default=0.2)
 
     _scan_data = StatusVar(name="scan_data", default=np.empty((0,3)))
-    _conversion_factor = StatusVar(name="conversion_factor", default=13.1378e9)
-    _scan_mini = StatusVar(name="scan_mini", default=-10)
-    _scan_maxi = StatusVar(name="scan_maxi", default=10)
     _exposure_time = StatusVar(name="exposure_time", default=1e-2)
-    _scan_step_tension = StatusVar(name="scan_step_tension", default=1e-3)
-    _sleep_time_before_scan = StatusVar(name="sleep_time_before_scan", default=5)
+    _sleep_time_before_scan = StatusVar(name="sleep_time_before_scan", default=60)
     _n_repeat = StatusVar(name="n_repeat", default=1)
-    _idle_value = StatusVar(name="idle_value", default=0.0)
+    _idle_value = StatusVar(name="idle_value", default=0.4)
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._watchdog_state = Fysom({
@@ -75,24 +80,75 @@ class FiniteSamplingScanningExcitationLogic(LogicBase, ExcitationScannerInterfac
     def watchdog_event(self, event):
         with self._watchdog_lock:
             self._watchdog_state.trigger(event)
+            
+    @property
+    def _scan_mini(self):
+        v = self._matisse().get_setpoint("scan lower limit")
+        return netobtain(v)
+    @_scan_mini.setter
+    def _scan_mini(self, v):
+        self._matisse().set_setpoint("scan lower limit", v)
+    @property
+    def _scan_maxi(self):
+        v = self._matisse().get_setpoint("scan upper limit")
+        return netobtain(v)
+    @_scan_maxi.setter
+    def _scan_maxi(self, v):
+        self._matisse().set_setpoint("scan upper limit", v)
+    @property
+    def _conversion_factor(self):
+        v = self._matisse().get_setpoint("conversion factor")
+        return netobtain(v)
+    @_conversion_factor.setter
+    def _conversion_factor(self, v):
+        self._matisse().set_setpoint("conversion factor", v)
+    @property
+    def _scan_speed(self):
+        v = self._matisse().get_setpoint("scan rising speed")
+        return netobtain(v)
+    @_scan_speed.setter
+    def _scan_speed(self, value):
+        self._matisse().set_setpoint("scan rising speed", value)
+    @property
+    def _scan_speed(self):
+        v = self._matisse().get_setpoint("scan rising speed")
+        return netobtain(v)
+    @_scan_speed.setter
+    def _scan_speed(self, value):
+        self._matisse().set_setpoint("scan rising speed", value)
+    @property
+    def _fall_speed(self):
+        v = self._matisse().get_setpoint("scan falling speed")
+        return netobtain(v)
+    @_fall_speed.setter
+    def _fall_speed(self, value):
+        self._matisse().set_setpoint("scan falling speed", value)
+    @property
+    def _scan_value(self):
+        v = self._matisse().get_setpoint("scan value")
+        return netobtain(v)
+    @_scan_value.setter
+    def _scan_value(self, v):
+        self._matisse().set_setpoint("scan value", v)
+    @property
+    def _scanning(self):
+        v = self._matisse_sw().get_state("Scan Status")
+        return netobtain(v)
+        
+            
     @property 
     def _number_of_samples_per_frame(self):
-        return round((self._scan_maxi - self._scan_mini) / self._scan_step_tension)
+        return round((self._scan_maxi - self._scan_mini) / self._scan_speed / self._exposure_time)
     def _watchdog(self):
         try:
             time_start = time.perf_counter()
             watchdog_state = self.watchdog_state
             if watchdog_state == "prepare_idle": 
-                if self._finite_sampling_io().is_running:
-                    self._finite_sampling_io().stop_buffered_frame()
-                self._ao().set_activity_state(self._output_channel, True)
-                self._ao().set_setpoint(self._output_channel, self._idle_value)
+                if self._finite_sampling_input().module_state() == 'locked':
+                    self._finite_sampling_input().stop_buffered_acquisition()
                 self.watchdog_event("start_idle")
             elif watchdog_state == "idle": 
-                if not self._ao().get_activity_state(self._output_channel):
-                    self._ao().set_activity_state(self._output_channel, True)
-                if self._ao().get_setpoint(self._output_channel) != self._idle_value:
-                    self._ao().set_setpoint(self._output_channel, self._idle_value)
+                pass
             elif watchdog_state == "prepare_scan": 
                 n = self._number_of_samples_per_frame
                 self.log.debug(f"Preparing scan from {self._scan_mini} to {self._scan_maxi} with {n} points.")
@@ -102,15 +158,10 @@ class FiniteSamplingScanningExcitationLogic(LogicBase, ExcitationScannerInterfac
                     self._scan_data[:,2] = np.repeat(range(self._n_repeat), n)
                 self._repeat_no = 0
                 self._data_row_index = 0
-                self._finite_sampling_io().set_sample_rate(1/self._exposure_time)
-                self._finite_sampling_io().set_active_channels(
-                    input_channels=(self._input_channel,),
-                    output_channels=(self._output_channel,)
-                    #output_channels = (self._ni_channel_mapping[ax] for ax in axes)
-                )
+                self._finite_sampling_input().set_sample_rate(1/self._exposure_time)
+                self._finite_sampling_input().set_frame_size(n)
+                self._finite_sampling_input().set_active_channels((self._input_channel,))
 
-                self._finite_sampling_io().set_output_mode(SamplingOutputMode.JUMP_LIST)
-                self._finite_sampling_io().set_frame_data({self._output_channel:np.linspace(start=self._scan_mini, stop=self._scan_maxi, num=n)})
                 self.log.debug("Scan prepared.")
                 self.watchdog_event("start_prepare_step")
             elif watchdog_state == "prepare_step": 
@@ -118,38 +169,42 @@ class FiniteSamplingScanningExcitationLogic(LogicBase, ExcitationScannerInterfac
                     self.watchdog_event("end_scan")
                     self.log.info("Scan done.")
                 else:
-                    if self._finite_sampling_io().is_running:
-                        self._finite_sampling_io().stop_buffered_frame()
-                    self._ao().set_activity_state(self._output_channel, True)
-                    self._ao().set_setpoint(self._output_channel, self._scan_mini)
+                    if self._finite_sampling_input().module_state() == 'locked':
+                        self._finite_sampling_input().stop_buffered_acquisition()
                     self.log.debug("Step prepared, starting wait.")
                     self._waiting_start = time.perf_counter()
+                    if self._scan_value < self._scan_mini:
+                        self._matisse().set_setpoint("scan mode", MatisseScanMode.INCREASE_VOLTAGE_STOP_LOW.value)
+                        self._matisse_sw().set_state("Scan Status", "RUN")
+                    elif self._scan_value > self._scan_mini:
+                        self._matisse().set_setpoint("scan mode", MatisseScanMode.DECREASE_VOLTAGE_STOP_LOW.value)
+                        self._matisse_sw().set_state("Scan Status", "RUN")
                     self.watchdog_event("start_wait_first_value")
             elif watchdog_state == "wait_ready": 
-                if time_start - self._waiting_start > self._sleep_time_before_scan:
+                if time_start - self._waiting_start > self._sleep_time_before_scan or not self._scanning:
                     self.log.debug("Ready.")
-                    self._ao().set_activity_state(self._output_channel, False)
-                    self._finite_sampling_io().start_buffered_frame()
+                    self._matisse().set_setpoint("scan mode", MatisseScanMode.INCREASE_VOLTAGE_STOP_LOW.value)
+                    self._matisse_sw().set_state("Scan Status", "RUN")
+                    self._finite_sampling_input().start_buffered_acquisition()
                     self.watchdog_event("start_scan_step")
             elif watchdog_state == "record_scan_step": 
-                running = self._finite_sampling_io().is_running
                 samples_missing = self._number_of_samples_per_frame * (self._repeat_no+1) - self._data_row_index
                 if samples_missing <= 0:
                     self._repeat_no += 1
                     self.log.debug("Step done.")
                     self.watchdog_event("step_done")
-                elif self._finite_sampling_io().samples_in_buffer < min(self._chunk_size, samples_missing):
+                elif self._finite_sampling_input().samples_in_buffer < min(self._chunk_size, samples_missing):
                     pass
                 else:
-                    new_data = self._finite_sampling_io().get_buffered_samples()[self._input_channel]
+                    new_data = self._finite_sampling_input().get_buffered_samples()[self._input_channel]
                     i = self._data_row_index
                     with self._data_lock:
                         self._scan_data[i:i+len(new_data),1] = new_data
                         self._data_row_index += len(new_data)
             elif watchdog_state == "stopped": 
                 self.log.debug("stopped")
-                if self._finite_sampling_io().is_running:
-                    self._finite_sampling_io().stop_buffered_frame()
+                if self._finite_sampling_input().module_state() == 'locked':
+                    self._finite_sampling_input().stop_buffered_acquisition()
             time_end = time.perf_counter()
             time_overhead = time_end-time_start
             new_time = max(0, self._watchdog_delay - time_overhead)
@@ -161,14 +216,15 @@ class FiniteSamplingScanningExcitationLogic(LogicBase, ExcitationScannerInterfac
     def on_activate(self):
         """ Initialisation performed during activation of the module.
         """
+        scan_limits = (0.0, 0.7)
         self._constraints = ExcitationScannerConstraints(
             exposure_limits=(1e-4,1),
-            repeat_limits=(1,100),
-            idle_value_limits=(self._minimum_tension*self._conversion_factor, self._maximum_tension*self._conversion_factor),
-            control_variables=("Conversion factor", "Minimum tension", "Maximum tension", "Tension step", "Minimum frequency", "Maximum frequency", "Frequency step", "Sleep before scan", "Idle tension", "Idle frequency"),
-            control_variable_limits=((0.0, 1e11), (self._minimum_tension, self._maximum_tension), (self._minimum_tension, self._maximum_tension), (self._minimum_tension_step,self._maximum_tension-self._minimum_tension), (-10e12, 10e12), (-10e12, 10e12), (0.0, 10e12), (0.0, 10.0), (self._minimum_tension, self._maximum_tension), (-10e12, 10e12)),
-            control_variable_types=(float, float, float, float, float, float, float, float, float, float),
-            control_variable_units=("Hz/V", "V", "V", "V", "Hz", "Hz", "Hz", "s", "V", "Hz")
+            repeat_limits=(1,1000),
+            idle_value_limits=(0.0, 0.7),
+            control_variables=("Conversion factor", "Minimum scan", "Maximum scan", "Minimum frequency", "Maximum frequency", "Frequency step", "Sleep before scan", "Idle value", "Idle frequency"),
+            control_variable_limits=((0.0, 1e13), scan_limits, scan_limits, (-100e12, 100e12), (-100e12, 100e12), (0.0, 100e12), (0.0, 3000.0), scan_limits, (-100e12, 100e12)),
+            control_variable_types=(float, float, float, float, float, float, float, float, float),
+            control_variable_units=("Hz", "", "", "Hz", "Hz", "Hz", "s", "", "Hz")
         )
         self.watchdog_event("start_idle")
         self._watchdog_timer.setSingleShot(True)
@@ -206,53 +262,50 @@ class FiniteSamplingScanningExcitationLogic(LogicBase, ExcitationScannerInterfac
             freq_step = self.get_control("Frequency step")
             idle_value = self.get_control("Idle frequency")
             self._conversion_factor = value
-            self._scan_mini = max(self._minimum_tension, freq_mini/self._conversion_factor)
-            self._scan_maxi = min(self._maximum_tension, freq_maxi/self._conversion_factor)
-            self._scan_step_tension = max(self._minimum_tension_step, freq_step/self._conversion_factor)
-            self._idle_value = min(self._maximum_tension, max(self._minimum_tension, idle_value/self._conversion_factor))
-            lims = (self._minimum_tension/self._conversion_factor, self._maximum_tension/self._conversion_factor)
+            self._scan_mini = max(0.0, freq_mini/self._conversion_factor)
+            self._scan_maxi = min(0.7, freq_maxi/self._conversion_factor)
+            self._idle_value = min(0.7, max(0.0, idle_value/self._conversion_factor))
+            lims = (0.0, 0.7*self._conversion_factor)
             self._constraints.set_limits("Minimum frequency", *lims)
             self._constraints.set_limits("Maximum frequency", *lims)
             self._constraints.set_limits("Frequency step", 0, lims[1])
-        elif variable == "Minimum tension":
+        elif variable == "Minimum scan":
             self._scan_mini = value
-        elif variable == "Maximum tension":
+        elif variable == "Maximum scan":
             self._scan_maxi = value
-        elif variable == "Tension step":
-            self._scan_step_tension = value
         elif variable == "Minimum frequency":
-            self.set_control("Minimum tension", value/self._conversion_factor)
+            self.set_control("Minimum scan", value/self._conversion_factor)
         elif variable == "Maximum frequency":
-            self.set_control("Maximum tension", value/self._conversion_factor)
+            self.set_control("Maximum scan", value/self._conversion_factor)
         elif variable == "Frequency step":
-            self.set_control("Tension step", value/self._conversion_factor)
+            val_scan = value/self._conversion_factor
+            self._scan_speed = val_scan/self._exposure_time
+            self._fall_speed = 10*val_scan/self._exposure_time
         elif variable == "Sleep before scan":
             self._sleep_time_before_scan = value
-        elif variable == "Idle tension":
-            self.log.debug(f"Setting idle tension to {value}")
+        elif variable == "Idle value":
+            self.log.debug(f"Setting idle value to {value}")
             self._idle_value = value
         elif variable == "Idle frequency":
             self.log.debug(f"Setting idle frequency to {value}")
-            self.set_control("Idle tension", value/self._conversion_factor)
+            self.set_control("Idle value", value/self._conversion_factor)
     def get_control(self, variable: str):
         "Get a control variable value."
         if variable == "Conversion factor":
             return self._conversion_factor
-        elif variable == "Minimum tension":
+        elif variable == "Minimum scan":
             return self._scan_mini
-        elif variable == "Maximum tension":
+        elif variable == "Maximum scan":
             return self._scan_maxi
-        elif variable == "Tension step":
-            return self._scan_step_tension
         elif variable == "Minimum frequency":
             return self._scan_mini*self._conversion_factor
         elif variable == "Maximum frequency":
             return self._scan_maxi*self._conversion_factor
         elif variable == "Frequency step":
-            return self._scan_step_tension*self._conversion_factor
+            return self._scan_speed*self._exposure_time*self._conversion_factor
         elif variable == "Sleep before scan":
             return self._sleep_time_before_scan
-        elif variable == "Idle tension":
+        elif variable == "Idle value":
             return self._idle_value
         elif variable == "Idle frequency":
             return self._idle_value*self._conversion_factor

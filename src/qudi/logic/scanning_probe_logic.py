@@ -557,8 +557,7 @@ class ScanningProbeLogic(LogicBase):
             if self.scan_settings['save_to_history']:
                 # module_uuid signals data-ready to data logic
                 self.sigScanStateChanged.emit(False, self.scan_data, self.module_uuid)
-            else:
-                self.sigScanStateChanged.emit(False, self.scan_data, self._curr_caller_id)
+            self.sigScanStateChanged.emit(False, self.scan_data, self._curr_caller_id)
 
             return err
 

@@ -34,7 +34,7 @@ class ExcitationScannerConstraints:
             return True
         mini,maxi=self.control_variable_limits[i]
         return mini <= value <= maxi
-    def set_limits(name:str,mini:_Variable_Type,maxi:_Variable_Type):
+    def set_limits(self, name:str,mini:_Variable_Type,maxi:_Variable_Type):
         if name not in self.control_variables:
             raise KeyError(f"Unknown variable {name}")
         i = self.control_variables.index(name)

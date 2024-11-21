@@ -101,11 +101,13 @@ class ScanningExcitationControlWidget(QtWidgets.QWidget):
         #main_layout.addItem(spacer, 0, 3, 1, 1)
         
         notes_group_box = QtWidgets.QGroupBox('Notes')
-        main_layout.addWidget(notes_group_box, 0, 3, 1, 1)
         notes_layout = QtWidgets.QVBoxLayout()
         notes_group_box.setLayout(notes_layout)
         self.notes_text_input = QtWidgets.QTextEdit()
         notes_layout.addWidget(self.notes_text_input)
+        notes_group_box.setSizePolicy(QtWidgets.QSizePolicy.Maximum,
+                                           QtWidgets.QSizePolicy.Minimum)
+        main_layout.addWidget(notes_group_box, 0, 3, 1, 1)
 
     def create_variable_widgets(self, variables_dict):
         for widget in self._variables_widgets.values():

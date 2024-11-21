@@ -58,7 +58,7 @@ class ScanningExcitationGui(GuiBase):
                                            default=1,
                                            missing='nothing')
     _status_poll_interval = ConfigOption(name='status_poll_interval',
-                                           default=1,
+                                           default=3,
                                            missing='nothing')
 
     def __init__(self, *args, **kwargs):
@@ -97,6 +97,12 @@ class ScanningExcitationGui(GuiBase):
         self._mw.data_widget.fit_widget.link_fit_container(self._excitation_logic().fit_container)
         self._mw.data_widget.fit_widget.sigDoFit.connect(self._excitation_logic().do_fit)
 
+        # fill initial settings
+        self._mw.data_widget.target_point.setPos(self._target_x)
+        self.populate_settings()
+        self.update_state()
+        self.update_data()
+        
         # Connect signals
         self._excitation_logic().sig_data_updated.connect(self.update_data)
         self._excitation_logic().sig_state_updated.connect(self.update_state)
@@ -111,16 +117,12 @@ class ScanningExcitationGui(GuiBase):
         self._mw.action_save_spectrum.triggered.connect(self.save_spectrum)
         self._mw.data_widget.fit_region_from.editingFinished.connect(self.fit_region_value_changed)
         self._mw.data_widget.fit_region_to.editingFinished.connect(self.fit_region_value_changed)
+        self._mw.data_widget.scan_no_fit.editingFinished.connect(self.fit_region_value_changed)
         self._mw.data_widget.target_x.editingFinished.connect(self.target_updated)
 
         self._mw.data_widget.fit_region.sigRegionChangeFinished.connect(self.fit_region_changed)
         self._mw.data_widget.target_point.sigPositionChangeFinished.connect(self.target_changed)
 
-        # fill initial settings
-        self._mw.data_widget.target_point.setPos(self._target_x)
-        self.populate_settings()
-        self.update_state()
-        self.update_data()
         
         self._status_update_timer.start()
         
@@ -175,6 +177,7 @@ class ScanningExcitationGui(GuiBase):
         self.update_state()
         self.update_data()
         self.update_scanner_variables()
+        self.update_fit(self._excitation_logic().fit_method, self._excitation_logic().fit_results)
 
     def update_state(self):
         # Update the text of the buttons according to logic state
@@ -216,7 +219,9 @@ class ScanningExcitationGui(GuiBase):
         # erase previous fit line
         if self._delete_fit:
             self._mw.data_widget.fit_curve.setData(x=[], y=[])
-
+            
+        self._target_x = self._excitation_logic().idle
+        self._mw.data_widget.target_point.setPos(self._target_x)
         self.target_changed()
         missing_curves = len(all_steps) - len(self._mw.data_widget.data_curves) 
         if missing_curves > 0:
@@ -262,7 +267,9 @@ class ScanningExcitationGui(GuiBase):
 
     def fit_region_value_changed(self):
         self._excitation_logic().fit_region = (self._mw.data_widget.fit_region_from.value(),
-                                                 self._mw.data_widget.fit_region_to.value())
+                                                 self._mw.data_widget.fit_region_to.value(),
+                                                 self._mw.data_widget.scan_no_fit.value(),
+                                                 )
     def set_exposure(self, v):
         self._excitation_logic().exposure_time = v
     def set_repetitions(self, v):

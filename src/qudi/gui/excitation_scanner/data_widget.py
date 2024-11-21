@@ -50,12 +50,19 @@ class ScanningExcitationDataWidget(QtWidgets.QWidget):
         to_label = QtWidgets.QLabel('To:')
         to_label.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
         fit_region_layout.addWidget(to_label, 1, 0)
+        scan_no_label = QtWidgets.QLabel('Scan no.:')
+        scan_no_label.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
+        fit_region_layout.addWidget(scan_no_label, 2, 0)
         self.fit_region_from = ScienDSpinBox()
         self.fit_region_from.setMinimumWidth(100)
         fit_region_layout.addWidget(self.fit_region_from, 0, 1)
         self.fit_region_to = ScienDSpinBox()
         self.fit_region_to.setMinimumWidth(100)
         fit_region_layout.addWidget(self.fit_region_to, 1, 1)
+        self.scan_no_fit = QtWidgets.QSpinBox()
+        self.scan_no_fit.setMinimum(0)
+        self.scan_no_fit.setMaximum(100)
+        fit_region_layout.addWidget(self.scan_no_fit, 2, 1)
 
         target_group_box = QtWidgets.QGroupBox('Target')
         main_layout.addWidget(target_group_box, 0, 1)
@@ -127,7 +134,7 @@ class ScanningExcitationDataWidget(QtWidgets.QWidget):
 
         main_layout.addWidget(self.plot_widget, 2, 0, 1, 3)
     def add_curve(self):
-        self.data_curves.append(self.plot_widget.plot())
+        self.data_curves.append(self.plot_widget.plot(symbol='o', symbolSize=5))
         self.data_curves[-1].setPen(palette.c1, width=2)
 
 

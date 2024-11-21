@@ -216,7 +216,7 @@ class FiniteSamplingIODummy(FiniteSamplingIOInterface):
             assert self.module_state() == 'idle', \
                 'Unable to start sampling IO. Already in progress.'
             assert isinstance(self._simulation_mode, SimulationMode), 'Invalid simulation mode'
-            assert self.__frame_buffer is not None, \
+            assert not(self.__frame_buffer is None and len(self._active_output_channels)>0), \
                 'Unable to start sampling IO. No frame data has been set for output'
             self.module_state.lock()
 
@@ -225,6 +225,8 @@ class FiniteSamplingIODummy(FiniteSamplingIOInterface):
                 self.__simulate_odmr(self._frame_size)
             elif self._simulation_mode is SimulationMode.RANDOM:
                 self.__simulate_random(self._frame_size)
+            elif self._simulation_mode is SimulationMode.LORENTZ:
+                self.__simulate_lorentz(self._frame_size)
 
             self.__returned_samples = 0
             self.__elapsed_samples = 0
@@ -298,3 +300,12 @@ class FiniteSamplingIODummy(FiniteSamplingIOInterface):
             data[ch] = offset + (np.random.rand(length) - 0.5) * noise - amp * gamma ** 2 / (
                         (x - pos) ** 2 + gamma ** 2)
         self.__simulated_samples = data
+
+    def __simulate_lorentz(self, length):
+        if length < 3:
+            self.__simulate_random(length)
+            return
+        offset = np.clip(np.random.rand(length) * 10, 0, np.inf)
+        x = np.arange(length, dtype=np.float64)
+        data = 1000 / (1 + ((length/2 - x)/(2*length/100))**2) + offset
+        self.__simulated_samples = {ch:data for ch in self._active_channels}

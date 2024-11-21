@@ -1,8 +1,10 @@
 from PySide2 import QtCore
+from PySide2 import QtWidgets
 import numpy as np
 import matplotlib.pyplot as plt
 from datetime import datetime
 import traceback
+from uncertainties import ufloat
 
 from qudi.core.module import LogicBase
 from qudi.core.connector import Connector
@@ -14,7 +16,8 @@ from qudi.util.mutex import Mutex
 
 class ScanningExcitationLogic(LogicBase):
     _scanner = Connector(name='scanner', interface='ExcitationScannerInterface')
-    _watchdog_repeat_time = ConfigOption(name="watchdog_repeat_time_ms", default=50)
+    _watchdog_repeat_time = ConfigOption(name="watchdog_repeat_time_ms", default=500)
+    _beep = ConfigOption(name="beep", default=True)
     _spectrum = StatusVar(name='spectrum', default=[None, None, None])
     _fit_region = StatusVar(name='fit_region', default=[0, 1])
     _fit_config = StatusVar(name='fit_config', default=dict())
@@ -44,6 +47,7 @@ class ScanningExcitationLogic(LogicBase):
         self._fit_results = None
         self._fit_method = ''
         self._watchdog_timer = QtCore.QTimer(parent=self)
+        self._scanner_start_requested = False
 
     def on_activate(self):
         """ Initialisation performed during activation of the module.
@@ -78,6 +82,7 @@ class ScanningExcitationLogic(LogicBase):
         self.sig_state_updated.emit()
 
         self._scanner().start_scan()
+        self._scanner_start_requested = True
         self.__start_watchdog_timer()
         
         return self.spectrum
@@ -217,10 +222,10 @@ class ScanningExcitationLogic(LogicBase):
                      )
             # these are matplotlib.patch.Patch properties
             props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
-            textstr = f"""fit method: {self.fit_method}
-            fit results: {self.fit_results.params}
-            fit region: {self.fit_region}
-            """
+            textstr = f"fit method: {self.fit_method}\nfit results:\n"
+            for (name,param) in self.fit_results.params.items():
+                textstr += f"  - {name} = {ufloat(param.value, param.stderr)}\n"
+            textstr += f"fit region: {self.fit_region}"
             # place a text box in upper left in axes coords
             ax1.text(0.05, 0.95, textstr, transform=ax1.transAxes, fontsize=14,
         verticalalignment='top', bbox=props)
@@ -232,6 +237,7 @@ class ScanningExcitationLogic(LogicBase):
         ds.save_thumbnail(figure, file_path=file_path.rsplit('.', 1)[0])
 
         self.log.debug(f'Spectrum saved to:{file_path}')
+        return file_path
 
     @staticmethod
     def _get_si_scaling(number):
@@ -292,15 +298,19 @@ class ScanningExcitationLogic(LogicBase):
             self.sig_data_updated.emit()
             st = self._scanner().state_display
             self.sig_scanner_state_updated.emit(st)
-            if self._scanner().scan_running:
+            if self._scanner_start_requested or self._scanner().scan_running:
+                self._scanner_start_requested = not self._scanner().scan_running
                 if self._stop_acquisition:
                     self._scanner().stop_scan()
                     self._stop_acquisition = False
                 self._watchdog_timer.start(self._watchdog_repeat_time)
             else:
-                self.fit_region = (min(self.frequency), max(self.frequency))
-                self.idle = (min(self.frequency) + max(self.frequency)) / 2
-                self.sig_state_updated.emit()
+                if self._beep:
+                    QtWidgets.QApplication.instance().beep()
+                if self.frequency is not None:
+                    self.fit_region = (min(self.frequency), max(self.frequency))
+                    self.idle = (min(self.frequency) + max(self.frequency)) / 2
+                    self.sig_state_updated.emit()
         except:
             self.log.exception("")
 
@@ -317,7 +327,8 @@ class ScanningExcitationLogic(LogicBase):
     def fit_container(self):
         return self._fit_container
 
-    def do_fit(self, fit_method, step_num):
+    def do_fit(self, fit_method):
+        self.log.debug("do a fit")
         if fit_method == 'No Fit':
             self.sig_fit_updated.emit('No Fit', None)
             return 'No Fit', None
@@ -327,19 +338,21 @@ class ScanningExcitationLogic(LogicBase):
             self.log.error('No data to fit.')
             self.sig_fit_updated.emit('No Fit', None)
             return 'No Fit', None
-
+            
+        step_num = self._fit_region[2]
         roi = self.step_number == step_num
         frequency = self.frequency[roi]
-        start = len(frequency) - np.searchsorted(frequency, self._fit_region[1], 'left')
-        end = len(frequency) - np.searchsorted(frequency, self._fit_region[0], 'right')
+        start = np.searchsorted(frequency, self._fit_region[0], 'left')
+        end = np.searchsorted(frequency, self._fit_region[1], 'right')
 
         if end - start < 2:
             self.log.error('Fit region limited the data to less than two points. Fit not possible.')
             self.sig_fit_updated.emit('No Fit', None)
             return 'No Fit', None
 
-        frequency = self.frequency[start:end]
+        frequency = frequency[start:end]
         y_data = self.spectrum[roi][start:end]
+        self.log.debug(f"Fitting from {start} to {end}")
 
         try:
             self._fit_method, self._fit_results = self._fit_container.fit_data(fit_method, frequency, y_data)
@@ -349,6 +362,7 @@ class ScanningExcitationLogic(LogicBase):
             return 'No Fit', None
 
         self.sig_fit_updated.emit(self._fit_method, self._fit_results)
+        self.log.debug("done")
         return self._fit_method, self._fit_results
 
     @property
@@ -365,11 +379,13 @@ class ScanningExcitationLogic(LogicBase):
 
     @fit_region.setter
     def fit_region(self, fit_region):
-        assert len(fit_region) == 2, f'fit_region has to be of length 2 but was {type(fit_region)}'
+        if len(fit_region) == 2:
+            fit_region = (fit_region[0], fit_region[1], 0)
+        #assert len(fit_region) == 3, f'fit_region has to be of length 3 but was {len(fit_region)}'
 
         if self.frequency is None:
             return
-        fit_region = fit_region if fit_region[0] <= fit_region[1] else (fit_region[1], fit_region[0])
-        new_region = (max(min(self.frequency), fit_region[0]), min(max(self.frequency), fit_region[1]))
+        fit_region = fit_region if fit_region[0] <= fit_region[1] else (fit_region[1], fit_region[0], fit_region[2])
+        new_region = (max(min(self.frequency), fit_region[0]), min(max(self.frequency), fit_region[1]), fit_region[2])
         self._fit_region = new_region
         self.sig_state_updated.emit()
