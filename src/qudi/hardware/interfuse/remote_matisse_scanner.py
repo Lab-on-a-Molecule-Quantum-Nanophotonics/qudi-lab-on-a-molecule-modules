@@ -148,7 +148,8 @@ class RemoteMatisseScanner(ExcitationScannerInterface):
                     self._finite_sampling_input().stop_buffered_acquisition()
                 self.watchdog_event("start_idle")
             elif watchdog_state == "idle": 
-                pass
+                if self._scan_value != self._idle_value:
+                    self._scan_value = self._idle_value
             elif watchdog_state == "prepare_scan": 
                 n = self._number_of_samples_per_frame
                 self.log.debug(f"Preparing scan from {self._scan_mini} to {self._scan_maxi} with {n} points.")
