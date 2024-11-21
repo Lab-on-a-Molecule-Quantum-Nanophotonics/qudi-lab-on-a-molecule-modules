@@ -40,6 +40,7 @@ class RemoteMatisseScanner(ExcitationScannerInterface):
     _idle_value = StatusVar(name="idle_value", default=0.4)
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.log.info(self._matisse.interface)
         self._watchdog_state = Fysom({
             "initial": "stopped",
             "events": [
@@ -146,6 +147,8 @@ class RemoteMatisseScanner(ExcitationScannerInterface):
             if watchdog_state == "prepare_idle": 
                 if self._finite_sampling_input().module_state() == 'locked':
                     self._finite_sampling_input().stop_buffered_acquisition()
+                if self._matisse_sw().get_state("Scan Status") == "RUN":
+                    self._matisse_sw().set_state("Scan Status", "STOP")
                 self.watchdog_event("start_idle")
             elif watchdog_state == "idle": 
                 if self._scan_value != self._idle_value:
@@ -222,10 +225,10 @@ class RemoteMatisseScanner(ExcitationScannerInterface):
             exposure_limits=(1e-4,1),
             repeat_limits=(1,1000),
             idle_value_limits=(0.0, 0.7),
-            control_variables=("Conversion factor", "Minimum scan", "Maximum scan", "Minimum frequency", "Maximum frequency", "Frequency step", "Sleep before scan", "Idle value", "Idle frequency"),
-            control_variable_limits=((0.0, 1e13), scan_limits, scan_limits, (-100e12, 100e12), (-100e12, 100e12), (0.0, 100e12), (0.0, 3000.0), scan_limits, (-100e12, 100e12)),
-            control_variable_types=(float, float, float, float, float, float, float, float, float),
-            control_variable_units=("Hz", "", "", "Hz", "Hz", "Hz", "s", "", "Hz")
+            control_variables=("Conversion factor", "Minimum scan", "Maximum scan", "Minimum frequency", "Maximum frequency", "Frequency step", "Sleep before scan", "Idle active", "Idle value", "Idle frequency"),
+            control_variable_limits=((0.0, 1e13), scan_limits, scan_limits, (-100e12, 100e12), (-100e12, 100e12), (0.0, 100e12), (0.0, 3000.0), (False, True), scan_limits, (-100e12, 100e12)),
+            control_variable_types=(float, float, float, float, float, float, float, bool, float, float),
+            control_variable_units=("Hz", "", "", "Hz", "Hz", "Hz", "s", "", "", "Hz")
         )
         self.watchdog_event("start_idle")
         self._watchdog_timer.setSingleShot(True)
@@ -284,6 +287,8 @@ class RemoteMatisseScanner(ExcitationScannerInterface):
             self._fall_speed = 10*val_scan/self._exposure_time
         elif variable == "Sleep before scan":
             self._sleep_time_before_scan = value
+        elif variable == "Idle active":
+            self._matisse().set_activity_state("scan value", value)
         elif variable == "Idle value":
             self.log.debug(f"Setting idle value to {value}")
             self._idle_value = value
@@ -306,6 +311,9 @@ class RemoteMatisseScanner(ExcitationScannerInterface):
             return self._scan_speed*self._exposure_time*self._conversion_factor
         elif variable == "Sleep before scan":
             return self._sleep_time_before_scan
+        elif variable == "Idle active":
+            v = self._matisse().get_activity_state("scan value")
+            return netobtain(v)
         elif variable == "Idle value":
             return self._idle_value
         elif variable == "Idle frequency":
