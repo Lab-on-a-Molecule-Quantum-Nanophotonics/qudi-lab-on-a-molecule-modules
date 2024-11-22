@@ -21,6 +21,7 @@ class MatisseCommander(ProcessControlInterface, SwitchInterface):
         super().__init__(*args, **kwargs)
         self._device = None
         self._constraints_process = None
+        self._idle_activated = False
         
     # Qudi base 
     def on_activate(self):
@@ -33,6 +34,7 @@ class MatisseCommander(ProcessControlInterface, SwitchInterface):
         )
         self._device = SirahMatisseCommanderDevice(self._address, self._port)
         self._device.connect()
+        self._idle_activated = False
         
     def on_deactivate(self):
         if self._device is not None:
@@ -70,6 +72,8 @@ class MatisseCommander(ProcessControlInterface, SwitchInterface):
                 raise RuntimeError(
                     'Setting slow piezo did not complete successfully.')
         elif channel == "scan value":
+            if not self._idle_activated:
+                return
             if self._device.set('SCAN:NOW', value) is False:
                 raise RuntimeError(
                     'Setting slow piezo did not complete successfully.')
@@ -99,9 +103,12 @@ class MatisseCommander(ProcessControlInterface, SwitchInterface):
         else:
             raise ValueError(f'Invalid process channel specifier "{channel}".')
     def get_activity_state(self, channel):
+        if channel == "scan value":
+            return self._idle_activated
         return True
     def set_activity_state(self, channel, active):
-        pass
+        if channel == "scan value":
+            self._idle_activated = active
     @property
     def constraints(self):
         return self._constraints_process
