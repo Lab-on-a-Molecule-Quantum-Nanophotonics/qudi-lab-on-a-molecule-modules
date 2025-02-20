@@ -294,7 +294,7 @@ class NIXSeriesFiniteSamplingIO(FiniteSamplingIOInterface):
             adc_voltage_ranges = {self._extract_terminal(key): value
                                   for key, value in self._adc_voltage_ranges.items()}
 
-            input_limits.update(adc_voltage_ranges)
+            input_limits.update({self._extract_terminal(key):adc_voltage_ranges[self._extract_terminal(key)] for key in analog_sources})
 
         # Create constraints
         self._constraints = FiniteSamplingIOConstraints(

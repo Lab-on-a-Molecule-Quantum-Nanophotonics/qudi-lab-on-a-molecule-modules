@@ -375,4 +375,22 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface):
                                                   stop=self._offset+self._span/2, 
                                                   num=len(frequencies)
                                       ))
-
+    @property
+    def data_column_names(self):
+        return ["Frequency", self._input_channel, "Step number", "Time"]
+    @property
+    def data_column_unit(self):
+        units = self._finite_sampling_input().constraints.channel_units
+        return ["Hz", units[self._input_channel], "", "s"]
+    @property
+    def frequency_column_number(self):
+        return 0
+    @property
+    def step_number_column_number(self):
+        return 2
+    @property
+    def time_column_number(self):
+        return 3
+    @property
+    def data_column_number(self):
+        return [1]

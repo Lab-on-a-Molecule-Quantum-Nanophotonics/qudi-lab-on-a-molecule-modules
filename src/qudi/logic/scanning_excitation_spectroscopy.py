@@ -22,6 +22,7 @@ class ScanningExcitationLogic(LogicBase):
     _fit_region = StatusVar(name='fit_region', default=[0, 1])
     _fit_config = StatusVar(name='fit_config', default=dict())
     _notes = StatusVar(name='notes', default="")
+    _display_channel_column_number = StatusVar(name='display_channel_column_number', default=0)
 
     _sig_get_spectrum = QtCore.Signal(bool)
     
@@ -56,7 +57,13 @@ class ScanningExcitationLogic(LogicBase):
         self._fit_config_model.load_configs(self._fit_config)
         self._fit_container = FitContainer(parent=self, config_model=self._fit_config_model)
         self.fit_region = self._fit_region
-
+        
+        display_channel_is_correct = self._display_channel_column_number in self._scanner().data_column_number
+        if not display_channel_is_correct:
+            self._display_channel_column_number = self._scanner().data_column_number[0]
+        spectrum_shape_is_correct = len(self._spectrum) == len(self._scanner().data_column_names)
+        if not spectrum_shape_is_correct:
+            self._spectrum = [None for _ in range(len(self._scanner().data_column_names))]
         self._sig_get_spectrum.connect(self.get_spectrum, QtCore.Qt.QueuedConnection)
         self._watchdog_timer.setSingleShot(True)
         self._watchdog_timer.timeout.connect(self._watchdog, QtCore.Qt.QueuedConnection)
@@ -77,8 +84,9 @@ class ScanningExcitationLogic(LogicBase):
     def get_spectrum(self, reset=True):
         self._stop_acquisition = False
         if reset:
+            ncols = len(self._scanner().data_column_names)
             with self._lock:
-                self._spectrum = [None,None,None]
+                self._spectrum = [None for _ in range(ncols)]
         self.sig_state_updated.emit()
 
         self._scanner().start_scan()
@@ -109,9 +117,9 @@ class ScanningExcitationLogic(LogicBase):
     @property
     def spectrum(self):
         with self._lock:
-            if self._spectrum[1] is None:
+            if self._spectrum[self._display_channel_column_number] is None:
                 return None
-            return np.copy(self._spectrum[1])
+            return np.copy(self._spectrum[self._display_channel_column_number])
 
     def get_spectrum_at_x(self, x, step_num=0):
         if self.frequency is None or self.spectrum is None:
@@ -122,16 +130,23 @@ class ScanningExcitationLogic(LogicBase):
     @property
     def frequency(self):
         with self._lock:
-            if self._spectrum[0] is None:
+            if self._spectrum[self._scanner().frequency_column_number] is None:
                 return None
-            return np.copy(self._spectrum[0])
+            return np.copy(self._spectrum[self._scanner().frequency_column_number])
         
     @property
     def step_number(self):
         with self._lock:
-            if self._spectrum[2] is None:
+            if self._spectrum[self._scanner().step_number_column_number] is None:
                 return None
-            return np.copy(self._spectrum[2])
+            return np.copy(self._spectrum[self._scanner().step_number_column_number])
+            
+    @property
+    def time(self):
+        with self._lock:
+            if self._spectrum[self._scanner().time_column_number] is None:
+                return None
+        return np.copy(self._spectrum[self._scanner().time_column_number])
 
     def save_spectrum_data(self, name_tag='', root_dir=None, parameter=None):
         """ Saves the current spectrum data to a file.
@@ -169,21 +184,15 @@ class ScanningExcitationLogic(LogicBase):
         med = np.median(self.frequency)
         rescale_factor_freq, prefix_freq = self._get_si_scaling(np.max(self.frequency)-med)
 
-        data = [self.frequency, ]
-        header = [f'Frequency (Hz)', ]
-        
-        # prepare the data
-        if self.spectrum is None:
-            self.log.error('No spectrum to save.')
-            return
-        data.append(self.spectrum)
+        data = []
+        header = []
+        for (colname, colunit, col) in zip(self._scanner().data_column_names, self._scanner().data_column_unit, self._spectrum):
+            if col is None:
+                self.log.error('No spectrum to save.')
+                return
+            data.append(col)
+            header.append(f"{colname} ({colunit})")
         file_label = 'spectrum' + name_tag
-        
-        header.append('Signal')
-        
-        data.append(self.step_number)
-        header.append('Step_Number')
-
         # save the date to file
         ds = TextDataStorage(root_dir=self.module_default_data_dir if root_dir is None else root_dir,
                              include_global_metadata=True)
@@ -197,13 +206,13 @@ class ScanningExcitationLogic(LogicBase):
 
         # save the figure into a file
         figure, ax1 = plt.subplots()
-        rescale_factor, prefix = self._get_si_scaling(np.max(data[1]))
+        rescale_factor, prefix = self._get_si_scaling(np.max(data[self.display_channel_column_number]))
 
         n_step = np.unique(self.step_number)
         for i in n_step:
             roi = self.step_number == i
-            freq = (data[0][roi] - med) / rescale_factor_freq
-            count = data[1][roi] / rescale_factor
+            freq = (self.frequency[roi] - med) / rescale_factor_freq
+            count = self.spectrum[roi] / rescale_factor
             ax1.plot(freq,
                      count,
                      linestyle=':',
@@ -288,6 +297,20 @@ class ScanningExcitationLogic(LogicBase):
     def set_variable(self, name, value):
         self._scanner().set_control(name, value)
         self.sig_scanner_variables_updated.emit()
+
+    def available_channels(self):
+        indices = self._scanner().data_column_number
+        return [self._scanner().data_column_names[i] for i in indices]
+
+    @property
+    def display_channel_column_number(self):
+        return self._display_channel_column_number
+    @display_channel_column_number.setter
+    def display_channel_column_number(self, v):
+        self._display_channel_column_number = v
+        self.sig_data_updated.emit()
+    def set_display_channel_from_name(self, name):
+        self.display_channel_column_number = self._scanner().data_column_names.index(name)
 
     def _watchdog(self):
         try:

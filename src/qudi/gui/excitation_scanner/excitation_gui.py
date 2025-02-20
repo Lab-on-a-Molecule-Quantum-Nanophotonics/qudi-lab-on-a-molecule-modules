@@ -102,12 +102,15 @@ class ScanningExcitationGui(GuiBase):
         self.populate_settings()
         self.update_state()
         self.update_data()
+        available_channels = self._excitation_logic().available_channels()
+        self._mw.data_widget.channel_input_combo_box.addItems(available_channels)
         
         # Connect signals
         self._excitation_logic().sig_data_updated.connect(self.update_data)
         self._excitation_logic().sig_state_updated.connect(self.update_state)
         self._excitation_logic().sig_scanner_variables_updated.connect(self.update_scanner_variables)
         self._excitation_logic().sig_fit_updated.connect(self.update_fit)
+        self._excitation_logic().sig_scanner_state_updated.connect(self.update_scanner_status)
         #
         self._mw.control_widget.sig_toggle_acquisition.connect(self.acquire_spectrum)
         self._mw.control_widget.exposure_spinbox.valueChanged.connect(self.set_exposure)
@@ -119,6 +122,7 @@ class ScanningExcitationGui(GuiBase):
         self._mw.data_widget.fit_region_to.editingFinished.connect(self.fit_region_value_changed)
         self._mw.data_widget.scan_no_fit.editingFinished.connect(self.fit_region_value_changed)
         self._mw.data_widget.target_x.editingFinished.connect(self.target_updated)
+        self._mw.data_widget.channel_input_combo_box.currentTextChanged.connect(self._excitation_logic().set_display_channel_from_name)
 
         self._mw.data_widget.fit_region.sigRegionChangeFinished.connect(self.fit_region_changed)
         self._mw.data_widget.target_point.sigPositionChangeFinished.connect(self.target_changed)
@@ -160,6 +164,8 @@ class ScanningExcitationGui(GuiBase):
         self._mw.data_widget.fit_region_from.editingFinished.disconnect()
         self._mw.data_widget.fit_region_to.editingFinished.disconnect()
         self._mw.data_widget.target_x.editingFinished.disconnect()
+        
+        self._mw.data_widget.channel_input_combo_box.currentTextChanged.disconnect()
 
         self._mw.data_widget.fit_region.sigRegionChangeFinished.disconnect()
         self._mw.data_widget.target_point.sigPositionChangeFinished.disconnect()
@@ -172,6 +178,9 @@ class ScanningExcitationGui(GuiBase):
         self._mw.show()
         self._mw.activateWindow()
         self._mw.raise_()
+        
+    def update_scanner_status(self, st):
+        self._mw.control_widget.status_label.setText(str(st))
         
     def update_all(self):
         self.update_state()

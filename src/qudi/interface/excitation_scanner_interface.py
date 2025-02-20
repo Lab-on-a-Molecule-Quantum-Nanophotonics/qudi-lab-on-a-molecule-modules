@@ -122,6 +122,31 @@ class ExcitationScannerInterface(Base):
     def get_idle_value(self) -> float:
         "Get idle value."
         pass
+    @property
+    @abstractmethod
+    def data_column_names(self):
+        pass
+    @property
+    @abstractmethod
+    def data_column_unit(self):
+        pass
+    @property
+    @abstractmethod
+    def data_column_number(self):
+        pass
+    @property
+    @abstractmethod
+    def frequency_column_number(self):
+        pass
+    @property
+    @abstractmethod
+    def step_number_column_number(self):
+        pass
+    @property
+    @abstractmethod
+    def time_column_number(self):
+        pass
+
     
 class ExcitationScanData:
     pass

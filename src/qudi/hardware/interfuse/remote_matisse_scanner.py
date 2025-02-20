@@ -12,6 +12,7 @@ from qudi.util.network import netobtain
 from PySide2 import QtCore
 from fysom import Fysom
 import numpy as np
+from numpy.polynomial import polynomial
 
 
 class MatisseScanMode(Enum):
@@ -28,8 +29,9 @@ class RemoteMatisseScanner(ExcitationScannerInterface):
     _finite_sampling_input = Connector(name='input', interface='FiniteSamplingInputInterface')
     _matisse = Connector(name='matisse', interface='ProcessControlInterface')
     _matisse_sw = Connector(name='matisse_sw', interface='SwitchInterface')
+    _wavemeter = Connector(name='wavemeter', interface='DataInStreamInterface')
 
-    _input_channel = ConfigOption(name="input_channel")
+    _input_channels = ConfigOption(name="input_channels")
     _chunk_size = ConfigOption(name="chunk_size", default=10)
     _watchdog_delay = ConfigOption(name="watchdog_delay", default=0.2)
 
@@ -72,6 +74,10 @@ class RemoteMatisseScanner(ExcitationScannerInterface):
         self._repeat_no = 0
         self._data_row_index = 0
         self._watchdog_timer = QtCore.QTimer(parent=self)
+        self._conversion_offset = 0.0
+        self._scan_start_time = 0
+        self._step_start_time = 0
+
 
     # Internal utilities
     @property
@@ -134,12 +140,15 @@ class RemoteMatisseScanner(ExcitationScannerInterface):
     @property
     def _scanning(self):
         v = self._matisse_sw().get_state("Scan Status")
-        return netobtain(v)
+        return netobtain(v) == "RUN"
         
             
     @property 
     def _number_of_samples_per_frame(self):
         return round((self._scan_maxi - self._scan_mini) / self._scan_speed / self._exposure_time)
+    @property
+    def _number_of_wavemeter_point_per_frame(self):
+        return round(self._number_of_samples_per_frame * self._exposure_time * self._wavemeter().sample_rate * 1.5)
     def _watchdog(self):
         try:
             time_start = time.perf_counter()
@@ -157,22 +166,38 @@ class RemoteMatisseScanner(ExcitationScannerInterface):
                 n = self._number_of_samples_per_frame
                 self.log.debug(f"Preparing scan from {self._scan_mini} to {self._scan_maxi} with {n} points.")
                 with self._data_lock:
-                    self._scan_data = np.zeros((n*self._n_repeat, 3))
-                    self._scan_data[:,0] = np.tile(np.linspace(start=self._scan_mini, stop=self._scan_maxi, num=n), self._n_repeat)*self._conversion_factor
-                    self._scan_data[:,2] = np.repeat(range(self._n_repeat), n)
+                    self._scan_data = np.zeros((n*self._n_repeat, 3 + len(self._input_channels)))
+                    self._scan_data[:,self.frequency_column_number] = np.tile(np.linspace(start=self._scan_mini, stop=self._scan_maxi, num=n), self._n_repeat)*self._conversion_factor + self._conversion_offset
+                    self._scan_data[:,self.step_number_column_number] = np.repeat(range(self._n_repeat), n)
+                    self._scan_data[:,self.time_column_number] = range(self._n_repeat*n)
+
                 self._repeat_no = 0
                 self._data_row_index = 0
                 self._finite_sampling_input().set_sample_rate(1/self._exposure_time)
                 self._finite_sampling_input().set_frame_size(n)
-                self._finite_sampling_input().set_active_channels((self._input_channel,))
 
+                self._finite_sampling_input().set_active_channels(self._input_channels)
+                self._scan_start_time = time.perf_counter()
                 self.log.debug("Scan prepared.")
                 self.watchdog_event("start_prepare_step")
             elif watchdog_state == "prepare_step": 
                 if self._repeat_no >= self._n_repeat:
+                    poly = polynomial.polyfit(self.scanner_positions, self.sampled_frequencies, deg=1)
+                    self.log.debug(f"Fitted polynomial {poly}.")
+                    if not any(np.isnan(poly)):
+                        self._conversion_offset, self._conversion_factor = poly
+                    self._update_conversion()
                     self.watchdog_event("end_scan")
                     self.log.info("Scan done.")
                 else:
+                    if self._wavemeter().module_state() == 'locked':
+                        self._wavemeter().stop_stream()
+                    self._wavemeter().configure(
+                        active_channels=None,
+                        streaming_mode=None,
+                        channel_buffer_size = max(self._number_of_wavemeter_point_per_frame, self._wavemeter().channel_buffer_size),
+                        sample_rate=None
+                    )
                     if self._finite_sampling_input().module_state() == 'locked':
                         self._finite_sampling_input().stop_buffered_acquisition()
                     self.log.debug("Step prepared, starting wait.")
@@ -191,20 +216,39 @@ class RemoteMatisseScanner(ExcitationScannerInterface):
                     self._matisse_sw().set_state("Scan Status", "RUN")
                     self._finite_sampling_input().start_buffered_acquisition()
                     self.watchdog_event("start_scan_step")
+                    self._wavemeter().start_stream()
+                    self._step_start_time = time.perf_counter()
             elif watchdog_state == "record_scan_step": 
                 samples_missing = self._number_of_samples_per_frame * (self._repeat_no+1) - self._data_row_index
                 if samples_missing <= 0:
+                    self.sampled_frequencies, _ = netobtain(self._wavemeter().read_data())
+                    self.sampled_frequencies = netobtain(self.sampled_frequencies)
+                    self._wavemeter().stop_stream()
+                    self.scanner_positions = np.linspace(start=self._scan_mini, stop=self._scan_maxi, num=len(self.sampled_frequencies))
+                    n = self._number_of_samples_per_frame
+                    offset = n * self._repeat_no
+                    interp = np.interp(
+                        np.linspace(start=self._scan_mini, stop=self._scan_maxi, num=n),
+                        self.scanner_positions,
+                        self.sampled_frequencies
+                    )
+                    self.log.debug(f"Preparing interpolation. interp={interp.shape}, scndata {self._scan_data[offset:(offset+n),self.frequency_column_number].shape}")
+                    self._scan_data[offset:(offset+n),self.frequency_column_number] = interp
+                    self._scan_data[offset:(offset+n),self.time_column_number] = (self._step_start_time - self._scan_start_time) + np.arange(n)*self._exposure_time
                     self._repeat_no += 1
                     self.log.debug("Step done.")
                     self.watchdog_event("step_done")
                 elif self._finite_sampling_input().samples_in_buffer < min(self._chunk_size, samples_missing):
                     pass
                 else:
-                    new_data = self._finite_sampling_input().get_buffered_samples()[self._input_channel]
                     i = self._data_row_index
+                    l = 0
                     with self._data_lock:
-                        self._scan_data[i:i+len(new_data),1] = new_data
-                        self._data_row_index += len(new_data)
+                        new_data = self._finite_sampling_input().get_buffered_samples()
+                        for (chnum, ch) in enumerate(self._input_channels):
+                            self._scan_data[i:i+len(new_data[ch]),3+chnum] = new_data[ch]
+                            l = len(new_data[ch])
+                        self._data_row_index += l
             elif watchdog_state == "stopped": 
                 self.log.debug("stopped")
                 if self._finite_sampling_input().module_state() == 'locked':
@@ -225,18 +269,26 @@ class RemoteMatisseScanner(ExcitationScannerInterface):
             exposure_limits=(1e-4,1),
             repeat_limits=(1,1000),
             idle_value_limits=(0.0, 0.7),
-            control_variables=("Conversion factor", "Minimum scan", "Maximum scan", "Minimum frequency", "Maximum frequency", "Frequency step", "Sleep before scan", "Idle active", "Idle value", "Idle frequency"),
-            control_variable_limits=((0.0, 1e13), scan_limits, scan_limits, (-100e12, 100e12), (-100e12, 100e12), (0.0, 100e12), (0.0, 3000.0), (False, True), scan_limits, (-100e12, 100e12)),
-            control_variable_types=(float, float, float, float, float, float, float, bool, float, float),
-            control_variable_units=("Hz", "", "", "Hz", "Hz", "Hz", "s", "", "", "Hz")
+            control_variables=("Conversion factor", "Conversion offset", "Minimum scan", "Maximum scan", "Minimum frequency", "Maximum frequency", "Frequency step", "Sleep before scan", "Idle active", "Idle value", "Idle frequency"),
+            control_variable_limits=((0.0, 1e17), (0.0, 1e17), scan_limits, scan_limits, (0.0, 1e17), (0, 1e17), (0.0, 1e17), (0.0, 3000.0), (False, True), scan_limits, (-1e17, 1e17)),
+            control_variable_types=(float, float, float, float, float, float, float, float, bool, float, float),
+            control_variable_units=("Hz", "Hz", "", "", "Hz", "Hz", "Hz", "s", "", "", "Hz")
         )
         self.watchdog_event("start_idle")
         self._watchdog_timer.setSingleShot(True)
         self._watchdog_timer.timeout.connect(self._watchdog, QtCore.Qt.QueuedConnection)
         self._watchdog_timer.start(self._watchdog_delay)
+        self._wavemeter().start_stream()
+        time.sleep(1)
+        self._conversion_offset = float(netobtain(self._wavemeter().read_single_point())[0][0])
+        self.log.debug(self._conversion_offset)
+        self._wavemeter().stop_stream()
+        self._update_conversion()
 
     def on_deactivate(self):
         self.watchdog_event("stop_watchdog")
+    def get_frame_size(self):
+        return self._number_of_samples_per_frame
     @property
     def scan_running(self) -> bool:
         "Return True if a scan can be launched."
@@ -256,35 +308,40 @@ class RemoteMatisseScanner(ExcitationScannerInterface):
     def constraints(self) -> ExcitationScannerConstraints:
         "Get the list of control variables for the scanner."
         return self._constraints
+    def _update_conversion(self):
+        freq_mini = self.get_control("Minimum frequency")
+        freq_maxi = self.get_control("Maximum frequency")
+        freq_step = self.get_control("Frequency step")
+        idle_value = self.get_control("Idle frequency")
+        self._scan_mini = max(0.0, (freq_mini-self._conversion_offset)/self._conversion_factor)
+        self._scan_maxi = min(0.7, (freq_maxi-self._conversion_offset)/self._conversion_factor)
+        self._idle_value = min(0.7, max(0.0, (idle_value-self._conversion_offset)/self._conversion_factor))
+        lims = (self._conversion_offset, 0.7*self._conversion_factor + self._conversion_offset)
+        self._constraints.set_limits("Minimum frequency", *lims)
+        self._constraints.set_limits("Maximum frequency", *lims)
+        self._constraints.set_limits("Frequency step", 0, lims[1]-self._conversion_offset)
     def set_control(self, variable: str, value) -> None:
         "Set a control variable value."
         if not self.constraints.variable_in_range(variable, value):
             raise ValueError(f"Cannot set {variable}={value}")
         if variable == "Conversion factor":
-            freq_mini = self.get_control("Minimum frequency")
-            freq_maxi = self.get_control("Maximum frequency")
-            freq_step = self.get_control("Frequency step")
-            idle_value = self.get_control("Idle frequency")
             self._conversion_factor = value
-            self._scan_mini = max(0.0, freq_mini/self._conversion_factor)
-            self._scan_maxi = min(0.7, freq_maxi/self._conversion_factor)
-            self._idle_value = min(0.7, max(0.0, idle_value/self._conversion_factor))
-            lims = (0.0, 0.7*self._conversion_factor)
-            self._constraints.set_limits("Minimum frequency", *lims)
-            self._constraints.set_limits("Maximum frequency", *lims)
-            self._constraints.set_limits("Frequency step", 0, lims[1])
+            self._update_conversion()
+        elif variable == "Conversion offset":
+            self._conversion_offset = value
+            self._update_conversion()
         elif variable == "Minimum scan":
             self._scan_mini = value
         elif variable == "Maximum scan":
             self._scan_maxi = value
         elif variable == "Minimum frequency":
-            self.set_control("Minimum scan", value/self._conversion_factor)
+            self.set_control("Minimum scan", (value-self._conversion_offset)/self._conversion_factor)
         elif variable == "Maximum frequency":
-            self.set_control("Maximum scan", value/self._conversion_factor)
+            self.set_control("Maximum scan", (value-self._conversion_offset)/self._conversion_factor)
         elif variable == "Frequency step":
             val_scan = value/self._conversion_factor
             self._scan_speed = val_scan/self._exposure_time
-            self._fall_speed = 10*val_scan/self._exposure_time
+            self._fall_speed = min(10*val_scan/self._exposure_time, 0.1)
         elif variable == "Sleep before scan":
             self._sleep_time_before_scan = value
         elif variable == "Idle active":
@@ -294,19 +351,21 @@ class RemoteMatisseScanner(ExcitationScannerInterface):
             self._idle_value = value
         elif variable == "Idle frequency":
             self.log.debug(f"Setting idle frequency to {value}")
-            self.set_control("Idle value", value/self._conversion_factor)
+            self.set_control("Idle value", (value-self._conversion_offset)/self._conversion_factor)
     def get_control(self, variable: str):
         "Get a control variable value."
         if variable == "Conversion factor":
             return self._conversion_factor
+        elif variable == "Conversion offset":
+            return self._conversion_offset
         elif variable == "Minimum scan":
             return self._scan_mini
         elif variable == "Maximum scan":
             return self._scan_maxi
         elif variable == "Minimum frequency":
-            return self._scan_mini*self._conversion_factor
+            return self._scan_mini*self._conversion_factor + self._conversion_offset
         elif variable == "Maximum frequency":
-            return self._scan_maxi*self._conversion_factor
+            return self._scan_maxi*self._conversion_factor + self._conversion_offset
         elif variable == "Frequency step":
             return self._scan_speed*self._exposure_time*self._conversion_factor
         elif variable == "Sleep before scan":
@@ -317,12 +376,31 @@ class RemoteMatisseScanner(ExcitationScannerInterface):
         elif variable == "Idle value":
             return self._idle_value
         elif variable == "Idle frequency":
-            return self._idle_value*self._conversion_factor
+            return self._idle_value*self._conversion_factor + self._conversion_offset
         else:
             raise ValueError(f"Unknown variable {variable}")
     def get_current_data(self) -> np.ndarray:
         "Return current scan data."
         return self._scan_data
+    @property
+    def data_column_names(self):
+        return ["Frequency", "Step number", "Time"] + list(self._input_channels)
+    @property
+    def data_column_unit(self):
+        units = self._finite_sampling_input().constraints.channel_units
+        return ["Hz", "", "s"] + [units[ch] for ch in self._input_channels]
+    @property
+    def data_column_number(self):
+        return [i+3 for i in range(len(self._input_channels))]
+    @property
+    def frequency_column_number(self):
+        return 0
+    @property
+    def step_number_column_number(self):
+        return 1
+    @property
+    def time_column_number(self):
+        return 2
     def set_exposure_time(self, time:float) -> None:
         "Set exposure time for one data point."
         if not self.constraints.exposure_in_range(time):
@@ -341,10 +419,10 @@ class RemoteMatisseScanner(ExcitationScannerInterface):
         "Get number of repetition of each segment of the scan."
         return self._n_repeat
     def get_idle_value(self) -> float:
-        return self._idle_value * self._conversion_factor
+        return self._idle_value * self._conversion_factor + self._conversion_offset
     def set_idle_value(self, v):
-        tension = v / self._conversion_factor
+        tension = (v-self._conversion_offset) / self._conversion_factor
         if not self.constraints.idle_value_in_range(tension):
-            raise ValueError(f"Unable to set idle value to {v}")
+            tension=0.0
         self._idle_value = tension
 
