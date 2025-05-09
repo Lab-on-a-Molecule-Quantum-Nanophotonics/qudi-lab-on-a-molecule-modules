@@ -63,6 +63,7 @@ class ScanningExcitationLogic(LogicBase):
             self._display_channel_column_number = self._scanner().data_column_number[0]
         spectrum_shape_is_correct = len(self._spectrum) == len(self._scanner().data_column_names)
         if not spectrum_shape_is_correct:
+            self.log.info("resetting spectrum")
             self._spectrum = [None for _ in range(len(self._scanner().data_column_names))]
         self._sig_get_spectrum.connect(self.get_spectrum, QtCore.Qt.QueuedConnection)
         self._watchdog_timer.setSingleShot(True)
@@ -315,9 +316,10 @@ class ScanningExcitationLogic(LogicBase):
     def _watchdog(self):
         try:
             with self._lock:
+                ncols = len(self._scanner().data_column_names)
                 data = self._scanner().get_current_data()
                 if len(data) > 0:
-                    self._spectrum = [data[:,0], data[:,1], data[:,2]]
+                    self._spectrum = [data[:,i] for i in range(ncols)]
             self.sig_data_updated.emit()
             st = self._scanner().state_display
             self.sig_scanner_state_updated.emit(st)
