@@ -34,6 +34,7 @@ class RemoteMatisseScanner(ExcitationScannerInterface):
     _input_channels = ConfigOption(name="input_channels")
     _chunk_size = ConfigOption(name="chunk_size", default=10)
     _watchdog_delay = ConfigOption(name="watchdog_delay", default=0.2)
+    _max_scan_speed = ConfigOption(name="max_scan_speed", default=0.01)
 
     _scan_data = StatusVar(name="scan_data", default=np.empty((0,3)))
     _exposure_time = StatusVar(name="exposure_time", default=1e-2)
@@ -154,10 +155,13 @@ class RemoteMatisseScanner(ExcitationScannerInterface):
             time_start = time.perf_counter()
             watchdog_state = self.watchdog_state
             if watchdog_state == "prepare_idle": 
-                if self._finite_sampling_input().module_state() == 'locked':
-                    self._finite_sampling_input().stop_buffered_acquisition()
-                if self._matisse_sw().get_state("Scan Status") == "RUN":
-                    self._matisse_sw().set_state("Scan Status", "STOP")
+                try:
+                    if self._finite_sampling_input().module_state() == 'locked':
+                        self._finite_sampling_input().stop_buffered_acquisition()
+                    if self._matisse_sw().get_state("Scan Status") == "RUN":
+                        self._matisse_sw().set_state("Scan Status", "STOP")
+                except Exception as e:
+                    self.log.warn(f"Could not prepare idling: {e}")
                 self.watchdog_event("start_idle")
             elif watchdog_state == "idle": 
                 if self._scan_value != self._idle_value:
@@ -173,10 +177,14 @@ class RemoteMatisseScanner(ExcitationScannerInterface):
 
                 self._repeat_no = 0
                 self._data_row_index = 0
-                self._finite_sampling_input().set_sample_rate(1/self._exposure_time)
-                self._finite_sampling_input().set_frame_size(n)
+                try:
+                    self._finite_sampling_input().set_sample_rate(1/self._exposure_time)
+                    self._finite_sampling_input().set_frame_size(n)
 
-                self._finite_sampling_input().set_active_channels(self._input_channels)
+                    self._finite_sampling_input().set_active_channels(self._input_channels)
+                except Exception as e:
+                    self.log.warn(f"Could not prepare the scan: {e}")
+                    self.watchdog_event("interrupt_scan")
                 self._scan_start_time = time.perf_counter()
                 self.log.debug("Scan prepared.")
                 self.watchdog_event("start_prepare_step")
@@ -190,34 +198,42 @@ class RemoteMatisseScanner(ExcitationScannerInterface):
                     self.watchdog_event("end_scan")
                     self.log.info("Scan done.")
                 else:
-                    if self._wavemeter().module_state() == 'locked':
-                        self._wavemeter().stop_stream()
-                    self._wavemeter().configure(
-                        active_channels=None,
-                        streaming_mode=None,
-                        channel_buffer_size = max(self._number_of_wavemeter_point_per_frame, self._wavemeter().channel_buffer_size),
-                        sample_rate=None
-                    )
-                    if self._finite_sampling_input().module_state() == 'locked':
-                        self._finite_sampling_input().stop_buffered_acquisition()
-                    self.log.debug("Step prepared, starting wait.")
-                    self._waiting_start = time.perf_counter()
-                    if self._scan_value < self._scan_mini:
-                        self._matisse().set_setpoint("scan mode", MatisseScanMode.INCREASE_VOLTAGE_STOP_LOW.value)
-                        self._matisse_sw().set_state("Scan Status", "RUN")
-                    elif self._scan_value > self._scan_mini:
-                        self._matisse().set_setpoint("scan mode", MatisseScanMode.DECREASE_VOLTAGE_STOP_LOW.value)
-                        self._matisse_sw().set_state("Scan Status", "RUN")
-                    self.watchdog_event("start_wait_first_value")
+                    try:
+                        if self._wavemeter().module_state() == 'locked':
+                            self._wavemeter().stop_stream()
+                        self._wavemeter().configure(
+                            active_channels=None,
+                            streaming_mode=None,
+                            channel_buffer_size = max(self._number_of_wavemeter_point_per_frame, self._wavemeter().channel_buffer_size),
+                            sample_rate=None
+                        )
+                        if self._finite_sampling_input().module_state() == 'locked':
+                            self._finite_sampling_input().stop_buffered_acquisition()
+                        self.log.debug("Step prepared, starting wait.")
+                        self._waiting_start = time.perf_counter()
+                        if self._scan_value < self._scan_mini:
+                            self._matisse().set_setpoint("scan mode", MatisseScanMode.INCREASE_VOLTAGE_STOP_LOW.value)
+                            self._matisse_sw().set_state("Scan Status", "RUN")
+                        elif self._scan_value > self._scan_mini:
+                            self._matisse().set_setpoint("scan mode", MatisseScanMode.DECREASE_VOLTAGE_STOP_LOW.value)
+                            self._matisse_sw().set_state("Scan Status", "RUN")
+                        self.watchdog_event("start_wait_first_value")
+                    except Exception as e:
+                        self.log.warn(f"Could not prepare the step: {e}")
+                        self.watchdog_event("interrupt_scan")
             elif watchdog_state == "wait_ready": 
                 if time_start - self._waiting_start > self._sleep_time_before_scan or not self._scanning:
                     self.log.debug("Ready.")
-                    self._matisse().set_setpoint("scan mode", MatisseScanMode.INCREASE_VOLTAGE_STOP_LOW.value)
-                    self._matisse_sw().set_state("Scan Status", "RUN")
-                    self._finite_sampling_input().start_buffered_acquisition()
-                    self.watchdog_event("start_scan_step")
-                    self._wavemeter().start_stream()
-                    self._step_start_time = time.perf_counter()
+                    try:
+                        self._matisse().set_setpoint("scan mode", MatisseScanMode.INCREASE_VOLTAGE_STOP_LOW.value)
+                        self._matisse_sw().set_state("Scan Status", "RUN")
+                        self._finite_sampling_input().start_buffered_acquisition()
+                        self.watchdog_event("start_scan_step")
+                        self._wavemeter().start_stream()
+                        self._step_start_time = time.perf_counter()
+                    except Exception as e:
+                        self.log.warn(f"Could not start the step: {e}")
+                        self.watchdog_event("interrupt_scan")
             elif watchdog_state == "record_scan_step": 
                 samples_missing = self._number_of_samples_per_frame * (self._repeat_no+1) - self._data_row_index
                 if samples_missing <= 0:
@@ -340,8 +356,8 @@ class RemoteMatisseScanner(ExcitationScannerInterface):
             self.set_control("Maximum scan", (value-self._conversion_offset)/self._conversion_factor)
         elif variable == "Frequency step":
             val_scan = value/self._conversion_factor
-            self._scan_speed = val_scan/self._exposure_time
-            self._fall_speed = min(10*val_scan/self._exposure_time, 0.1)
+            self._scan_speed = min(val_scan/self._exposure_time, self._max_scan_speed)
+            self._fall_speed = min(10*val_scan/self._exposure_time, self._max_scan_speed)
         elif variable == "Sleep before scan":
             self._sleep_time_before_scan = value
         elif variable == "Idle active":
