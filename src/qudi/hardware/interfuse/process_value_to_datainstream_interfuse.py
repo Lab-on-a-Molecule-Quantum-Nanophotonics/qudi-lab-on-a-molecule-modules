@@ -19,14 +19,15 @@ class ProcessDataStream(DataInStreamInterface):
         self._sample_rate = 0
         self._buffer = []
         self._timestamps = []
-        self._thread = None
         self._mutex = QMutex()
         self._wait_condition = QWaitCondition()
         self._running = False
         self._start_time = None
+        self._thread = None
 
     def on_activate(self):
         process = self._process()
+        self._thread = self.AcquisitionThread(self)
         if not process:
             raise RuntimeError("ProcessValueInterface is not connected.")
         
@@ -58,7 +59,6 @@ class ProcessDataStream(DataInStreamInterface):
         
         self._running = True
         self._start_time = time.perf_counter()
-        self._thread = self.AcquisitionThread(self)
         self._thread.start()
 
     def stop_stream(self):
@@ -66,7 +66,6 @@ class ProcessDataStream(DataInStreamInterface):
             self._running = False
             self._wait_condition.wakeAll()
             self._thread.wait()
-            self._thread = None
 
     @property
     def constraints(self):
