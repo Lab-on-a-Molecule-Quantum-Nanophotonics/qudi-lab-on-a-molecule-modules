@@ -157,7 +157,7 @@ class RemoteMatisseScanner(ExcitationScannerInterface, SampledFiniteStateInterfa
     def _set_central_frequency(self, v):
         self._last_center_frequency = v
         self._matisse().set_setpoint("go to target", v)
-        self._matisse_sw().set_state("Go To Position", "Running")
+        self._matisse_sw().set_state("Go to Position", "Running")
     @property
     def _go_to_position_procedure_running(self):
         v = self._matisse_sw().get_state("Go To Position")

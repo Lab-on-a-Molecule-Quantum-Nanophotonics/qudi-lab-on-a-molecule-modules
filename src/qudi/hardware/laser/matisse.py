@@ -90,7 +90,7 @@ class MatisseCommander(ProcessControlInterface, SwitchInterface, SampledFiniteSt
     conversionfactor = StatusVar(default=1)
     "Internal status variable to remember the conversion factor between tension and frequency."
     _go_to_target = StatusVar(default=0.0)
-    "Target frequency for the Go To Position procedure"
+    "Target frequency for the Go to Position procedure"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -281,7 +281,7 @@ class MatisseCommander(ProcessControlInterface, SwitchInterface, SampledFiniteSt
             else:
                 v = "STOP"
             self._device.set('SCAN:STATUS', v)
-        elif switch == "Go To Position":
+        elif switch == "Go to Position":
             if self._wavemeter() is None:
                 self.log.error("Cannot perform go to position procedure without a wavemeter connected.")
                 return
