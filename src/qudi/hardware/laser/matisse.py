@@ -133,7 +133,7 @@ class MatisseCommander(ProcessControlInterface, SwitchInterface, SampledFiniteSt
 
     def on_deactivate(self):
         retry = 5
-        while self._watchdog_state != "idle":
+        while self.watchdog_state != "idle":
             if retry < 0:
                 break
             self.watchdog_event("stop")
@@ -142,6 +142,7 @@ class MatisseCommander(ProcessControlInterface, SwitchInterface, SampledFiniteSt
         self.disable_watchdog()
         if self._device is not None:
             self._device.disconnect()
+            self._device = None
 
     @property
     def _current_frequency(self) -> Union[None, float]:
@@ -259,13 +260,15 @@ class MatisseCommander(ProcessControlInterface, SwitchInterface, SampledFiniteSt
         }
     def get_state(self, switch):
         if switch == "Scan Status":
+            if self.watchdog_state != "idle":
+                return "STOP"
             v = self._device.query('SCAN:STATUS')
             if v == MatisseControlStatus.RUN:
                 return "RUN"
             else:
                 return "STOP"
         elif switch == "Go to Position":
-            if self._watchdog_state == "idle":
+            if self.watchdog_state == "idle":
                 return "Idle"
             else:
                 return "Running"
