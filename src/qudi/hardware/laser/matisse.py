@@ -40,7 +40,7 @@ class MatisseCommanderGoToConfiguration:
     pzetl_relaxation: float = 1000 # ms (default)
     spzt_lower_point: float = 0.01 # (default)
     spzt_upper_point: float = 0.65 # (default)
-    precision: float = 0.5 # (GHz)
+    precision: float = 7 # (GHz)
 
 class MatisseCommander(ProcessControlInterface, SwitchInterface, SampledFiniteStateInterface):
     """
@@ -74,7 +74,7 @@ class MatisseCommander(ProcessControlInterface, SwitchInterface, SampledFiniteSt
                 pzetl_relaxation: float = 1000 # ms (default)
                 spzt_lower_point: 0.01 # (default)
                 spzt_upper_point: 0.65 # (default)
-                precision: 0.5 # (GHz)
+                precision: 7 # (GHz)
     ```
     """
     _wavemeter = Connector(name='wavemeter', interface='DataInStreamInterface', optional = True)
@@ -110,6 +110,7 @@ class MatisseCommander(ProcessControlInterface, SwitchInterface, SampledFiniteSt
         self._pzetl_previous_error = np.inf
         self._te_previous_error = np.inf
         self._bifi_reset_countdown = 0
+        self._scan_device = 0
 
     # Qudi base 
     def on_activate(self):
@@ -333,6 +334,8 @@ class MatisseCommander(ProcessControlInterface, SwitchInterface, SampledFiniteSt
         self.log.info("Resetting piezo etalon")
         self._device.set('PIEZOETALON:BASELINE', (self._go_to_position_config.pzetl_lower_point + self._go_to_position_config.pzetl_upper_point)/2)
         self.log.info("Resetting slow piezo")
+        self._scan_device = self._device.query("SCAN:DEVICE")
+        self._device.set("SCAN:DEVICE", 0)
         self._device.set("SLOWPIEZO:NOW", (self._go_to_position_config.spzt_lower_point + self._go_to_position_config.spzt_upper_point)/2)
         if self._wavemeter().module_state() != 'locked':
             self._wavemeter().start_stream()
@@ -485,7 +488,6 @@ class MatisseCommander(ProcessControlInterface, SwitchInterface, SampledFiniteSt
     @state
     @transition_to(("next", "prepare_pzetl_scan"))
     @transition_to(("reoptimize_bifi", "prepare_bifi_scan"))
-    @transition_to(("redo", "prepare_te_scan"))
     def choose_te_position(self):
         """
         Choose the best thin etalon position based on the latest thin etalon scan.
@@ -512,10 +514,6 @@ class MatisseCommander(ProcessControlInterface, SwitchInterface, SampledFiniteSt
             if np.abs(delta) < self._go_to_position_config.pzetl_free_spectral_range*1e9: 
                 self.log.info(f"thin etalon step successful (delta: {delta*1e-9} GHz)")
                 self.watchdog_event("next")
-            elif np.abs(delta) < self._go_to_position_config.thin_etalon_free_spectral_range*1e9: 
-                self.log.info(f"Redoing TE scan (delta: {delta*1e-9} GHz)")
-                self._device.set('MOTORTHINETALON:POSITION', self._go_to_position_config.thin_etalon_signal_start)
-                self.watchdog_event("redo")
             else:
                 self.log.info(f"Resetting BiFi (delta: {delta*1e-9} GHz)")
                 self._reoptimize_bifi = True
@@ -656,6 +654,7 @@ class MatisseCommander(ProcessControlInterface, SwitchInterface, SampledFiniteSt
             self._device.set('PIEZOETALON:BASELINE', (self._go_to_position_config.pzetl_lower_point + self._go_to_position_config.pzetl_upper_point)/2)
             self.log.info("Resetting slow piezo")
             self._device.set("SLOWPIEZO:NOW", (self._go_to_position_config.spzt_lower_point + self._go_to_position_config.spzt_upper_point)/2)
+            self._device.set("SCAN:DEVICE", self._scan_device)
             self._relax_timer = time.perf_counter()
         elif time.perf_counter() - self._relax_timer < self._go_to_position_config.pzetl_relaxation/1000:
             pass
