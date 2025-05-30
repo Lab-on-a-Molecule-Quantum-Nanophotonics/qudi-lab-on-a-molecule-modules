@@ -217,6 +217,9 @@ class MatisseCommander(ProcessControlInterface, SwitchInterface, SampledFiniteSt
         else:
             raise ValueError(f'Invalid process channel specifier "{channel}".')
     def get_setpoint(self, channel):
+        if self.watchdog_state != "idle" and channel not in ("conversion factor", "go to target"):
+            self.log.warn("Go to position procedure in progress, cannot query {channel} to {value}.")
+            return
         if channel == "piezo ref cell":
             return self._device.piezo_ref_cell
         elif channel == "piezo slow":
@@ -242,6 +245,16 @@ class MatisseCommander(ProcessControlInterface, SwitchInterface, SampledFiniteSt
     def get_activity_state(self, channel):
         if channel == "scan value":
             return self._idle_activated
+        require_communication = set([
+            "scan rising speed",
+            "scan falling speed",
+            "scan lower limit",
+            "scan upper limit",
+            "scan mode",
+            "scan value",
+        ])
+        if self.watchdog_state != "idle" and channel in require_communication:
+            return False
         return True
     def set_activity_state(self, channel, active):
         if channel == "scan value":
