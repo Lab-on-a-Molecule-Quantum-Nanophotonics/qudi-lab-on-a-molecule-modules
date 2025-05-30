@@ -389,7 +389,10 @@ class RemoteMatisseScanner(ExcitationScannerInterface, SampledFiniteStateInterfa
                 ExcitationScanControlVariable("Stitching last central frequency", (0.0, 1e17), float, "Hz"),
             ]
         )
-
+        number_of_columns = 4 + len(self._input_channels)
+        if len(self._scan_data.shape) != 2 or (len(self._scan_data.shape) == 2 and self._scan_data.shape[1] != number_of_columns):
+            self.log.debug("Wrong shape of stored data, discarding.")
+            self._scan_data = np.empty((0, number_of_columns))
         self.enable_watchdog()
         self.start_watchdog()
         self._wavemeter().start_stream()
