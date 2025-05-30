@@ -326,8 +326,8 @@ class NIXSeriesFiniteSamplingIO(FiniteSamplingIOInterface):
         if analog_sources:
             adc_voltage_ranges = {self._extract_terminal(key): value
                                   for key, value in self._adc_voltage_ranges.items()}
-
-            input_limits.update(adc_voltage_ranges)
+            input_keys = [self._extract_terminal(key) for key in analog_sources]
+            input_limits.update({key: adc_voltage_ranges[key] for key in input_keys})
 
         if digital_outputs:
             self._output_channel_units.update({ch: "" for ch in digital_outputs})  # digital outputs have no unit
