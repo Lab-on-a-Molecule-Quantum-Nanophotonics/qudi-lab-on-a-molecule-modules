@@ -78,6 +78,8 @@ class RemoteMatisseScanner(ExcitationScannerInterface, SampledFiniteStateInterfa
     "First central frequency used when stitching."
     _stitching_last_frequency = StatusVar(name="stitching_last_frequency", default=0.0)
     "Last central frequency used when stitching."
+    _last_known_scan_parameters = StatusVar(name="last_known_scan_parameters", default={})
+    "Caching dict to use when we cannot query the laser."
 
     _scanning_states = {"prepare_scan", "prepare_step", "wait_ready", "go_to_position", "record_scan_step"}
     "States that are considering as scanning when reporting."
@@ -101,55 +103,54 @@ class RemoteMatisseScanner(ExcitationScannerInterface, SampledFiniteStateInterfa
         self._stitch_buffer_row_index = 0
 
     # Internal data querying utilities
+    def _query_laser(self, name):
+        active = self._matisse().get_activity_state(name)
+        if not active:
+            return self._last_known_scan_parameters.get(name, 0.0)
+        v = netobtain(self._matisse().get_setpoint(name))
+        self._last_known_scan_parameters[name] = v
+        return v
+    def _set_laser(self, name, v):
+        active = self._matisse().get_activity_state(name)
+        if not active:
+            return 
+        self._matisse().set_setpoint(name, v)
     @property
     def _scan_mini(self):
-        v = self._matisse().get_setpoint("scan lower limit")
-        return netobtain(v)
+        return self._query_laser("scan lower limit")
     @_scan_mini.setter
     def _scan_mini(self, v):
-        self._matisse().set_setpoint("scan lower limit", v)
+        self._set_laser("scan lower limit", v)
     @property
     def _scan_maxi(self):
-        v = self._matisse().get_setpoint("scan upper limit")
-        return netobtain(v)
+        return self._query_laser("scan upper limit")
     @_scan_maxi.setter
     def _scan_maxi(self, v):
-        self._matisse().set_setpoint("scan upper limit", v)
+        self._set_laser("scan upper limit", v)
     @property
     def _conversion_factor(self):
-        v = self._matisse().get_setpoint("conversion factor")
-        return netobtain(v)
+        return self._query_laser("conversion factor")
     @_conversion_factor.setter
     def _conversion_factor(self, v):
-        self._matisse().set_setpoint("conversion factor", v)
+        self._set_laser("conversion factor", v)
     @property
     def _scan_speed(self):
-        v = self._matisse().get_setpoint("scan rising speed")
-        return netobtain(v)
+        return self._query_laser("scan rising speed")
     @_scan_speed.setter
     def _scan_speed(self, value):
-        self._matisse().set_setpoint("scan rising speed", value)
-    @property
-    def _scan_speed(self):
-        v = self._matisse().get_setpoint("scan rising speed")
-        return netobtain(v)
-    @_scan_speed.setter
-    def _scan_speed(self, value):
-        self._matisse().set_setpoint("scan rising speed", value)
+        self._set_laser("scan rising speed", value)
     @property
     def _fall_speed(self):
-        v = self._matisse().get_setpoint("scan falling speed")
-        return netobtain(v)
+        return self._query_laser("scan falling speed")
     @_fall_speed.setter
     def _fall_speed(self, value):
-        self._matisse().set_setpoint("scan falling speed", value)
+        self._set_laser("scan falling speed", value)
     @property
     def _scan_value(self):
-        v = self._matisse().get_setpoint("scan value")
-        return netobtain(v)
+        return self._query_laser("scan value")
     @_scan_value.setter
     def _scan_value(self, v):
-        self._matisse().set_setpoint("scan value", v)
+        self._set_laser("scan value", v)
     @property
     def _scanning(self):
         v = self._matisse_sw().get_state("Scan Status")
@@ -245,7 +246,7 @@ class RemoteMatisseScanner(ExcitationScannerInterface, SampledFiniteStateInterfa
             if not any(np.isnan(poly)):
                 self._conversion_offset, self._conversion_factor = poly
             self._update_conversion()
-            if not self.stitching_enabled or self._last_center_frequency == self._stitching_last_frequency:
+            if not self.stitching_enabled or self._last_center_frequency >= self._stitching_last_frequency:
                 self.watchdog_event("end")
                 self.log.info("Scan done.")
                 return
