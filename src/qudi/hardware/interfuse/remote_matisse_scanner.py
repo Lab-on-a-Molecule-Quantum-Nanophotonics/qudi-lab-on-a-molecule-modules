@@ -157,10 +157,10 @@ class RemoteMatisseScanner(ExcitationScannerInterface, SampledFiniteStateInterfa
     def _set_central_frequency(self, v):
         self._last_center_frequency = v
         self._matisse().set_setpoint("go to target", v)
-        self._matisse_sw().set_state("Go To Position", "Running")
+        self._matisse_sw().set_state("Go to Position", "Running")
     @property
     def _go_to_position_procedure_running(self):
-        v = self._matisse_sw().get_state("Go To Position")
+        v = self._matisse_sw().get_state("Go to Position")
         return netobtain(v) == "Running"
 
     @property 
@@ -193,7 +193,7 @@ class RemoteMatisseScanner(ExcitationScannerInterface, SampledFiniteStateInterfa
             if self._matisse_sw().get_state("Scan Status") == "RUN":
                 self._matisse_sw().set_state("Scan Status", "STOP")
             if self._go_to_position_procedure_running:
-                self._matisse_sw().set_state("Go To Position", "Idle")
+                self._matisse_sw().set_state("Go to Position", "Idle")
         except Exception as e:
             self.log.warn(f"Could not prepare idling: {e}")
         self.watchdog_event("start_idle")
