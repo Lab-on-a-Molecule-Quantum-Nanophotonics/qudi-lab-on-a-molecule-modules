@@ -372,6 +372,9 @@ class RemoteMatisseScanner(ExcitationScannerInterface, SampledFiniteStateInterfa
         self._scan_mini = max(0.0, (freq_mini-self._conversion_offset)/self._conversion_factor)
         self._scan_maxi = min(0.7, (freq_maxi-self._conversion_offset)/self._conversion_factor)
         self._idle_value = min(0.7, max(0.0, (idle_value-self._conversion_offset)/self._conversion_factor))
+        val_scan = freq_step/self._conversion_factor
+        self._scan_speed = min(val_scan/self._exposure_time, self._max_scan_speed)
+        self._fall_speed = min(10*val_scan/self._exposure_time, self._max_scan_speed)
         lims = (self._conversion_offset, 0.7*self._conversion_factor + self._conversion_offset)
         self._constraints.set_limits("Minimum frequency", *lims)
         self._constraints.set_limits("Maximum frequency", *lims)
