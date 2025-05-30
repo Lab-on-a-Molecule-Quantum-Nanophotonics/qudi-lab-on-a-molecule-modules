@@ -62,7 +62,7 @@ class RemoteMatisseScanner(ExcitationScannerInterface, SampledFiniteStateInterfa
     _max_scan_speed = ConfigOption(name="max_scan_speed", default=0.01)
     "Limitation on the maximum scan speed."
 
-    _scan_data = StatusVar(name="scan_data", default=np.empty((0,3)))
+    _scan_data = StatusVar(name="scan_data", default=np.empty((0,4)))
     "Internal data cache."
     _exposure_time = StatusVar(name="exposure_time", default=1e-2)
     "How long one frequency is exposed."
@@ -72,10 +72,18 @@ class RemoteMatisseScanner(ExcitationScannerInterface, SampledFiniteStateInterfa
     "How many times do we scan the frequency range."
     _idle_value = StatusVar(name="idle_value", default=0.4)
     "What should be the value while idling."
+    _stitching_enabled = StatusVar(name="stitching_enabled", default=False)
+    "Should we stitch several scan range to scan more frequencies?"
+    _stitching_first_frequency = StatusVar(name="stitching_first_frequency", default=0.0)
+    "First central frequency used when stitching."
+    _stitching_last_frequency = StatusVar(name="stitching_last_frequency", default=0.0)
+    "Last central frequency used when stitching."
 
-    _scanning_states = {"prepare_scan", "prepare_step", "wait_ready", "record_scan_step"}
+    _scanning_states = {"prepare_scan", "prepare_step", "wait_ready", "go_to_position", "record_scan_step"}
     "States that are considering as scanning when reporting."
     _initial_state = "prepare_idle"
+
+    _stitch_column_number = 3
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -87,6 +95,10 @@ class RemoteMatisseScanner(ExcitationScannerInterface, SampledFiniteStateInterfa
         self._conversion_offset = 0.0
         self._scan_start_time = 0
         self._step_start_time = 0
+        self._last_center_frequency = 0.0
+        self._stitch_no = 0
+        self._last_prepared_stitch = -1
+        self._stitch_buffer_row_index = 0
 
     # Internal data querying utilities
     @property
@@ -142,6 +154,14 @@ class RemoteMatisseScanner(ExcitationScannerInterface, SampledFiniteStateInterfa
     def _scanning(self):
         v = self._matisse_sw().get_state("Scan Status")
         return netobtain(v) == "RUN"
+    def _set_central_frequency(self, v):
+        self._last_center_frequency = v
+        self._matisse().set_setpoint("go to target", v)
+        self._matisse_sw().set_state("Go To Position", "Running")
+    @property
+    def _go_to_position_procedure_running(self):
+        v = self._matisse_sw().get_state("Go To Position")
+        return netobtain(v) == "Running"
 
     @property 
     def _number_of_samples_per_frame(self):
@@ -150,10 +170,19 @@ class RemoteMatisseScanner(ExcitationScannerInterface, SampledFiniteStateInterfa
     def _number_of_wavemeter_point_per_frame(self):
         return round(self._number_of_samples_per_frame * self._exposure_time * self._wavemeter().sample_rate * 1.5)
 
+    def _init_stitch_buffer(self):
+        n = self._number_of_samples_per_frame
+        stitch_buffer = np.zeros((n*self._n_repeat, 4 + len(self._input_channels)))
+        stitch_buffer[:,self.frequency_column_number] = np.tile(np.linspace(start=self._scan_mini, stop=self._scan_maxi, num=n), self._n_repeat)*self._conversion_factor + self._conversion_offset
+        stitch_buffer[:,self.step_number_column_number] = np.repeat(range(self._n_repeat), n)
+        stitch_buffer[:,self.time_column_number] = range(self._n_repeat*n)
+        stitch_buffer[:,self._stitch_column_number] = self._stitch_no
+        return stitch_buffer
+
     # SampledFiniteStateInterface
     @state
     @transition_to(("start_idle", "idle"))
-    @transition_from(("interrupt", ["prepare_scan", "prepare_step", "wait_ready", "record_scan_step"]))
+    @transition_from(("interrupt", ["prepare_scan", "prepare_step", "wait_ready", "go_to_position", "record_scan_step"]))
     def prepare_idle(self):
         """Prepare idling mode. We stop all acquisitions and stop scanning.
         In case of failure, a warning is issued and we proceed to the idle mode.
@@ -163,6 +192,8 @@ class RemoteMatisseScanner(ExcitationScannerInterface, SampledFiniteStateInterfa
                 self._finite_sampling_input().stop_buffered_acquisition()
             if self._matisse_sw().get_state("Scan Status") == "RUN":
                 self._matisse_sw().set_state("Scan Status", "STOP")
+            if self._go_to_position_procedure_running:
+                self._matisse_sw().set_state("Go To Position", "Idle")
         except Exception as e:
             self.log.warn(f"Could not prepare idling: {e}")
         self.watchdog_event("start_idle")
@@ -181,12 +212,10 @@ class RemoteMatisseScanner(ExcitationScannerInterface, SampledFiniteStateInterfa
         """
         n = self._number_of_samples_per_frame
         self.log.debug(f"Preparing scan from {self._scan_mini} to {self._scan_maxi} with {n} points.")
-        with self._data_lock:
-            self._scan_data = np.zeros((n*self._n_repeat, 3 + len(self._input_channels)))
-            self._scan_data[:,self.frequency_column_number] = np.tile(np.linspace(start=self._scan_mini, stop=self._scan_maxi, num=n), self._n_repeat)*self._conversion_factor + self._conversion_offset
-            self._scan_data[:,self.step_number_column_number] = np.repeat(range(self._n_repeat), n)
-            self._scan_data[:,self.time_column_number] = range(self._n_repeat*n)
+        self._scan_data = np.empty((0, 4 + len(self._input_channels)))
 
+        self._stitch_no = 0
+        self._last_prepared_stitch = -1
         self._repeat_no = 0
         self._data_row_index = 0
         try:
@@ -202,44 +231,71 @@ class RemoteMatisseScanner(ExcitationScannerInterface, SampledFiniteStateInterfa
         self.watchdog_event("next")
     @state
     @transition_to(("next", "wait_ready"))
+    @transition_to(("go to position", "go_to_position"))
     @transition_to(("end", "prepare_idle"))
     def prepare_step(self):
         """Prepare a specific scan step. We first check if we have already run 
         all requested steps, in which cas we go back to preparing idling. Otherwise,
         we initialize the instruments, and move the scanner to its first position.
         """
+        next_central_frequency = self._stitching_first_frequency
         if self._repeat_no >= self._n_repeat:
             poly = polynomial.polyfit(self.scanner_positions, self.sampled_frequencies, deg=1)
             self.log.debug(f"Fitted polynomial {poly}.")
             if not any(np.isnan(poly)):
                 self._conversion_offset, self._conversion_factor = poly
             self._update_conversion()
-            self.watchdog_event("end")
-            self.log.info("Scan done.")
-        else:
-            try:
-                if self._wavemeter().module_state() == 'locked':
-                    self._wavemeter().stop_stream()
-                self._wavemeter().configure(
-                    active_channels=None,
-                    streaming_mode=None,
-                    channel_buffer_size = max(self._number_of_wavemeter_point_per_frame, self._wavemeter().channel_buffer_size),
-                    sample_rate=None
-                )
-                if self._finite_sampling_input().module_state() == 'locked':
-                    self._finite_sampling_input().stop_buffered_acquisition()
-                self.log.debug("Step prepared, starting wait.")
-                self._waiting_start = time.perf_counter()
-                if self._scan_value < self._scan_mini:
-                    self._matisse().set_setpoint("scan mode", MatisseScanMode.INCREASE_VOLTAGE_STOP_LOW.value)
-                    self._matisse_sw().set_state("Scan Status", "RUN")
-                elif self._scan_value > self._scan_mini:
-                    self._matisse().set_setpoint("scan mode", MatisseScanMode.DECREASE_VOLTAGE_STOP_LOW.value)
-                    self._matisse_sw().set_state("Scan Status", "RUN")
-                self.watchdog_event("next")
-            except Exception as e:
-                self.log.warn(f"Could not prepare the step: {e}")
-                self.watchdog_event("interrupt")
+            if not self.stitching_enabled or self._last_center_frequency == self._stitching_last_frequency:
+                self.watchdog_event("end")
+                self.log.info("Scan done.")
+                return
+            else:
+                next_central_frequency = max(self.sampled_frequencies)
+                self._stitch_no += 1
+        if self._last_prepared_stitch != self._stitch_no:
+            stitch_buffer = self._init_stitch_buffer()
+            self._repeat_no = 0
+            self._data_row_index = 0
+            with self._data_lock:
+                self._stitch_buffer_row_index = self._scan_data.shape[0]
+                self._scan_data = np.vstack((self._scan_data, stitch_buffer))
+            if self._stitching_enabled:
+                self._set_central_frequency(next_central_frequency)
+                self.watchdog_event("go to position")
+                return
+            else:
+                self._last_prepared_stitch = self._stitch_no
+        try:
+            if self._wavemeter().module_state() == 'locked':
+                self._wavemeter().stop_stream()
+            self._wavemeter().configure(
+                active_channels=None,
+                streaming_mode=None,
+                channel_buffer_size = max(self._number_of_wavemeter_point_per_frame, self._wavemeter().channel_buffer_size),
+                sample_rate=None
+            )
+            if self._finite_sampling_input().module_state() == 'locked':
+                self._finite_sampling_input().stop_buffered_acquisition()
+            self.log.debug("Step prepared, starting wait.")
+            self._waiting_start = time.perf_counter()
+            if self._scan_value < self._scan_mini:
+                self._matisse().set_setpoint("scan mode", MatisseScanMode.INCREASE_VOLTAGE_STOP_LOW.value)
+                self._matisse_sw().set_state("Scan Status", "RUN")
+            elif self._scan_value > self._scan_mini:
+                self._matisse().set_setpoint("scan mode", MatisseScanMode.DECREASE_VOLTAGE_STOP_LOW.value)
+                self._matisse_sw().set_state("Scan Status", "RUN")
+            self.watchdog_event("next")
+        except Exception as e:
+            self.log.warn(f"Could not prepare the step: {e}")
+            self.watchdog_event("interrupt")
+    @state
+    @transition_to(("next", "prepare_step"))
+    def go_to_position(self):
+        """Wait for the laser to reach its new central frequency."""
+        # We wait at least 1s to be sure.
+        if time.perf_counter() - self._waiting_start > 1 and not self._go_to_position_procedure_running:
+            self._last_prepared_stitch = self._stitch_no
+            self.watchdog_event("next")
     @state
     @transition_to(("next", "record_scan_step"))
     def wait_ready(self):
@@ -247,7 +303,7 @@ class RemoteMatisseScanner(ExcitationScannerInterface, SampledFiniteStateInterfa
         after which we give up to avoid getting stuck.
         """
         if time.perf_counter() - self._waiting_start > self._sleep_time_before_scan:
-                self.log.warn(f"Time before scan exceeded, giving up.")
+                self.log.warn("Time before scan exceeded, giving up.")
                 self.watchdog_event("interrupt")
         elif not self._scanning:
             self.log.debug("Ready.")
@@ -274,7 +330,7 @@ class RemoteMatisseScanner(ExcitationScannerInterface, SampledFiniteStateInterfa
             self._wavemeter().stop_stream()
             self.scanner_positions = np.linspace(start=self._scan_mini, stop=self._scan_maxi, num=len(self.sampled_frequencies))
             n = self._number_of_samples_per_frame
-            offset = n * self._repeat_no
+            offset = n * self._repeat_no + self._stitch_buffer_row_index
             interp = np.interp(
                 np.linspace(start=self._scan_mini, stop=self._scan_maxi, num=n),
                 self.scanner_positions,
@@ -289,14 +345,14 @@ class RemoteMatisseScanner(ExcitationScannerInterface, SampledFiniteStateInterfa
         elif self._finite_sampling_input().samples_in_buffer < min(self._chunk_size, samples_missing):
             pass
         else:
-            i = self._data_row_index
-            l = 0
+            i = self._data_row_index + self._stitch_buffer_row_index
+            new_data_length = 0
             with self._data_lock:
                 new_data = self._finite_sampling_input().get_buffered_samples()
                 for (chnum, ch) in enumerate(self._input_channels):
                     self._scan_data[i:i+len(new_data[ch]),3+chnum] = new_data[ch]
-                    l = len(new_data[ch])
-                self._data_row_index += l
+                    new_data_length = len(new_data[ch])
+                self._data_row_index += new_data_length
     @state
     @transition_from(("stop", "*"))
     @transition_to(("start_idle", "prepare_idle"))
@@ -328,6 +384,9 @@ class RemoteMatisseScanner(ExcitationScannerInterface, SampledFiniteStateInterfa
                 ExcitationScanControlVariable("Idle active", (False, True), bool, ""),
                 ExcitationScanControlVariable("Idle value", scan_limits, float, ""),
                 ExcitationScanControlVariable("Idle frequency", scan_limits, float, "Hz"),
+                ExcitationScanControlVariable("Stitch scans", (False, True), bool, ""),
+                ExcitationScanControlVariable("Stitching first central frequency", (0.0, 1e17), float, "Hz"),
+                ExcitationScanControlVariable("Stitching last central frequency", (0.0, 1e17), float, "Hz"),
             ]
         )
 
@@ -408,9 +467,14 @@ class RemoteMatisseScanner(ExcitationScannerInterface, SampledFiniteStateInterfa
         elif variable == "Idle value":
             self.log.debug(f"Setting idle value to {value}")
             self._idle_value = value
-        elif variable == "Idle frequency":
-            self.log.debug(f"Setting idle frequency to {value}")
-            self.set_control("Idle value", (value-self._conversion_offset)/self._conversion_factor)
+        elif variable == "Idle active":
+            self._matisse().set_activity_state("scan value", value)
+        elif variable == "Stitch scans":
+            self._stitching_enabled = value
+        elif variable == "Stitching first central frequency":
+            self._stitching_first_frequency = value
+        elif variable == "Stitching last central frequency":
+            self._stitching_last_frequency = value
     def get_control(self, variable: str):
         "Get a control variable value."
         if variable == "Conversion factor":
@@ -436,6 +500,12 @@ class RemoteMatisseScanner(ExcitationScannerInterface, SampledFiniteStateInterfa
             return self._idle_value
         elif variable == "Idle frequency":
             return self._idle_value*self._conversion_factor + self._conversion_offset
+        elif variable == "Stitch scans":
+            return self._stitching_enabled
+        elif variable == "Stitching first central frequency":
+            return self._stitching_first_frequency
+        elif variable == "Stitching last central frequency":
+            return self._stitching_last_frequency
         else:
             raise ValueError(f"Unknown variable {variable}")
     def get_current_data(self) -> np.ndarray:
@@ -473,9 +543,9 @@ class RemoteMatisseScanner(ExcitationScannerInterface, SampledFiniteStateInterfa
                 frequency_column_number=0,
                 step_number_column_number=1,
                 time_column_number=2,
-                data_column_number=[i+3 for i in range(len(self._input_channels))],
-                data_column_unit=["Hz", "", "s"] + [units[ch] for ch in self._input_channels],
-                data_column_names=["Frequency", "Step number", "Time"] + list(self._input_channels)
+                data_column_number=[i+4 for i in range(len(self._input_channels))],
+                data_column_unit=["Hz", "", "s", ""] + [units[ch] for ch in self._input_channels],
+                data_column_names=["Frequency", "Step number", "Time", "Stitch number"] + list(self._input_channels)
             )
 
 
