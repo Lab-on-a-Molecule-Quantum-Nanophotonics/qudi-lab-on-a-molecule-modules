@@ -389,7 +389,6 @@ class ScanningExcitationLogic(LogicBase):
         frequency = self.frequency[roi]
         start = np.searchsorted(frequency, self._fit_region[0], 'left')
         end = np.searchsorted(frequency, self._fit_region[1], 'right')
-
         if end - start < 2:
             self.log.error('Fit region limited the data to less than two points. Fit not possible.')
             self.sig_fit_updated.emit('No Fit', None)
