@@ -385,18 +385,20 @@ class ScanningExcitationLogic(LogicBase):
             return 'No Fit', None
 
         step_num = self._fit_region[2]
-        roi = self.step_number == step_num
-        frequency = self.frequency[roi]
-        start = np.searchsorted(frequency, self._fit_region[0], 'left')
-        end = np.searchsorted(frequency, self._fit_region[1], 'right')
-        if end - start < 2:
+        roi_step = self.step_number == step_num
+        frequency = self.frequency[roi_step]
+        roi = (self._fit_region[0] <= frequency) & (frequency <= self._fit_region[1])
+        
+        self.log.debug("Roi built")
+        if not roi.any():
             self.log.error('Fit region limited the data to less than two points. Fit not possible.')
             self.sig_fit_updated.emit('No Fit', None)
             return 'No Fit', None
+        self.log.debug("Roi selected")
 
-        frequency = frequency[start:end]
-        y_data = self.spectrum[roi][start:end]
-        self.log.debug(f"Fitting from {start} to {end}")
+        frequency = frequency[roi]
+        y_data = self.spectrum[roi_step][roi]
+        self.log.debug("Data selected")
 
         try:
             self._fit_method, self._fit_results = self._fit_container.fit_data(fit_method, frequency, y_data)
