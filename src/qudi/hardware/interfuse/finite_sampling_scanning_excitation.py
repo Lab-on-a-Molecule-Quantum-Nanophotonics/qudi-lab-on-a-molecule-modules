@@ -24,6 +24,8 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface, Samp
         connect:
             scan_hardware: ni_finite_sampling_io
             analog_output: ni_analog_output # to control the idle value of the laser
+            external_process: cryostation # optional
+            external_setpoint: cryostation # optional
         config:
             maximum_tension: 10 # V (default)
             minimum_tension: -10 # V (default)
@@ -31,10 +33,14 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface, Samp
             output_channel: 'ao1' # required
             input_channel: 'pfi1' # required
             chunk_size: 10 # default
+            process_channel: "" # required if an external process is connected
+            setpoint_channel: "" # required if an external setpoint is connected
     ```
     """
     _finite_sampling_io = Connector(name='scan_hardware', interface='FiniteSamplingIOInterface')
     _ao = Connector(name='analog_output', interface='ProcessSetpointInterface')
+    _ext_process = Connector(name='external_process', interface='ProcessValueInterface', optional=True)
+    _ext_setpoint = Connector(name='external_setpoint', interface='ProcessSetpointInterface', optional=True)
 
     _maximum_tension = ConfigOption(name="maximum_tension", default=10)
     _minimum_tension = ConfigOption(name="minimum_tension", default=-10)
@@ -42,6 +48,8 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface, Samp
     _output_channel = ConfigOption(name="output_channel")
     _input_channel = ConfigOption(name="input_channel")
     _chunk_size = ConfigOption(name="chunk_size", default=10)
+    _process_channel = ConfigOption(name="process_channel", default=None)
+    _setpoint_channel = ConfigOption(name="setpoint_channel", default=None)
 
     _scan_data = StatusVar(name="scan_data", default=np.empty((0,3)))
     _conversion_factor = StatusVar(name="conversion_factor", default=13.1378e9)
@@ -52,6 +60,10 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface, Samp
     _sleep_time_before_scan = StatusVar(name="sleep_time_before_scan", default=5)
     _n_repeat = StatusVar(name="n_repeat", default=1)
     _idle_value = StatusVar(name="idle_value", default=0.0)
+    _setpoint_first = StatusVar(name="setpoint_first", default=0.0)
+    _setpoint_last = StatusVar(name="setpoint_last",  default=0.0)
+    _repeat_per_setpoint = StatusVar(name="repeat_per_setpoint", default=1)
+    _external_enabled = StatusVar(name="external_enabled", default=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -63,6 +75,10 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface, Samp
         self._data_row_index = 0
         self._scan_start_time = 0
         self._step_start_time = 0
+        self._setpoint_no = 0
+        self._process_begin = 0.0
+        self._process_end = 0.0
+        self._setpoints = []
 
     # Internal utilities
     @property 
@@ -73,11 +89,7 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface, Samp
     def on_activate(self):
         """ Initialisation performed during activation of the module.
         """
-        self._constraints = ExcitationScannerConstraints(
-            exposure_limits=(1e-4,1),
-            repeat_limits=(1,100),
-            idle_value_limits=(self._minimum_tension*self._conversion_factor, self._maximum_tension*self._conversion_factor),
-            control_variables_list=[
+        variables = [
                 ExcitationScanControlVariable("Conversion factor", (0.0, 1e11), float, "Hz/V"),
                 ExcitationScanControlVariable("Minimum tension", (self._minimum_tension, self._maximum_tension), float, "V"),
                 ExcitationScanControlVariable("Maximum tension", (self._minimum_tension, self._maximum_tension), float, "V"),
@@ -88,8 +100,19 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface, Samp
                 ExcitationScanControlVariable("Sleep before scan", (0.0, 60.0), float, "s"),
                 ExcitationScanControlVariable("Idle tension", (self._minimum_tension, self._maximum_tension), float, "V"),
                 ExcitationScanControlVariable("Idle frequency", (-10e12, 10e12), float, "Hz"),
-
-        ])
+                ExcitationScanControlVariable("External enabled", (False, True), bool, ""),
+        ]
+        if self._ext_setpoint() is not None:
+            limits = self._ext_setpoint().constraints.channel_limits[self._setpoint_channel]
+            variables.append(ExcitationScanControlVariable("First external setpoint", limits, float, self._ext_setpoint().constraints.channel_units[self._setpoint_channel]),)
+            variables.append(ExcitationScanControlVariable("Last external setpoint", limits, float, self._ext_setpoint().constraints.channel_units[self._setpoint_channel]),)
+            variables.append(ExcitationScanControlVariable("External setpoint step", (0, abs(limits[0]-limits[1])), float, self._ext_setpoint().constraints.channel_units[self._setpoint_channel]),)
+            variables.append(ExcitationScanControlVariable("External setpoint repeat per step", (1, 100), int, ""))
+        self._constraints = ExcitationScannerConstraints(
+            exposure_limits=(1e-4,1),
+            repeat_limits=(1,100),
+            idle_value_limits=(self._minimum_tension*self._conversion_factor, self._maximum_tension*self._conversion_factor),
+            control_variables_list=variables)
         self.enable_watchdog()
         self.start_watchdog()
 
@@ -124,10 +147,21 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface, Samp
         """
         n = self._number_of_samples_per_frame
         self.log.debug(f"Preparing scan from {self._scan_mini} to {self._scan_maxi} with {n} points.")
+        ncols = 4
+        if self._external_enabled and self._ext_setpoint() is not None:
+            ncols += 1
+        if self._external_enabled and self._ext_process() is not None:
+            ncols += 1
         with self._data_lock:
-            self._scan_data = np.zeros((n*self._n_repeat, 4))
+            self._scan_data = np.zeros((n*self._n_repeat, ncols))
             self._scan_data[:,self.frequency_column_number] = np.tile(np.linspace(start=self._scan_mini, stop=self._scan_maxi, num=n), self._n_repeat)*self._conversion_factor
             self._scan_data[:,self.step_number_column_number] = np.repeat(range(self._n_repeat), n)
+        self._setpoint_no = 0
+        if self._external_enabled and self._ext_setpoint() is not None:
+            self._setpoints = np.linspace(start=self._setpoint_first, stop=self._setpoint_last, num = self._n_repeat // self._repeat_per_setpoint)
+            self._ext_setpoint().set_activity_state(self._setpoint_channel, True)
+        if self._external_enabled and self._ext_process() is not None:
+            self._ext_process().set_activity_state(self._process_channel, True)
         self._repeat_no = 0
         self._data_row_index = 0
         self._finite_sampling_io().set_sample_rate(1/self._exposure_time)
@@ -156,6 +190,8 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface, Samp
                 self._finite_sampling_io().stop_buffered_frame()
             self._ao().set_activity_state(self._output_channel, True)
             self._ao().set_setpoint(self._output_channel, self._scan_mini)
+            if self._external_enabled and self._ext_setpoint() is not None and self._repeat_no % self._repeat_per_setpoint == 0:
+                self._ext_setpoint().set_setpoint(self._setpoint_channel, self._setpoints[self._setpoint_no])
             self.log.debug("Step prepared, starting wait.")
             self._waiting_start = time.perf_counter()
             self.watchdog_event("next")
@@ -167,6 +203,8 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface, Samp
             self.log.debug("Ready.")
             self._ao().set_activity_state(self._output_channel, False)
             self._finite_sampling_io().start_buffered_frame()
+            if self._external_enabled and self._ext_process() is not None:
+                self._process_begin = self._ext_process().get_process_value(self._process_channel)
             self._step_start_time = time.perf_counter()
             self.watchdog_event("next")
     @state
@@ -176,9 +214,19 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface, Samp
         have been collected, we go back to preparing a step.
         """
         samples_missing = self._number_of_samples_per_frame * (self._repeat_no+1) - self._data_row_index
-        if samples_missing <= 0:
+        if samples_missing <= 0: 
             n = self._number_of_samples_per_frame
             offset = n * self._repeat_no
+            ncols = 4
+            if self._external_enabled and self._ext_setpoint() is not None:
+                ncols += 1
+                self._scan_data[offset:(offset+n),4] = self._ext_setpoint().get_setpoint(self._setpoint_channel)
+                if self._repeat_no % self._repeat_per_setpoint == self._repeat_per_setpoint-1:
+                    self._setpoint_no = min(len(self._setpoints)-1, self._setpoint_no+1)
+            if self._external_enabled and self._ext_process() is not None:
+                ncols += 1
+                self._process_end = self._ext_process().get_process_value(self._process_channel)
+                self._scan_data[offset:(offset+n),ncols-1] = np.linspace(start=self._process_begin, stop=self._process_end, num=n)
             self._scan_data[offset:(offset+n),self.time_column_number] = (self._step_start_time - self._scan_start_time) + np.arange(n)*self._exposure_time
             self._repeat_no += 1
             self.log.debug("Step done.")
@@ -259,6 +307,19 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface, Samp
         elif variable == "Idle frequency":
             self.log.debug(f"Setting idle frequency to {value}")
             self.set_control("Idle tension", value/self._conversion_factor)
+        elif variable == "External setpoint repeat per step":
+            self._repeat_per_setpoint = int(value)
+        elif variable == "External setpoint step":
+            number_of_setpoints = abs(self._setpoint_first - self._setpoint_last) / value
+            repeat_per_setpoint = self._n_repeat // number_of_setpoints
+            self.set_control("External setpoint repeat per step", repeat_per_setpoint)
+        elif variable == "Last external setpoint":
+            self._setpoint_last = value
+        elif variable == "First external setpoint":
+            self._setpoint_first = value
+        elif variable == "External enabled":
+            self._external_enabled = value
+            
     def get_control(self, variable: str):
         "Get a control variable value."
         if variable == "Conversion factor":
@@ -281,6 +342,18 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface, Samp
             return self._idle_value
         elif variable == "Idle frequency":
             return self._idle_value*self._conversion_factor
+        elif variable == "External setpoint repeat per step":
+            return self._repeat_per_setpoint
+        elif variable == "External setpoint step":
+            repeat_per_setpoint = self.get_control("External setpoint repeat per step")
+            number_of_setpoints = self._n_repeat // repeat_per_setpoint
+            return abs(self._setpoint_first - self._setpoint_last) / number_of_setpoints
+        elif variable == "Last external setpoint":
+            return self._setpoint_last
+        elif variable == "First external setpoint":
+            return self._setpoint_first
+        elif variable == "External enabled":
+            return self._external_enabled
         else:
             raise ValueError(f"Unknown variable {variable}")
     def get_current_data(self) -> np.ndarray:
@@ -314,12 +387,23 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface, Samp
     def data_format(self) -> ExcitationScanDataFormat:
         "Return the data format used in this implementation of the interface."
         units = self._finite_sampling_io().constraints.input_channel_units
+        data_column_number = [1]
+        data_column_unit=["Hz", units[self._input_channel], "s", "c"]
+        data_column_names=["Frequency", self._input_channel, "Step number", "Time"] 
+        if self._external_enabled and self._ext_setpoint() is not None:
+            data_column_number.append(max(data_column_number)+1)
+            data_column_unit.append(self._ext_setpoint().constraints.channel_units[self._setpoint_channel])
+            data_column_names.append(self._setpoint_channel)
+        if self._external_enabled and self._ext_process() is not None:
+            data_column_number.append(max(data_column_number)+1)
+            data_column_unit.append(self._ext_process().constraints.channel_units[self._process_channel])
+            data_column_names.append(self._process_channel)
         return ExcitationScanDataFormat(
                 frequency_column_number=0,
                 step_number_column_number=2,
                 time_column_number=3,
-                data_column_number=[1],
-                data_column_unit=["Hz", units[self._input_channel], "s", "c"],
-                data_column_names=["Frequency", self._input_channel, "Step number", "Time"] 
+                data_column_number=data_column_number,
+                data_column_unit=data_column_unit,
+                data_column_names=data_column_names 
             )
 
