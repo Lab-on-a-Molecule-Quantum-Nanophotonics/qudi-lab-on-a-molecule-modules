@@ -152,6 +152,7 @@ class TimeSeriesGui(GuiBase):
         self._mw.record_trace_action.triggered[bool].connect(self._record_toggled)
         self._mw.snapshot_trace_action.triggered.connect(logic.save_trace_snapshot,
                                                          QtCore.Qt.QueuedConnection)
+        self._mw.freeze_y_axis_action.triggered[bool].connect(self._toggle_y_axis_frozen)
         self._mw.settings_dockwidget.trace_length_spinbox.editingFinished.connect(
             self._trace_settings_changed
         )
@@ -205,6 +206,7 @@ class TimeSeriesGui(GuiBase):
     def show(self):
         """Make window visible and put it above all other windows.
         """
+        self._restore_window_geometry(self._mw)
         self._mw.show()
         self._mw.raise_()
         self._mw.activateWindow()
@@ -234,6 +236,7 @@ class TimeSeriesGui(GuiBase):
         logic.sigTraceSettingsChanged.disconnect(self.update_trace_settings)
         logic.sigChannelSettingsChanged.disconnect(self.update_channel_settings)
         logic.sigStatusChanged.disconnect(self.update_status)
+        self._save_window_geometry(self._mw)
         self._mw.close()
 
     @property
@@ -498,12 +501,12 @@ class TimeSeriesGui(GuiBase):
         if self._streamer_constraints.sample_timing == SampleTiming.RANDOM:
             self._mw.trace_plot_widget.setRange(
                 xRange=[0, settings_dict['trace_window_size'] * settings_dict['data_rate']],
-                disableAutoRange=False
+                disableAutoRange=self._mw.freeze_y_axis_action.isChecked()
             )
         else:
             self._mw.trace_plot_widget.setRange(
                 xRange=[0, settings_dict['trace_window_size']],
-                disableAutoRange=False
+                disableAutoRange=self._mw.freeze_y_axis_action.isChecked()
             )
 
     def _remove_channel_from_plot(self, channel: str) -> None:
@@ -530,3 +533,11 @@ class TimeSeriesGui(GuiBase):
                 self._mw.trace_plot_widget.addItem(self.averaged_curves[channel])
             else:
                 self._vb.addItem(self.averaged_curves[channel])
+
+    def _toggle_y_axis_frozen(self, st):
+        if st:
+            self._mw.trace_plot_widget.disableAutoRange(axis='y')
+            self._mw.freeze_y_axis_action.setText("Un-freeze Y axis")
+        else:
+            self._mw.trace_plot_widget.enableAutoRange(axis='y')
+            self._mw.freeze_y_axis_action.setText("Freeze Y axis")
