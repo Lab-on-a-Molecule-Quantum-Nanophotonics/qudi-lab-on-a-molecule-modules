@@ -29,7 +29,7 @@ class MatisseCommanderGoToConfiguration:
     thin_etalon_signal_start: int = 40000 # steps (default)
     thin_etalon_signal_end: int = 50000 # steps (default)
     thin_etalon_set_point_scan_increment: int = 25 # steps (default)
-    thin_etalon_set_point_scan_range: int = 500 # steps (default)
+    thin_etalon_set_point_scan_range: int = 800 # steps (default)
     thin_etalon_free_spectral_range: float = 260 # GHz (default)
     pzetl_scan_increment: float = 0.0125 # (default)
     pzetl_full_scan_range: float = 0.4 # (default)
@@ -60,7 +60,6 @@ class MatisseCommander(ProcessControlInterface, SwitchInterface, SampledFiniteSt
                 birefringent_scan_increment: 20 # steps (default)
                 thin_etalon_scan_increment: 80 # steps (default)
                 thin_etalon_signal_start: 40000 # steps (default)
-                thin_etalon_signal_end: 60000 # steps (default)
                 thin_etalon_signal_end: 60000 # steps (default)
                 thin_etalon_set_point_scan_increment: 25 # steps (default)
                 thin_etalon_set_point_scan_range: 500 # steps (default)
@@ -108,7 +107,6 @@ class MatisseCommander(ProcessControlInterface, SwitchInterface, SampledFiniteSt
         self._reoptimize_bifi = False
         self._reoptimize_te = False
         self._pzetl_previous_error = np.inf
-        self._te_previous_error = np.inf
         self._bifi_reset_countdown = 0
         self._scan_device = 0
         self._scan_lower_limit = 0
@@ -116,6 +114,9 @@ class MatisseCommander(ProcessControlInterface, SwitchInterface, SampledFiniteSt
         self._scan_mode = 0
         self._scan_rising_speed = 0
         self.scan_falling_speed = 0
+        self._reset_te = False
+        self._te_retry_countdown = 0
+        self._full_te_scan = False
 
     # Qudi base 
     def on_activate(self):
@@ -360,36 +361,69 @@ class MatisseCommander(ProcessControlInterface, SwitchInterface, SampledFiniteSt
         self._reoptimize_te = False
         self.watchdog_event("next")
     @state
-    @transition_to(("next", "bifi_scan"))
+    @transition_to(("next", "send_bifi_to_first_position"))
+    @transition_to(("reset", "reset_bifi_wavelength"))
     @transition_to(("skip_step", "prepare_te_scan"))
     def prepare_bifi_scan(self):
-        "Prepare the positions scanned by the birefringent filter."
+        """
+        Prepare the positions scanned by the birefringent filter.
+
+        Wait for the BiFi motor to be ready, then if the current frequency is close enough to the target, 
+        skip the BiFi scan. If it is too far, reset the wavelength of the BiFi if it has not been reset for a long time, or
+        go to the first position of the scan.
+        """
         status = self._device.query('MOTORBIREFRINGENT:STATUS')
-        bifi_target_wavelength = 1e9 * SPEED_OF_LIGHT / self._go_to_target
-        bifi_current_frequency = 1e9 * SPEED_OF_LIGHT / self._device.query('MOTORBIREFRINGENT:WAVELENGTH')
         status_ready = status & 0xff == 0x02
+        if not status_ready:
+            return
+        te_position = self._device.query("MOTORTHINETALON:POSITION")
+        te_position_in_range = self._go_to_position_config.thin_etalon_signal_start < te_position < self._go_to_position_config.thin_etalon_signal_end
         if (self._bifi_reset_countdown > 0) and not self._reoptimize_bifi and np.abs(self._current_frequency - self._go_to_target) < self._go_to_position_config.thin_etalon_free_spectral_range*1e9/2:
             self.log.info(f"Current set frequency is less than {self._go_to_position_config.thin_etalon_free_spectral_range/2} GHz from current frequency. Skipping Bifi step.")
             self._bifi_reset_countdown -= 1
             self.watchdog_event("skip_step")
-        elif not status_ready:
-            pass
-        elif self._bifi_reset_countdown <= 0 or np.abs(bifi_current_frequency - self._go_to_target) > self._go_to_position_config.thin_etalon_free_spectral_range*1e9/2:
-            self._bifi_reset_countdown = 2
-            self.log.debug(f"bifi current freq: {bifi_current_frequency}, current frequency:{self._current_frequency}, go_to_target {self._go_to_target}, delta {np.abs(bifi_current_frequency - self._go_to_target)*1e-9} GHz, threshold {self._go_to_position_config.thin_etalon_free_spectral_range} GHz")
-            self.log.info(f"Setting BiFi wavelength to {bifi_target_wavelength} nm.")
-            self._device.set('MOTORBIREFRINGENT:WAVELENGTH', bifi_target_wavelength)
-            self.log.info("Resetting thin etalon position")
-            self._device.set('MOTORTHINETALON:POSITION', (self._go_to_position_config.thin_etalon_signal_start + self._go_to_position_config.thin_etalon_signal_end)/2)
+        elif self._bifi_reset_countdown <= 0 or not te_position_in_range:    # or np.abs(bifi_current_frequency - self._go_to_target) > self._go_to_position_config.thin_etalon_free_spectral_range*1e9/2 or
+            self.watchdog_event("reset")
         else:
-            self._bifi_reset_countdown -= 1
-            current_bifi_position = self._device.query('MOTORBIREFRINGENT:POSITION')
-            bifi_first_position = int(current_bifi_position - self._go_to_position_config.birefringent_scan_range/2)
-            self._last_bifi_position = int(current_bifi_position + self._go_to_position_config.birefringent_scan_range/2) 
-            self.log.info(f"Sending BiFi to first scan position {bifi_first_position}.")
-            self._device.set('MOTORBIREFRINGENT:POSITION', bifi_first_position)
-            self._bifi_scan = []
             self.watchdog_event("next")
+    @state
+    @transition_to(("next", "prepare_bifi_scan"))
+    def reset_bifi_wavelength(self):
+        """
+        Perform the reset operation of the BiFi motor. Optionnaly, if the TE is not in range, reset the TE.
+        """
+        te_position = self._device.query("MOTORTHINETALON:POSITION")
+        bifi_target_wavelength = 1e9 * SPEED_OF_LIGHT / self._go_to_target
+        bifi_current_frequency = 1e9 * SPEED_OF_LIGHT / self._device.query('MOTORBIREFRINGENT:WAVELENGTH')
+        te_position_in_range = self._go_to_position_config.thin_etalon_signal_start < te_position < self._go_to_position_config.thin_etalon_signal_end
+        self._bifi_reset_countdown = 2
+        self.log.debug(f"bifi current freq: {bifi_current_frequency}, current frequency:{self._current_frequency}, go_to_target {self._go_to_target}, delta {np.abs(bifi_current_frequency - self._go_to_target)*1e-9} GHz, threshold {self._go_to_position_config.thin_etalon_free_spectral_range} GHz")
+        self.log.info(f"Setting BiFi wavelength to {bifi_target_wavelength} nm.")
+        self._device.set('MOTORBIREFRINGENT:WAVELENGTH', bifi_target_wavelength)
+        if not self._reoptimize_bifi or not te_position_in_range or self._reset_te:
+            self._reset_te = False
+            te_center =  (self._go_to_position_config.thin_etalon_signal_start + self._go_to_position_config.thin_etalon_signal_end)/2
+            te_span =  np.abs(self._go_to_position_config.thin_etalon_signal_start - self._go_to_position_config.thin_etalon_signal_end)
+            new_te_position = np.clip(te_center + np.random.randn() * te_span/2, self._go_to_position_config.thin_etalon_signal_start, self._go_to_position_config.thin_etalon_signal_end)
+            self._bifi_reset_countdown = 2
+            self.log.info("Resetting thin etalon position")
+            self._device.set('MOTORTHINETALON:POSITION', new_te_position)
+        self.watchdog_event("next")
+    @state
+    @transition_to(("next", "bifi_scan"))
+    def send_bifi_to_first_position(self):
+        """
+        Decrement the bifi reset countdown then send the BiFi motor to its first position. 
+        Flush the saved BiFi scan data.
+        """
+        self._bifi_reset_countdown -= 1
+        current_bifi_position = self._device.query('MOTORBIREFRINGENT:POSITION')
+        bifi_first_position = int(current_bifi_position - self._go_to_position_config.birefringent_scan_range/2)
+        self._last_bifi_position = int(current_bifi_position + self._go_to_position_config.birefringent_scan_range/2) 
+        self.log.info(f"Sending BiFi to first scan position {bifi_first_position}.")
+        self._device.set('MOTORBIREFRINGENT:POSITION', bifi_first_position)
+        self._bifi_scan = []
+        self.watchdog_event("next")
     @state
     @transition_to(("next", "choose_bifi_position"))
     def bifi_scan(self):
@@ -405,38 +439,58 @@ class MatisseCommander(ProcessControlInterface, SwitchInterface, SampledFiniteSt
             self._bifi_scan.append([current_bifi_position, self._current_frequency, self._device.query('DIODEPOWER:DCVALUE')])
             self._device.set('MOTORBIREFRINGENT:RELATIVE', self._go_to_position_config.birefringent_scan_increment)
     @state
+    @transition_to(("next", "relax_bifi"))
+    def choose_bifi_position(self):
+        """
+        Choose a BiFi position from the scan and send the BiFi motor there.
+        """
+        self._bifi_pos_array = np.array(self._bifi_scan)
+        position_index = np.argmin(np.absolute(self._bifi_pos_array[:, 1] - self._go_to_target))
+        position = self._bifi_pos_array[position_index, 0]
+        frequency = self._bifi_pos_array[position_index, 1]
+        prev_position_index = max(0, position_index - 1)
+        prev_position = self._bifi_pos_array[prev_position_index, 0]
+        prev_frequency = self._bifi_pos_array[position_index, 1]
+        next_position_index = min(len(self._bifi_scan)-1, position_index + 1)
+        next_position = self._bifi_pos_array[next_position_index, 0]
+        next_frequency = self._bifi_pos_array[position_index, 1]
+        best_position = self._scale_position(prev_position, position, next_position, prev_frequency, frequency, next_frequency)
+        self.log.info(f"Setting BiFi position to {best_position}")
+        self._device.set('MOTORBIREFRINGENT:POSITION', best_position)
+        self._relax_timer = time.perf_counter()
+        self.watchdog_event("next")
+    @state
+    @transition_to(("next", "assess_bifi_position"))
+    def relax_bifi(self):
+        """
+        Wait 0.5s for the BiFi to relax.
+        """
+        if time.perf_counter() - self._relax_timer > 0.5:
+            self.watchdog_event("next")
+    @state
     @transition_to(("next", "prepare_te_scan"))
     @transition_to(("redo", "prepare_bifi_scan"))
-    def choose_bifi_position(self):
-        "Choose the best BiFi position based on the latest BiFi scan."
-        if self._relax_timer < 0:
-            self._bifi_pos_array = np.array(self._bifi_scan)
-            position_index = np.argmin(np.absolute(self._bifi_pos_array[:, 1] - self._go_to_target))
-            position = self._bifi_pos_array[position_index, 0]
-            frequency = self._bifi_pos_array[position_index, 1]
-            prev_position_index = max(0, position_index - 1)
-            prev_position = self._bifi_pos_array[prev_position_index, 0]
-            prev_frequency = self._bifi_pos_array[position_index, 1]
-            next_position_index = min(len(self._bifi_scan)-1, position_index + 1)
-            next_position = self._bifi_pos_array[next_position_index, 0]
-            next_frequency = self._bifi_pos_array[position_index, 1]
-            best_position = self._scale_position(prev_position, position, next_position, prev_frequency, frequency, next_frequency)
-            self.log.info(f"Setting BiFi position to {best_position}")
-            self._device.set('MOTORBIREFRINGENT:POSITION', best_position)
-            self._relax_timer = time.perf_counter()
-        elif time.perf_counter() - self._relax_timer < 0.5:
-            pass
+    def assess_bifi_position(self):
+        "Evaluate the result of the BiFi scan, and redo the procedure if needed."
+        self._relax_timer = -1
+        delta = self._current_frequency - self._go_to_target
+        self.log.info(f"Delta is now: {delta*1e-9} GHz.")
+        if np.abs(delta) < self._go_to_position_config.thin_etalon_free_spectral_range*1e9:
+            self._te_retry_countdown = 2
+            self.watchdog_event("next")
         else:
-            self._relax_timer = -1
-            delta = self._current_frequency - self._go_to_target
-            self.log.info(f"Delta is now: {delta*1e-9} GHz.")
-            if np.abs(delta) < self._go_to_position_config.thin_etalon_free_spectral_range*1e9:
-                self.watchdog_event("next")
-            else:
-                self.log.info("Bifi setting failed redoing this step.")
-                self._reoptimize_bifi = True
-                self.watchdog_event("redo")
+            self.log.info("Bifi setting failed redoing this step.")
+            self._reoptimize_bifi = True
+            self._reset_te = True
+            self.watchdog_event("redo")
     @state
+    @transition_to(("next", "prepare_te_scan"))
+    def relax_prepare_te_scan(self):
+        if self._relax_timer > 0 and time.perf_counter() - self._relax_timer<0.5:
+            return
+        self.watchdog_event("next")
+    @state
+    @transition_to(("relax", "relax_prepare_te_scan"))
     @transition_to(("next", "te_scan"))
     @transition_to(("skip_step", "prepare_pzetl_scan"))
     def prepare_te_scan(self):
@@ -444,11 +498,10 @@ class MatisseCommander(ProcessControlInterface, SwitchInterface, SampledFiniteSt
         Prepare the positions scanned by the thin etalon filter. Move the thin etalon to the first
         position thin_etalon_signal_start.
         """
-        if self._relax_timer > 0 and time.perf_counter() - self._relax_timer<0.5:
-            return
         self._relax_timer = -1
         delta = self._current_frequency - self._go_to_target
         if np.abs(delta) < self._go_to_position_config.pzetl_free_spectral_range*1e9/2:
+            self.log.info(f"Skipping TE scan because delta={delta*1e-9}GHz < { self._go_to_position_config.pzetl_free_spectral_range/2}GHz.")
             self.watchdog_event("skip_step")
             return
         status = self._device.query('MOTORTHINETALON:STATUS')
@@ -457,8 +510,13 @@ class MatisseCommander(ProcessControlInterface, SwitchInterface, SampledFiniteSt
         if not status_ready:
             self._device.set("MOTORTHINETALON:CLEAR", "")
             self._relax_timer = time.perf_counter()
+            self.watchdog_event("relax")
+        elif self._full_te_scan:
+            self._relax_timer = time.perf_counter()
+            self._full_te_scan = False
+            self._device.set('MOTORTHINETALON:POSITION', self._go_to_position_config.thin_etalon_signal_start)
+            self.watchdog_event("relax")
         else:  
-            self._te_previous_error = np.inf
             if self._current_frequency < self._go_to_target:
                 self._te_scan_direction = -1
                 self.log.info("Scanning TE down.")
@@ -466,24 +524,30 @@ class MatisseCommander(ProcessControlInterface, SwitchInterface, SampledFiniteSt
                 self._te_scan_direction = 1
                 self.log.info("Scanning TE up.")
             self._te_scan = []
+            self._te_retry_countdown -= 1
             self.watchdog_event("next")
     @state
+    @transition_to(("next", "te_scan"))
+    def relax_te_scan(self):
+        if self._relax_timer > 0 and time.perf_counter() - self._relax_timer<0.5:
+            return
+        self.watchdog_event("next")
+    @state
+    @transition_to(("relax", "relax_te_scan"))
     @transition_to(("next", "choose_te_position"))
     def te_scan(self):
         """
         Perform thin etalon scan and save wavelength and thin etalon DC power for each scanned 
         position. The scan spans until thin_etalon_signal_end with steps thin_etalon_scan_increment.
         """
-        if self._relax_timer > 0 and time.perf_counter() - self._relax_timer<0.5:
-            return
         status = self._device.query('MOTORTHINETALON:STATUS')
         status_ready = status & 0xff == 0x02
-        current_te_position = self._device.query('MOTORTHINETALON:POSITION')
-        error = np.abs(self._current_frequency - self._go_to_target)
         if not status_ready:
             self._device.set("MOTORTHINETALON:CLEAR", "")
             self._relax_timer = time.perf_counter()
+            self.watchdog_event("relax")
             return
+        current_te_position = self._device.query('MOTORTHINETALON:POSITION')
         self._relax_timer = -1
         self._te_scan.append([current_te_position, self._current_frequency, self._device.query('THINETALON:DCVALUE')])
         if self._te_scan_direction > 0 and current_te_position >= self._go_to_position_config.thin_etalon_signal_end:
@@ -493,62 +557,86 @@ class MatisseCommander(ProcessControlInterface, SwitchInterface, SampledFiniteSt
             self.log.debug("Stopping scan because lower end has been reached.")
             self.watchdog_event("next")
         else:
-            self._te_previous_error = error
             self._device.set('MOTORTHINETALON:RELATIVE', self._te_scan_direction * self._go_to_position_config.thin_etalon_scan_increment)
     @state
-    @transition_to(("next", "prepare_pzetl_scan"))
-    @transition_to(("reoptimize_bifi", "prepare_bifi_scan"))
+    @transition_to(("next", "relax_te_position"))
     def choose_te_position(self):
         """
         Choose the best thin etalon position based on the latest thin etalon scan.
-        Will reset BiFi if the optimized mode is more distant than thin_etalon_free_spectral_range. 
         """
-        if self._relax_timer < 0:
-            self._te_pos_array = np.array(self._te_scan)
-            position_index = np.argmin(np.absolute(self._te_pos_array[:, 1] - self._go_to_target))
-            position = self._te_pos_array[position_index, 0]
-            frequency = self._te_pos_array[position_index, 1]
-            prev_position_index = max(0, position_index-1)
-            prev_position = self._te_pos_array[prev_position_index, 0]
-            prev_frequency = self._te_pos_array[prev_position_index, 1]
-            next_position_index = min(len(self._te_scan)-1, position_index+1)
-            next_position = self._te_pos_array[next_position_index, 0]
-            next_frequency = self._te_pos_array[next_position_index, 1]
-            best_position = self._scale_position(prev_position, position, next_position, prev_frequency, frequency, next_frequency)
-            self.log.info(f"Setting TE position to {best_position}.")
-            self._device.set('MOTORTHINETALON:POSITION', best_position)
-            self._relax_timer = time.perf_counter()
-        elif time.perf_counter() - self._relax_timer > 0.5:
-            self._relax_timer = -1
-            delta = np.abs(self._current_frequency - self._go_to_target)
-            if np.abs(delta) < self._go_to_position_config.pzetl_free_spectral_range*1e9: 
-                self.log.info(f"thin etalon step successful (delta: {delta*1e-9} GHz)")
-                self.watchdog_event("next")
-            else:
-                self.log.info(f"Resetting BiFi (delta: {delta*1e-9} GHz)")")
-                self._reoptimize_bifi = True
-                self.watchdog_event("reoptimize_bifi")
+        self._te_pos_array = np.array(self._te_scan)
+        position_index = np.argmin(np.absolute(self._te_pos_array[:, 1] - self._go_to_target))
+        position = self._te_pos_array[position_index, 0]
+        frequency = self._te_pos_array[position_index, 1]
+        prev_position_index = max(0, position_index-1)
+        prev_position = self._te_pos_array[prev_position_index, 0]
+        prev_frequency = self._te_pos_array[prev_position_index, 1]
+        next_position_index = min(len(self._te_scan)-1, position_index+1)
+        next_position = self._te_pos_array[next_position_index, 0]
+        next_frequency = self._te_pos_array[next_position_index, 1]
+        best_position = self._scale_position(prev_position, position, next_position, prev_frequency, frequency, next_frequency)
+        self.log.info(f"Setting TE position to {best_position}.")
+        self._device.set('MOTORTHINETALON:POSITION', best_position)
+        self._relax_timer = time.perf_counter()
+        self.watchdog_event("next")
     @state
-    @transition_to(("next", "pzetl_scan"))
+    @transition_to(("next", "assess_te_position"))
+    def relax_te_position(self):
+        if self._relax_timer > 0 and time.perf_counter() - self._relax_timer<0.5:
+            return
+        self.watchdog_event("next")
+    @state
+    @transition_to(("next", "prepare_pzetl_scan"))
+    @transition_to(("reoptimize_bifi", "prepare_bifi_scan"))
+    @transition_to(("reoptimize_te", "prepare_te_scan"))
+    def assess_te_position(self):
+        self._relax_timer = -1
+        delta = self._go_to_target - self._current_frequency
+        if np.abs(delta) < self._go_to_position_config.pzetl_free_spectral_range*1e9: 
+            self.log.info(f"thin etalon step successful (delta: {delta*1e-9} GHz)")
+            self.watchdog_event("next")
+        elif self._te_retry_countdown > 0 and np.abs(delta) < self._go_to_position_config.thin_etalon_free_spectral_range:
+            self.log.info(f"Retrying TE scan (delta: {delta*1e-9} GHz)")
+            self._full_te_scan = True
+            self._relax_timer = -1
+            self.watchdog_event("reoptimize_te")
+        else:
+            # If we are more than one FSR from the target, we try to guess what will be the position after a mode
+            # jump triggered by the BiFi and go there.
+            if np.abs(delta) > self._go_to_position_config.thin_etalon_free_spectral_range*1e9:
+                sgn = np.sign(delta)
+                fsr = self._go_to_position_config.thin_etalon_free_spectral_range*1e9
+                position_index = np.argmin(np.absolute(self._te_pos_array[:, 1] - (self._go_to_target - sgn*fsr)))
+                position = self._te_pos_array[position_index, 0]
+                self.log.info(f"Setting TE position to {position} because delta is greater thant the TE FSR.")
+                self._device.set('MOTORTHINETALON:POSITION', position)
+            self.log.info(f"Resetting BiFi (delta: {delta*1e-9} GHz)")
+            self._reoptimize_bifi = True
+            self.watchdog_event("reoptimize_bifi")
+    @state
+    @transition_to(("next", "relax_pzetl"))
     @transition_to(("skip_step", "finalize_procedure"))
     def prepare_pzetl_scan(self):
         """
         Prepare to scan the piezo etalon. The routine will scan around the current position
         and span pzetl_full_scan_range with a scan step of pzetl_scan_increment. The scan stops
-        as soon as we cross the target frequency. Wait pzetl_relaxation before starting scan.
+        as soon as we cross the target frequency.
         """
-        if self._relax_timer < 0:
-            delta = np.abs(self._current_frequency - self._go_to_target)
-            if delta < self._go_to_position_config.precision*1e9:
-                self.watchdog_event("skip_step")
-                return
-            pzetl_current_position = self._device.query('PIEZOETALON:BASELINE')
-            pzetl_first_position = pzetl_current_position - self._go_to_position_config.pzetl_full_scan_range/2
-            self._last_pzetl_position = pzetl_current_position + self._go_to_position_config.pzetl_full_scan_range/2
-            self.log.info(f"Setting PZETL to position {pzetl_first_position}.")
-            self._device.set('PIEZOETALON:BASELINE', pzetl_first_position)
-            self._relax_timer = time.perf_counter()
-        elif time.perf_counter() - self._relax_timer >= self._go_to_position_config.pzetl_relaxation/1000:
+        delta = np.abs(self._current_frequency - self._go_to_target)
+        if delta < self._go_to_position_config.precision*1e9:
+            self.watchdog_event("skip_step")
+            return
+        pzetl_current_position = self._device.query('PIEZOETALON:BASELINE')
+        pzetl_first_position = pzetl_current_position - self._go_to_position_config.pzetl_full_scan_range/2
+        self._last_pzetl_position = pzetl_current_position + self._go_to_position_config.pzetl_full_scan_range/2
+        self.log.info(f"Setting PZETL to position {pzetl_first_position}.")
+        self._device.set('PIEZOETALON:BASELINE', pzetl_first_position)
+        self._relax_timer = time.perf_counter()
+        self.watchdog_event("next")
+    @state
+    @transition_to(("next", "pzetl_scan"))
+    def relax_pzetl(self):
+        if time.perf_counter() - self._relax_timer >= self._go_to_position_config.pzetl_relaxation/1000:
             self._relax_timer = -1
             self._pzetl_previous_error = np.inf
             self.watchdog_event("next")
@@ -581,7 +669,7 @@ class MatisseCommander(ProcessControlInterface, SwitchInterface, SampledFiniteSt
         status = self._device.query('MOTORTHINETALON:STATUS')
         status_ready = status & 0xff == 0x02
         if not status_ready:
-            pass
+            return
         else:
             te_current_position = self._device.query('MOTORTHINETALON:POSITION')
             te_first_position = int(te_current_position - self._go_to_position_config.thin_etalon_set_point_scan_range/2)
@@ -607,11 +695,10 @@ class MatisseCommander(ProcessControlInterface, SwitchInterface, SampledFiniteSt
             self._te_setpoint_scan.append([current_te_position, self._current_frequency, self._device.query('THINETALON:DCVALUE')])
             self._device.set('MOTORTHINETALON:RELATIVE', self._go_to_position_config.thin_etalon_set_point_scan_increment)
     @state
-    @transition_to(("next", "finalize_procedure"))
-    def choose_te_setpoint(self):
+    @transition_to(("next", "relax_te_setpoint"))
+    def send_te_to_best_position(self):
         """
-        Choose the best thin etalon setpoint position based on the latest thin etalon scan. Will also
-        compute the side of the valley of the mode on which we stand.
+        Choose the best thin etalon setpoint position based on the latest thin etalon scan.
         """
         self._te_setpoint_pos_array =np.array(self._te_setpoint_scan)
         position_index = np.argmin(np.absolute(self._te_setpoint_pos_array[:, 1] - self._go_to_target))
@@ -624,56 +711,79 @@ class MatisseCommander(ProcessControlInterface, SwitchInterface, SampledFiniteSt
         next_position = self._te_setpoint_pos_array[next_position_index, 0]
         next_frequency = self._te_setpoint_pos_array[next_position_index, 1]
         best_position = self._scale_position(prev_position, position, next_position, prev_frequency, frequency, next_frequency)
-        if self._relax_timer < 0:
-            self.log.info(f"Setting TE position to {best_position}.")
-            self._device.set('MOTORTHINETALON:POSITION', best_position)
-            self._relax_timer = time.perf_counter()
-        elif time.perf_counter() - self._relax_timer < 0.5:
+        self.log.info(f"Setting TE position to {best_position}.")
+        self._device.set('MOTORTHINETALON:POSITION', best_position)
+        self._relax_timer = time.perf_counter()
+        self.watchdog_event("next")
+    @state
+    @transition_to(("next", "choose_te_setpoint"))
+    def relax_te_setpoint(self):
+        if time.perf_counter() - self._relax_timer < 0.5:
             return
-        else:
-            self._relax_timer = -1
-            prev_position_power = self._te_setpoint_pos_array[prev_position_index, 2]
-            next_position_power = self._te_setpoint_pos_array[prev_position_index, 2]
-            slope = next_position_power - prev_position_power
-            te_proportional_gain = self._device.query('THINETALON:CONTROLPROPORTIONAL')
-            te_integral_gain = self._device.query('THINETALON:CONTROLINTEGRAL')
-            if slope < 0: # left side of the valley, need negative gains
-                te_proportional_gain = - np.abs(te_proportional_gain)
-                te_integral_gain = - np.abs(te_integral_gain)
-                self.log.info("Choosing left flank of thin etalon.")
-            else: # right side of the valley, need positive gains
-                te_proportional_gain = np.abs(te_proportional_gain)
-                te_integral_gain = np.abs(te_integral_gain)
-                self.log.info("Choosing right flank of thin etalon.")
-            te_proportional_gain = self._device.set('THINETALON:CONTROLPROPORTIONAL', te_proportional_gain)
-            te_integral_gain = self._device.set('THINETALON:CONTROLINTEGRAL', te_integral_gain)
-            delta = np.abs(self._current_frequency - self._go_to_target)
-            self.log.info(f"Thin etalon setpoint scan over (delta: {delta*1e-9} GHz).")
-            self.watchdog_event("next")
+        self._relax_timer = -1
+        self.watchdog_event("next")
+    @state
+    @transition_to(("next", "reset_pz"))
+    def choose_te_setpoint(self):
+        """
+        Compute the side of the valley of the mode on which we stand.
+        """
+        position_index = np.argmin(np.absolute(self._te_setpoint_pos_array[:, 1] - self._go_to_target))
+        prev_position_index = max(0, position_index-1)
+        next_position_index = min(len(self._te_setpoint_scan)-1, position_index+1)
+        prev_position_power = self._te_setpoint_pos_array[prev_position_index, 2]
+        next_position_power = self._te_setpoint_pos_array[next_position_index, 2]
+        slope = next_position_power - prev_position_power
+        te_proportional_gain = self._device.query('THINETALON:CONTROLPROPORTIONAL')
+        te_integral_gain = self._device.query('THINETALON:CONTROLINTEGRAL')
+        if slope < 0: # left side of the valley, need negative gains
+            te_proportional_gain = - np.abs(te_proportional_gain)
+            te_integral_gain = - np.abs(te_integral_gain)
+            self.log.info("Choosing left flank of thin etalon.")
+        else: # right side of the valley, need positive gains
+            te_proportional_gain = np.abs(te_proportional_gain)
+            te_integral_gain = np.abs(te_integral_gain)
+            self.log.info("Choosing right flank of thin etalon.")
+        te_proportional_gain = self._device.set('THINETALON:CONTROLPROPORTIONAL', te_proportional_gain)
+        te_integral_gain = self._device.set('THINETALON:CONTROLINTEGRAL', te_integral_gain)
+        delta = np.abs(self._current_frequency - self._go_to_target)
+        self.log.info(f"Thin etalon setpoint scan over (delta: {delta*1e-9} GHz).")
+        self.watchdog_event("next")
+    @state
+    @transition_to(("next", "relax_pz"))
+    def reset_pz(self):
+        """
+        Reset the piezo etalon and the slow piezo.
+        """
+        self.log.info("Resetting piezo etalon")
+        self._device.set('PIEZOETALON:BASELINE', (self._go_to_position_config.pzetl_lower_point + self._go_to_position_config.pzetl_upper_point)/2)
+        self.log.info("Resetting slow piezo")
+        self._device.set("SLOWPIEZO:NOW", (self._go_to_position_config.spzt_lower_point + self._go_to_position_config.spzt_upper_point)/2)
+        self._device.set("SCAN:DEVICE", self._scan_device)
+        self._device.set("SCAN:LOWERLIMIT", self._scan_lower_limit)
+        self._device.set("SCAN:UPPERLIMIT", self._scan_upper_limit)
+        self._device.set("SCAN:MODE", self._scan_mode)
+        self._device.set("SCAN:RISINGSPEED", self._scan_rising_speed)
+        self._device.set("SCAN:FALLINGSPEED", self.scan_falling_speed)
+        self._relax_timer = time.perf_counter()
+        self.watchdog_event("next")
+    @state
+    @transition_to(("next", "finalize_procedure"))
+    def relax_pz(self):
+        if time.perf_counter() - self._relax_timer < self._go_to_position_config.pzetl_relaxation/1000:
+            return
+        self._relax_timer = -1
+        self.watchdog_event("next")
     @state
     @transition_to(("next", "idle"))
     @transition_to(("reoptimize_te", "prepare_te_setpoint"))
     def finalize_procedure(self):
         """
-        Reset the piezo etalon and the slow piezo and triggers a thin etalon setpoint reoptimization if
+        Triggers a thin etalon setpoint reoptimization if
         required. Then finalize the procedure by re-enabling the control loops.
         """
         delta = np.abs(self._current_frequency - self._go_to_target)
-        if self._relax_timer < 0:
-            self.log.info("Resetting piezo etalon")
-            self._device.set('PIEZOETALON:BASELINE', (self._go_to_position_config.pzetl_lower_point + self._go_to_position_config.pzetl_upper_point)/2)
-            self.log.info("Resetting slow piezo")
-            self._device.set("SLOWPIEZO:NOW", (self._go_to_position_config.spzt_lower_point + self._go_to_position_config.spzt_upper_point)/2)
-            self._device.set("SCAN:DEVICE", self._scan_device)
-            self._device.set("SCAN:LOWERLIMIT", self._scan_lower_limit)
-            self._device.set("SCAN:UPPERLIMIT", self._scan_upper_limit)
-            self._device.set("SCAN:MODE", self._scan_mode)
-            self._device.set("SCAN:RISINGSPEED", self._scan_rising_speed)
-            self._device.set("SCAN:FALLINGSPEED", self.scan_falling_speed)
-            self._relax_timer = time.perf_counter()
-        elif time.perf_counter() - self._relax_timer < self._go_to_position_config.pzetl_relaxation/1000:
-            pass
-        elif delta < self._go_to_position_config.precision*1e9 or self._reoptimize_te:
+        if delta < self._go_to_position_config.precision*1e9 or self._reoptimize_te:
             setpoint_te = self._device.query("THINETALON:DCVALUE") / self._device.query("DIODEPOWER:DCVALUE")
             self._device.set("THINETALON:CONTROLSETPOINT", setpoint_te)
             self.log.info(f"Enabling thin etalon control loop.")
