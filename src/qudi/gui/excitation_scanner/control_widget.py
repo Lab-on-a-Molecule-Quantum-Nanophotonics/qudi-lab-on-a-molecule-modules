@@ -66,13 +66,13 @@ class ScanningExcitationControlWidget(QtWidgets.QWidget):
         self.progress_bar = QtWidgets.QProgressBar()
         self.progress_bar.setRange(0, 100)
         self.progress_bar.setValue(0)
-        main_layout.addWidget(self.progress_bar, 2, 0, 1, 2)
+        main_layout.addWidget(self.progress_bar, 1, 0, 1, 2)
 
         # Add separator
         separator = QtWidgets.QFrame()
         separator.setFrameShape(QtWidgets.QFrame.HLine)
         separator.setFrameShadow(QtWidgets.QFrame.Sunken)
-        main_layout.addWidget(separator, 3, 0, 1, 2)
+        main_layout.addWidget(separator, 2, 0, 1, 2)
 
         # Common controls
         common_controls_layout = QtWidgets.QFormLayout()
@@ -86,10 +86,10 @@ class ScanningExcitationControlWidget(QtWidgets.QWidget):
         common_controls_layout.addRow("Repetitions", self.repetitions_spinbox)
         self.status_label = QtWidgets.QLabel("")
         common_controls_layout.addRow("Scanner status", self.status_label)
-        main_layout.addLayout(common_controls_layout, 4, 0, 1, 2)
+        main_layout.addLayout(common_controls_layout, 3, 0, 1, 2)
 
         self._variables_layout = QtWidgets.QFormLayout()
-        main_layout.addLayout(self._variables_layout, 0, 2, 1, 1)
+        main_layout.addLayout(self._variables_layout, 0, 2, 4, 1)
         self._variables_widgets = {}
 
         #spacer = QtWidgets.QSpacerItem(1, 1, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
@@ -102,7 +102,7 @@ class ScanningExcitationControlWidget(QtWidgets.QWidget):
         notes_layout.addWidget(self.notes_text_input)
         notes_group_box.setSizePolicy(QtWidgets.QSizePolicy.Maximum,
                                            QtWidgets.QSizePolicy.Minimum)
-        main_layout.addWidget(notes_group_box, 0, 3, 1, 1)
+        main_layout.addWidget(notes_group_box, 0, 3, 4, 1)
 
     def create_variable_widgets(self, variables_dict):
         for widget in self._variables_widgets.values():
