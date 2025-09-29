@@ -201,6 +201,11 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface, Samp
                         frequency_times, 
                         self._frequency_buffer
                     )
+                roi = self._scan_data[:,2] == self._scan_data[0,2]
+                frequencies = self._scan_data[roi,self.frequency_column_number]
+                idle_mini = min(frequencies)
+                idle_maxi = max(frequencies)
+                self._constraints.idle_value_limits = (idle_mini, idle_maxi)
             self._idle_value = self._offset
             self.watchdog_event("end")
             self.log.info("Scan done.")
@@ -372,7 +377,7 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface, Samp
         roi = self._scan_data[:,2] == self._scan_data[0,2]
         frequencies = self._scan_data[roi,0]
         return np.interp(self._idle_value, 
-                         np.linspace(start=self._offset-self._span/2, stop=self._offset+self._span/2, num=len(frequencies)), 
+                         np.linspace(start=0.0, stop=1.0, num=len(frequencies)), 
                          frequencies
                          )
     def set_idle_value(self, n:float) -> None:
@@ -383,8 +388,8 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface, Samp
         frequencies = self._scan_data[roi,0]
         self._idle_value =  np.interp(n, 
                                       frequencies,
-                                      np.linspace(start=self._offset-self._span/2, 
-                                                  stop=self._offset+self._span/2, 
+                                      np.linspace(start=0.0, 
+                                                  stop=1.0, 
                                                   num=len(frequencies)
                                       ))
     @property
