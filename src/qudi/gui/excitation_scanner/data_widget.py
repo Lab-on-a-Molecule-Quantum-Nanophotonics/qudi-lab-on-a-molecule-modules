@@ -149,6 +149,17 @@ class ScanningExcitationDataWidget(QtWidgets.QWidget):
         self.fit_region_to.setSuffix('Hz')
 
         main_layout.addWidget(self.plot_widget, 2, 0, 1, 3)
+        scrollbar_layout = QtWidgets.QHBoxLayout()
+        self.frequency_scrollbar = QtWidgets.QSlider(QtCore.Qt.Orientation.Horizontal)
+        self.frequency_scrollbar.setSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Fixed)
+        scrollbar_layout.addWidget(self.frequency_scrollbar)
+        stepsize_label = QtWidgets.QLabel("Scroll step divider:")
+        scrollbar_layout.addWidget(stepsize_label)
+        self.frequency_step_combobox = QtWidgets.QComboBox()
+        for i in range(12):
+            self.frequency_step_combobox.addItem(f"1e{i}")
+        scrollbar_layout.addWidget(self.frequency_step_combobox)
+        main_layout.addLayout(scrollbar_layout, 3, 0, 1, 3)
     def add_curve(self):
         self.data_curves.append(self.plot_widget.plot(symbol='o', symbolSize=5))
         self.data_curves[-1].setPen(palette.c1, width=2)

@@ -124,6 +124,9 @@ class ScanningExcitationGui(GuiBase):
         self._mw.data_widget.fit_visible.toggled.connect(self.toggle_fit_visibility)
         self._mw.data_widget.delete_current_fit.clicked.connect(self.delete_current_fit)
 
+        self._mw.data_widget.frequency_step_combobox.currentIndexChanged.connect(self.set_scroll_divider_decade)
+        self._mw.data_widget.frequency_scrollbar.valueChanged.connect(self.scrollbar_changed)
+        self._mw.data_widget.frequency_step_combobox.setCurrentIndex(self._excitation_logic().scroll_divider_decade)
 
         self._status_update_timer.start()
 
@@ -169,6 +172,8 @@ class ScanningExcitationGui(GuiBase):
         self._mw.data_widget.fit_region_visible.toggled.disconnect()
         self._mw.data_widget.fit_visible.toggled.disconnect()
         self._mw.data_widget.delete_current_fit.clicked.disconnect()
+        self._mw.data_widget.frequency_step_combobox.currentIndexChanged.disconnect()
+        self._mw.data_widget.frequency_scrollbar.valueChanged.disconnect()
 
         self._mw.close()
 
@@ -322,6 +327,12 @@ class ScanningExcitationGui(GuiBase):
         self._mw.data_widget.target_point.setPos(self._target_x)
         if self._mw.data_widget.laser_follow_cursor.current_state == "Yes":
             self._excitation_logic().idle = self._target_x
+            self._mw.data_widget.frequency_scrollbar.blockSignals(True)
+            current_maxi = self._mw.data_widget.frequency_scrollbar.maximum()
+            current_ratio = (self._target_x-mini)/(maxi-mini)
+            new_pos = int(current_ratio * current_maxi)
+            self._mw.data_widget.frequency_scrollbar.setValue(new_pos)
+            self._mw.data_widget.frequency_scrollbar.blockSignals(False)
 
     def target_updated(self):
         self._target_x = self._mw.data_widget.target_x.value()
@@ -351,3 +362,23 @@ class ScanningExcitationGui(GuiBase):
 
     def delete_current_fit(self, state):
         self._mw.data_widget.fit_curve.setData(x=[], y=[])
+
+    def set_scroll_divider_decade(self, v):
+        self._excitation_logic().set_scroll_divider_decade(v)
+        self._mw.data_widget.frequency_scrollbar.blockSignals(True)
+        current_maxi = self._mw.data_widget.frequency_scrollbar.maximum()
+        current_pos = self._mw.data_widget.frequency_scrollbar.value()
+        current_ratio = current_pos/current_maxi
+        new_maxi = int(10**v)
+        new_pos = current_ratio * new_maxi
+        self._mw.data_widget.frequency_scrollbar.setMaximum(new_maxi)
+        self._mw.data_widget.frequency_scrollbar.setValue(new_pos)
+        self._mw.data_widget.frequency_scrollbar.blockSignals(False)
+
+    def scrollbar_changed(self, v):
+        current_maxi = self._mw.data_widget.frequency_scrollbar.maximum()
+        current_ratio = v/current_maxi
+        mini,maxi = self._excitation_logic().idle_value_limits
+        self._target_x = mini + (maxi-mini) * current_ratio
+        self._mw.data_widget.target_point.setPos(self._target_x)
+        self.target_changed()
