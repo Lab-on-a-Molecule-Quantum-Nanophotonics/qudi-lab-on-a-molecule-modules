@@ -121,6 +121,8 @@ class ScanningExcitationGui(GuiBase):
         self._mw.data_widget.fit_region.sigRegionChangeFinished.connect(self.fit_region_changed)
         self._mw.data_widget.target_point.sigPositionChanged.connect(self.target_changed)
         self._mw.data_widget.fit_region_visible.toggled.connect(self.toggle_fit_region_visibility)
+        self._mw.data_widget.fit_visible.toggled.connect(self.toggle_fit_visibility)
+        self._mw.data_widget.delete_current_fit.clicked.connect(self.delete_current_fit)
 
 
         self._status_update_timer.start()
@@ -165,6 +167,8 @@ class ScanningExcitationGui(GuiBase):
         self._mw.data_widget.fit_region.sigRegionChangeFinished.disconnect()
         self._mw.data_widget.target_point.sigPositionChanged.disconnect()
         self._mw.data_widget.fit_region_visible.toggled.disconnect()
+        self._mw.data_widget.fit_visible.toggled.disconnect()
+        self._mw.data_widget.delete_current_fit.clicked.disconnect()
 
         self._mw.close()
 
@@ -182,7 +186,6 @@ class ScanningExcitationGui(GuiBase):
         self.update_state()
         self.update_data()
         self.update_scanner_variables()
-        self.update_fit(self._excitation_logic().fit_method, self._excitation_logic().fit_results)
 
     def update_state(self):
         # Update the text of the buttons according to logic state
@@ -224,10 +227,6 @@ class ScanningExcitationGui(GuiBase):
         spectrum = spectrum[:l]
         step_numbers = step_numbers[:l]
         all_steps = np.unique(step_numbers)
-
-        # erase previous fit line
-        if self._delete_fit:
-            self._mw.data_widget.fit_curve.setData(x=[], y=[])
 
         self._target_x = self._excitation_logic().idle
         self._mw.data_widget.target_point.setPos(self._target_x)
@@ -341,3 +340,12 @@ class ScanningExcitationGui(GuiBase):
             self._mw.data_widget.plot_widget.addItem(self._mw.data_widget.fit_region)
         else:
             self._mw.data_widget.plot_widget.removeItem(self._mw.data_widget.fit_region)
+
+    def toggle_fit_visibility(self, state):
+        if state:
+            self._mw.data_widget.plot_widget.addItem(self._mw.data_widget.fit_curve)
+        else:
+            self._mw.data_widget.plot_widget.removeItem(self._mw.data_widget.fit_curve)
+
+    def delete_current_fit(self, state):
+        self._mw.data_widget.fit_curve.setData(x=[], y=[])
