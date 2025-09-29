@@ -12,6 +12,7 @@ from qudi.core.connector import Connector
 from qudi.core.configoption import ConfigOption
 from qudi.core.statusvariable import StatusVar
 from qudi.util.tomldatastorage import TOMLHeaderDataStorage
+from qudi.util.datastorage import DataStorageBase
 from qudi.util.datafitting import FitContainer, FitConfigurationsModel
 from qudi.util.mutex import Mutex
 
@@ -26,6 +27,7 @@ class ScanningExcitationLogic(LogicBase):
         options:
           beep: True # default
           watchdog_repeat_time_ms: 500 # default
+          save_idle_to_global_metadata: True # save the current idle value to global metadata
         connect:
           scanner: excitation_scanner_hardware
     ```
@@ -34,6 +36,7 @@ class ScanningExcitationLogic(LogicBase):
 
     _watchdog_repeat_time = ConfigOption(name="watchdog_repeat_time_ms", default=500)
     _beep = ConfigOption(name="beep", default=True)
+    _save_idle_to_global_metadata = ConfigOption(name='save_idle_to_global_metadata', default=True)
 
     _spectrum = StatusVar(name='spectrum', default=[None, None, None])
     _fit_region = StatusVar(name='fit_region', default=[0, 1])
@@ -82,6 +85,9 @@ class ScanningExcitationLogic(LogicBase):
         if not spectrum_shape_is_correct:
             self.log.info("resetting spectrum")
             self._spectrum = [None for _ in range(len(self._scanner().data_format.data_column_names))]
+        if self._save_idle_to_global_metadata:
+            DataStorageBase.add_global_metadata(self.module_name, {"idle": self.idle, "idle_unit": "Hz"}, overwrite=True)
+
         self._sig_get_spectrum.connect(self.get_spectrum, QtCore.Qt.QueuedConnection)
         self._watchdog_timer.setSingleShot(True)
         self._watchdog_timer.timeout.connect(self._watchdog, QtCore.Qt.QueuedConnection)
@@ -304,6 +310,8 @@ class ScanningExcitationLogic(LogicBase):
         return self._scanner().get_idle_value()
     @idle.setter
     def idle(self, v):
+        if self._save_idle_to_global_metadata:
+            DataStorageBase.add_global_metadata(self.module_name, {"idle": v, "idle_unit": "Hz"}, overwrite=True)
         self._scanner().set_idle_value(v)
     @property
     def notes(self):
