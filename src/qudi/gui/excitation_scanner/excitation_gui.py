@@ -119,7 +119,7 @@ class ScanningExcitationGui(GuiBase):
         self._mw.data_widget.channel_input_combo_box.currentTextChanged.connect(self._excitation_logic().set_display_channel_from_name)
 
         self._mw.data_widget.fit_region.sigRegionChangeFinished.connect(self.fit_region_changed)
-        self._mw.data_widget.target_point.sigPositionChangeFinished.connect(self.target_changed)
+        self._mw.data_widget.target_point.sigPositionChanged.connect(self.target_changed)
 
 
         self._status_update_timer.start()
@@ -162,7 +162,7 @@ class ScanningExcitationGui(GuiBase):
         self._mw.data_widget.channel_input_combo_box.currentTextChanged.disconnect()
 
         self._mw.data_widget.fit_region.sigRegionChangeFinished.disconnect()
-        self._mw.data_widget.target_point.sigPositionChangeFinished.disconnect()
+        self._mw.data_widget.target_point.sigPositionChanged.disconnect()
 
         self._mw.close()
 
