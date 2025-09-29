@@ -17,7 +17,7 @@ class ExcitationScannerDummy(ExcitationScannerInterface, SampledFiniteStateInter
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._constraints = ExcitationScannerConstraints((1e-4,1),(1,1000),(0.0,1.0),[
+        self._constraints = ExcitationScannerConstraints((1e-4,1),(1,1000),(-1.5e9,1.5e9),[
             ExcitationScanControlVariable("dummy variable", (0.0, 10.0), float, "potatoes")
         ])
         self._exposure_time = 0.001

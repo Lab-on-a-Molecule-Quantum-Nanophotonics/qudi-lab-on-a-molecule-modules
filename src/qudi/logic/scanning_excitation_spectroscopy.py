@@ -436,3 +436,7 @@ class ScanningExcitationLogic(LogicBase):
         self._fit_region = new_region
         self.sig_state_updated.emit()
 
+    @property
+    def idle_value_limits(self):
+        return self._scanner().constraints.idle_value_limits
+
