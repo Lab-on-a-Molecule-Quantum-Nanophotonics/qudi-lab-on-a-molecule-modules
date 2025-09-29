@@ -31,6 +31,7 @@ class ExcitationScannerDummy(ExcitationScannerInterface, SampledFiniteStateInter
         self._dummy_variable = 0
         self._current_step = 0
         self._n_values = 0
+        self._idle = 0.0
     def on_activate(self):
         self.enable_watchdog()
         self.start_watchdog()
@@ -67,7 +68,7 @@ class ExcitationScannerDummy(ExcitationScannerInterface, SampledFiniteStateInter
         self._repeat_no = n
     def set_idle_value(self, n:float) -> None:
         "Set idle value."
-        pass
+        self._idle = n
     def get_exposure_time(self) -> float:
         "Get exposure time for one data point."
         return self._exposure_time
@@ -76,7 +77,7 @@ class ExcitationScannerDummy(ExcitationScannerInterface, SampledFiniteStateInter
         return 1
     def get_idle_value(self) -> float:
         "Get idle value."
-        return 0.0
+        return self._idle
     @property
     def data_format(self) -> ExcitationScanDataFormat:
         "Return the data format used in this implementation of the interface."
