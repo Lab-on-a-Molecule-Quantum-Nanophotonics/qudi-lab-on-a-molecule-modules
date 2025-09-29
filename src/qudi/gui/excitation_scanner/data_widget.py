@@ -61,7 +61,7 @@ class ScanningExcitationDataWidget(QtWidgets.QWidget):
         fit_region_visible_label = QtWidgets.QLabel('Show fit region:')
         fit_region_visible_label.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
         fit_region_layout.addWidget(fit_region_visible_label, 3, 0)
-        self.fit_region_visible = QtWidgets.QCheckBox("Show fit region.")
+        self.fit_region_visible = QtWidgets.QCheckBox()
         self.fit_region_visible.setChecked(True)
         fit_region_layout.addWidget(self.fit_region_visible, 3, 1)
 
@@ -101,8 +101,19 @@ class ScanningExcitationDataWidget(QtWidgets.QWidget):
         h_layout.addStretch()
         main_layout.addLayout(h_layout, 1, 0, 1, 2)
 
+        fit_layout = QtWidgets.QVBoxLayout()
         self.fit_widget = FitWidget()
-        main_layout.addWidget(self.fit_widget, 0, 2, 2, 1)
+        fit_layout.addWidget(self.fit_widget)
+        h_layout = QtWidgets.QHBoxLayout()
+        self.fit_visible = QtWidgets.QCheckBox("Fitted model visible")
+        self.fit_visible.setChecked(True)
+        h_layout.addWidget(self.fit_visible)
+        self.delete_current_fit = QtWidgets.QPushButton("Delete current fit")
+        h_layout.addWidget(self.delete_current_fit)
+        h_layout.addStretch()
+        fit_layout.addLayout(h_layout)
+        fit_layout.addStretch()
+        main_layout.addLayout(fit_layout, 0, 2, 1, 1)
 
         self.plot_widget = pg.PlotWidget(
             axisItems={'bottom': CustomAxis(orientation='bottom'),
