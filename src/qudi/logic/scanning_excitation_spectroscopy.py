@@ -43,6 +43,7 @@ class ScanningExcitationLogic(LogicBase):
     _fit_config = StatusVar(name='fit_config', default=dict())
     _notes = StatusVar(name='notes', default="")
     _display_channel_column_number = StatusVar(name='display_channel_column_number', default=0)
+    _scroll_divider_decade = StatusVar(name="scroll_divider_decade", default=3)
 
     _sig_get_spectrum = QtCore.Signal(bool)
 
@@ -448,3 +449,8 @@ class ScanningExcitationLogic(LogicBase):
     def idle_value_limits(self):
         return self._scanner().constraints.idle_value_limits
 
+    @property
+    def scroll_divider_decade(self):
+        return self._scroll_divider_decade
+    def set_scroll_divider_decade(self, v):
+        self._scroll_divider_decade = v
