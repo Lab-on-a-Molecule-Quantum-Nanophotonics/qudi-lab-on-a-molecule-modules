@@ -58,6 +58,12 @@ class ScanningExcitationDataWidget(QtWidgets.QWidget):
         self.scan_no_fit.setMinimum(0)
         self.scan_no_fit.setMaximum(100)
         fit_region_layout.addWidget(self.scan_no_fit, 2, 1)
+        fit_region_visible_label = QtWidgets.QLabel('Show fit region:')
+        fit_region_visible_label.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
+        fit_region_layout.addWidget(fit_region_visible_label, 3, 0)
+        self.fit_region_visible = QtWidgets.QCheckBox("Show fit region.")
+        self.fit_region_visible.setChecked(True)
+        fit_region_layout.addWidget(self.fit_region_visible, 3, 1)
 
         target_group_box = QtWidgets.QGroupBox('Target')
         main_layout.addWidget(target_group_box, 0, 1)
