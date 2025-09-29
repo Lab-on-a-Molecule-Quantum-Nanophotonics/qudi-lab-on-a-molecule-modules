@@ -303,17 +303,19 @@ class ScanningExcitationGui(GuiBase):
         self._mw.control_widget.create_variable_widgets(variables)
 
     def target_changed(self):
-        frequency = self._excitation_logic().frequency
-        if frequency is None or len(frequency)==0:
-            return
+        mini,maxi = self._excitation_logic().idle_value_limits
         self._target_x = self._mw.data_widget.target_point.pos()[0]
 
-        if self._target_x < min(frequency):
-            self._target_x = frequency[0]
-        elif self._target_x > max(frequency):
-            self._target_x = frequency[-1]
+        if self._target_x < mini:
+            self._target_x = mini
+        elif self._target_x > maxi:
+            self._target_x = maxi
 
-        new_y = self._excitation_logic().get_spectrum_at_x(self._target_x)
+        frequency = self._excitation_logic().frequency
+        if frequency is None or len(frequency)==0:
+            new_y = 0.0
+        else:
+            new_y = self._excitation_logic().get_spectrum_at_x(self._target_x)
         self._mw.data_widget.target_x.setValue(self._target_x)
         self._mw.data_widget.target_y.setValue(new_y)
 
