@@ -481,6 +481,7 @@ class RemoteMatisseScanner(ExcitationScannerInterface, SampledFiniteStateInterfa
         self._constraints.set_limits("Minimum frequency", *lims)
         self._constraints.set_limits("Maximum frequency", *lims)
         self._constraints.set_limits("Frequency step", 0, lims[1]-self._conversion_offset)
+        self._constraints.idle_value_limits = lims
     def set_control(self, variable: str, value) -> None:
         "Set a control variable value."
         if not self.constraints.variable_in_range(variable, value):
