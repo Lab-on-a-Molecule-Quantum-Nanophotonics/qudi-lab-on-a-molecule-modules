@@ -1,7 +1,10 @@
 import socket
 
+import time
+
 from qudi.core.module import Base
 from qudi.core.configoption import ConfigOption
+from qudi.util.mutex import Mutex
 from qudi.interface.process_control_interface import ProcessControlInterface, ProcessControlConstraints
 
 class Cryostation(ProcessControlInterface):
@@ -12,6 +15,7 @@ class Cryostation(ProcessControlInterface):
     _ip_port = ConfigOption('port', default=7773)
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._lock = Mutex()
         self.cryostation_socket = None
     
     def on_activate(self):
@@ -37,12 +41,14 @@ class Cryostation(ProcessControlInterface):
         return response[2:2+l]
 
     def query(self, cmd):
-        self.send_cmd(cmd)
-        return self.recv_response()
+        with self._lock:
+            self.send_cmd(cmd)
+            return self.recv_response()
 
     def query_with_float(self, cmd, arg):
-        self.send_cmd_with_float(cmd, arg)
-        return self.recv_response()
+        with self._lock:
+            self.send_cmd_with_float(cmd, arg)
+            return self.recv_response()
       
     # ProcessControlInterfaceBase
     @property
@@ -80,13 +86,24 @@ class Cryostation(ProcessControlInterface):
             self.query_with_float("SHTSP", value)
         elif channel == "platform temperature":
             self.query_with_float("STSP", value)
+            self.query("SCD")
         else:
             pass
     def get_setpoint(self, channel):
         if channel == "user stage temperature":
-            return float(self.query("GHTSP"))
+            try:
+                return float(self.query("GHTSP"))
+            except:
+                return float(self.query("GHTSP"))
         elif channel == "platform temperature":
-            return float(self.query("GTSP"))
+            v = self.query("GTSP")
+            try:
+                return float(v)
+            except ValueError:
+                self.log.warn(f"Failed to read temperature: {v}.")
+                time.sleep(1.1398)
+                v = self.query("GTSP")
+                return float(v)
         else:
             pass
             

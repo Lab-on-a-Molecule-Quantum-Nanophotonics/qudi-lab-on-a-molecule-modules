@@ -254,7 +254,10 @@ class ScanningExcitationLogic(LogicBase):
             props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
             textstr = f"fit method: {self.fit_method}\nfit results:\n"
             for (name,param) in self.fit_results.params.items():
-                textstr += f"  - {name} = {ufloat(param.value, param.stderr)}\n"
+                if np.isfinite(param.stderr):
+                    textstr += f"  - {name} = {ufloat(param.value, param.stderr)}\n"
+                else:
+                    textstr += f"  - {name} = {param.value}\n"
             textstr += f"fit region: {self.fit_region}"
             # place a text box in upper left in axes coords
             ax1.text(0.05, 0.95, textstr, transform=ax1.transAxes, fontsize=14,

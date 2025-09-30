@@ -82,7 +82,7 @@ class ScanningExcitationControlWidget(QtWidgets.QWidget):
         common_controls_layout.addRow("Exposure", self.exposure_spinbox)
         self.repetitions_spinbox = QtWidgets.QSpinBox()
         self.repetitions_spinbox.setMinimum(1)
-        self.repetitions_spinbox.setMaximum(100)
+        self.repetitions_spinbox.setMaximum(1000000)
         common_controls_layout.addRow("Repetitions", self.repetitions_spinbox)
         self.status_label = QtWidgets.QLabel("")
         common_controls_layout.addRow("Scanner status", self.status_label)
