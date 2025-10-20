@@ -823,8 +823,9 @@ class SequenceGeneratorLogic(LogicBase):
         try:
             with open(os.path.join(self._assets_storage_dir, filename), 'wb') as file:
                 pickle.dump(block, file)
-        except:
+        except Exception as e:
             self.log.error('Failed to serialize PulseBlock "{0}" to file.'.format(block.name))
+            self.log.debug(f'Exception {e}')
         return
 
     def _save_blocks_to_file(self):
@@ -934,9 +935,10 @@ class SequenceGeneratorLogic(LogicBase):
         try:
             with open(os.path.join(self._assets_storage_dir, filename), 'wb') as file:
                 pickle.dump(ensemble, file)
-        except:
+        except Exception as e:
             self.log.error('Failed to serialize PulseBlockEnsemble "{0}" to file.'
                            ''.format(ensemble.name))
+            self.log.debug(f'Exception {e}')
         return
 
     def _save_ensembles_to_file(self):
@@ -1865,6 +1867,14 @@ class SequenceGeneratorLogic(LogicBase):
                             analog_samples[chnl][array_write_index:array_write_index + samples_to_add] = pulse_function[
                                                                                                              chnl].get_samples(
                                 time_arr) / (self.__analog_levels[0][chnl] / 2)
+                            mini = np.min(analog_samples[chnl][array_write_index:array_write_index + samples_to_add])
+                            maxi = np.max(analog_samples[chnl][array_write_index:array_write_index + samples_to_add])
+                            
+                            if mini < -1 or maxi > 1:
+                                self.log.warning("Not a good range!")
+                                self.log.debug(f"Pulse function {pulse_function[chnl]}")
+                                self.log.debug(f"normalizer for the following is {(self.__analog_levels[0][chnl] / 2)}.")
+                                self.log.debug(f"Analog samples for channel {chnl}, range {array_write_index} to {array_write_index + samples_to_add}, are in [{mini},{maxi}]")
 
                         # Free memory
                         if pulse_function:
@@ -1883,6 +1893,7 @@ class SequenceGeneratorLogic(LogicBase):
                             # Set first/last chunk flags
                             is_first_chunk = array_write_index == processed_samples
                             is_last_chunk = processed_samples == ensemble_info['number_of_samples']
+                            self.log.debug(f"Writing samples {analog_samples}")
                             written_samples, wfm_list = self.pulsegenerator().write_waveform(
                                 name=waveform_name,
                                 analog_samples=analog_samples,
