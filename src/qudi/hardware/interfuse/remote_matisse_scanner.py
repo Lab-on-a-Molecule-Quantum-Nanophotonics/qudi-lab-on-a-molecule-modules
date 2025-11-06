@@ -206,7 +206,8 @@ class RemoteMatisseScanner(ExcitationScannerInterface, SampledFiniteStateInterfa
         """Idling mode, we wait for a new scan to be triggered, and update the 
         idling value if needed.
         """
-        if self._scan_value != self._idle_value:
+        idle_active = self._matisse().get_activity_state("scan value")
+        if idle_active and self._scan_value != self._idle_value:
             self._scan_value = self._idle_value
     @state
     @transition_to(("next", "prepare_stitch"))
@@ -238,7 +239,7 @@ class RemoteMatisseScanner(ExcitationScannerInterface, SampledFiniteStateInterfa
     @transition_to(("end", "prepare_idle"))
     def prepare_stitch(self):
         no_stitch_all_done = not self._stitching_enabled and self._repeat_no >= self._n_repeat
-        if no_stitch_all_done or self._last_center_frequency >= self._stitching_last_frequency:
+        if no_stitch_all_done or (self._stitching_enabled and self._last_center_frequency >= self._stitching_last_frequency):
             self.watchdog_event("end")
             self.log.info("All stitches done done.")
         elif self._stitching_enabled and self._last_prepared_stitch != self._stitch_no:
@@ -390,7 +391,7 @@ class RemoteMatisseScanner(ExcitationScannerInterface, SampledFiniteStateInterfa
             with self._data_lock:
                 new_data = self._finite_sampling_input().get_buffered_samples()
                 for (chnum, ch) in enumerate(self._input_channels):
-                    self._scan_data[i:i+len(new_data[ch]),3+chnum] = new_data[ch]
+                    self._scan_data[i:i+len(new_data[ch]),4+chnum] = new_data[ch]
                     new_data_length = len(new_data[ch])
                 self._data_row_index += new_data_length
     @state
