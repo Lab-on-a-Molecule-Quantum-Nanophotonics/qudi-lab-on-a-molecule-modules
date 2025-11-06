@@ -39,7 +39,7 @@ class NationalInstrumentsPulser(Base, PulserInterface):
     Example config for copy-paste:
 
     ni_pulser:
-        module.Class: 'national_instruments_pulser.NationalInstrumentsPulser'
+        module.Class: 'dig_generator.national_instruments_pulser.NationalInstrumentsPulser'
         options:
             device: 'Dev0'
             #pulsed_file_dir: 'C:\\Software\\qudi_pulsed_files' # optional, path
