@@ -82,6 +82,8 @@ class NiScanningProbeInterfuseBare(ScanningProbeInterface):
                 AI0: 'V'
             move_velocity: 400e-6 #m/s; This speed is used for scanner movements and avoids jumps from position to position.
             default_backward_resolution: 50
+            backwards_line_resolution: 50 # optional
+            maximum_move_velocity: 400e-6 #m/s; This speed is used for scanner movements and avoids jumps from position to position.
     """
     _ni_finite_sampling_io = Connector(name='scan_hardware', interface=FiniteSamplingIOInterface)
     _ni_ao = Connector(name='analog_output', interface=ProcessSetpointInterface)
