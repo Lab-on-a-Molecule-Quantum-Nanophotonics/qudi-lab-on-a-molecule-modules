@@ -1,4 +1,4 @@
-# Programming guides: writing your own modules
+# Programming guides: writing your own modules and understanding our hardwares.
 
 Writing your own modules is not as hard as it seems. Plus, we added some utilities that you may find useful in making it even easier.
 
@@ -7,4 +7,5 @@ Writing your own modules is not as hard as it seems. Plus, we added some utiliti
 :caption: Contents:
 
 lens-modules/state-machines
+lens-modules/excitation-spectroscopy
 ```

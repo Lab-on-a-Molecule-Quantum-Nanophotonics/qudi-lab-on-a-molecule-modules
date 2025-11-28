@@ -8,6 +8,9 @@ The matisse laser is intended to have its own computer with Qudi running on it. 
 
 ## Matisse proxy
 
+```{statemachine} qudi.hardware.laser.matisse.MatisseCommander
+```
+
 ```{autodoc2-object} qudi.hardware.laser.matisse.MatisseCommander
 render_plugin = "myst"
 ```

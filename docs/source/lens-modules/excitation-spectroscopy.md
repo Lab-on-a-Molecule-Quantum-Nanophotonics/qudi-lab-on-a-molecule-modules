@@ -5,10 +5,6 @@
 :caption: Contents:
 ```
 
-## Excitation setup at a glance
-## The excitation scanner interface
-## The scanning excitation logic
-## The excitation GUI
 ## Available hardwares
 ```{toctree}
 :maxdepth: 1

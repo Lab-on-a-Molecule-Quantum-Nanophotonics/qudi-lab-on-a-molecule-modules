@@ -5,6 +5,9 @@ This is a fork of [Ulm-IQO's qudi module](https://github.com/Ulm-IQO/qudi-iqo-mo
 We try to maintain it up to date with the original repository by rebasing our modifications on top of it. You can see a list of modifications in [the LENS changelog](docs/changelog-lens.md).
 
 
+You can also consult the [documentation](https://lab-on-a-molecule-quantum-nanophotonics.github.io/qudi-lab-on-a-molecule-modules/index.html).
+
+
 # qudi-iqo-modules (original README)
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
 

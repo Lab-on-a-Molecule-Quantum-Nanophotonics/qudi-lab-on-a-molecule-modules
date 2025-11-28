@@ -18,7 +18,11 @@ author = 'Molecular Quantum Nanophotonics Lab @ LENS'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ['myst_parser', 'autodoc2', 'plotstatemachine', 'sphinx.ext.linkcode']
+extensions = ['autodoc2', 'plotstatemachine', 'sphinx.ext.linkcode', "myst_nb", "sphinx_exercise"]
+nb_render_image_options = {
+    'width':"60%"
+}
+nb_render_markdown_format = "myst"
 
 autodoc2_packages = [
     {
