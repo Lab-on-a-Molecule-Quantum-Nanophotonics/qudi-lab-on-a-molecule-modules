@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html  lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+      <title>Setting up confocal scanning</title>
+    
+          <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+          <link rel="stylesheet" href="../_static/theme.css " type="text/css" />
+          <link rel="stylesheet" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" type="text/css" />
+          <link rel="stylesheet" href="../_static/exercise.css" type="text/css" />
+      
+      <!-- sphinx script_files -->
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+
+      
+      <!-- bundled in js (rollup iife) -->
+      <!-- <script src="../_static/theme-vendors.js"></script> -->
+      <script src="../_static/theme.js" defer></script>
+    
+  <link rel="index" title="Index" href="../genindex.html" />
+  <link rel="search" title="Search" href="../search.html" />
+  <link rel="next" title="Setting up ODMR" href="setup_odmr.html" />
+  <link rel="prev" title="Introduction to a crash course into Qudi" href="../Crash%20course%20into%20Qudi.html" /> 
+  </head>
+
+  <body>
+    <div id="app">
+    <div class="theme-container" :class="pageClasses"><navbar @toggle-sidebar="toggleSidebar">
+  <router-link to="../index.html" class="home-link">
+    
+      <span class="site-name">Qudi Lab on a molecule modules</span>
+    
+  </router-link>
+
+  <div class="links">
+    <navlinks class="can-hide">
+
+  
+    <div class="nav-item">
+      <a href="../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link  router-link-active">
+         Tutorials:
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+    </navlinks>
+  </div>
+</navbar>
+
+      
+      <div class="sidebar-mask" @click="toggleSidebar(false)">
+      </div>
+        <sidebar @toggle-sidebar="toggleSidebar">
+          
+          <navlinks>
+            
+
+  
+    <div class="nav-item">
+      <a href="../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link  router-link-active">
+         Tutorials:
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+            
+          </navlinks><div id="searchbox" class="searchbox" role="search">
+  <div class="caption"><span class="caption-text">Quick search</span>
+    <div class="searchformwrapper">
+      <form class="search" action="../search.html" method="get">
+        <input type="text" name="q" />
+        <input type="submit" value="Search" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div><div class="sidebar-links" role="navigation" aria-label="main navigation">
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../index.html#qudi-lab-on-a-molecule-modules-documentation">Tutorials:</a></span>
+      </p>
+      <ul class="current">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../Crash%20course%20into%20Qudi.html" class="reference internal ">    Tutorial: a crash course into Qudi</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 current">
+            
+              <a href="#" class="reference internal current">    Guide: Setting up confocal scanning</a>
+            
+
+            
+              <ul>
+                
+                  <li class="toctree-l2"><a href="#introduction" class="reference internal">Introduction</a></li>
+                
+                  <li class="toctree-l2"><a href="#example-config" class="reference internal">Example config</a></li>
+                
+                  <li class="toctree-l2"><a href="#configuration-hints" class="reference internal">Configuration hints</a></li>
+                
+                  <li class="toctree-l2"><a href="#tilt-correction" class="reference internal">Tilt correction</a></li>
+                
+                  <li class="toctree-l2"><a href="#todo-this-readme" class="reference internal">Todo this readme</a></li>
+                
+              </ul>
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="setup_odmr.html" class="reference internal ">    Guide: Setting up ODMR</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="setup_timeseries.html" class="reference internal ">    Guide: Setting up time series</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../index.html#qudi-lab-on-a-molecule-modules-documentation">Contents:</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../installation.html" class="reference internal ">Installation</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../changelog-lens.html" class="reference internal ">Lens's changelog</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="changelog.html" class="reference internal ">Ulm IQO's changelog (parent repository)</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../programming-guides.html" class="reference internal ">Programming guides: writing your own modules and understanding our hardwares.</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="iqo-specifics.html" class="reference internal ">Ulm IQO's specific guides</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+</div>
+        </sidebar>
+
+      <page>
+          <div class="body-header" role="navigation" aria-label="navigation">
+  
+  <ul class="breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+    
+    <li>Setting up confocal scanning</li>
+  </ul>
+  
+
+  <ul class="page-nav">
+  <li class="prev">
+    <a href="../Crash%20course%20into%20Qudi.html"
+       title="previous chapter">← Introduction to a crash course into Qudi</a>
+  </li>
+  <li class="next">
+    <a href="setup_odmr.html"
+       title="next chapter">Setting up ODMR →</a>
+  </li>
+</ul>
+  
+</div>
+<hr>
+          <div class="content" role="main" v-pre>
+            
+  <section id="setting-up-confocal-scanning">
+<h1>Setting up confocal scanning<a class="headerlink" href="#setting-up-confocal-scanning" title="Link to this heading">¶</a></h1>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h2>
+<p>The scanning toolchain is designed to be fully configurable with respect to multiple signal inputs (eg. APD counts, analogue inputs) and an arbitrary scanning axes configuration.
+To this end, its written in a very modular way.
+A typical working toolchain consists out of the following qudi modules:</p>
+<p>logic:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/Ulm-IQO/qudi-iqo-modules/blob/main/src/qudi/logic/scanning_data_logic.py#L50">scanning_data_logic</a></p></li>
+<li><p><a class="reference external" href="https://github.com/Ulm-IQO/qudi-iqo-modules/blob/main/src/qudi/logic/scanning_probe_logic.py#L33">scanning_probe_logic</a></p></li>
+<li><p><a class="reference external" href="https://github.com/Ulm-IQO/qudi-iqo-modules/blob/main/src/qudi/logic/scanning_optimize_logic.py#L33">scanning_optimize_logic</a></p></li>
+</ul>
+<p>hardware (here NI X-series):</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/Ulm-IQO/qudi-iqo-modules/blob/main/src/qudi/hardware/ni_x_series/ni_x_series_analog_output.py#L39">analog_output</a></p></li>
+<li><p><a class="reference external" href="https://github.com/Ulm-IQO/qudi-iqo-modules/blob/main/src/qudi/hardware/ni_x_series/ni_x_series_finite_sampling_input.py#L46">finite_sampling_input</a></p></li>
+<li><p><a class="reference external" href="https://github.com/Ulm-IQO/qudi-iqo-modules/blob/main/src/qudi/hardware/ni_x_series/ni_x_series_finite_sampling_io.py#L50">finite_sampling_io</a></p></li>
+<li><p>(<a class="reference external" href="https://github.com/Ulm-IQO/qudi-iqo-modules/blob/main/src/qudi/hardware/ni_x_series/ni_x_series_in_streamer.py#L45">in_streamer</a>, optional)</p></li>
+</ul>
+<p>gui:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/Ulm-IQO/qudi-iqo-modules/blob/main/src/qudi/gui/scanning/scannergui.py#L83">scannergui</a></p></li>
+</ul>
+</section>
+<section id="example-config">
+<h2>Example config<a class="headerlink" href="#example-config" title="Link to this heading">¶</a></h2>
+<p>These modules need to be configured and connected in your qudi config file.
+We here provide an examplary config for a toolchain based on a NI X-series scanner with analogue output and digital (APD TTL) input.
+Note: This readme file might not be up-to-date with the most recent development. We advice to check the examplary config present in the
+docstring of every module’s python file. In the list above, a direct link for every module is provided:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>gui:
+    scanner_gui:
+      module.Class: &#39;scanning.scannergui.ScannerGui&#39;
+      options:  
+          image_axes_padding: 0.02
+          default_position_unit_prefix: null  # optional, use unit prefix characters, e.g. &#39;u&#39; or &#39;n&#39;
+          optimizer_plot_dimensions: [2,1]
+      connect:
+          scanning_logic: scanning_probe_logic
+          data_logic: scanning_data_logic
+          optimize_logic: scanning_optimize_logic
+
+
+logic:
+    scanning_probe_logic:
+        module.Class: &#39;scanning_probe_logic.ScanningProbeLogic&#39;
+        options:  
+            max_history_length: 20
+            max_scan_update_interval: 2
+            position_update_interval: 1
+        connect:
+            scanner: ni_scanner
+
+    scanning_data_logic:
+        module.Class: &#39;scanning_data_logic.ScanningDataLogic&#39;
+        options:  
+            max_history_length: 20
+        connect:
+            scan_logic: scanning_probe_logic
+
+    scanning_optimize_logic:
+        module.Class: &#39;scanning_optimize_logic.ScanningOptimizeLogic&#39;
+        connect:
+            scan_logic: scanning_probe_logic
+
+
+hardware:
+    ni_scanner:
+        module.Class: &#39;interfuse.ni_scanning_probe_interfuse.NiScanningProbeInterfuse&#39;
+        connect:
+            scan_hardware: &#39;ni_io&#39;
+            analog_output: &#39;ni_ao&#39;
+        options:  
+            ni_channel_mapping:
+                x: &#39;ao0&#39;
+                y: &#39;ao1&#39;
+                z: &#39;ao2&#39;
+                #a: &#39;ao3&#39;
+                APD1: &#39;PFI8&#39;
+                #APD2: &#39;PFI9&#39;
+                #AI0: &#39;ai0&#39;
+                #APD3: &#39;PFI10&#39;
+            position_ranges: # in m
+                x: [0, 200e-6]
+                y: [0, 200e-6]
+                z: [-100e-6, 100e-6]
+            frequency_ranges:
+                x: [1, 5000]
+                y: [1, 5000]
+                z: [1, 1000]
+            resolution_ranges:
+                x: [1, 10000]
+                y: [1, 10000]
+                z: [1, 10000]
+            input_channel_units:
+                APD1: &#39;c/s&#39;
+                #AI0: &#39;V&#39;
+                #APD2: &#39;c/s&#39;
+                #APD3: &#39;c/s&#39;
+            backwards_line_resolution: 50 # optional
+            maximum_move_velocity: 400e-6 #m/s
+    
+    # dummy, if no real hardware available
+    scanner_dummy:
+        module.Class: &#39;dummy.scanning_probe_dummy.ScanningProbeDummy&#39;
+        options:
+            position_ranges:
+                &#39;x&#39;: [0, 200e-6]
+                &#39;y&#39;: [0, 200e-6]
+                &#39;z&#39;: [-100e-6, 100e-6]
+            frequency_ranges:
+                &#39;x&#39;: [0, 10000]
+                &#39;y&#39;: [0, 10000]
+                &#39;z&#39;: [0, 5000]
+            resolution_ranges:
+                &#39;x&#39;: [2, 2147483647]
+                &#39;y&#39;: [2, 2147483647]
+                &#39;z&#39;: [2, 2147483647]
+            position_accuracy:
+                &#39;x&#39;: 10e-9
+                &#39;y&#39;: 10e-9
+                &#39;z&#39;: 50e-9
+            spot_density: 1e11
+    
+    ni_io:
+        module.Class: &#39;ni_x_series.ni_x_series_finite_sampling_io.NIXSeriesFiniteSamplingIO&#39;
+        options:
+            device_name: &#39;Dev1&#39;
+            input_channel_units:  # optional
+                PFI8: &#39;c/s&#39;
+                #PFI9: &#39;c/s&#39;
+                #PFI10: &#39;c/s&#39;
+                #ai0: &#39;V&#39;
+                #ai1: &#39;V&#39;
+            output_channel_units:
+                &#39;ao0&#39;: &#39;V&#39;
+                &#39;ao1&#39;: &#39;V&#39;
+                &#39;ao2&#39;: &#39;V&#39;
+            adc_voltage_ranges:
+                #ai0: [-10, 10]  # optional
+                #ai1: [-10, 10]  # optional
+            output_voltage_ranges:
+                ao0: [-10, 10]
+                ao1: [-10, 10]
+                ao2: [-10, 10]
+
+            frame_size_limits: [1, 1e9]  # optional #TODO actual HW constraint?
+            output_mode: &#39;JUMP_LIST&#39; #&#39;JUMP_LIST&#39; # optional, must be name of SamplingOutputMode
+            read_write_timeout: 10  # optional
+            #sample_clock_output: &#39;/Dev1/PFI11&#39; # optional
+
+    ni_ao:
+        module.Class: &#39;ni_x_series.ni_x_series_analog_output.NIXSeriesAnalogOutput&#39;
+        options:
+            device_name: &#39;Dev1&#39;
+            channels:
+                ao0:
+                    limits: [-10.0, 10.0]
+                    keep_value: True
+                ao1:
+                    limits: [-10.0, 10.0]
+                    keep_value: True
+                ao2:
+                    limits: [-10.0, 10.0]
+                    keep_value: True
+                ao3:
+                    limits: [-10.0, 10.0]
+                    keep_value: True
+
+    
+    # optional, for slow counter / timer series reader
+    ni_instreamer:
+        module.Class: &#39;ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer&#39;
+        options:
+            device_name: &#39;Dev1&#39;
+            digital_sources:  # optional
+                - &#39;PFI8&#39;
+            #analog_sources:  # optional
+            #   - &#39;ai0&#39;
+            #   - &#39;ai1&#39;
+            # external_sample_clock_source: &#39;PFI0&#39;  # optional
+            # external_sample_clock_frequency: 1000  # optional
+            adc_voltage_range: [-10, 10]  # optional
+            max_channel_samples_buffer: 10000000  # optional
+            read_write_timeout: 10  # optional
+</pre></div>
+</div>
+</section>
+<section id="configuration-hints">
+<h2>Configuration hints<a class="headerlink" href="#configuration-hints" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>The maximum scanning frequency is given by the bandwidth of your Piezo controller (check the datasheet). It might make sense to put an even smaller limit into your config, since scanning at the hardware limit might introduce artifacts/offsets to your confocal scan.</p></li>
+<li><p>The optimizer scan behavior and sequence are configurable in the scanning gui -&gt; Settings -&gt; Optimizer settings.</p></li>
+</ul>
+<p>Deprecated:</p>
+<ul class="simple">
+<li><p>Until v0.5.1, the scanning gui’s <code class="docutils literal notranslate"><span class="pre">optimizer_plot_dimensions</span></code> ConfigOption allowed to specify the optimizer’s scanning behavior. The default setting <code class="docutils literal notranslate"><span class="pre">[2,1]</span></code> enables one 2D and one 1D optimization step. You may set to eg. <code class="docutils literal notranslate"><span class="pre">[2,2,2]</span></code> to have three two-dimensionsal scans done for optimzation. In the gui (Settings/Optimizer Settings), this will change the list of possible optimizer sequences.</p></li>
+</ul>
+</section>
+<section id="tilt-correction">
+<h2>Tilt correction<a class="headerlink" href="#tilt-correction" title="Link to this heading">¶</a></h2>
+<p>The above configuration will enable the tilt correction feature for the ScanningProbeDummy and NiScanningProbeInterfuse.
+This allows to perform scans in tilted layers, eg. along the surface of a non-flat sample.</p>
+<ul class="simple">
+<li><p>In the scanning_probe_gui, you can configure this feature in the menu enabled by ‘View’ -&gt; ‘Tilt correction’.</p></li>
+<li><p>Choose three support vectors in the plane that should become the new $\hat{e}_z$ plane.
+Instead of manually typing the coordinates of a support vector, hitting the ‘Vec 1” button will
+insert the current crosshair position as support vector 1.</p></li>
+<li><p>Enable the transformation by the “Tilt correction” button.</p></li>
+</ul>
+</section>
+<section id="todo-this-readme">
+<h2>Todo this readme<a class="headerlink" href="#todo-this-readme" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+
+
+          </div>
+          <div class="page-nav">
+            <div class="inner"><ul class="page-nav">
+  <li class="prev">
+    <a href="../Crash%20course%20into%20Qudi.html"
+       title="previous chapter">← Introduction to a crash course into Qudi</a>
+  </li>
+  <li class="next">
+    <a href="setup_odmr.html"
+       title="next chapter">Setting up ODMR →</a>
+  </li>
+</ul><div class="footer" role="contentinfo">
+      &#169; Copyright 2025, Molecular Quantum Nanophotonics Lab @ LENS.
+    <br>
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.1.3 with <a href="https://github.com/schettino72/sphinx_press_theme">Press Theme</a> 0.9.1.
+</div>
+            </div>
+          </div>
+      </page>
+    </div></div>
+    
+    
+  </body>
+</html>

@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html  lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+      <title>Changelog</title>
+    
+          <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+          <link rel="stylesheet" href="../_static/theme.css " type="text/css" />
+          <link rel="stylesheet" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" type="text/css" />
+          <link rel="stylesheet" href="../_static/exercise.css" type="text/css" />
+      
+      <!-- sphinx script_files -->
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+
+      
+      <!-- bundled in js (rollup iife) -->
+      <!-- <script src="../_static/theme-vendors.js"></script> -->
+      <script src="../_static/theme.js" defer></script>
+    
+  <link rel="index" title="Index" href="../genindex.html" />
+  <link rel="search" title="Search" href="../search.html" />
+  <link rel="next" title="Programming guides: writing your own modules and understanding our hardwares." href="../programming-guides.html" />
+  <link rel="prev" title="Changelog - LENS additions" href="../changelog-lens.html" /> 
+  </head>
+
+  <body>
+    <div id="app">
+    <div class="theme-container" :class="pageClasses"><navbar @toggle-sidebar="toggleSidebar">
+  <router-link to="../index.html" class="home-link">
+    
+      <span class="site-name">Qudi Lab on a molecule modules</span>
+    
+  </router-link>
+
+  <div class="links">
+    <navlinks class="can-hide">
+
+  
+    <div class="nav-item">
+      <a href="../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Tutorials:
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link  router-link-active">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+    </navlinks>
+  </div>
+</navbar>
+
+      
+      <div class="sidebar-mask" @click="toggleSidebar(false)">
+      </div>
+        <sidebar @toggle-sidebar="toggleSidebar">
+          
+          <navlinks>
+            
+
+  
+    <div class="nav-item">
+      <a href="../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Tutorials:
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link  router-link-active">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+            
+          </navlinks><div id="searchbox" class="searchbox" role="search">
+  <div class="caption"><span class="caption-text">Quick search</span>
+    <div class="searchformwrapper">
+      <form class="search" action="../search.html" method="get">
+        <input type="text" name="q" />
+        <input type="submit" value="Search" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div><div class="sidebar-links" role="navigation" aria-label="main navigation">
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../index.html#qudi-lab-on-a-molecule-modules-documentation">Tutorials:</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../Crash%20course%20into%20Qudi.html" class="reference internal ">    Tutorial: a crash course into Qudi</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="setup_confocal_scanning.html" class="reference internal ">    Guide: Setting up confocal scanning</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="setup_odmr.html" class="reference internal ">    Guide: Setting up ODMR</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="setup_timeseries.html" class="reference internal ">    Guide: Setting up time series</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../index.html#qudi-lab-on-a-molecule-modules-documentation">Contents:</a></span>
+      </p>
+      <ul class="current">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../installation.html" class="reference internal ">Installation</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../changelog-lens.html" class="reference internal ">Lens's changelog</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 current">
+            
+              <a href="#" class="reference internal current">Ulm IQO's changelog (parent repository)</a>
+            
+
+            
+              <ul>
+                
+                  <li class="toctree-l2"><a href="#pre-release" class="reference internal">Pre-Release</a></li>
+                
+                  <li class="toctree-l2"><a href="#version-0-6-0" class="reference internal">Version 0.6.0</a></li>
+                
+                  <li class="toctree-l2"><a href="#version-0-5-1" class="reference internal">Version 0.5.1</a></li>
+                
+                  <li class="toctree-l2"><a href="#version-0-4-0" class="reference internal">Version 0.4.0</a></li>
+                
+              </ul>
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../programming-guides.html" class="reference internal ">Programming guides: writing your own modules and understanding our hardwares.</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="iqo-specifics.html" class="reference internal ">Ulm IQO's specific guides</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+</div>
+        </sidebar>
+
+      <page>
+          <div class="body-header" role="navigation" aria-label="navigation">
+  
+  <ul class="breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+    
+    <li>Changelog</li>
+  </ul>
+  
+
+  <ul class="page-nav">
+  <li class="prev">
+    <a href="../changelog-lens.html"
+       title="previous chapter">← Changelog - LENS additions</a>
+  </li>
+  <li class="next">
+    <a href="../programming-guides.html"
+       title="next chapter">Programming guides: writing your own modules and understanding our hardwares. →</a>
+  </li>
+</ul>
+  
+</div>
+<hr>
+          <div class="content" role="main" v-pre>
+            
+  <section id="changelog">
+<h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">¶</a></h1>
+<section id="pre-release">
+<h2>Pre-Release<a class="headerlink" href="#pre-release" title="Link to this heading">¶</a></h2>
+<section id="breaking-changes">
+<h3>Breaking Changes<a class="headerlink" href="#breaking-changes" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Dropped <code class="docutils literal notranslate"><span class="pre">Python</span> <span class="pre">3.8</span></code> support</p></li>
+</ul>
+</section>
+<section id="bugfixes">
+<h3>Bugfixes<a class="headerlink" href="#bugfixes" title="Link to this heading">¶</a></h3>
+</section>
+<section id="new-features">
+<h3>New Features<a class="headerlink" href="#new-features" title="Link to this heading">¶</a></h3>
+</section>
+<section id="other">
+<h3>Other<a class="headerlink" href="#other" title="Link to this heading">¶</a></h3>
+</section>
+</section>
+<section id="version-0-6-0">
+<h2>Version 0.6.0<a class="headerlink" href="#version-0-6-0" title="Link to this heading">¶</a></h2>
+<p><strong>⚠ DEPRECATION WARNING</strong>
+In future releases, <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">3.8</span></code> support will be dropped to be able to upgrade to <code class="docutils literal notranslate"><span class="pre">numpy</span> <span class="pre">&gt;</span> <span class="pre">1.24</span></code> package versions.</p>
+<section id="id1">
+<h3>Breaking Changes<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Refactoring of data classes in <code class="docutils literal notranslate"><span class="pre">qudi.interface.scanning_probe_interface</span></code>. Will break custom modules
+implementing this interface.</p></li>
+<li><p>Add back scan data and back scan settings getter and setter methods
+to <code class="docutils literal notranslate"><span class="pre">qudi.interface.scanning_probe_interface</span></code>.</p></li>
+<li><p>Moved ConfigOption ScannerGui.optimizer_plot_dimensions to qudi.logic.scanning_optimize_logic.optimizer_sequence_dimensions and optimizer sequence creation is solely handled by logic</p></li>
+</ul>
+</section>
+<section id="id2">
+<h3>Bugfixes<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Fix a crash of pulsed gui on reload of pulsed logic, e.g. sequence_generator_logic</p></li>
+<li><p>Fix failure of saving plots in <code class="docutils literal notranslate"><span class="pre">QDPlotLogic</span></code> when fiting is used.</p></li>
+<li><p>Improve handling of errors during start of a scan in the scanning probe toolchain.</p></li>
+<li><p>Now correct microwave phases in predefined method generate_hahnecho_exp()</p></li>
+<li><p>“NFiniteSamplingInput supporting both trigger polarities via ConfigOption</p></li>
+<li><p>Old ODMR fits are now removed when starting a new measurement</p></li>
+<li><p>Remove hardcoded limits of the setpoint in the PID gui.</p></li>
+<li><p>Fixed missing <code class="docutils literal notranslate"><span class="pre">plot_index</span></code> when calling <code class="docutils literal notranslate"><span class="pre">QDPlotLogic._remove_plot</span></code> in <code class="docutils literal notranslate"><span class="pre">QDPlotLogic._set_plot_count</span></code></p></li>
+<li><p>Fixed <code class="docutils literal notranslate"><span class="pre">QDPlotterGui</span></code> example config</p></li>
+<li><p>Fixed psu-dependent bugs for laser_quantum_laser</p></li>
+<li><p>Laser logic does not automatically start query loop, gui will still start it on startup</p></li>
+<li><p>Optimization sequences other than [2D, 1D] are now working</p></li>
+<li><p>Fixed <code class="docutils literal notranslate"><span class="pre">t1_sequencing</span></code> predefined method’s <code class="docutils literal notranslate"><span class="pre">counting_length</span></code> for gated mode</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">QDPlotterGui</span></code> will continue to show fit results if new plot was added</p></li>
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">PulseSequence.generation_method_parameters</span></code> variable to correctly save <code class="docutils literal notranslate"><span class="pre">generation_method_parameters</span></code> of a <code class="docutils literal notranslate"><span class="pre">PulseSequence</span></code> and save these parameters in the output file</p></li>
+<li><p>Fixed <code class="docutils literal notranslate"><span class="pre">ScanningOptimizeLogic</span></code> crashing on first start when using scanner with less than the default 3 axes configured</p></li>
+<li><p>Fixed Keysight M8195A AWG sequence mode</p></li>
+<li><p>Fixed setting of digital channel amplitude of Keysight M819X AWG</p></li>
+<li><p>Fixed potential <code class="docutils literal notranslate"><span class="pre">scanning_optimize_logic</span></code> deadlock when starting the optimizer</p></li>
+<li><p>Fixed loading of most recent target when starting scanning GUI</p></li>
+<li><p>added <code class="docutils literal notranslate"><span class="pre">waiting_element</span></code> to <code class="docutils literal notranslate"><span class="pre">generate_t1_sequencing</span></code> method</p></li>
+<li><p>Fixed example config typo in <code class="docutils literal notranslate"><span class="pre">tektronix_awg70k.py</span></code></p></li>
+<li><p>Fixed issue when using same pfi channel on two different ni cards for NI instreamer</p></li>
+<li><p>Fixed POI manager auto-find</p></li>
+<li><p>Fixed overwriting of file in scanner GUI when using custom nametag</p></li>
+<li><p>Fix failure of saving plots in <code class="docutils literal notranslate"><span class="pre">QDPlotLogic</span></code> when fiting is used</p></li>
+<li><p>Fixed StatusVar initialization in POI manager</p></li>
+<li><p>Fixed checker for optimizer plot dimensions in scanning toolchain</p></li>
+<li><p>Disconnect GUI widgets on deactivation of laser <code class="docutils literal notranslate"><span class="pre">LaserGui</span></code></p></li>
+<li><p>Fix failure of saving plots in <code class="docutils literal notranslate"><span class="pre">QDPlotLogic</span></code> when fiting is used.</p></li>
+</ul>
+</section>
+<section id="id3">
+<h3>New Features<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>New <code class="docutils literal notranslate"><span class="pre">qudi.interface.scanning_probe_interface.ScanSettings</span></code> dataclass added.</p></li>
+<li><p>Checkers and clipping methods added to <code class="docutils literal notranslate"><span class="pre">qudi.interface.scanning_probe_interface.Constraints</span></code></p></li>
+<li><p>Data classes of the scanning probe interface now have an improved hierarchy
+(e.g. <code class="docutils literal notranslate"><span class="pre">ScanData</span></code> contains <code class="docutils literal notranslate"><span class="pre">ScanSettings</span></code>).</p></li>
+<li><p>Improved scanning probe dummy: new image generator class, more realistic forward and backward scan simulation.</p></li>
+<li><p>Major refactoring of scanning probe toolchain, including scanning probe logic, optimizer logic and gui modules.
+Implementation of configurable backward scans.</p></li>
+<li><p>Add widgets to configure back scan resolution and frequency from scanning GUI.</p></li>
+<li><p>Add config option to save backward scan data to scanning data logic.</p></li>
+<li><p>Get current sweeps and runtime of fastcomtec fastcounter MCS6 when pulling the data trace.</p></li>
+<li><p>Re-introduced tilt correction (from old core) to the scanning probe toolchain.</p></li>
+<li><p>Improved support for Stanford Research Systems signal generators</p></li>
+<li><p>Expanded documentation of the microwave interface</p></li>
+<li><p>Add new hardware module for the PID laser control functionality of HighFinesse wavemeters.</p></li>
+<li><p>Added option to specify custom save file name in scanning GUI (PR #148)</p></li>
+<li><p>Add support for digital output to NI X-series finite sampling io</p></li>
+<li><p>Added fastcounter hardware file support for Adlink PCIe 9834</p></li>
+<li><p>Save and restore window position of various module GUIs</p></li>
+<li><p>Added DMC output mode for Keysight M8195A AWG</p></li>
+<li><p>Updated workflows to follow new ‘pyproject.toml’ release workflow</p></li>
+<li><p>Altered tektronix_awg70k hardware file to allow the use of the newer, B-series of Tektronix AWGs</p></li>
+<li><p>Added ruff configuration to <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> to standardize formatting</p></li>
+<li><p>Added Windfreak synthHD documentation</p></li>
+<li><p>Added cursor position in <code class="docutils literal notranslate"><span class="pre">Scan2DWidget</span></code> of the scanning toolchain</p></li>
+<li><p>Added scanning settings to scanning toolchain</p></li>
+<li><p>Updated Documentation in <code class="docutils literal notranslate"><span class="pre">basic_predefined_methods</span></code></p></li>
+</ul>
+</section>
+<section id="id4">
+<h3>Other<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Remove the (non-functional) wavemeter dummy based on the already removed wavemeter interface.</p></li>
+<li><p>Removed <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> and moved fully to <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> instead.</p></li>
+<li><p>Updated .gitignore to better exclude unwanted files</p></li>
+<li><p>Fix typos in repo management documentation</p></li>
+<li><p>Added documentation on testing of <code class="docutils literal notranslate"><span class="pre">test.pypi.org</span></code> release</p></li>
+<li><p>Added some integration tests that run automatically via Github Actions on PRs and commits to main.</p></li>
+</ul>
+</section>
+</section>
+<section id="version-0-5-1">
+<h2>Version 0.5.1<a class="headerlink" href="#version-0-5-1" title="Link to this heading">¶</a></h2>
+<p><strong>⚠ DEPRECATION WARNING</strong>
+This is the last release before major changes in the interfaces of the scanning probe toolchain (see PR #97).
+No action is required if you’re using our <code class="docutils literal notranslate"><span class="pre">ni_scanning_probe_interfuse</span></code> hardware. If you integrated new hardware
+into the scanning probe toolchain, you will be required to adapt to the new interface beyond this version.</p>
+<section id="id5">
+<h3>Breaking Changes<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Major rework of <code class="docutils literal notranslate"><span class="pre">qudi.interface.data_instream_interface.DataInStreamInterface</span></code>. Time series
+toolchain and NI x-series hardware module have been adapted but custom modules relying on this
+interface will break.
+Configuration for time series toolchain needs changes as well. See <code class="docutils literal notranslate"><span class="pre">default.cfg</span></code> or module
+docstrings.</p></li>
+</ul>
+</section>
+<section id="id6">
+<h3>Bugfixes<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Disconnect GUI widgets on deactivation of laser <code class="docutils literal notranslate"><span class="pre">LaserGui</span></code></p></li>
+<li><p>Fix failure of saving plots in <code class="docutils literal notranslate"><span class="pre">QDPlotLogic</span></code> when fiting is used.</p></li>
+<li><p>Basic data saving in <code class="docutils literal notranslate"><span class="pre">TimeSeriesReaderLogic</span></code> works now.</p></li>
+<li><p>Fix missing meta info <code class="docutils literal notranslate"><span class="pre">generation_method_parameters</span></code> that occurred for generated sequences with granularity mismatch.</p></li>
+<li><p>Ni Finite Sampling Input module now returns digital input channel values in “clicks/counts” per second and not “clicks/counts” per clock cycle</p></li>
+<li><p>Fix wrong asset name, non-invokable settings for AWG Tek 70k in sequence mode.</p></li>
+<li><p>Fix disfunctional <code class="docutils literal notranslate"><span class="pre">mw_source_smbv</span></code></p></li>
+<li><p>Fix Keysight AWG sample rate only set-able with too coarse 10 MHz precision</p></li>
+<li><p>Fix various Poimanager crashes</p></li>
+</ul>
+</section>
+<section id="id7">
+<h3>New Features<a class="headerlink" href="#id7" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Added remote streamer support to <code class="docutils literal notranslate"><span class="pre">TimeSeriesReaderLogic</span></code>.</p></li>
+<li><p>New <code class="docutils literal notranslate"><span class="pre">qudi.interface.data_instream_interface.SampleTiming</span></code> Enum added to <code class="docutils literal notranslate"><span class="pre">DataInStreamInterface</span></code>
+constraints to allow non-uniform sampling mode.</p></li>
+<li><p>Pulsed and odmr now add fit parameters to saved meta data.</p></li>
+<li><p>New hardware module added that implements the HighFinesse wavemeter as a data instream device, replacing the old (non-functional) wavemeter toolchain.</p></li>
+<li><p>Add option to save waveforms and sequence information for debugging to pulser dummy</p></li>
+<li><p>Introduce plugins to the pulsed toolchain that allow more control over <code class="docutils literal notranslate"><span class="pre">generation_parameters</span></code> and can influence all loaded <code class="docutils literal notranslate"><span class="pre">pulse_objects</span></code>.</p></li>
+</ul>
+</section>
+<section id="id8">
+<h3>Other<a class="headerlink" href="#id8" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Bumped <code class="docutils literal notranslate"><span class="pre">qudi-core</span></code> package minimum version requirement to v1.5.0</p></li>
+<li><p>Got rid of deprecated <code class="docutils literal notranslate"><span class="pre">qudi.core.interface</span></code> module usage</p></li>
+<li><p>Support for Python 3.10</p></li>
+<li><p>This version 0.5.1 fixes a requirement issue found while pushing release 0.5.0 to test-pypi</p></li>
+</ul>
+</section>
+</section>
+<section id="version-0-4-0">
+<h2>Version 0.4.0<a class="headerlink" href="#version-0-4-0" title="Link to this heading">¶</a></h2>
+<section id="id9">
+<h3>Breaking Changes<a class="headerlink" href="#id9" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">QDPlotLogic</span></code> has changed its public method signatures</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">OkFpgaPulser</span></code> now has a mandatory config option pointing towards a directory with the bitfiles necessary.</p></li>
+</ul>
+</section>
+<section id="id10">
+<h3>Bugfixes<a class="headerlink" href="#id10" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Resolved some issues with QDPlot GUI layouts and improved overall QDPlot GUI code quality</p></li>
+<li><p>catching null bytes in Keysight M3202A module</p></li>
+<li><p>2D gaussian fit arguments changed to be compatible with the datafitting toolchain.</p></li>
+</ul>
+</section>
+<section id="id11">
+<h3>New Features<a class="headerlink" href="#id11" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>First stable version of new scanning toolchain (aka omniscan):</p>
+<ul>
+<li><p>New <code class="docutils literal notranslate"><span class="pre">blocking</span></code> argument for scanner moves executed via <code class="docutils literal notranslate"><span class="pre">ScanningProbeInterface</span></code></p></li>
+<li><p>Multiple bugfixes for the new scanning toolchain with NICard.</p></li>
+<li><p>The NiScanningProbeInterfuse now polls data in chunks and independent of logic calls, as it should be.</p></li>
+<li><p>More meta data of scans in saved data</p></li>
+</ul>
+</li>
+<li><p>Support for Zaber (linear) motorized stages (in <code class="docutils literal notranslate"><span class="pre">qudi.hardware.motor.zaber_motion</span></code>)</p></li>
+<li><p>Overhaul of QDPlot toolchain (GUI and logic) to improve stability and consistency as well as
+adding minor GUI features.</p></li>
+<li><p>Added mixin <code class="docutils literal notranslate"><span class="pre">qudi.interface.mixins.process_control_switch.ProcessControlSwitchMixin</span></code> to provide
+optional default implementation satisfying the <code class="docutils literal notranslate"><span class="pre">SwitchInterface</span></code> for process control hardware
+modules implementing any of the interfaces contained in <code class="docutils literal notranslate"><span class="pre">qudi.interface.process_control_interface</span></code></p></li>
+<li><p>Overhaul of PID toolchain: added units support, normalization option, gui reset feature,
+dependency option for <code class="docutils literal notranslate"><span class="pre">process_control_dummy</span></code> to simulate PID control</p></li>
+<li><p>support for Thorlabs power meters using the TLPM driver</p></li>
+<li><p>pulsed toolchain: generation parameters of sequence saved as meta data</p></li>
+</ul>
+</section>
+<section id="id12">
+<h3>Other<a class="headerlink" href="#id12" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Bumped <code class="docutils literal notranslate"><span class="pre">qudi-core</span></code> package minimum version requirement to v1.2.0</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+          </div>
+          <div class="page-nav">
+            <div class="inner"><ul class="page-nav">
+  <li class="prev">
+    <a href="../changelog-lens.html"
+       title="previous chapter">← Changelog - LENS additions</a>
+  </li>
+  <li class="next">
+    <a href="../programming-guides.html"
+       title="next chapter">Programming guides: writing your own modules and understanding our hardwares. →</a>
+  </li>
+</ul><div class="footer" role="contentinfo">
+      &#169; Copyright 2025, Molecular Quantum Nanophotonics Lab @ LENS.
+    <br>
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.1.3 with <a href="https://github.com/schettino72/sphinx_press_theme">Press Theme</a> 0.9.1.
+</div>
+            </div>
+          </div>
+      </page>
+    </div></div>
+    
+    
+  </body>
+</html>

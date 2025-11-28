@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html  lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+      <title>Installation Guide</title>
+    
+          <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+          <link rel="stylesheet" href="../_static/theme.css " type="text/css" />
+          <link rel="stylesheet" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" type="text/css" />
+          <link rel="stylesheet" href="../_static/exercise.css" type="text/css" />
+      
+      <!-- sphinx script_files -->
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+
+      
+      <!-- bundled in js (rollup iife) -->
+      <!-- <script src="../_static/theme-vendors.js"></script> -->
+      <script src="../_static/theme.js" defer></script>
+    
+  <link rel="index" title="Index" href="../genindex.html" />
+  <link rel="search" title="Search" href="../search.html" />
+  <link rel="next" title="Migrating from old qudi (release v0.1) to new core" href="migrating_from_qudi_v0.1.html" />
+  <link rel="prev" title="IQO-specific guides" href="iqo-specifics.html" /> 
+  </head>
+
+  <body>
+    <div id="app">
+    <div class="theme-container" :class="pageClasses"><navbar @toggle-sidebar="toggleSidebar">
+  <router-link to="../index.html" class="home-link">
+    
+      <span class="site-name">Qudi Lab on a molecule modules</span>
+    
+  </router-link>
+
+  <div class="links">
+    <navlinks class="can-hide">
+
+  
+    <div class="nav-item">
+      <a href="../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Tutorials:
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+    </navlinks>
+  </div>
+</navbar>
+
+      
+      <div class="sidebar-mask" @click="toggleSidebar(false)">
+      </div>
+        <sidebar @toggle-sidebar="toggleSidebar">
+          
+          <navlinks>
+            
+
+  
+    <div class="nav-item">
+      <a href="../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Tutorials:
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+            
+          </navlinks><div id="searchbox" class="searchbox" role="search">
+  <div class="caption"><span class="caption-text">Quick search</span>
+    <div class="searchformwrapper">
+      <form class="search" action="../search.html" method="get">
+        <input type="text" name="q" />
+        <input type="submit" value="Search" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div><div class="sidebar-links" role="navigation" aria-label="main navigation">
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../index.html#qudi-lab-on-a-molecule-modules-documentation">Tutorials:</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../Crash%20course%20into%20Qudi.html" class="reference internal ">    Tutorial: a crash course into Qudi</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="setup_confocal_scanning.html" class="reference internal ">    Guide: Setting up confocal scanning</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="setup_odmr.html" class="reference internal ">    Guide: Setting up ODMR</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="setup_timeseries.html" class="reference internal ">    Guide: Setting up time series</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../index.html#qudi-lab-on-a-molecule-modules-documentation">Contents:</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../installation.html" class="reference internal ">Installation</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../changelog-lens.html" class="reference internal ">Lens's changelog</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="changelog.html" class="reference internal ">Ulm IQO's changelog (parent repository)</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../programming-guides.html" class="reference internal ">Programming guides: writing your own modules and understanding our hardwares.</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="iqo-specifics.html" class="reference internal ">Ulm IQO's specific guides</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+</div>
+        </sidebar>
+
+      <page>
+          <div class="body-header" role="navigation" aria-label="navigation">
+  
+  <ul class="breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+    
+      <li><a href="iqo-specifics.html">IQO-specific guides</a> &raquo;</li>
+    
+    <li>Installation Guide</li>
+  </ul>
+  
+
+  <ul class="page-nav">
+  <li class="prev">
+    <a href="iqo-specifics.html"
+       title="previous chapter">← IQO-specific guides</a>
+  </li>
+  <li class="next">
+    <a href="migrating_from_qudi_v0.1.html"
+       title="next chapter">Migrating from old qudi (release v0.1) to new core →</a>
+  </li>
+</ul>
+  
+</div>
+<hr>
+          <div class="content" role="main" v-pre>
+            
+  <section id="installation-guide">
+<h1>Installation Guide<a class="headerlink" href="#installation-guide" title="Link to this heading">¶</a></h1>
+<p>This guide is a step-by-step instruction how to get started with qudi + iqo-modules installation.
+For additional information, we recommend checking the <a class="reference external" href="https://github.com/Ulm-IQO/qudi-core/blob/main/docs/index.md">qudi-core documentation</a>.
+If you’re migrating an existing qudi v0.1 installation, there is a dedicated <a class="reference external" href="https://github.com/Ulm-IQO/qudi-iqo-modules/blob/main/docs/migrating_from_qudi_v0.1.md">porting guide</a>.</p>
+<section id="install-qudi-core">
+<h2>Install qudi core<a class="headerlink" href="#install-qudi-core" title="Link to this heading">¶</a></h2>
+<p>Follow the <a class="reference external" href="https://ulm-iqo.github.io/qudi-core/setup/installation.html">qudi-core installation</a> instructions to setup your Python environment and the basic qudi installation. We recommend installing qudi-core from PyPI (non dev), as typical users shouldn’t need to change core code too often. You can still change your measurements modules that are installed next.</p>
+</section>
+<section id="install-qudi-iqo-modules">
+<h2>Install qudi-iqo-modules<a class="headerlink" href="#install-qudi-iqo-modules" title="Link to this heading">¶</a></h2>
+<p>The last step in the qudi-core installation instructions briefly explains setting up the measurement modules. More detailedly, this is how you install the qudi-iqo-modules in dev mode. In this way, you can easily change code in the measurement toolchains.</p>
+<ul class="simple">
+<li><p>Make sure you have a working git installation and that you can run the  <code class="docutils literal notranslate"><span class="pre">git</span></code> command from your console.</p></li>
+<li><p>Open your Anaconda prompt and <code class="docutils literal notranslate"><span class="pre">activate</span> <span class="pre">qudi-env</span></code> (or activate your venv in your other Python distro), the same environment you used to install the core.</p></li>
+<li><p>Navigate to the folder you want the modules to install to, eg.
+<code class="docutils literal notranslate"><span class="pre">cd</span> <span class="pre">C:/Software</span></code></p></li>
+<li><p>Clone the iqo-modules via <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/Ulm-IQO/qudi-iqo-modules.git</span></code>. This will create a new folder <code class="docutils literal notranslate"><span class="pre">C:/Software/qudi-iqo-modules</span></code>. Do not copy/move this folder around after finishing the installation!</p></li>
+<li><p>Navigate into the folder <code class="docutils literal notranslate"><span class="pre">cd</span> <span class="pre">C:/Software/qudi-iqo-modules</span></code></p></li>
+<li><p>Install and register the modules to your current qudi environment via <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">.</span></code></p></li>
+</ul>
+<p>Now you qudi-core installation will know about the measurement modules and it’s time to set up a proper qudi configuration file.</p>
+</section>
+<section id="troubleshooting">
+<h2>⚠ Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading">¶</a></h2>
+<ul>
+<li><p>Installing according to this guide will leave you with the most recent version of qudi and all dependency packages.
+If you encounter bugs, especially ones that relate to dependency packages, you can roll back to the latest stable release by:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  cd C:/Software/qudi-iqo-modules
+  git checkout tags/v0.6.0
+  python -m pip install -e .
+</pre></div>
+</div>
+</li>
+<li><p>In rare cases and mostly with old versions of qudi-core, qudi-iqo-modules can be incompatible with qudi-core. If you encounter errors related to this, try to update manually to the latest qudi-core github release via <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">git+https://github.com/Ulm-IQO/qudi-core.git&#64;main</span></code>.</p></li>
+</ul>
+</section>
+<section id="configure-pycharm">
+<h2>Configure Pycharm<a class="headerlink" href="#configure-pycharm" title="Link to this heading">¶</a></h2>
+<p>It is possible to run Qudi just from the command line. To this end, just type <code class="docutils literal notranslate"><span class="pre">qudi</span></code> into your console.
+Having the code as a project in the Pycharm IDE allows to easily navigate and run the qudi code.</p>
+<ul class="simple">
+<li><p>Open your Anaconda prompt and <code class="docutils literal notranslate"><span class="pre">activate</span> <span class="pre">qudi-env</span></code> (or activate your venv in your other Python distro)</p></li>
+<li><p>Create a new empty project in Pycharm. Don’t open any source code yet.</p></li>
+</ul>
+<p>To run Qudi via Pycharm you have to configure the right Python environment as a project interpreter.</p>
+<ul class="simple">
+<li><p>In Pycharm, navigate to ‘File’-&gt;’Settings’-&gt;’Project:qudi’-&gt;’Project interpreter’</p></li>
+<li><p>If the correct environment ist not listed yet, you can add it via the “+” button. If you followed the qudi-core installation incstructions, the environment should be named <code class="docutils literal notranslate"><span class="pre">qudi-env</span></code> (or whatever name you give it during the core installation).</p></li>
+<li><p>You can find the path to the environment by (mind activating your qudi environment!) <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-c</span> <span class="pre">&quot;import</span> <span class="pre">os,</span> <span class="pre">sys;</span> <span class="pre">print(os.path.dirname(sys.executable))&quot;</span></code></p></li>
+<li><p>Choose the correct environment, like shown on the screenshot.
+<img src="https://user-images.githubusercontent.com/5861249/176209579-3175f422-e940-4a58-98e1-821a85211de3.png" alt="drawing" width="700"/></p></li>
+</ul>
+<p>Now we open the code in Pycharm.</p>
+<ul>
+<li><p>Add the qudi-iqo-modules (and potentially qudi-core) folder by ‘File’-&gt;’Open..’. After selecting the folder, a pop up window will ask you how to open the project. Press the ‘Attach’ option to have seperate locations open in the same project. If you did install qudi-core in non-developer mode, you can find your qudi-core folder by <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-c</span> <span class="pre">&quot;import</span> <span class="pre">os,</span> <span class="pre">sys;</span> <span class="pre">print(os.path.dirname(sys.executable)+'\Lib\site-packages\qudi')&quot;</span></code></p></li>
+<li><p>Now navigate in Pycharm to ‘Run’-&gt;’Edit configuration’ and create a new ‘Shell script’ configuration just as shown below. The ‘-d’ flag enables debug output and is optional.</p>
+<img src="https://user-images.githubusercontent.com/5861249/190195589-dff2a80e-65f8-43bd-ae1c-cef937c099ce.png" alt="drawing" width="500"/>
+</li>
+</ul>
+<p>You may run Qudi now from Pycharm via  ‘Run’-&gt;’Run qudi’.</p>
+<section id="switching-branches">
+<h3>Switching branches<a class="headerlink" href="#switching-branches" title="Link to this heading">¶</a></h3>
+<p>Switching to some other development branch is easy, if you installed your modules in dev mode. Just look in the lower right to access Pycharm’s branch control and
+‘checkout’ the desired branch from remote/origin (that is branches available online, not copies on your local computer).</p>
+<img src="https://user-images.githubusercontent.com/5861249/178280865-70936ade-f1d4-488f-9979-86ece4cba5cb.png" alt="drawing" width="500"/>
+<p>Now you will have a local copy of this branch in which you can create commits and push these online.</p>
+</section>
+</section>
+<section id="qudi-configuration">
+<h2>Qudi configuration<a class="headerlink" href="#qudi-configuration" title="Link to this heading">¶</a></h2>
+<p>The configuration file specifies all the modules and hardware that are loaded to Qudi. Additionally, many modules come with
+configuration parameters that are set in this file. On your first startup, the Qudi manager might be empty.
+As a first step, it is instructive to load the default <a class="reference external" href="https://github.com/Ulm-IQO/qudi-iqo-modules/blob/main/src/qudi/default.cfg"><em>dummy</em> configuration</a> that we provide with qudi-iqo-modules. It allows to have a look at the available toolchains and modules
+without the need to attach real hardware.</p>
+<ul class="simple">
+<li><p>Copy the default.cfg (from qudi-iqo-modules\src\qudi\default.cfg) into your user data folder, eg. to <code class="docutils literal notranslate"><span class="pre">C:\Users\quantumguy\qudi\config</span></code>. We strongly discourage to store any configuration (except the default.cfg) in the source folder of qudi.</p></li>
+<li><p>Start qudi, and then load (via File -&gt; Load configuration) the default config that you just copied.</p></li>
+<li><p>Currently, we provide the following toolchains:</p>
+<ul>
+<li><p><a class="reference external" href="https://github.com/Ulm-IQO/qudi-iqo-modules/blob/main/docs/setup_timeseries.md">Time series</a> (/<em>slow counting</em>)</p></li>
+<li><p><a class="reference external" href="https://github.com/Ulm-IQO/qudi-iqo-modules/blob/main/docs/setup_confocal_scanning.md">Scanning</a> (/<em>confocal</em>)</p></li>
+<li><p>Poi manager</p></li>
+<li><p><a class="reference external" href="https://github.com/Ulm-IQO/qudi-iqo-modules/blob/main/docs/setup_odmr.md">CW ODMR</a></p></li>
+<li><p>Pulsed</p></li>
+<li><p>Camera</p></li>
+<li><p>Switches</p></li>
+<li><p>Laser</p></li>
+<li><p>Spectrometer</p></li>
+<li><p>Task runner</p></li>
+<li><p>Qdplot</p></li>
+<li><p>NV Calculator</p></li>
+</ul>
+</li>
+<li><p>Continue by settting up real hardware. For the more complex toolchains above, we added links to help files that explain their configuration.
+Otherwise, we advise you to start with the respective gui section in the dummy config file and iteratively go through all the connected modules (logic/hardware)
+to adapt them for working with real hardware.</p></li>
+</ul>
+<p>As an IQO member, we strongly advise to store your configuration in <a class="reference external" href="https://github.com/Ulm-IQO/qudi-iqo-config">qudi-iqo-config repo</a>. In there, you can find configurations for multiple setups in the institute.</p>
+<ul class="simple">
+<li><p>To set this up, navigate in your console to the folder where you want to store your configuration. We recommend your user directory, because qudi by default stores logs and data there:
+<code class="docutils literal notranslate"><span class="pre">cd</span> <span class="pre">C:\Users\quantumguy\qudi</span></code></p></li>
+<li><p>Clone the repo from git:
+<code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/Ulm-IQO/qudi-iqo-config</span></code></p></li>
+<li><p>Open the created folder in Pycharm via File -&gt; Open -&gt; Attach</p></li>
+<li><p>Copy your configuration file into this folder.</p></li>
+<li><p>Commit your file by right clicking on it in Pycharm -&gt; Git -&gt; Commit</p></li>
+<li><p>Push your change online by Git -&gt; Push</p></li>
+</ul>
+<p>Whenever you make changes to your configuration, you should create such an commit and make it available online. All configurations in this repo are visible to iqo members only.</p>
+<section id="remote">
+<h3>Remote<a class="headerlink" href="#remote" title="Link to this heading">¶</a></h3>
+<p>Qudi allows to access modules (including hardware) that run on a different computer that is connected to the same LAN network.
+Please find the <a class="reference external" href="https://ulm-iqo.github.io/qudi-core/design_concepts/remote_modules.html">configuration instructions</a> in the qudi-core docs.</p>
+</section>
+</section>
+<section id="jupyter-notebooks-measurement-scripts">
+<h2>Jupyter notebooks/ measurement scripts<a class="headerlink" href="#jupyter-notebooks-measurement-scripts" title="Link to this heading">¶</a></h2>
+<p>Qudi runs a IPython kernel that can be accessed from a jupyter notebook. In this way you can write your own measurements
+scripts as described <a class="reference external" href="https://ulm-iqo.github.io/qudi-core/setup/jupyter.html">here</a>.</p>
+<section id="comparing-notebooks">
+<h3>Comparing notebooks<a class="headerlink" href="#comparing-notebooks" title="Link to this heading">¶</a></h3>
+<p>Pycharm lets you easily compare text based files (like .py) between different branches or versions by right-clicking
+on the file -&gt;Git-&gt;Compare with. This fails for content enriched files like jupyter notebooks (.ipynb).
+For similar functionality, we configure Pycharm to use the <code class="docutils literal notranslate"><span class="pre">nbdime</span></code> tool.</p>
+<ul class="simple">
+<li><p>Open your Anaconda prompt and <code class="docutils literal notranslate"><span class="pre">activate</span> <span class="pre">qudi-env</span></code> (or activate your venv in your other Python distro)</p></li>
+<li><p>Install via <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">nbdime</span></code></p></li>
+<li><p>Find the executable of nbdime by <code class="docutils literal notranslate"><span class="pre">where</span> <span class="pre">nbdiff-web</span></code></p></li>
+<li><p>Navigate in Pycharm to File-&gt;Settings-&gt;Tools-&gt;Diff and Merge-&gt;External Diff Tools and paste this path into ‘Path to executable’</p></li>
+<li><p>Add as Parameters:  <code class="docutils literal notranslate"><span class="pre">--ignore-details</span> <span class="pre">--ignore-metadata</span> <span class="pre">--ignore-outputs</span> <span class="pre">%1</span> <span class="pre">%2</span></code></p></li>
+</ul>
+<p>Now you can open nbdime from Pycharms diff tool by hitting the hammer symbol.</p>
+</section>
+<section id="transcribing-scripts-from-qudi-v0-1">
+<h3>Transcribing scripts from qudi v0.1<a class="headerlink" href="#transcribing-scripts-from-qudi-v0-1" title="Link to this heading">¶</a></h3>
+<p>Ipython in Qudi (either in Manager or jupyter notebook) is running
+now in its own process. The communication between QuDi and the
+corresponding ipython process is done via rpyc.</p>
+<p>Not python built in objects need to be
+copied via netobtain(). We plan to have indepth documentation
+in the new core.</p>
+</section>
+</section>
+<section id="ruff-autoformatting">
+<h2>Ruff Autoformatting<a class="headerlink" href="#ruff-autoformatting" title="Link to this heading">¶</a></h2>
+<p>To ensure a consistent code style across the project, we’ve included a configuration for <a class="reference external" href="https://github.com/astral-sh/ruff">Ruff</a>, a fast Python linter and formatter.</p>
+<p>Before submitting a pull request, please format your code using Ruff. You can run it as a standalone tool or integrate it with your IDE for automatic formatting.</p>
+<p>For installation and setup instructions, refer to the <a class="reference external" href="https://docs.astral.sh/ruff/installation/">official Ruff documentation</a>.</p>
+</section>
+</section>
+
+
+          </div>
+          <div class="page-nav">
+            <div class="inner"><ul class="page-nav">
+  <li class="prev">
+    <a href="iqo-specifics.html"
+       title="previous chapter">← IQO-specific guides</a>
+  </li>
+  <li class="next">
+    <a href="migrating_from_qudi_v0.1.html"
+       title="next chapter">Migrating from old qudi (release v0.1) to new core →</a>
+  </li>
+</ul><div class="footer" role="contentinfo">
+      &#169; Copyright 2025, Molecular Quantum Nanophotonics Lab @ LENS.
+    <br>
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.1.3 with <a href="https://github.com/schettino72/sphinx_press_theme">Press Theme</a> 0.9.1.
+</div>
+            </div>
+          </div>
+      </page>
+    </div></div>
+    
+    
+  </body>
+</html>

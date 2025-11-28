@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html  lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+      <title>Finite sampling io for scanning</title>
+    
+          <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+          <link rel="stylesheet" href="../../_static/theme.css " type="text/css" />
+          <link rel="stylesheet" href="../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" type="text/css" />
+          <link rel="stylesheet" href="../../_static/exercise.css" type="text/css" />
+      
+      <!-- sphinx script_files -->
+        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+
+      
+      <!-- bundled in js (rollup iife) -->
+      <!-- <script src="../../_static/theme-vendors.js"></script> -->
+      <script src="../../_static/theme.js" defer></script>
+    
+  <link rel="index" title="Index" href="../../genindex.html" />
+  <link rel="search" title="Search" href="../../search.html" />
+  <link rel="next" title="IQO-specific guides" href="../../iqo-docs/iqo-specifics.html" />
+  <link rel="prev" title="Dummy excitation scanner" href="dummy_excitation_scanner.html" /> 
+  </head>
+
+  <body>
+    <div id="app">
+    <div class="theme-container" :class="pageClasses"><navbar @toggle-sidebar="toggleSidebar">
+  <router-link to="../../index.html" class="home-link">
+    
+      <span class="site-name">Qudi Lab on a molecule modules</span>
+    
+  </router-link>
+
+  <div class="links">
+    <navlinks class="can-hide">
+
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Tutorials:
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+    </navlinks>
+  </div>
+</navbar>
+
+      
+      <div class="sidebar-mask" @click="toggleSidebar(false)">
+      </div>
+        <sidebar @toggle-sidebar="toggleSidebar">
+          
+          <navlinks>
+            
+
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Tutorials:
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+            
+          </navlinks><div id="searchbox" class="searchbox" role="search">
+  <div class="caption"><span class="caption-text">Quick search</span>
+    <div class="searchformwrapper">
+      <form class="search" action="../../search.html" method="get">
+        <input type="text" name="q" />
+        <input type="submit" value="Search" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div><div class="sidebar-links" role="navigation" aria-label="main navigation">
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation">Tutorials:</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../Crash%20course%20into%20Qudi.html" class="reference internal ">    Tutorial: a crash course into Qudi</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/setup_confocal_scanning.html" class="reference internal ">    Guide: Setting up confocal scanning</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/setup_odmr.html" class="reference internal ">    Guide: Setting up ODMR</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/setup_timeseries.html" class="reference internal ">    Guide: Setting up time series</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation">Contents:</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../installation.html" class="reference internal ">Installation</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../changelog-lens.html" class="reference internal ">Lens's changelog</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/changelog.html" class="reference internal ">Ulm IQO's changelog (parent repository)</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../programming-guides.html" class="reference internal ">Programming guides: writing your own modules and understanding our hardwares.</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/iqo-specifics.html" class="reference internal ">Ulm IQO's specific guides</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+</div>
+        </sidebar>
+
+      <page>
+          <div class="body-header" role="navigation" aria-label="navigation">
+  
+  <ul class="breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+    
+      <li><a href="../../programming-guides.html">Programming guides: writing your own modules and understanding our hardwares.</a> &raquo;</li>
+    
+      <li><a href="../excitation-spectroscopy.html">Guide: performing excitation spectroscopy</a> &raquo;</li>
+    
+    <li>Finite sampling io for scanning</li>
+  </ul>
+  
+
+  <ul class="page-nav">
+  <li class="prev">
+    <a href="dummy_excitation_scanner.html"
+       title="previous chapter">← Dummy excitation scanner</a>
+  </li>
+  <li class="next">
+    <a href="../../iqo-docs/iqo-specifics.html"
+       title="next chapter">IQO-specific guides →</a>
+  </li>
+</ul>
+  
+</div>
+<hr>
+          <div class="content" role="main" v-pre>
+            
+  <section id="finite-sampling-io-for-scanning">
+<h1><a class="toc-backref" href="#id1" role="doc-backlink">Finite sampling io for scanning</a><a class="headerlink" href="#finite-sampling-io-for-scanning" title="Link to this heading">¶</a></h1>
+<p>Typically, our toptica laser is controlled by an analog tension generated by a national instrument card. We have an <a class="reference internal" href="#"><span class="xref myst">interfuse</span></a> to use this interface as an excitation scanner</p>
+<nav class="contents" id="table-of-contents">
+<p class="topic-title">Table of Contents</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#finite-sampling-io-for-scanning" id="id1">Finite sampling io for scanning</a></p>
+<ul>
+<li><p><a class="reference internal" href="#finite-sampling-scanning-excitation-interfuse" id="id2">Finite sampling scanning excitation interfuse</a></p></li>
+</ul>
+</li>
+</ul>
+</nav>
+<section id="finite-sampling-scanning-excitation-interfuse">
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">Finite sampling scanning excitation interfuse</a><a class="headerlink" href="#finite-sampling-scanning-excitation-interfuse" title="Link to this heading">¶</a></h2>
+<p>This module is meant to be connected to a finite sampling io hardware for scanning and a <code class="docutils literal notranslate"><span class="pre">ProcessSetpointInterface</span></code> instance to set the laser’s position during idling. Both are typically the same physical hardware underneath: the NI card.</p>
+<p>This hardware uses a <a class="reference internal" href="../state-machines.html"><span class="doc std std-doc">state machine</span></a> that is depicted below. The link are clickable and lead to the specific method documentation for the state.</p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 14.0.4 (0)
+ -->
+<!-- Title: statemachine_FiniteSamplingScanningExcitationInterfuse Pages: 1 -->
+<svg width="315pt" height="566pt"
+ viewBox="0.00 0.00 315.00 566.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 562)">
+<title>statemachine_FiniteSamplingScanningExcitationInterfuse</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-562 310.84,-562 310.84,4 -4,4"/>
+<!-- prepare_idle -->
+<g id="node1" class="node">
+<title>prepare_idle</title>
+<g id="a_node1"><a xlink:href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.prepare_idle" xlink:title="Prepare the hardware for idling: stop acquisition and enable analog output hardware.">
+<polygon fill="none" stroke="black" points="189.59,-486 109.09,-486 109.09,-450 189.59,-450 189.59,-486"/>
+<text xml:space="preserve" text-anchor="middle" x="149.34" y="-462.95" font-family="Times,serif" font-size="14.00">prepare idle</text>
+</a>
+</g>
+</g>
+<!-- idle -->
+<g id="node2" class="node">
+<title>idle</title>
+<g id="a_node2"><a xlink:href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.idle" xlink:title="Idling between scans, setting the analog output value if requested.">
+<polygon fill="none" stroke="black" points="98.34,-414 44.34,-414 44.34,-378 98.34,-378 98.34,-414"/>
+<text xml:space="preserve" text-anchor="middle" x="71.34" y="-390.95" font-family="Times,serif" font-size="14.00">idle</text>
+</a>
+</g>
+</g>
+<!-- prepare_idle&#45;&gt;idle -->
+<g id="edge6" class="edge">
+<title>prepare_idle&#45;&gt;idle</title>
+<path fill="none" stroke="black" d="M114.57,-449.83C114.57,-428.5 114.57,-396 114.57,-396 114.57,-396 109.99,-396 109.99,-396"/>
+<polygon fill="black" stroke="black" points="109.99,-392.5 99.99,-396 109.99,-399.5 109.99,-392.5"/>
+<text xml:space="preserve" text-anchor="middle" x="89.44" y="-423.82" font-family="Times,serif" font-size="14.00">start_idle</text>
+</g>
+<!-- stopped -->
+<g id="node7" class="node">
+<title>stopped</title>
+<g id="a_node7"><a xlink:href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.stopped" xlink:title="Stop all operations and wait.&#10; &#160;&#160;&#160;&#160;&#160;&#160;&#160;">
+<polygon fill="none" stroke="black" points="101.34,-54 43.34,-54 43.34,-18 101.34,-18 101.34,-54"/>
+<text xml:space="preserve" text-anchor="middle" x="72.34" y="-30.95" font-family="Times,serif" font-size="14.00">stopped</text>
+</a>
+</g>
+</g>
+<!-- prepare_idle&#45;&gt;stopped -->
+<g id="edge14" class="edge">
+<title>prepare_idle&#45;&gt;stopped</title>
+<path fill="none" stroke="black" d="M120.04,-449.76C120.04,-420.43 120.04,-366 120.04,-366 120.04,-366 48.28,-366 48.28,-366 48.28,-366 48.28,-65.73 48.28,-65.73"/>
+<polygon fill="black" stroke="black" points="51.78,-65.73 48.28,-55.73 44.78,-65.73 51.78,-65.73"/>
+<text xml:space="preserve" text-anchor="middle" x="37.03" y="-296.83" font-family="Times,serif" font-size="14.00">stop</text>
+</g>
+<!-- prepare_scan -->
+<g id="node3" class="node">
+<title>prepare_scan</title>
+<g id="a_node3"><a xlink:href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.prepare_scan" xlink:title="Prepare a scan, we initialize the internal buffers and status variables.&#10; &#160;&#160;&#160;&#160;&#160;&#160;&#160;">
+<polygon fill="none" stroke="black" points="136.47,-342 52.22,-342 52.22,-306 136.47,-306 136.47,-342"/>
+<text xml:space="preserve" text-anchor="middle" x="94.34" y="-318.95" font-family="Times,serif" font-size="14.00">prepare scan</text>
+</a>
+</g>
+</g>
+<!-- idle&#45;&gt;prepare_scan -->
+<g id="edge8" class="edge">
+<title>idle&#45;&gt;prepare_scan</title>
+<path fill="none" stroke="black" d="M75.28,-377.83C75.28,-377.83 75.28,-353.93 75.28,-353.93"/>
+<polygon fill="black" stroke="black" points="78.78,-353.93 75.28,-343.93 71.78,-353.93 78.78,-353.93"/>
+<text xml:space="preserve" text-anchor="middle" x="63.66" y="-352.58" font-family="Times,serif" font-size="14.00">start</text>
+</g>
+<!-- idle&#45;&gt;stopped -->
+<g id="edge15" class="edge">
+<title>idle&#45;&gt;stopped</title>
+<path fill="none" stroke="black" d="M46.31,-377.65C46.31,-377.65 46.31,-65.82 46.31,-65.82"/>
+<polygon fill="black" stroke="black" points="49.81,-65.82 46.31,-55.82 42.81,-65.82 49.81,-65.82"/>
+<text xml:space="preserve" text-anchor="middle" x="35.06" y="-224.94" font-family="Times,serif" font-size="14.00">stop</text>
+</g>
+<!-- prepare_scan&#45;&gt;prepare_idle -->
+<g id="edge2" class="edge">
+<title>prepare_scan&#45;&gt;prepare_idle</title>
+<path fill="none" stroke="black" d="M130.99,-342.24C130.99,-342.24 130.99,-438.4 130.99,-438.4"/>
+<polygon fill="black" stroke="black" points="127.49,-438.4 130.99,-448.4 134.49,-438.4 127.49,-438.4"/>
+<text xml:space="preserve" text-anchor="middle" x="154.24" y="-393.52" font-family="Times,serif" font-size="14.00">interrupt</text>
+</g>
+<!-- prepare_step -->
+<g id="node4" class="node">
+<title>prepare_step</title>
+<g id="a_node4"><a xlink:href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.prepare_step" xlink:title="Prepare a specific scan step. We first check if we have already run &#10; &#160;&#160;&#160;&#160;&#160;&#160;&#160;all requested steps, in which cas we go back to preparing idling. Otherwise,&#10; &#160;&#160;&#160;&#160;&#160;&#160;&#160;we initialize the instruments, and move the scanner to its first position.&#10; &#160;&#160;&#160;&#160;&#160;&#160;&#160;">
+<polygon fill="none" stroke="black" points="192.34,-270 110.34,-270 110.34,-234 192.34,-234 192.34,-270"/>
+<text xml:space="preserve" text-anchor="middle" x="151.34" y="-246.95" font-family="Times,serif" font-size="14.00">prepare step</text>
+</a>
+</g>
+</g>
+<!-- prepare_scan&#45;&gt;prepare_step -->
+<g id="edge9" class="edge">
+<title>prepare_scan&#45;&gt;prepare_step</title>
+<path fill="none" stroke="black" d="M123.41,-305.83C123.41,-305.83 123.41,-281.93 123.41,-281.93"/>
+<polygon fill="black" stroke="black" points="126.91,-281.93 123.41,-271.93 119.91,-281.93 126.91,-281.93"/>
+<text xml:space="preserve" text-anchor="middle" x="111.78" y="-280.58" font-family="Times,serif" font-size="14.00">next</text>
+</g>
+<!-- prepare_scan&#45;&gt;stopped -->
+<g id="edge16" class="edge">
+<title>prepare_scan&#45;&gt;stopped</title>
+<path fill="none" stroke="black" d="M62.04,-305.55C62.04,-305.55 62.04,-65.81 62.04,-65.81"/>
+<polygon fill="black" stroke="black" points="65.54,-65.81 62.04,-55.81 58.54,-65.81 65.54,-65.81"/>
+<text xml:space="preserve" text-anchor="middle" x="50.79" y="-188.88" font-family="Times,serif" font-size="14.00">stop</text>
+</g>
+<!-- prepare_step&#45;&gt;prepare_idle -->
+<g id="edge3" class="edge">
+<title>prepare_step&#45;&gt;prepare_idle</title>
+<path fill="none" stroke="black" d="M154.18,-270.42C154.18,-270.42 154.18,-438.12 154.18,-438.12"/>
+<polygon fill="black" stroke="black" points="150.68,-438.12 154.18,-448.12 157.68,-438.12 150.68,-438.12"/>
+<text xml:space="preserve" text-anchor="middle" x="130.93" y="-357.47" font-family="Times,serif" font-size="14.00">interrupt</text>
+</g>
+<!-- prepare_step&#45;&gt;prepare_idle -->
+<g id="edge13" class="edge">
+<title>prepare_step&#45;&gt;prepare_idle</title>
+<path fill="none" stroke="black" d="M171.89,-270.42C171.89,-270.42 171.89,-438.12 171.89,-438.12"/>
+<polygon fill="black" stroke="black" points="168.39,-438.12 171.89,-448.12 175.39,-438.12 168.39,-438.12"/>
+<text xml:space="preserve" text-anchor="middle" x="162.14" y="-340.97" font-family="Times,serif" font-size="14.00">end</text>
+</g>
+<!-- wait_ready -->
+<g id="node5" class="node">
+<title>wait_ready</title>
+<g id="a_node5"><a xlink:href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.wait_ready" xlink:title="Wait a bit for the laser to reach its first value.">
+<polygon fill="none" stroke="black" points="306.84,-198 233.84,-198 233.84,-162 306.84,-162 306.84,-198"/>
+<text xml:space="preserve" text-anchor="middle" x="270.34" y="-174.95" font-family="Times,serif" font-size="14.00">wait ready</text>
+</a>
+</g>
+</g>
+<!-- prepare_step&#45;&gt;wait_ready -->
+<g id="edge10" class="edge">
+<title>prepare_step&#45;&gt;wait_ready</title>
+<path fill="none" stroke="black" d="M174.39,-233.62C174.39,-214.09 174.39,-186 174.39,-186 174.39,-186 222,-186 222,-186"/>
+<polygon fill="black" stroke="black" points="222,-189.5 232,-186 222,-182.5 222,-189.5"/>
+<text xml:space="preserve" text-anchor="middle" x="162.76" y="-189.2" font-family="Times,serif" font-size="14.00">next</text>
+</g>
+<!-- prepare_step&#45;&gt;stopped -->
+<g id="edge17" class="edge">
+<title>prepare_step&#45;&gt;stopped</title>
+<path fill="none" stroke="black" d="M124.41,-233.58C124.41,-181.35 124.41,-36 124.41,-36 124.41,-36 113.24,-36 113.24,-36"/>
+<polygon fill="black" stroke="black" points="113.24,-32.5 103.24,-36 113.24,-39.5 113.24,-32.5"/>
+<text xml:space="preserve" text-anchor="middle" x="113.16" y="-132.41" font-family="Times,serif" font-size="14.00">stop</text>
+</g>
+<!-- wait_ready&#45;&gt;prepare_idle -->
+<g id="edge4" class="edge">
+<title>wait_ready&#45;&gt;prepare_idle</title>
+<path fill="none" stroke="black" d="M270.34,-198.39C270.34,-262.75 270.34,-474 270.34,-474 270.34,-474 201.49,-474 201.49,-474"/>
+<polygon fill="black" stroke="black" points="201.49,-470.5 191.49,-474 201.49,-477.5 201.49,-470.5"/>
+<text xml:space="preserve" text-anchor="middle" x="247.09" y="-373.82" font-family="Times,serif" font-size="14.00">interrupt</text>
+</g>
+<!-- record_scan_step -->
+<g id="node6" class="node">
+<title>record_scan_step</title>
+<g id="a_node6"><a xlink:href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.record_scan_step" xlink:title="Actual data recording. We collect the available data. When all data&#10; &#160;&#160;&#160;&#160;&#160;&#160;&#160;have been collected, we go back to preparing a step.&#10; &#160;&#160;&#160;&#160;&#160;&#160;&#160;">
+<polygon fill="none" stroke="black" points="242.22,-126 138.47,-126 138.47,-90 242.22,-90 242.22,-126"/>
+<text xml:space="preserve" text-anchor="middle" x="190.34" y="-102.95" font-family="Times,serif" font-size="14.00">record scan step</text>
+</a>
+</g>
+</g>
+<!-- wait_ready&#45;&gt;record_scan_step -->
+<g id="edge11" class="edge">
+<title>wait_ready&#45;&gt;record_scan_step</title>
+<path fill="none" stroke="black" d="M238.03,-161.83C238.03,-161.83 238.03,-137.93 238.03,-137.93"/>
+<polygon fill="black" stroke="black" points="241.53,-137.93 238.03,-127.93 234.53,-137.93 241.53,-137.93"/>
+<text xml:space="preserve" text-anchor="middle" x="226.41" y="-136.58" font-family="Times,serif" font-size="14.00">next</text>
+</g>
+<!-- wait_ready&#45;&gt;stopped -->
+<g id="edge18" class="edge">
+<title>wait_ready&#45;&gt;stopped</title>
+<path fill="none" stroke="black" d="M233.48,-174C176.08,-174 71.87,-174 71.87,-174 71.87,-174 71.87,-65.84 71.87,-65.84"/>
+<polygon fill="black" stroke="black" points="75.37,-65.84 71.87,-55.84 68.37,-65.84 75.37,-65.84"/>
+<text xml:space="preserve" text-anchor="middle" x="87.34" y="-177.2" font-family="Times,serif" font-size="14.00">stop</text>
+</g>
+<!-- record_scan_step&#45;&gt;prepare_idle -->
+<g id="edge5" class="edge">
+<title>record_scan_step&#45;&gt;prepare_idle</title>
+<path fill="none" stroke="black" d="M213.09,-126.04C213.09,-198.18 213.09,-462 213.09,-462 213.09,-462 201.59,-462 201.59,-462"/>
+<polygon fill="black" stroke="black" points="201.59,-458.5 191.59,-462 201.59,-465.5 201.59,-458.5"/>
+<text xml:space="preserve" text-anchor="middle" x="189.84" y="-302.97" font-family="Times,serif" font-size="14.00">interrupt</text>
+</g>
+<!-- record_scan_step&#45;&gt;prepare_step -->
+<g id="edge12" class="edge">
+<title>record_scan_step&#45;&gt;prepare_step</title>
+<path fill="none" stroke="black" d="M156.43,-126.24C156.43,-126.24 156.43,-222.4 156.43,-222.4"/>
+<polygon fill="black" stroke="black" points="152.93,-222.4 156.43,-232.4 159.93,-222.4 152.93,-222.4"/>
+<text xml:space="preserve" text-anchor="middle" x="144.8" y="-161.02" font-family="Times,serif" font-size="14.00">next</text>
+</g>
+<!-- record_scan_step&#45;&gt;stopped -->
+<g id="edge19" class="edge">
+<title>record_scan_step&#45;&gt;stopped</title>
+<path fill="none" stroke="black" d="M138.25,-108C110.36,-108 81.69,-108 81.69,-108 81.69,-108 81.69,-65.68 81.69,-65.68"/>
+<polygon fill="black" stroke="black" points="85.19,-65.68 81.69,-55.68 78.19,-65.68 85.19,-65.68"/>
+<text xml:space="preserve" text-anchor="middle" x="77.56" y="-111.2" font-family="Times,serif" font-size="14.00">stop</text>
+</g>
+<!-- stopped&#45;&gt;prepare_idle -->
+<g id="edge7" class="edge">
+<title>stopped&#45;&gt;prepare_idle</title>
+<path fill="none" stroke="black" d="M50.25,-54.47C50.25,-122.34 50.25,-354 50.25,-354 50.25,-354 125.52,-354 125.52,-354 125.52,-354 125.52,-438.17 125.52,-438.17"/>
+<polygon fill="black" stroke="black" points="122.02,-438.17 125.52,-448.17 129.02,-438.17 122.02,-438.17"/>
+<text xml:space="preserve" text-anchor="middle" x="25.12" y="-270.66" font-family="Times,serif" font-size="14.00">start_idle</text>
+</g>
+<!-- stopped&#45;&gt;stopped -->
+<g id="edge20" class="edge">
+<title>stopped&#45;&gt;stopped</title>
+<path fill="none" stroke="black" d="M91.52,-54.42C91.52,-63.28 91.52,-72 91.52,-72 91.52,-72 105.84,-72 105.84,-72 105.84,-72 105.84,0 105.84,0 105.84,0 72.34,0 72.34,0 72.34,0 72.34,-6.06 72.34,-6.06"/>
+<polygon fill="black" stroke="black" points="68.84,-6.06 72.34,-16.06 75.84,-6.06 68.84,-6.06"/>
+<text xml:space="preserve" text-anchor="middle" x="117.09" y="-35.37" font-family="Times,serif" font-size="14.00">stop</text>
+</g>
+<!-- begin -->
+<g id="node8" class="node">
+<title>begin</title>
+<polygon fill="none" stroke="black" points="176.34,-558 122.34,-558 122.34,-522 176.34,-522 176.34,-558"/>
+<text xml:space="preserve" text-anchor="middle" x="149.34" y="-534.95" font-family="Times,serif" font-size="14.00">begin</text>
+</g>
+<!-- begin&#45;&gt;prepare_idle -->
+<g id="edge1" class="edge">
+<title>begin&#45;&gt;prepare_idle</title>
+<path fill="none" stroke="black" d="M149.34,-521.83C149.34,-521.83 149.34,-497.93 149.34,-497.93"/>
+<polygon fill="black" stroke="black" points="152.84,-497.93 149.34,-487.93 145.84,-497.93 152.84,-497.93"/>
+<text xml:space="preserve" text-anchor="middle" x="130.97" y="-496.58" font-family="Times,serif" font-size="14.00">startup</text>
+</g>
+</g>
+</svg>
+<map id="statemachine_FiniteSamplingScanningExcitationInterfuse" name="statemachine_FiniteSamplingScanningExcitationInterfuse">
+<area shape="rect" id="node1" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.prepare_idle" title="Prepare the hardware for idling: stop acquisition and enable analog output hardware." alt="" coords="151,101,258,149"/>
+<area shape="rect" id="node2" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.idle" title="Idling between scans, setting the analog output value if requested." alt="" coords="64,197,136,245"/>
+<area shape="rect" id="node7" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.stopped" title="Stop all operations and wait.
+ &#160;&#160;&#160;&#160;&#160;&#160;&#160;" alt="" coords="63,677,140,725"/>
+<area shape="rect" id="node3" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.prepare_scan" title="Prepare a scan, we initialize the internal buffers and status variables.
+ &#160;&#160;&#160;&#160;&#160;&#160;&#160;" alt="" coords="75,293,187,341"/>
+<area shape="rect" id="node4" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.prepare_step" title="Prepare a specific scan step. We first check if we have already run 
+ &#160;&#160;&#160;&#160;&#160;&#160;&#160;all requested steps, in which cas we go back to preparing idling. Otherwise,
+ &#160;&#160;&#160;&#160;&#160;&#160;&#160;we initialize the instruments, and move the scanner to its first position.
+ &#160;&#160;&#160;&#160;&#160;&#160;&#160;" alt="" coords="152,389,262,437"/>
+<area shape="rect" id="node5" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.wait_ready" title="Wait a bit for the laser to reach its first value." alt="" coords="317,485,414,533"/>
+<area shape="rect" id="node6" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.record_scan_step" title="Actual data recording. We collect the available data. When all data
+ &#160;&#160;&#160;&#160;&#160;&#160;&#160;have been collected, we go back to preparing a step.
+ &#160;&#160;&#160;&#160;&#160;&#160;&#160;" alt="" coords="190,581,328,629"/>
+</map>
+<dl class="py class">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FiniteSamplingScanningExcitationInterfuse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">qudi.interface.excitation_scanner_interface.ExcitationScannerInterface</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface</span></code></p>
+<p>An ExcitationScannerInterface to use a FiniteSamplingIOInterface, and an
+analog output, as a scanning excitation module. Typical use case is to
+have a laser whose frequency is set by the analog output of a NI card, and
+measure the corresponding count rate on an APD.</p>
+<p>Copy and paste example configuration:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">finite_sampling_excitation</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">module.Class</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse&#39;</span>
+<span class="w">    </span><span class="nt">connect</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">scan_hardware</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ni_finite_sampling_io</span>
+<span class="w">        </span><span class="nt">analog_output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ni_analog_output</span><span class="w"> </span><span class="c1"># to control the idle value of the laser</span>
+<span class="w">        </span><span class="nt">external_process</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cryostation</span><span class="w"> </span><span class="c1"># optional</span>
+<span class="w">        </span><span class="nt">external_setpoint</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cryostation</span><span class="w"> </span><span class="c1"># optional</span>
+<span class="w">    </span><span class="nt">config</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">maximum_tension</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10</span><span class="w"> </span><span class="c1"># V (default)</span>
+<span class="w">        </span><span class="nt">minimum_tension</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-10</span><span class="w"> </span><span class="c1"># V (default)</span>
+<span class="w">        </span><span class="nt">minimum_tension_step</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1e-4</span><span class="w"> </span><span class="c1"># V (default)</span>
+<span class="w">        </span><span class="nt">output_channel</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;ao1&#39;</span><span class="w"> </span><span class="c1"># required</span>
+<span class="w">        </span><span class="nt">input_channel</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;pfi1&#39;</span><span class="w"> </span><span class="c1"># required</span>
+<span class="w">        </span><span class="nt">chunk_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10</span><span class="w"> </span><span class="c1"># default</span>
+<span class="w">        </span><span class="nt">process_channel</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w"> </span><span class="c1"># required if an external process is connected</span>
+<span class="w">        </span><span class="nt">setpoint_channel</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w"> </span><span class="c1"># required if an external setpoint is connected</span>
+</pre></div>
+</div>
+<p class="rubric">Initialization</p>
+<p>Initialise Base instance. Set up its state machine and initialize ConfigOption meta
+attributes from given config.</p>
+<p class="rubric" id="parameters">Parameters</p>
+<p>self : object
+The object being initialized.
+name : str
+Unique name for this module instance.
+configuration : dict
+Parameters from the configuration file.
+callbacks : dict
+Dictionary specifying functions to be run on state machine transitions.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._finite_sampling_io">
+<span class="sig-name descname"><span class="pre">_finite_sampling_io</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._finite_sampling_io" title="Link to this definition">¶</a></dt>
+<dd><p>‘Connector(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._ao">
+<span class="sig-name descname"><span class="pre">_ao</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._ao" title="Link to this definition">¶</a></dt>
+<dd><p>‘Connector(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._ext_process">
+<span class="sig-name descname"><span class="pre">_ext_process</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._ext_process" title="Link to this definition">¶</a></dt>
+<dd><p>‘Connector(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._ext_setpoint">
+<span class="sig-name descname"><span class="pre">_ext_setpoint</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._ext_setpoint" title="Link to this definition">¶</a></dt>
+<dd><p>‘Connector(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._maximum_tension">
+<span class="sig-name descname"><span class="pre">_maximum_tension</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._maximum_tension" title="Link to this definition">¶</a></dt>
+<dd><p>‘ConfigOption(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._minimum_tension">
+<span class="sig-name descname"><span class="pre">_minimum_tension</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._minimum_tension" title="Link to this definition">¶</a></dt>
+<dd><p>‘ConfigOption(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._minimum_tension_step">
+<span class="sig-name descname"><span class="pre">_minimum_tension_step</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._minimum_tension_step" title="Link to this definition">¶</a></dt>
+<dd><p>‘ConfigOption(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._output_channel">
+<span class="sig-name descname"><span class="pre">_output_channel</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._output_channel" title="Link to this definition">¶</a></dt>
+<dd><p>‘ConfigOption(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._input_channel">
+<span class="sig-name descname"><span class="pre">_input_channel</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._input_channel" title="Link to this definition">¶</a></dt>
+<dd><p>‘ConfigOption(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._chunk_size">
+<span class="sig-name descname"><span class="pre">_chunk_size</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._chunk_size" title="Link to this definition">¶</a></dt>
+<dd><p>‘ConfigOption(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._process_channel">
+<span class="sig-name descname"><span class="pre">_process_channel</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._process_channel" title="Link to this definition">¶</a></dt>
+<dd><p>‘ConfigOption(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._setpoint_channel">
+<span class="sig-name descname"><span class="pre">_setpoint_channel</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._setpoint_channel" title="Link to this definition">¶</a></dt>
+<dd><p>‘ConfigOption(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._scan_data">
+<span class="sig-name descname"><span class="pre">_scan_data</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._scan_data" title="Link to this definition">¶</a></dt>
+<dd><p>‘StatusVar(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._conversion_factor">
+<span class="sig-name descname"><span class="pre">_conversion_factor</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._conversion_factor" title="Link to this definition">¶</a></dt>
+<dd><p>‘StatusVar(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._scan_mini">
+<span class="sig-name descname"><span class="pre">_scan_mini</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._scan_mini" title="Link to this definition">¶</a></dt>
+<dd><p>‘StatusVar(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._scan_maxi">
+<span class="sig-name descname"><span class="pre">_scan_maxi</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._scan_maxi" title="Link to this definition">¶</a></dt>
+<dd><p>‘StatusVar(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._exposure_time">
+<span class="sig-name descname"><span class="pre">_exposure_time</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._exposure_time" title="Link to this definition">¶</a></dt>
+<dd><p>‘StatusVar(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._scan_step_tension">
+<span class="sig-name descname"><span class="pre">_scan_step_tension</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._scan_step_tension" title="Link to this definition">¶</a></dt>
+<dd><p>‘StatusVar(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._sleep_time_before_scan">
+<span class="sig-name descname"><span class="pre">_sleep_time_before_scan</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._sleep_time_before_scan" title="Link to this definition">¶</a></dt>
+<dd><p>‘StatusVar(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._n_repeat">
+<span class="sig-name descname"><span class="pre">_n_repeat</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._n_repeat" title="Link to this definition">¶</a></dt>
+<dd><p>‘StatusVar(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._idle_value">
+<span class="sig-name descname"><span class="pre">_idle_value</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._idle_value" title="Link to this definition">¶</a></dt>
+<dd><p>‘StatusVar(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._setpoint_first">
+<span class="sig-name descname"><span class="pre">_setpoint_first</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._setpoint_first" title="Link to this definition">¶</a></dt>
+<dd><p>‘StatusVar(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._setpoint_last">
+<span class="sig-name descname"><span class="pre">_setpoint_last</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._setpoint_last" title="Link to this definition">¶</a></dt>
+<dd><p>‘StatusVar(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._repeat_per_setpoint">
+<span class="sig-name descname"><span class="pre">_repeat_per_setpoint</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._repeat_per_setpoint" title="Link to this definition">¶</a></dt>
+<dd><p>‘StatusVar(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._external_enabled">
+<span class="sig-name descname"><span class="pre">_external_enabled</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._external_enabled" title="Link to this definition">¶</a></dt>
+<dd><p>‘StatusVar(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._sleep_time_external_stabilization">
+<span class="sig-name descname"><span class="pre">_sleep_time_external_stabilization</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._sleep_time_external_stabilization" title="Link to this definition">¶</a></dt>
+<dd><p>‘StatusVar(…)’</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._number_of_samples_per_frame">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_number_of_samples_per_frame</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse._number_of_samples_per_frame" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.on_activate">
+<span class="sig-name descname"><span class="pre">on_activate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.on_activate" title="Link to this definition">¶</a></dt>
+<dd><p>Initialisation performed during activation of the module.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.on_deactivate">
+<span class="sig-name descname"><span class="pre">on_deactivate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.on_deactivate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.prepare_idle">
+<span class="sig-name descname"><span class="pre">prepare_idle</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.prepare_idle" title="Link to this definition">¶</a></dt>
+<dd><p>Prepare the hardware for idling: stop acquisition and enable analog output hardware.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.idle">
+<span class="sig-name descname"><span class="pre">idle</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.idle" title="Link to this definition">¶</a></dt>
+<dd><p>Idling between scans, setting the analog output value if requested.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.prepare_scan">
+<span class="sig-name descname"><span class="pre">prepare_scan</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.prepare_scan" title="Link to this definition">¶</a></dt>
+<dd><p>Prepare a scan, we initialize the internal buffers and status variables.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.prepare_step">
+<span class="sig-name descname"><span class="pre">prepare_step</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.prepare_step" title="Link to this definition">¶</a></dt>
+<dd><p>Prepare a specific scan step. We first check if we have already run
+all requested steps, in which cas we go back to preparing idling. Otherwise,
+we initialize the instruments, and move the scanner to its first position.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.wait_ready">
+<span class="sig-name descname"><span class="pre">wait_ready</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.wait_ready" title="Link to this definition">¶</a></dt>
+<dd><p>Wait a bit for the laser to reach its first value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.record_scan_step">
+<span class="sig-name descname"><span class="pre">record_scan_step</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.record_scan_step" title="Link to this definition">¶</a></dt>
+<dd><p>Actual data recording. We collect the available data. When all data
+have been collected, we go back to preparing a step.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.stopped">
+<span class="sig-name descname"><span class="pre">stopped</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.stopped" title="Link to this definition">¶</a></dt>
+<dd><p>Stop all operations and wait.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.scan_running">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">scan_running</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.scan_running" title="Link to this definition">¶</a></dt>
+<dd><p>Return True if a scan can be launched.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.state_display">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">state_display</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.state_display" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.start_scan">
+<span class="sig-name descname"><span class="pre">start_scan</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.start_scan" title="Link to this definition">¶</a></dt>
+<dd><p>Start scanning in a non_blocking way.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.stop_scan">
+<span class="sig-name descname"><span class="pre">stop_scan</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.stop_scan" title="Link to this definition">¶</a></dt>
+<dd><p>Stop scanning in a non_blocking way.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.constraints">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">constraints</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">qudi.interface.excitation_scanner_interface.ExcitationScannerConstraints</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.constraints" title="Link to this definition">¶</a></dt>
+<dd><p>Get the list of control variables for the scanner.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.set_control">
+<span class="sig-name descname"><span class="pre">set_control</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.set_control" title="Link to this definition">¶</a></dt>
+<dd><p>Set a control variable value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.get_control">
+<span class="sig-name descname"><span class="pre">get_control</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.get_control" title="Link to this definition">¶</a></dt>
+<dd><p>Get a control variable value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.get_current_data">
+<span class="sig-name descname"><span class="pre">get_current_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.get_current_data" title="Link to this definition">¶</a></dt>
+<dd><p>Return current scan data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.set_exposure_time">
+<span class="sig-name descname"><span class="pre">set_exposure_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.set_exposure_time" title="Link to this definition">¶</a></dt>
+<dd><p>Set exposure time for one data point.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.set_repeat_number">
+<span class="sig-name descname"><span class="pre">set_repeat_number</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.set_repeat_number" title="Link to this definition">¶</a></dt>
+<dd><p>Set number of repetition of each segment of the scan.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.get_exposure_time">
+<span class="sig-name descname"><span class="pre">get_exposure_time</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.get_exposure_time" title="Link to this definition">¶</a></dt>
+<dd><p>Get exposure time for one data point.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.get_repeat_number">
+<span class="sig-name descname"><span class="pre">get_repeat_number</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.get_repeat_number" title="Link to this definition">¶</a></dt>
+<dd><p>Get number of repetition of each segment of the scan.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.get_idle_value">
+<span class="sig-name descname"><span class="pre">get_idle_value</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.get_idle_value" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.set_idle_value">
+<span class="sig-name descname"><span class="pre">set_idle_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.set_idle_value" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.data_format">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">data_format</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">qudi.interface.excitation_scanner_interface.ExcitationScanDataFormat</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/interfuse/finite_sampling_scanning_excitation.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.interfuse.finite_sampling_scanning_excitation.qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.FiniteSamplingScanningExcitationInterfuse.data_format" title="Link to this definition">¶</a></dt>
+<dd><p>Return the data format used in this implementation of the interface.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          <div class="page-nav">
+            <div class="inner"><ul class="page-nav">
+  <li class="prev">
+    <a href="dummy_excitation_scanner.html"
+       title="previous chapter">← Dummy excitation scanner</a>
+  </li>
+  <li class="next">
+    <a href="../../iqo-docs/iqo-specifics.html"
+       title="next chapter">IQO-specific guides →</a>
+  </li>
+</ul><div class="footer" role="contentinfo">
+      &#169; Copyright 2025, Molecular Quantum Nanophotonics Lab @ LENS.
+    <br>
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.1.3 with <a href="https://github.com/schettino72/sphinx_press_theme">Press Theme</a> 0.9.1.
+</div>
+            </div>
+          </div>
+      </page>
+    </div></div>
+    
+    
+  </body>
+</html>

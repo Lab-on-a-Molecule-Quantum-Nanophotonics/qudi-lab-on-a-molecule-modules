@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html  lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+      <title>Module conversion from old qudi to new core {#module_conversion}</title>
+    
+          <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+          <link rel="stylesheet" href="../_static/theme.css " type="text/css" />
+          <link rel="stylesheet" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" type="text/css" />
+          <link rel="stylesheet" href="../_static/exercise.css" type="text/css" />
+      
+      <!-- sphinx script_files -->
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+
+      
+      <!-- bundled in js (rollup iife) -->
+      <!-- <script src="../_static/theme-vendors.js"></script> -->
+      <script src="../_static/theme.js" defer></script>
+    
+  <link rel="index" title="Index" href="../genindex.html" />
+  <link rel="search" title="Search" href="../search.html" />
+  <link rel="next" title="Release Workflow" href="repo_management/release_workflow.html" />
+  <link rel="prev" title="Migrating from old qudi (release v0.1) to new core" href="migrating_from_qudi_v0.1.html" /> 
+  </head>
+
+  <body>
+    <div id="app">
+    <div class="theme-container" :class="pageClasses"><navbar @toggle-sidebar="toggleSidebar">
+  <router-link to="../index.html" class="home-link">
+    
+      <span class="site-name">Qudi Lab on a molecule modules</span>
+    
+  </router-link>
+
+  <div class="links">
+    <navlinks class="can-hide">
+
+  
+    <div class="nav-item">
+      <a href="../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Tutorials:
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+    </navlinks>
+  </div>
+</navbar>
+
+      
+      <div class="sidebar-mask" @click="toggleSidebar(false)">
+      </div>
+        <sidebar @toggle-sidebar="toggleSidebar">
+          
+          <navlinks>
+            
+
+  
+    <div class="nav-item">
+      <a href="../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Tutorials:
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+            
+          </navlinks><div id="searchbox" class="searchbox" role="search">
+  <div class="caption"><span class="caption-text">Quick search</span>
+    <div class="searchformwrapper">
+      <form class="search" action="../search.html" method="get">
+        <input type="text" name="q" />
+        <input type="submit" value="Search" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div><div class="sidebar-links" role="navigation" aria-label="main navigation">
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../index.html#qudi-lab-on-a-molecule-modules-documentation">Tutorials:</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../Crash%20course%20into%20Qudi.html" class="reference internal ">    Tutorial: a crash course into Qudi</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="setup_confocal_scanning.html" class="reference internal ">    Guide: Setting up confocal scanning</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="setup_odmr.html" class="reference internal ">    Guide: Setting up ODMR</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="setup_timeseries.html" class="reference internal ">    Guide: Setting up time series</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../index.html#qudi-lab-on-a-molecule-modules-documentation">Contents:</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../installation.html" class="reference internal ">Installation</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../changelog-lens.html" class="reference internal ">Lens's changelog</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="changelog.html" class="reference internal ">Ulm IQO's changelog (parent repository)</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../programming-guides.html" class="reference internal ">Programming guides: writing your own modules and understanding our hardwares.</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="iqo-specifics.html" class="reference internal ">Ulm IQO's specific guides</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+</div>
+        </sidebar>
+
+      <page>
+          <div class="body-header" role="navigation" aria-label="navigation">
+  
+  <ul class="breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+    
+      <li><a href="iqo-specifics.html">IQO-specific guides</a> &raquo;</li>
+    
+    <li>Module conversion from old qudi to new core {#module_conversion}</li>
+  </ul>
+  
+
+  <ul class="page-nav">
+  <li class="prev">
+    <a href="migrating_from_qudi_v0.1.html"
+       title="previous chapter">← Migrating from old qudi (release v0.1) to new core</a>
+  </li>
+  <li class="next">
+    <a href="repo_management/release_workflow.html"
+       title="next chapter">Release Workflow →</a>
+  </li>
+</ul>
+  
+</div>
+<hr>
+          <div class="content" role="main" v-pre>
+            
+  <section id="module-conversion-from-old-qudi-to-new-core-module-conversion">
+<h1>Module conversion from old qudi to new core {#module_conversion}<a class="headerlink" href="#module-conversion-from-old-qudi-to-new-core-module-conversion" title="Link to this heading">¶</a></h1>
+<p>This document should give a short introduction on how to convert custom modules
+that have work with old qudi to work with the new qudi core.
+In principle the new core follows the same ideas as the old qudi,
+so the structure of any custom modules can stay the same with a few smaller changes.</p>
+<p>Here we want to list common points that sould be considered when converting modules.</p>
+<section id="imports">
+<h2>Imports<a class="headerlink" href="#imports" title="Link to this heading">¶</a></h2>
+<p>All the imports of the qudi core modules have changed from e.g.
+<code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">core.connector</span> <span class="pre">import</span> <span class="pre">Connector</span></code> to now have a <code class="docutils literal notranslate"><span class="pre">qudi.</span></code> infront of it.
+So the new import of the connector would be: <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">qudi.core.connector</span> <span class="pre">import</span> <span class="pre">Connector</span></code></p>
+<p>Also the base modules of your custom qudi classes have changed to:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">qudi.core.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">Base</span><span class="p">,</span> <span class="n">LogicBase</span><span class="p">,</span> <span class="n">GuiBase</span>
+</pre></div>
+</div>
+<p>Notice, that the base class for the logic also has been renamed.</p>
+<p>As the Interfaces now inherite from the base class,
+you do not need to inherit again from <code class="docutils literal notranslate"><span class="pre">Base</span></code> if you make your custom class
+confirm to an interface by inheriting it.
+Therefore the follwoing will suffice e.g. for a new hardware switch module:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">qudi.interface.switch_interface</span><span class="w"> </span><span class="kn">import</span> <span class="n">SwitchInterface</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">SwitchDummy</span><span class="p">(</span><span class="n">SwitchInterface</span><span class="p">):</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+<p>Common objects used in qudi modules are:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">qudi.core.connector</span><span class="w"> </span><span class="kn">import</span> <span class="n">Connector</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qudi.core.statusvariable</span><span class="w"> </span><span class="kn">import</span> <span class="n">StatusVar</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qudi.core.configoption</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigOption</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qudi.util.mutex</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mutex</span><span class="p">,</span> <span class="n">RecursiveMutex</span>  <span class="c1"># use Mutex over RecursiveMutex whenever possible</span>
+</pre></div>
+</div>
+</section>
+<section id="interfaces">
+<h2>Interfaces<a class="headerlink" href="#interfaces" title="Link to this heading">¶</a></h2>
+<p>The old way of declaring an intraface was:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">core.interface</span><span class="w"> </span><span class="kn">import</span> <span class="n">abstract_interface_method</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">core.meta</span><span class="w"> </span><span class="kn">import</span> <span class="n">InterfaceMetaclass</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">DummyInterface</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">InterfaceMetaclass</span><span class="p">):</span>
+    <span class="nd">@property</span>
+    <span class="nd">@abstract_interface_method</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The name of the Module.</span>
+<span class="sd">        @return str: name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+</pre></div>
+</div>
+<p>The new way of declaring an interface is as follows:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qudi.core.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">Base</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">DummyInterface</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The name of the Module.</span>
+<span class="sd">        @return str: name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+</pre></div>
+</div>
+<p>Notice that the interface is now inheriting the Base class and that the pure <code class="docutils literal notranslate"><span class="pre">abcabstractmethod</span></code> is used.</p>
+</section>
+<section id="saving-and-fitting">
+<h2>Saving and fitting<a class="headerlink" href="#saving-and-fitting" title="Link to this heading">¶</a></h2>
+<p>Fitting and saving is now part of the core itself and does not belong to a logic module.
+Therefore both can be accessed via core-imports instead of with connectors.</p>
+<p>For details please see <a class="reference internal" href="#data_storage.md"><span class="xref myst">Saving</span></a> and <a class="reference internal" href="#data_fitting_integration.md"><span class="xref myst">Fitting</span></a>.</p>
+</section>
+<section id="threading">
+<h2>Threading<a class="headerlink" href="#threading" title="Link to this heading">¶</a></h2>
+<p>In general threading in qudi should not be handled directly but through Signals in QT.
+All the logic modules run in their own threads, as can be seen when selecting the
+thread view in the qudi main window. GUI modules have to run in the Qt main thread
+while hardware modules do not have their own threads by default and their functions are run
+by the calling thread (probably logic).
+You can however also force a hardware module to run in its own thread by setting <code class="docutils literal notranslate"><span class="pre">_threaded</span> <span class="pre">=</span> <span class="pre">True</span></code>
+in the module class definition, e.g.:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyThreadedHardware</span><span class="p">(</span><span class="n">MyInterface</span><span class="p">):</span>
+    <span class="n">_threaded</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>If you do however need explicit threading, please use the qudi thread manager,
+so it keeps track of them and also shows them in the thread view.</p>
+<p>A simple example for spawning a worker thread and executing a worker method inside this thread.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PySide2.QtCore</span><span class="w"> </span><span class="kn">import</span> <span class="n">QObject</span><span class="p">,</span> <span class="n">QThread</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qudi.core.threadmanager</span><span class="w"> </span><span class="kn">import</span> <span class="n">ThreadManager</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Worker</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; This is a classical worker class that can run a script defined e.g. in &quot;do_stuff&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_stuff</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Worker started in thread: &quot;</span><span class="si">{</span><span class="n">QThread</span><span class="o">.</span><span class="n">currentThread</span><span class="p">()</span><span class="o">.</span><span class="n">objectName</span><span class="p">()</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+        <span class="c1"># work on stuff, e.g. something that takes 5 seconds to complete</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Worker finished in thread: &quot;</span><span class="si">{</span><span class="n">QThread</span><span class="o">.</span><span class="n">currentThread</span><span class="p">()</span><span class="o">.</span><span class="n">objectName</span><span class="p">()</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+        
+        
+<span class="k">def</span><span class="w"> </span><span class="nf">run_in_thread</span><span class="p">(</span><span class="n">thread_name</span><span class="o">=</span><span class="s1">&#39;MyThread&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; This function will spawn and run a new worker thread and waits until it has finished.</span>
+<span class="sd">    </span>
+<span class="sd">    @param str thread_name: The custom name of the thread to spawn</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Check if thread manager can be retrieved from the qudi main application</span>
+    <span class="n">thread_manager</span> <span class="o">=</span> <span class="n">ThreadManager</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">thread_manager</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;No thread manager found. Qudi application is probably not running.&#39;</span><span class="p">)</span>
+    <span class="c1"># Get a newly spawned thread (PySide2.QtCore.QThread) from the thread manager and give it a name</span>
+    <span class="n">my_thread</span> <span class="o">=</span> <span class="n">thread_manager</span><span class="o">.</span><span class="n">get_new_thread</span><span class="p">(</span><span class="n">thread_name</span><span class="p">)</span>
+    <span class="c1"># Create worker instance and move the worker object to the new thread</span>
+    <span class="n">my_worker</span> <span class="o">=</span> <span class="n">Worker</span><span class="p">()</span>
+    <span class="n">my_worker</span><span class="o">.</span><span class="n">moveToThread</span><span class="p">(</span><span class="n">my_thread</span><span class="p">)</span>
+    <span class="c1"># Connect the QThread.started signal to the worker &quot;run&quot;-method.</span>
+    <span class="c1"># This will cause the worker to execute its &quot;do_stuff&quot; method as soon as the corresponding</span>
+    <span class="c1"># thread is up and running.</span>
+    <span class="n">my_thread</span><span class="o">.</span><span class="n">started</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">my_worker</span><span class="o">.</span><span class="n">do_stuff</span><span class="p">)</span>
+    <span class="c1"># Start the thread and let the worker run</span>
+    <span class="n">my_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="c1"># Issue stopping the thread. This will not wait until it has actually stopped.</span>
+    <span class="n">thread_manager</span><span class="o">.</span><span class="n">quit_thread</span><span class="p">(</span><span class="n">my_thread</span><span class="p">)</span>
+    <span class="c1"># Wait until it has actually finished running and the thread is stopped.</span>
+    <span class="c1"># The thread manager will clean up the created thread automatically after it has stopped so </span>
+    <span class="c1"># you can not re-run a thread after it has stopped</span>
+    <span class="n">thread_manager</span><span class="o">.</span><span class="n">join_thread</span><span class="p">(</span><span class="n">my_thread</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="miscellaneous">
+<h2>Miscellaneous<a class="headerlink" href="#miscellaneous" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>The former <code class="docutils literal notranslate"><span class="pre">qudi_slot</span></code> mechanism does not exist anymore.
+Just use normal slots from Pyside.</p></li>
+<li><p>ui-files created with the QTDesigner can contain promoted widgets that directly
+link to qudi custom widgets. In this case the path to the custom widgets needs to be replaced.
+e.g. <code class="docutils literal notranslate"><span class="pre">qtwidgets.scientific_spinbox.h</span></code> becomes <code class="docutils literal notranslate"><span class="pre">qudi.core.gui.qtwidgets.scientific_spinbox</span></code></p></li>
+<li><p>On some Windows 10 system the following error might appear after installation of the new core:<br />
+<code class="docutils literal notranslate"><span class="pre">ImportError:</span> <span class="pre">DLL</span> <span class="pre">load</span> <span class="pre">failed</span> <span class="pre">while</span> <span class="pre">importing</span> <span class="pre">win32api:</span> <span class="pre">The</span> <span class="pre">specified</span> <span class="pre">module</span> <span class="pre">could</span> <span class="pre">not</span> <span class="pre">be</span> <span class="pre">found.</span></code><br />
+There is a bug report on that <a class="reference external" href="https://github.com/jupyter/notebook/issues/4980">here</a>. <br />
+An estabilished workaround is to call the following in you new qudi environment.
+This is actually not a fix, but by upgrading the pywin32 package with pip
+you make sure that the PATH is set correctly independent of the buggy conda: <br />
+<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">–upgrade</span> <span class="pre">pywin32==225</span></code></p></li>
+</ul>
+</section>
+</section>
+
+
+          </div>
+          <div class="page-nav">
+            <div class="inner"><ul class="page-nav">
+  <li class="prev">
+    <a href="migrating_from_qudi_v0.1.html"
+       title="previous chapter">← Migrating from old qudi (release v0.1) to new core</a>
+  </li>
+  <li class="next">
+    <a href="repo_management/release_workflow.html"
+       title="next chapter">Release Workflow →</a>
+  </li>
+</ul><div class="footer" role="contentinfo">
+      &#169; Copyright 2025, Molecular Quantum Nanophotonics Lab @ LENS.
+    <br>
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.1.3 with <a href="https://github.com/schettino72/sphinx_press_theme">Press Theme</a> 0.9.1.
+</div>
+            </div>
+          </div>
+      </page>
+    </div></div>
+    
+    
+  </body>
+</html>

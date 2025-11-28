@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html  lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+      <title>Introduction to a crash course into Qudi</title>
+    
+          <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+          <link rel="stylesheet" href="_static/theme.css " type="text/css" />
+          <link rel="stylesheet" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" type="text/css" />
+          <link rel="stylesheet" href="_static/exercise.css" type="text/css" />
+      
+      <!-- sphinx script_files -->
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=9bcbadda"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+
+      
+      <!-- bundled in js (rollup iife) -->
+      <!-- <script src="_static/theme-vendors.js"></script> -->
+      <script src="_static/theme.js" defer></script>
+    
+  <link rel="index" title="Index" href="genindex.html" />
+  <link rel="search" title="Search" href="search.html" />
+  <link rel="next" title="Setting up confocal scanning" href="iqo-docs/setup_confocal_scanning.html" />
+  <link rel="prev" title="Qudi Lab on a Molecule Modules documentation" href="index.html" /> 
+  </head>
+
+  <body>
+    <div id="app">
+    <div class="theme-container" :class="pageClasses"><navbar @toggle-sidebar="toggleSidebar">
+  <router-link to="index.html" class="home-link">
+    
+      <span class="site-name">Qudi Lab on a molecule modules</span>
+    
+  </router-link>
+
+  <div class="links">
+    <navlinks class="can-hide">
+
+  
+    <div class="nav-item">
+      <a href="index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link  router-link-active">
+         Tutorials:
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+    </navlinks>
+  </div>
+</navbar>
+
+      
+      <div class="sidebar-mask" @click="toggleSidebar(false)">
+      </div>
+        <sidebar @toggle-sidebar="toggleSidebar">
+          
+          <navlinks>
+            
+
+  
+    <div class="nav-item">
+      <a href="index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link  router-link-active">
+         Tutorials:
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+            
+          </navlinks><div id="searchbox" class="searchbox" role="search">
+  <div class="caption"><span class="caption-text">Quick search</span>
+    <div class="searchformwrapper">
+      <form class="search" action="search.html" method="get">
+        <input type="text" name="q" />
+        <input type="submit" value="Search" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div><div class="sidebar-links" role="navigation" aria-label="main navigation">
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="index.html#qudi-lab-on-a-molecule-modules-documentation">Tutorials:</a></span>
+      </p>
+      <ul class="current">
+        
+          <li class="toctree-l1 current">
+            
+              <a href="#" class="reference internal current">    Tutorial: a crash course into Qudi</a>
+            
+
+            
+              <ul>
+                
+                  <li class="toctree-l2"><a href="#introduction-to-a-crash-course-into-qudi" class="reference internal">Introduction to a crash course into Qudi</a></li>
+                
+                  <li class="toctree-l2"><a href="#before-the-lecture" class="reference internal">Before the lecture</a></li>
+                
+                  <li class="toctree-l2"><a href="#at-the-beginning-of-the-lecture" class="reference internal">At the beginning of the lecture</a></li>
+                
+                  <li class="toctree-l2"><a href="#a-crash-course-into-qudi" class="reference internal">A crash course into Qudi</a></li>
+                
+                  <li class="toctree-l2"><a href="#hello-qudi" class="reference internal">Hello, Qudi!</a></li>
+                
+                  <li class="toctree-l2"><a href="#basics-of-qudi" class="reference internal">Basics of Qudi</a></li>
+                
+                  <li class="toctree-l2"><a href="#when-things-go-wrong-understanding-errors" class="reference internal">When things go wrong: understanding errors</a></li>
+                
+                  <li class="toctree-l2"><a href="#interactive-activity-let-s-write-a-logic-module" class="reference internal">Interactive activity: let’s write a logic module</a></li>
+                
+                  <li class="toctree-l2"><a href="#the-modules-we-commonly-use" class="reference internal">The modules we commonly use</a></li>
+                
+                  <li class="toctree-l2"><a href="#laser-scanners" class="reference internal">Laser scanners</a></li>
+                
+                  <li class="toctree-l2"><a href="#pulsers" class="reference internal">Pulsers</a></li>
+                
+                  <li class="toctree-l2"><a href="#concluding-remarks" class="reference internal">Concluding remarks</a></li>
+                
+              </ul>
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="iqo-docs/setup_confocal_scanning.html" class="reference internal ">    Guide: Setting up confocal scanning</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="iqo-docs/setup_odmr.html" class="reference internal ">    Guide: Setting up ODMR</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="iqo-docs/setup_timeseries.html" class="reference internal ">    Guide: Setting up time series</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="index.html#qudi-lab-on-a-molecule-modules-documentation">Contents:</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="installation.html" class="reference internal ">Installation</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="changelog-lens.html" class="reference internal ">Lens's changelog</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="iqo-docs/changelog.html" class="reference internal ">Ulm IQO's changelog (parent repository)</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="programming-guides.html" class="reference internal ">Programming guides: writing your own modules and understanding our hardwares.</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="iqo-docs/iqo-specifics.html" class="reference internal ">Ulm IQO's specific guides</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+</div>
+        </sidebar>
+
+      <page>
+          <div class="body-header" role="navigation" aria-label="navigation">
+  
+  <ul class="breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+    
+    <li>Introduction to a crash course into Qudi</li>
+  </ul>
+  
+
+  <ul class="page-nav">
+  <li class="prev">
+    <a href="index.html"
+       title="previous chapter">← Qudi Lab on a Molecule Modules documentation</a>
+  </li>
+  <li class="next">
+    <a href="iqo-docs/setup_confocal_scanning.html"
+       title="next chapter">Setting up confocal scanning →</a>
+  </li>
+</ul>
+  
+</div>
+<hr>
+          <div class="content" role="main" v-pre>
+            
+  <div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+</pre></div>
+</div>
+</div>
+</div>
+<section id="introduction-to-a-crash-course-into-qudi">
+<h1>Introduction to a crash course into Qudi<a class="headerlink" href="#introduction-to-a-crash-course-into-qudi" title="Link to this heading">¶</a></h1>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This page is a work in progress.</p>
+</div>
+<p>The goal of this lecture is to get people to become familiar with Qudi. This is an <strong>interactive lecture</strong>. This means that people are expected to download Qudi and run this notebook on their computer. The <a class="reference internal" href="#before-the-lecture"><span class="std std-ref">Before the lecture</span></a> section covers the pre-requisites to follow the lecture and theinstallation of Qudi on your computer. The actual lecture is in the <a class="reference internal" href="#a-crash-course-into-qudi"><span class="std std-ref">A crash course into Qudi</span></a> section.</p>
+</section>
+<section id="before-the-lecture">
+<span id="id1"></span><h1>Before the lecture<a class="headerlink" href="#before-the-lecture" title="Link to this heading">¶</a></h1>
+<p>This is a Jupyter notebook that we will use to discover the basics about Qudi, the Python framework we use to control and automate our setups. Before the lecture, I would like you to read this first section to prepare your computer so that you can follow it interactively.</p>
+<section id="you-need-to-know">
+<h2>You need to know<a class="headerlink" href="#you-need-to-know" title="Link to this heading">¶</a></h2>
+<p>It helps a lot to be familiar with some tools:</p>
+<ul class="simple">
+<li><p>YAML (Yet Another Markup Language), you can read <a class="reference external" href="https://learnxinyminutes.com/yaml/">this guide</a></p></li>
+<li><p>Python. You can get a refresher here in <a class="reference external" href="https://learnxinyminutes.com/python/">this short guide</a>. In particular, I want you to be familiar with the idea of classes and objects in addition to the standard programming statements. It is useful to have the <a class="reference external" href="https://docs.python.org/3/">official documentation</a> at hand. If you need a more in-depth introduction, read the <a class="reference external" href="https://docs.python.org/3/tutorial/index.html">official python tutorial</a>. There’s also <a class="reference external" href="https://wiki.python.org/moin/BeginnersGuide">the beginner’s guide to python</a> for people lacking programming experience.</p></li>
+</ul>
+</section>
+<section id="what-i-want-you-to-install-and-download">
+<h2>What I want you to install and download<a class="headerlink" href="#what-i-want-you-to-install-and-download" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>We use the <code class="docutils literal notranslate"><span class="pre">uv</span></code> package manager. Please read and follow the <a class="reference external" href="https://docs.astral.sh/uv/getting-started/">getting started</a> guide. <strong>Ask me for help if you are struggling.</strong></p></li>
+<li><p>We will need <code class="docutils literal notranslate"><span class="pre">git</span></code>. This is a version control system (a tool to work collaboratively on code. For example, this is the tool behind <a class="reference external" href="https://github.com">GitHub</a>). Explaining this tool is out of scope, please <a class="reference external" href="https://git-scm.com/install/">install it</a>. If you want to learn more, you might read <a class="reference external" href="https://learnxinyminutes.com/git/">this short guide</a> or look for a more extensive tutorial.</p></li>
+<li><p>A text editor. In theory the simplest notepad is enough, but you may find more advanced applications useful. If you just need somethin lightwight, you can use <a class="reference external" href="https://notepad-plus-plus.org/">Notepad++</a>. Other people like <a class="reference external" href="https://code.visualstudio.com/">VSCode</a>, although I do not use it so I cannot help you much with that.</p></li>
+</ul>
+</section>
+<section id="getting-the-lecture-materials">
+<h2>Getting the lecture materials<a class="headerlink" href="#getting-the-lecture-materials" title="Link to this heading">¶</a></h2>
+<p>This section contains some commands that will get you the source code and setup qudi on you computer. Everything is installed in a Python virtual environment so the impact on your system should be minimal (you can simply delete the folder once the lecture is over if you want to get rid of it).</p>
+<p>Everything we need, including the interactive version of this notebook, is hosted in our <a class="reference external" href="https://github.com/Lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules">public repository</a>. The first task is to recover it using <code class="docutils literal notranslate"><span class="pre">git</span></code>. There are several ways of using the tool (VSCode users can do it from the editor I think), I will present the simplest: using it directly from the command line. For Mac and Linux users, your operating system already provide a decently functionnal command line interface, please open one. For Windows users, if you installed <code class="docutils literal notranslate"><span class="pre">git</span></code> following the instructions above, you also installed a tool called <code class="docutils literal notranslate"><span class="pre">Git</span> <span class="pre">Bash</span></code> that emulates the command line interface, you can launch it from the startup menu.</p>
+<p>You should now see a text window (likely with a black or white background). The text displayed depends on your specific configuration. For example, mine is very minimalistic.</p>
+<figure class="align-left" id="id6">
+<a class="reference internal image-reference" href="_images/af91774f-40f8-439f-a5eb-cde6a11e007e.png"><img alt="Screenshot of an empty terminal" src="_images/af91774f-40f8-439f-a5eb-cde6a11e007e.png" style="width: 60%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1 </span><span class="caption-text">Example of an empty terminal.</span><a class="headerlink" href="#id6" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>The first step is to decide in which directory to put the materials for this lecture. To know where you currently are, you can run the <code class="docutils literal notranslate"><span class="pre">pwd</span></code> command: it returns the current directory. You can do so by typing <code class="docutils literal notranslate"><span class="pre">pwd</span></code>, then pressing <code class="docutils literal notranslate"><span class="pre">Enter</span></code>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">pwd</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">klafyvel</span>
+</pre></div>
+</div>
+<p>I am currently in the directory <code class="docutils literal notranslate"><span class="pre">/home/klafyvel</span></code>. If you want to work in another directory, you can change directory using the <code class="docutils literal notranslate"><span class="pre">cd</span></code> command. For example, I will work in <code class="docutils literal notranslate"><span class="pre">/home/klafyvel/Documents</span></code>, so I can go there as follows:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>Documents<span class="w"> </span>
+<span class="nb">pwd</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">klafyvel</span><span class="o">/</span><span class="n">Documents</span>
+</pre></div>
+</div>
+<p>:::{tip}
+If you are interested in learning more how to use the command line you might read a tutorial on <code class="docutils literal notranslate"><span class="pre">bash</span></code> command line, although this is not required to follow this lecture.
+:::</p>
+<p>At this point, you should have a terminal open, and be in the directory where you want to work from. You can now download the material by invoking the <code class="docutils literal notranslate"><span class="pre">git</span></code> command as follow:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/Lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules
+</pre></div>
+</div>
+<p>It will display some information on what <code class="docutils literal notranslate"><span class="pre">git</span></code> is currently doing, for example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Cloning</span> <span class="n">into</span> <span class="s1">&#39;qudi-lab-on-a-molecule-modules&#39;</span><span class="o">...</span>
+<span class="n">remote</span><span class="p">:</span> <span class="n">Enumerating</span> <span class="n">objects</span><span class="p">:</span> <span class="mi">54378</span><span class="p">,</span> <span class="n">done</span><span class="o">.</span>
+<span class="n">remote</span><span class="p">:</span> <span class="n">Counting</span> <span class="n">objects</span><span class="p">:</span> <span class="mi">100</span><span class="o">%</span> <span class="p">(</span><span class="mi">52</span><span class="o">/</span><span class="mi">52</span><span class="p">),</span> <span class="n">done</span><span class="o">.</span>
+<span class="n">remote</span><span class="p">:</span> <span class="n">Compressing</span> <span class="n">objects</span><span class="p">:</span> <span class="mi">100</span><span class="o">%</span> <span class="p">(</span><span class="mi">12</span><span class="o">/</span><span class="mi">12</span><span class="p">),</span> <span class="n">done</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>Once this is done, you can navigate to the directory using the <code class="docutils literal notranslate"><span class="pre">cd</span></code> command and have a first look at what has been downloaded using the <code class="docutils literal notranslate"><span class="pre">ls</span></code> command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>qudi-lab-on-a-molecule-modules
+ls
+</pre></div>
+</div>
+<p>This will display a list of files and directories</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">AUTHORS</span><span class="o">.</span><span class="n">md</span>  <span class="n">docs</span>  <span class="n">LICENSE</span>  <span class="n">LICENSE</span><span class="o">.</span><span class="n">LESSER</span>  <span class="n">pyproject</span><span class="o">.</span><span class="n">toml</span>  <span class="n">README</span><span class="o">.</span><span class="n">md</span>  <span class="n">src</span>  <span class="n">tests</span>  <span class="n">VERSION</span>
+</pre></div>
+</div>
+<p>You can check that it corresponds to the files listed on <a class="reference external" href="https://github.com/Lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules">the GitHub</a> page.</p>
+<p>At this point we have downloaded the source code of our modules (if you don’t know what that is don’t worry, we will cover that later), but we still need to install Qudi and all the related dependencies. If you have used Python in the past, you might have encountered many difficulties with managing and installing packages. Because we use the <code class="docutils literal notranslate"><span class="pre">uv</span></code> package manager, that you should have installed following the previous section, all this is made much easier. It will take care of installing everything we need, including the correct Python version, the first time we invoke it. If you want to get scared, you can read the <a class="reference external" href="https://ulm-iqo.github.io/qudi-core/setup/installation.html">installation section</a> of the Qudi manual to see all the complicated steps that <code class="docutils literal notranslate"><span class="pre">uv</span></code> removes.</p>
+<p>Before we actually run Qudi for the first time, we need one final step that will enable the interaction between jupyter notebooks and Qudi. The following command will do so:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>qudi-install-kernel
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>We all love Microsoft (no).
+<strong>Windows users</strong>: some libraries are complicated to install on Windows. If you are getting errors, you may get luckier using the <code class="docutils literal notranslate"><span class="pre">--no-dev</span></code> option to prevent <code class="docutils literal notranslate"><span class="pre">uv</span></code> from installing some developpment dependencies: <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">run</span> <span class="pre">--no-dev</span> <span class="pre">qudi-install-kernel</span></code>. If this fixes the issue, then you need to keep this <code class="docutils literal notranslate"><span class="pre">--no-dev</span></code> option for all <code class="docutils literal notranslate"><span class="pre">uv</span></code> calls used later.</p>
+</div>
+<p>Since it is the first time we invoke the <code class="docutils literal notranslate"><span class="pre">uv</span></code> command, it will install all the dependencies we need. <strong>This might take some time</strong>, so it is the good time to take a break and enjoy a coffee.
+<img alt="image.png" src="_images/." /></p>
+<figure class="align-left" id="id7">
+<a class="reference internal image-reference" href="_images/7210315e-1ae4-424a-9a7e-a24a33aa114a.png"><img alt="Screenshot of a terminal with the uv utility running." src="_images/7210315e-1ae4-424a-9a7e-a24a33aa114a.png" style="width: 60%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 2 </span><span class="caption-text">Example of the output of the previous command while <code class="docutils literal notranslate"><span class="pre">uv</span></code> is installing dependencies.</span><a class="headerlink" href="#id7" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="running-qudi-and-the-interactive-notes">
+<h2>Running Qudi and the interactive notes<a class="headerlink" href="#running-qudi-and-the-interactive-notes" title="Link to this heading">¶</a></h2>
+<section id="running-qudi">
+<h3>Running Qudi<a class="headerlink" href="#running-qudi" title="Link to this heading">¶</a></h3>
+<p>At this stage, Qudi has been installed in our local directory and can be launched. From a terminal in the tutorial directory (refer to the previous sections if you are unsure of how to get one), you can now use the <code class="docutils literal notranslate"><span class="pre">qudi</span></code> command through <code class="docutils literal notranslate"><span class="pre">uv</span></code>. Qudi accepts a few parameters through the command line. We can get some help about them using the <code class="docutils literal notranslate"><span class="pre">--help</span></code> parameter:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>qudi<span class="w"> </span>--help<span class="w">       </span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">qudi</span><span class="o">.</span><span class="n">core</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">g</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">d</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">c</span> <span class="n">CONFIG</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">l</span> <span class="n">LOGDIR</span><span class="p">]</span>
+
+<span class="n">options</span><span class="p">:</span>
+  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>            <span class="n">show</span> <span class="n">this</span> <span class="n">help</span> <span class="n">message</span> <span class="ow">and</span> <span class="n">exit</span>
+  <span class="o">-</span><span class="n">g</span><span class="p">,</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">gui</span>          <span class="n">Run</span> <span class="n">qudi</span> <span class="s2">&quot;headless&quot;</span><span class="p">,</span> <span class="n">i</span><span class="o">.</span><span class="n">e</span><span class="o">.</span> <span class="n">without</span> <span class="n">GUI</span><span class="o">.</span> <span class="n">User</span> <span class="n">interaction</span> <span class="n">only</span> <span class="n">possible</span> <span class="n">via</span> <span class="n">IPython</span> <span class="n">kernel</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">d</span><span class="p">,</span> <span class="o">--</span><span class="n">debug</span>           <span class="n">Run</span> <span class="n">qudi</span> <span class="ow">in</span> <span class="n">debug</span> <span class="n">mode</span> <span class="n">to</span> <span class="n">log</span> <span class="nb">all</span> <span class="n">debug</span> <span class="n">messages</span><span class="o">.</span> <span class="n">Can</span> <span class="n">affect</span> <span class="n">performance</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">c</span> <span class="n">CONFIG</span><span class="p">,</span> <span class="o">--</span><span class="n">config</span> <span class="n">CONFIG</span>
+                        <span class="n">Path</span> <span class="n">to</span> <span class="n">the</span> <span class="n">configuration</span> <span class="n">file</span> <span class="n">to</span> <span class="n">use</span> <span class="k">for</span> <span class="k">for</span> <span class="n">this</span> <span class="n">qudi</span> <span class="n">session</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">l</span> <span class="n">LOGDIR</span><span class="p">,</span> <span class="o">--</span><span class="n">logdir</span> <span class="n">LOGDIR</span>
+                        <span class="n">Absolute</span> <span class="n">path</span> <span class="n">to</span> <span class="n">log</span> <span class="n">directory</span> <span class="n">to</span> <span class="n">use</span> <span class="n">instead</span> <span class="n">of</span> <span class="n">the</span> <span class="n">default</span> <span class="n">one</span> <span class="s2">&quot;&lt;user_home&gt;/qudi/log/&quot;</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">--config</span></code> option is of peculiar interest to us. As we will see later, with Qudi we use a configuration file to describe the setup and how the various components are configured and connect to one another. This file uses <a class="reference external" href="https://learnxinyminutes.com/yaml/">the YAML (Yet Another Markup Language) syntax</a>, and we will play with it later. For now, you are provided with two configuration files:</p>
+<ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">default.cfg</span></code> file, located in <code class="docutils literal notranslate"><span class="pre">src/qudi/default.cfg</span></code>. This file is kindly provided by the developpers of the Ulm-IQO module, and showcases many possibilities of qudi using dummy hardwares.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">crash_course.cfg</span></code> file, located in <code class="docutils literal notranslate"><span class="pre">src/qudi/crash_course.cfg</span></code>. We will use and edit this file to understand together how Qudi works.</p></li>
+</ul>
+<p>By default, if you do not specify a configuration file, Qudi uses the last configuration file used. If you are reading ahead before the lecture, I encourage you to try the default configuration and try to play with all the user interfaces. On the day of the lecture, I want you to use the <code class="docutils literal notranslate"><span class="pre">crash_course.cfg</span></code> file. The configuration file can also be changed from the user interface.</p>
+<section id="selecting-the-configuration-file-from-the-command-line">
+<h4>Selecting the configuration file from the command line<a class="headerlink" href="#selecting-the-configuration-file-from-the-command-line" title="Link to this heading">¶</a></h4>
+<p>To run a specific configuration file from the command line, you need to specify the <a class="reference external" href="https://en.wikipedia.org/wiki/Path_(computing)">absolute path</a> to the file. For example for the default file <em>on my computer</em>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>qudi<span class="w"> </span>--config<span class="w"> </span>/home/klafyvel/Documents/qudi-lab-on-a-molecule-modules/src/qudi/default.cfg
+</pre></div>
+</div>
+</section>
+<section id="selecting-the-configuration-file-from-the-user-interface">
+<h4>Selecting the configuration file from the user interface<a class="headerlink" href="#selecting-the-configuration-file-from-the-user-interface" title="Link to this heading">¶</a></h4>
+<p>This is perhaps the simplest way if you are not comfortable with the command line. From the terminal, you can run Qudi without any options:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>qudi
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>On the computers of the setups, we have a shortcut that runs Qudi for us. There is no underlying magic: it simply opens a terminal at the right location and runs the above command!</p>
+</div>
+<p>The goal of this section is not to explore the main Qudi interface. However, it is useful to see that it displays the name of the currently loaded configuration file at the very bottom:</p>
+<figure class="align-left" id="id8">
+<a class="reference internal image-reference" href="_images/b5e71907-597a-40ba-b774-bff484374926.png"><img alt="Screenshot of the bottom of the main Qudi window." src="_images/b5e71907-597a-40ba-b774-bff484374926.png" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 3 </span><span class="caption-text">The very bottom of the main Qudi window, displaying the version number and the path of the configuration file loaded.</span><a class="headerlink" href="#id8" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>You can choose another file from the menu by clicking on <code class="docutils literal notranslate"><span class="pre">File</span> <span class="pre">&gt;</span> <span class="pre">Load</span> <span class="pre">configuration</span></code></p>
+<figure class="align-left" id="id9">
+<a class="reference internal image-reference" href="_images/ac4463e1-e59c-4f0d-8f61-de54d68881c1.png"><img alt="Screenshot of the file explorer showing a configuration file." src="_images/ac4463e1-e59c-4f0d-8f61-de54d68881c1.png" style="width: 60%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4 </span><span class="caption-text">The file explorer window to select the configuration file may vary depending on your specific configuration</span><a class="headerlink" href="#id9" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>After selecting the file, Qudi will ask you to restart the program to load the new configuration. Click on “Yes”.</p>
+<figure class="align-left" id="id10">
+<a class="reference internal image-reference" href="_images/3d77eeac-ba7a-4845-beca-01fc92821911.png"><img alt="Screenshot of the dialog window asking if you want to restart Qudi." src="_images/3d77eeac-ba7a-4845-beca-01fc92821911.png" style="width: 60%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 5 </span><span class="caption-text">Yes, we want to restart Qudi!</span><a class="headerlink" href="#id10" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+</section>
+<section id="running-the-jupyter-notebook">
+<h3>Running the Jupyter notebook<a class="headerlink" href="#running-the-jupyter-notebook" title="Link to this heading">¶</a></h3>
+<p>While installing Qudi, we also intalled a jupyter notebook. You need a terminal available to run commands in the tutorial directory. If you previously closed your terminal, open it again and navigate to the directory using the <code class="docutils literal notranslate"><span class="pre">cd</span></code> command as before.</p>
+<p>Once you are there, you can start the jupyter notebook through <code class="docutils literal notranslate"><span class="pre">uv</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>jupyter<span class="w"> </span>notebook
+</pre></div>
+</div>
+<p>This will open a web browser and display a page listing the current directory:</p>
+<figure class="align-left" id="id11">
+<a class="reference internal image-reference" href="_images/7c9411a8-83e4-434c-918e-f747d55cfea4.png"><img alt="Screenshot of the jupyter file explorer." src="_images/7c9411a8-83e4-434c-918e-f747d55cfea4.png" style="width: 60%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 6 </span><span class="caption-text">The jupyter file explorer.</span><a class="headerlink" href="#id11" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>Navigate to the folder <code class="docutils literal notranslate"><span class="pre">docs/source</span></code>, where the interactive version of this notebook lives:</p>
+<figure class="align-left" id="id12">
+<a class="reference internal image-reference" href="_images/0add01ec-7e1f-4953-89df-677302243964.png"><img alt="Screenshot of the jupyter file explorer." src="_images/0add01ec-7e1f-4953-89df-677302243964.png" style="width: 60%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 7 </span><span class="caption-text">The jupyter file explorer showing the directory where this tutorial lives.</span><a class="headerlink" href="#id12" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>And then double-click on the file “Crash course into Qudi.ipynb”.</p>
+<p>For comfort, you might want to enable the Table of Contents pannel. You can do this by clicking on <code class="docutils literal notranslate"><span class="pre">View</span> <span class="pre">&gt;</span> <span class="pre">Table</span> <span class="pre">of</span> <span class="pre">Contents</span></code>.</p>
+<figure class="align-left" id="id13">
+<a class="reference internal image-reference" href="_images/6792b125-e465-4d14-9e9f-9619bd40279b.png"><img alt="Screenshot of the jupyter toolbar to enable the table of contents." src="_images/6792b125-e465-4d14-9e9f-9619bd40279b.png" style="width: 30%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 8 </span><span class="caption-text">The jupyter toolbar to enable the table of contents.</span><a class="headerlink" href="#id13" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>In the Qudi main window, you should see a log line in the Qudi main window that tells you that the jupyter kernel connected to Qudi.</p>
+<figure class="align-left" id="id14">
+<a class="reference internal image-reference" href="_images/3aab4ccd-d298-4c26-a158-884ae95b8a4d.png"><img alt="Screenshot of the Qudi main window log viewer." src="_images/3aab4ccd-d298-4c26-a158-884ae95b8a4d.png" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 9 </span><span class="caption-text">The jupyter kernel connected to my Qudi application.</span><a class="headerlink" href="#id14" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p><strong>You are ready!</strong></p>
+</section>
+</section>
+<section id="what-you-can-read-in-addition">
+<h2>What you can read in addition<a class="headerlink" href="#what-you-can-read-in-addition" title="Link to this heading">¶</a></h2>
+<p>Although we will be covering most of it, you can read the <a class="reference external" href="https://ulm-iqo.github.io/qudi-core/#design-concepts">design concepts section</a> of the Qudi manual.</p>
+</section>
+</section>
+<section id="at-the-beginning-of-the-lecture">
+<span id="id2"></span><h1>At the beginning of the lecture<a class="headerlink" href="#at-the-beginning-of-the-lecture" title="Link to this heading">¶</a></h1>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Please start Qudi and this notebook!</p>
+</div>
+</section>
+<section id="a-crash-course-into-qudi">
+<span id="id3"></span><h1>A crash course into Qudi<a class="headerlink" href="#a-crash-course-into-qudi" title="Link to this heading">¶</a></h1>
+<center>
+    Lecture notes by <b>Hugo Levy-Falk</b>, CNR-INO
+</center>
+<figure class="align-center" id="id15">
+<a class="reference internal image-reference" href="_images/lazy_me.jpeg"><img alt="A comics showing expectations vs reality when automating setups. One expects to relax while the setup is running automatically, while in reality one can only dream of that while fixing code." src="_images/lazy_me.jpeg" style="width: 60%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 10 </span><span class="caption-text">The reality of automating experiments.</span><a class="headerlink" href="#id15" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<br/>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>At this point, it helps a lot if you have already read and followed the <a class="reference internal" href="#before-the-lecture">Before the lecture</a> and <a class="reference internal" href="#at-the-beginning-of-the-lecture">At the beginning of the lecture</a> sections and installed the requirements to follow the interactive bits. However, if you joined-in late, you can still get the lecture notes and follow along.</p>
+</div>
+<center>
+<figure >
+    <img src="" alt="QR code towards the lecture notes" style="max-width: 600px;"/>
+    <figcaption>Get the lecture notes at <a href="https://github.com/Lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules">https://github.com/Lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules</a>.</figcaption>
+</figure>
+</center><p>Today, I want to discuss:</p>
+<ul class="simple">
+<li><p>Why we automate data aquisition and pre-analysis, why we use a framework / a library rather than a simple <em>ad-hoc</em> script, what tools are available, and why we choose Qudi;</p></li>
+<li><p>The structure and basics of Qudi, with a practical example (this is an interactive lecture!)</p></li>
+<li><p>How to deal with errors</p></li>
+<li><p>A broad overview of the modules useful for single-molecule experiments</p></li>
+<li><p>A specific focus on the laser scanning module that we use for single-molecule experiments and laser control</p></li>
+</ul>
+</section>
+<section id="hello-qudi">
+<h1>Hello, Qudi!<a class="headerlink" href="#hello-qudi" title="Link to this heading">¶</a></h1>
+<p>In this section I would like to introduce the rationale behind automating experiments and the method used to achieve that.</p>
+<section id="why-automation">
+<h2>Why automation?<a class="headerlink" href="#why-automation" title="Link to this heading">¶</a></h2>
+<p>We operate complex instruments, and need to perform repetitive measurements systematically. These are two tasks that a computer is very good at solving.</p>
+<p>We want a software that:</p>
+<ul class="simple">
+<li><p>Is able to handle the variability in instrumentation,</p></li>
+<li><p>Facilitates the systematic handling of experiments,</p></li>
+<li><p>Provides traceability of data provenance and experimental settings,</p></li>
+<li><p>Is easy enough to tweak, expand, and re-use.</p></li>
+</ul>
+</section>
+<section id="why-a-framework">
+<h2>Why a framework?<a class="headerlink" href="#why-a-framework" title="Link to this heading">¶</a></h2>
+<p>We are all able, given enough time, to write a script that <em>kind of work</em>™ to make a specific measurement. The problems with this approach are:</p>
+<ul class="simple">
+<li><p>This is time consuming,</p></li>
+<li><p>You will likely reinvent the wheel everytime,</p></li>
+<li><p>You will likely end-up with a single huge, poorly documented, fragile spaghetti-code script that nobody understands after two rotations of non-permanent people in the lab.</p></li>
+</ul>
+<p><strong>Designing (good) software is a job</strong>. Software engineering is challenging and is a skill that takes time and experience to acquire. What do we mean by “good” software?</p>
+<ul class="simple">
+<li><p>The software performs its task correctly,</p></li>
+<li><p>The software performs its task efficiently,</p></li>
+<li><p>The software is documented so users can learn how to use it and understand what it does,</p></li>
+<li><p>The code is documented so new people can work on it,</p></li>
+<li><p>The code is sufficiently well structured that it will facilitate maintenance and addition of new functionalities.</p></li>
+</ul>
+<p><strong>We are not software engineers.</strong> This is why we want to avoid making software engineering decisions as much as possible. One solution is to use a <strong>framework</strong>. This is a fancy name to describe a big library that, among other things, encourages or even enforces some code practices. The goal is to produce good software thanks to these guiding rules and the available code base in the framework.</p>
+</section>
+<section id="so-many-available-frameworks">
+<h2>So many available frameworks<a class="headerlink" href="#so-many-available-frameworks" title="Link to this heading">¶</a></h2>
+<p>Many people have had a hand at automating experiments. Some people tried to compile <a class="reference external" href="https://pymeasure.github.io/python-lab-automation-landscape/catalog/">lists of available frameworks</a>. Among them are:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/PyMoDAQ/PyMoDAQ">PyMoDAQ</a>, developped at CNRS in France,</p></li>
+<li><p><a class="reference external" href="https://microsoft.github.io/Qcodes/index.html">QCoDeS</a>, developped by the Copenhagen / Delft / Sydney / Microsoft quantum computing consortium,</p></li>
+<li><p><a class="reference external" href="https://github.com/pymeasure/pymeasure">PyMeasure</a>, by Colin Jermain and Graham Rowlands at Cornell University,</p></li>
+<li><p><a class="reference external" href="https://github.com/Ulm-IQO/qudi-core">Qudi</a>, developped at the Institute for Quantum Optics, Ulm in Germany</p></li>
+</ul>
+<p>With so many choices available, how do we pick one?</p>
+<ul class="simple">
+<li><p>Look into what is used in your field</p></li>
+<li><p>Check how different frameworks have different approaches</p></li>
+<li><p>Check from previous experience in your team</p></li>
+<li><p>See to what extend you can collaborate with your colleagues in other teams of your institute</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It is still useful to know that other frameworks exists. Scientific instruments manufacturers are famously terrible at documenting how to tweak, script and sometimes simply use their hardwares. If someone else using another framework has been able to make a hardware that you need work, you may take inspiration from them!</p>
+</div>
+</section>
+<section id="qudi">
+<h2>Qudi<a class="headerlink" href="#qudi" title="Link to this heading">¶</a></h2>
+<p>Qudi is an automation framework developped at Ulm IQO by people working on NV centers in diamond, but its scope is way more general. It devides the code in re-usable modules by abstracting the hardware layer. In addition it provides many experimental commodities for saving data and metadata, connecting modules on different computers, configuring experiments, saving status…</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Please, reference the <a class="reference external" href="https://doi.org/10.1016/j.softx.2017.02.001">Binder <em>et al</em>, <strong>Software</strong>, 6 (2017), pp. 85-90, 10.1016/j.softx.2017.02.001</a> paper in your methods when you use Qudi for your experiments! This helps them getting funds to work on improving Qudi!</p>
+</div>
+</section>
+</section>
+<section id="basics-of-qudi">
+<h1>Basics of Qudi<a class="headerlink" href="#basics-of-qudi" title="Link to this heading">¶</a></h1>
+<section id="the-hardware-logic-gui-stack">
+<h2>The Hardware, Logic, GUI stack<a class="headerlink" href="#the-hardware-logic-gui-stack" title="Link to this heading">¶</a></h2>
+<p>The main logical structure of Qudi is shown below. Qudi is built around the idea of <strong>logic</strong> modules. Logics control hardwares and are controlled either through Graphical User Interfaces (GUI) or Jupyter notebooks.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>If you want a more technical explanation, you will find <a class="reference external" href="https://ulm-iqo.github.io/qudi-core/design_concepts/measurement_modules.html">the official Qudi documentation</a> useful.</p>
+</div>
+<figure class="align-default" id="id16">
+<a class="reference internal image-reference" href="_images/diagram.jpeg"><img alt="A diagram showing the module structure of Qudi." src="_images/diagram.jpeg" style="width: 50%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 11 </span><span class="caption-text">The basics of the basics: Hardware, interfaces, logics, and Graphical User Interfaces (GUI)</span><a class="headerlink" href="#id16" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<section id="logic-modules">
+<h3>Logic modules<a class="headerlink" href="#logic-modules" title="Link to this heading">¶</a></h3>
+<p>A logic should be understood as the brain of an experiment. Concretely, this will describe how to interface a set of hardwares or other logics to produce an experimental result. For example, the laser scanning logic configures a scanning laser to scan a range of frequencies and acquire a set of data. Logics are also responsible for data analysis, storage, and monitoring of the experiment. They can rely heavily on helper functions of Qudi.</p>
+</section>
+<section id="hardwares">
+<h3>Hardwares<a class="headerlink" href="#hardwares" title="Link to this heading">¶</a></h3>
+<p>A hardware is a Python class that is tasked with interfacing with the actual hardware. To be able to be used by a specific logic, the hardware must implement the correct <a class="reference internal" href="#interfaces"><span class="std std-ref">Interfaces</span></a>.</p>
+</section>
+<section id="interfaces">
+<span id="id4"></span><h3>Interfaces<a class="headerlink" href="#interfaces" title="Link to this heading">¶</a></h3>
+<p>We want to keep the logics as generalistic as possible. Still keeping the example of the laser scanning logic, we want to be able to use if with all our lasers without rewriting it. This issue of being able to interface the same logic with a variety of hardwares that fill the same function is solved through <strong>interfaces</strong>. An interface can be understood as a promise that a hardware module will behave in a certain way and provide a set of methods. For example, the laser hardwares must implement the  <a class="reference external" href="https://github.com/Lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/blob/main/src/qudi/interface/excitation_scanner_interface.py"><code class="docutils literal notranslate"><span class="pre">ExcitationScannerInterface</span></code></a> to be compatible with the laser scanning logic. <strong>This is very powerful</strong>, because it means that often you can integrate a new hardware with the existing logics by simply reading its documentation and writing the adequate hardware module using the interface definition as a template.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>You can also have a look at the <a class="reference external" href="https://ulm-iqo.github.io/qudi-core/design_concepts/hardware_interface.html">Hardware Interfaces</a> page of Qudi’s documentation.</p>
+</div>
+</section>
+<section id="graphical-user-interfaces-gui">
+<h3>Graphical User Interfaces (GUI)<a class="headerlink" href="#graphical-user-interfaces-gui" title="Link to this heading">¶</a></h3>
+<p>Even though logic modules can be controlled via explicit Python code (for example in Jupyter notebooks), it is also convenient for daily operations to have a nice user interface. This is the role of GUIs. GUIs should only handle presentation of data, and control of logic modules. Logic modules are unaware of the GUI modules. This separation of concern also makes the code simpler, since logic don’t have to bother with user interactions.</p>
+</section>
+<section id="where-all-these-live">
+<h3>Where all these live<a class="headerlink" href="#where-all-these-live" title="Link to this heading">¶</a></h3>
+<p>The repository where our Qudi modules live looks like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>.
+├── AUTHORS.md
+├── Crash course into Qudi.html
+├── docs
+│   ... All the documentation files
+├── LICENSE
+├── LICENSE.LESSER
+├── pyproject.toml
+├── README.md
+├── src
+│   └── qudi
+│       ├── default.cfg
+│       ├── gui &lt;- All the GUI modules live there
+│       ├── hardware &lt;- All the hardware modules live there
+│       ├── interface &lt;- All the interfaces are defined there
+│       ├── logic &lt;- All the logics live there
+│       ├── scripts &lt;- These are some scripts, I will not cover it today, I think it is better that we use jupyter notebooks instead
+│       └── util &lt;- We extend Qudi here, in particular with the TOMLDataStorage that we will cover at the end.
+├── tests
+│   ... All unit tests
+├── uv.lock
+└── VERSION
+</pre></div>
+</div>
+</section>
+</section>
+<section id="writing-our-first-configuration-file">
+<h2>Writing our first configuration file<a class="headerlink" href="#writing-our-first-configuration-file" title="Link to this heading">¶</a></h2>
+<p>In this section, we will write (and hopefully understand) a Qudi configuration file. A configuration file can be understood as a recipe that explains to Qudi which modules (GUIs, logics, and hardwares) should be intancied, how they should connect to one another, and how they sould be configured. In addition, it provides some general configuration for Qudi. The configuration is stored in a text file, formated in YAML (Yet Another Markup Language, if you haven’t done so yet, you can check out <a class="reference external" href="https://learnxinyminutes.com/yaml/">this guide</a>). You can edit it with any text editor.</p>
+<figure class="align-default" id="id17">
+<a class="reference internal image-reference" href="_images/writing_configuration.jpeg"><img alt="A character is trying to connect a logic and a hardware modules." src="_images/writing_configuration.jpeg" style="width: 40%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 12 </span><span class="caption-text">Writing configuration is as easy as finding which pieces fit. Writing working configuration is a bit harder.</span><a class="headerlink" href="#id17" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<section id="configuration-file-layout">
+<h3>Configuration file layout<a class="headerlink" href="#configuration-file-layout" title="Link to this heading">¶</a></h3>
+<p>Qudi configuration files typically consist in four sections: <code class="docutils literal notranslate"><span class="pre">global</span></code>, <code class="docutils literal notranslate"><span class="pre">gui</span></code>, <code class="docutils literal notranslate"><span class="pre">logic</span></code>, and <code class="docutils literal notranslate"><span class="pre">hardware</span></code>.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">global</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># global parameters for Qudi</span>
+<span class="nt">gui</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># Configuration of GUI modules</span>
+<span class="nt">logic</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># Configuration of Logic modules</span>
+<span class="nt">hardware</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># Configuration of Hardware modules</span>
+</pre></div>
+</div>
+</section>
+<section id="global-section">
+<h3>Global section<a class="headerlink" href="#global-section" title="Link to this heading">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">global</span></code> section has the following fields availale:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">global</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">startup_modules</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[]</span>
+<span class="w">    </span><span class="nt">remote_modules_server</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="w">    </span><span class="nt">namespace_server_port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">18861</span>
+<span class="w">    </span><span class="nt">force_remote_calls_by_value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="w">    </span><span class="nt">hide_manager_window</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span>
+<span class="w">    </span><span class="nt">stylesheet</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;qdark.qss&#39;</span>
+<span class="w">    </span><span class="nt">default_data_dir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="w">    </span><span class="nt">daily_data_dirs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="w">    </span><span class="nt">extension_paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[]</span>
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Going through all these fields is beyond the point of this introduction. Refer to <a class="reference external" href="https://ulm-iqo.github.io/qudi-core/design_concepts/configuration.html">Qudi’s documentation</a> to learn more. Here I list the most important ones.</p>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">startup_modules</span></code>: This lists the modules we want to start automatically when we run Qudi. This avoids having to launch the manually.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">remote_modules_server</span></code>: This is how we make Qudi aware of another instance running on another network. Refer to the documentation for how to use it.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">default_data_dir</span></code>: This is where Qudi will store the data when saving. We systematically overwrite this in our configurations to make it point to the shared drives!</p></li>
+</ul>
+</section>
+<section id="modules-sections">
+<h3>Modules sections<a class="headerlink" href="#modules-sections" title="Link to this heading">¶</a></h3>
+<p>Here, I will only cover the configuration of local modules, refer to the <a class="reference external" href="https://ulm-iqo.github.io/qudi-core/design_concepts/configuration.html">documentation page on configuration</a> to learn about configuring remote modules.</p>
+<p>The GUI, logic, and hardware modules are configured in their respective sections: <code class="docutils literal notranslate"><span class="pre">gui</span></code>, <code class="docutils literal notranslate"><span class="pre">logic</span></code>, and <code class="docutils literal notranslate"><span class="pre">hardware</span></code>.</p>
+<p>The configuration of a module itself contains three elements (for example, for a logic):</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">logic</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">my_logic</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">module.Class</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_example_logic.MyExampleLogic</span>
+<span class="w">        </span><span class="nt">options</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">my_config_option</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;I</span><span class="nv"> </span><span class="s">am</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">string</span><span class="nv"> </span><span class="s">from</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">qudi</span><span class="nv"> </span><span class="s">configuration&#39;</span>
+<span class="w">        </span><span class="nt">connect</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">a_connector</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">a_defined_hardware_or_logic</span>
+</pre></div>
+</div>
+<section id="module-class">
+<h4>module.Class<a class="headerlink" href="#module-class" title="Link to this heading">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">module.Class</span></code> element tells Qudi which Python class to use for this module. Since we are in the <code class="docutils literal notranslate"><span class="pre">logic</span></code> section, Qudi will look directly in the folder of the logics. To find what to put here, we need to do a bit of investigation. For a logic, the directory contains the following files:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">camera_logic</span><span class="o">.</span><span class="n">py</span>          <span class="n">qdplot_logic</span><span class="o">.</span><span class="n">py</span>
+<span class="n">interface_test_logic</span><span class="o">.</span><span class="n">py</span>  <span class="n">scanning_data_logic</span><span class="o">.</span><span class="n">py</span>
+<span class="n">laser_logic</span><span class="o">.</span><span class="n">py</span>           <span class="n">scanning_excitation_spectroscopy</span><span class="o">.</span><span class="n">py</span>
+<span class="n">laser_scanner_logic</span><span class="o">.</span><span class="n">py</span>   <span class="n">scanning_optimize_logic</span><span class="o">.</span><span class="n">py</span>
+<span class="n">nv_calculator_logic</span><span class="o">.</span><span class="n">py</span>   <span class="n">scanning_probe_logic</span><span class="o">.</span><span class="n">py</span>
+<span class="n">odmr_logic</span><span class="o">.</span><span class="n">py</span>            <span class="n">software_pid_controller</span><span class="o">.</span><span class="n">py</span>
+<span class="n">pid_logic</span><span class="o">.</span><span class="n">py</span>             <span class="n">spectrometer_logic</span><span class="o">.</span><span class="n">py</span>
+<span class="n">poi_manager_logic</span><span class="o">.</span><span class="n">py</span>     <span class="n">switch_logic</span><span class="o">.</span><span class="n">py</span>
+<span class="n">power_sweep_logic</span><span class="o">.</span><span class="n">py</span>     <span class="n">temperature_global_save</span><span class="o">.</span><span class="n">py</span>
+<span class="n">pulsed</span>                   <span class="n">time_series_reader_logic</span><span class="o">.</span><span class="n">py</span>
+<span class="n">__pycache__</span>
+</pre></div>
+</div>
+<p>If we look in <code class="docutils literal notranslate"><span class="pre">time_series_reader_logic.py</span></code> for example, we see the following class has been declared:</p>
+<div class="literal-block-wrapper docutils container" id="id18">
+<div class="code-block-caption"><span class="caption-number">Listing 1 </span><span class="caption-text">src/qudi/logic/time_series_reader_logic.py</span><a class="headerlink" href="#id18" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">TimeSeriesReaderLogic</span><span class="p">(</span><span class="n">LogicBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This logic module gathers data from a hardware streaming device.</span>
+
+<span class="sd">    Example config for copy-paste:</span>
+
+<span class="sd">    time_series_reader_logic:</span>
+<span class="sd">        module.Class: &#39;time_series_reader_logic.TimeSeriesReaderLogic&#39;</span>
+<span class="sd">        options:</span>
+<span class="sd">            max_frame_rate: 20  # optional (default: 20Hz)</span>
+<span class="sd">            channel_buffer_size: 1048576  # optional (default: 1MSample)</span>
+<span class="sd">            max_raw_data_bytes: 1073741824  # optional (default: 1GB)</span>
+<span class="sd">        connect:</span>
+<span class="sd">            streamer: &lt;streamer_name&gt;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+</div>
+<p>It inherits from <code class="docutils literal notranslate"><span class="pre">LogicBase</span></code>, so that’s a logic, and the developper gives some example configuration. This means we could configure it as:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">logic</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">time_series_reader_logic</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">module.Class</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;time_series_reader_logic.TimeSeriesReaderLogic&#39;</span>
+<span class="w">        </span><span class="nt">options</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">max_frame_rate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20</span><span class="w">  </span><span class="c1"># optional (default: 20Hz)</span>
+<span class="w">            </span><span class="nt">channel_buffer_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1048576</span><span class="w">  </span><span class="c1"># optional (default: 1MSample)</span>
+<span class="w">            </span><span class="nt">max_raw_data_bytes</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1073741824</span><span class="w">  </span><span class="c1"># optional (default: 1GB)</span>
+<span class="w">        </span><span class="nt">connect</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">streamer</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_streamer</span>
+</pre></div>
+</div>
+<p>You can see that <code class="docutils literal notranslate"><span class="pre">module.Class</span></code> corresponds to the Python path to reach this calss. Also here are the options and connect sections.</p>
+</section>
+</section>
+<section id="connectors">
+<h3>Connectors<a class="headerlink" href="#connectors" title="Link to this heading">¶</a></h3>
+<p>In the previous example configuration, there is a <code class="docutils literal notranslate"><span class="pre">connect</span></code> section. When Qudi initializes a module (more on that in a coming section), it looks for <strong>connectors</strong> in the class declaration and matches them with elements of the <code class="docutils literal notranslate"><span class="pre">connect</span></code> section of the configuration. If we look further in the source code of <code class="docutils literal notranslate"><span class="pre">TimeSeriesReaderLogic</span></code>, you’ll notice the following lines:</p>
+<div class="literal-block-wrapper docutils container" id="id19">
+<div class="code-block-caption"><span class="caption-number">Listing 2 </span><span class="caption-text">src/qudi/logic/time_series_reader_logic.py</span><a class="headerlink" href="#id19" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="c1"># declare connectors</span>
+    <span class="n">_streamer</span> <span class="o">=</span> <span class="n">Connector</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;streamer&#39;</span><span class="p">,</span> <span class="n">interface</span><span class="o">=</span><span class="s1">&#39;DataInStreamInterface&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>which tells Qudi to initialize the <code class="docutils literal notranslate"><span class="pre">_streamer</span></code> attribute of the Python object corresponding to the module with a connector to the module listed as <code class="docutils literal notranslate"><span class="pre">streamer</span></code> in the <code class="docutils literal notranslate"><span class="pre">connect</span></code> part of the configuration section. In the example above, we have <code class="docutils literal notranslate"><span class="pre">streamer:</span> <span class="pre">my_streamer</span></code> which means that we want the connected module to be <code class="docutils literal notranslate"><span class="pre">my_streamer</span></code>. We need to declare and configure this module in the configuration file as well.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Accessing the connected module
+When coding logics, if you need to refer to the connected module (in this example, the module <code class="docutils literal notranslate"><span class="pre">my_streamer</span></code>), you need to <em>de-reference</em> it through the connector. This means that in a method of <code class="docutils literal notranslate"><span class="pre">TimeSeriesReaderLogic</span></code> for example, you would need to do something like <code class="docutils literal notranslate"><span class="pre">self._streamer()</span></code> to access the module. <strong>Note the parentheses</strong>, forgetting them is a very common source of errors.</p>
+</div>
+<p>You will notice that there is a second argument to <code class="docutils literal notranslate"><span class="pre">Connector</span></code>: <code class="docutils literal notranslate"><span class="pre">interface</span></code>. It tells Qudi which interface the connected module must implement. Qudi will throw an error if you try to connect a module that does not satisfy this interface. For us, it means that we want to add to the configuration file a hardware that implements the <code class="docutils literal notranslate"><span class="pre">DataInStreamInterface</span></code>. We will do that in a moment.</p>
+</section>
+<section id="configuration-options">
+<h3>Configuration options<a class="headerlink" href="#configuration-options" title="Link to this heading">¶</a></h3>
+<p>Last, but not least, come the configuration options. They are static attributes that are defined directly in the configuration file. Typical use cases would include the USB address of a hardware, the default acquisition rate of an acquisition card, etc. Sticking with our <code class="docutils literal notranslate"><span class="pre">TimeSeriesReaderLogic</span></code> example, we have the possibility of configuring the maximum frame rate, the size of a channel buffer, and the maximum size of all data. Ideally these would be better documented. In practice you often need to read code to grasp what they do.</p>
+<p>In the code, these are declared using <code class="docutils literal notranslate"><span class="pre">ConfigOption</span></code>, in a similar way to the connectors. For example for <code class="docutils literal notranslate"><span class="pre">TimeSeriesReaderLogic</span></code>:</p>
+<div class="literal-block-wrapper docutils container" id="id20">
+<div class="code-block-caption"><span class="caption-number">Listing 3 </span><span class="caption-text">src/qudi/logic/time_series_reader_logic.py</span><a class="headerlink" href="#id20" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="c1"># config options</span>
+    <span class="n">_max_frame_rate</span> <span class="o">=</span> <span class="n">ConfigOption</span><span class="p">(</span><span class="s1">&#39;max_frame_rate&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">missing</span><span class="o">=</span><span class="s1">&#39;warn&#39;</span><span class="p">)</span>
+    <span class="n">_channel_buffer_size</span> <span class="o">=</span> <span class="n">ConfigOption</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;channel_buffer_size&#39;</span><span class="p">,</span>
+                                        <span class="n">default</span><span class="o">=</span><span class="mi">1024</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span>
+                                        <span class="n">missing</span><span class="o">=</span><span class="s1">&#39;info&#39;</span><span class="p">,</span>
+                                        <span class="n">constructor</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+    <span class="n">_max_raw_data_bytes</span> <span class="o">=</span> <span class="n">ConfigOption</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;max_raw_data_bytes&#39;</span><span class="p">,</span>
+                                       <span class="n">default</span><span class="o">=</span><span class="mi">1024</span><span class="o">**</span><span class="mi">3</span><span class="p">,</span>
+                                       <span class="n">missing</span><span class="o">=</span><span class="s1">&#39;info&#39;</span><span class="p">,</span>
+                                       <span class="n">constructor</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">name</span></code> and <code class="docutils literal notranslate"><span class="pre">default</span></code> arguments are self-explanatories. <code class="docutils literal notranslate"><span class="pre">missing</span></code> tells Qudi what to do if the value is absent from the configuration. For example you can have <code class="docutils literal notranslate"><span class="pre">'error'</span></code> if you want to throw an error if it is missing.</p>
+</section>
+<section id="interactive-time-let-s-finish-this-configuration-file">
+<h3>Interactive time: Let’s finish this configuration file!<a class="headerlink" href="#interactive-time-let-s-finish-this-configuration-file" title="Link to this heading">¶</a></h3>
+<p>For this part, you need a text editor. You can use VSCode, Notepad++, Vim, or even the notepad of your system. It helps if you have an editor that knows YAML syntax and can detect for you some errors. From my tests, Notepad++ and VSCode should detect correctly the file format. If it is not the case, see <a class="reference external" href="https://stackoverflow.com/questions/30775551/set-language-for-syntax-highlighting-in-visual-studio-code">this SO post for VSCode</a>, and for Notepad++, click on the bottom left of the window. <strong>Remember that YAML is very sensitive to indentation</strong>, use four spaces to avoid issues.</p>
+<div class="exercise admonition" id="configuration">
+
+<p class="admonition-title"><span class="caption-number">Exercise 1 </span></p>
+<section id="exercise-content">
+<p>Using what we just learned, complete this configuration file to have our logic working (<code class="docutils literal notranslate"><span class="pre">TimeSeriesReaderLogic</span></code>), with a GUI (<code class="docutils literal notranslate"><span class="pre">TimeSeriesGui</span></code>, you will find it in <code class="docutils literal notranslate"><span class="pre">src/qudi/gui/time_series/time_series_gui.py</span></code>), and a dummy hardware (<code class="docutils literal notranslate"><span class="pre">InStreamDummy</span></code>, you will find it in <code class="docutils literal notranslate"><span class="pre">src/qudi/hardware/dummy/data_instream_dummy.py</span></code>).</p>
+<p>You can copy and paste this empty configuration file to start with:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">global</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># list of modules to load when starting</span>
+<span class="w">    </span><span class="nt">startup_modules</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[]</span>
+<span class="w">    </span><span class="c1"># Server port for serving the active qudi module namespace locally (localhost).</span>
+<span class="w">    </span><span class="c1"># Used by e.g. the Qudi jupyter kernel.</span>
+<span class="w">    </span><span class="nt">namespace_server_port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">18861</span>
+<span class="w">    </span><span class="c1"># Save data to daily data sub-directories by default</span>
+<span class="w">    </span><span class="nt">daily_data_dirs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="nt">gui</span><span class="p">:</span>
+<span class="nt">logic</span><span class="p">:</span>
+<span class="nt">hardware</span><span class="p">:</span>
+</pre></div>
+</div>
+</section>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>You can test your solution by opening your file in Qudi’s main window!</p>
+</div>
+<p>Click on the block below to see a solution:</p>
+<div class="solution dropdown admonition" id="configuration-solution">
+
+<p class="admonition-title">Solution to<a class="reference internal" href="#configuration"> Exercise 1</a></p>
+<section id="solution-content">
+<p>Here’s one solution (directly from the default configuration).</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">global</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># list of modules to load when starting</span>
+<span class="w">    </span><span class="nt">startup_modules</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;time_series_gui&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="c1"># Server port for serving the active qudi module namespace locally (localhost).</span>
+<span class="w">    </span><span class="c1"># Used by e.g. the Qudi jupyter kernel.</span>
+<span class="w">    </span><span class="nt">namespace_server_port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">18861</span>
+<span class="w">    </span><span class="c1"># Save data to daily data sub-directories by default</span>
+<span class="w">    </span><span class="nt">daily_data_dirs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="nt">gui</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">time_series_gui</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">module.Class</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;time_series.time_series_gui.TimeSeriesGui&#39;</span>
+<span class="w">        </span><span class="nt">options</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">use_antialias</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w">  </span><span class="c1"># optional, set to False if you encounter performance issues</span>
+<span class="w">        </span><span class="nt">connect</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">_time_series_logic_con</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">time_series_reader_logic</span>
+<span class="nt">logic</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">time_series_reader_logic</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">module.Class</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;time_series_reader_logic.TimeSeriesReaderLogic&#39;</span>
+<span class="w">        </span><span class="nt">options</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">max_frame_rate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20</span><span class="w">  </span><span class="c1"># optional (default: 20Hz)</span>
+<span class="w">            </span><span class="nt">channel_buffer_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1048576</span><span class="w">  </span><span class="c1"># optional (default: 1MSample)</span>
+<span class="w">            </span><span class="nt">max_raw_data_bytes</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1073741824</span><span class="w">  </span><span class="c1"># optional (default: 1GB)</span>
+<span class="w">        </span><span class="nt">connect</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">streamer</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">instream_dummy</span>
+<span class="nt">hardware</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">instream_dummy</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">module.Class</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;dummy.data_instream_dummy.InStreamDummy&#39;</span>
+<span class="w">        </span><span class="nt">options</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">channel_names</span><span class="p">:</span>
+<span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;digital</span><span class="nv"> </span><span class="s">1&#39;</span>
+<span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;analog</span><span class="nv"> </span><span class="s">1&#39;</span>
+<span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;analog</span><span class="nv"> </span><span class="s">2&#39;</span>
+<span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;digital</span><span class="nv"> </span><span class="s">2&#39;</span>
+<span class="w">            </span><span class="nt">channel_units</span><span class="p">:</span>
+<span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;Hz&#39;</span>
+<span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;V&#39;</span>
+<span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;V&#39;</span>
+<span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;Hz&#39;</span>
+<span class="w">            </span><span class="nt">channel_signals</span><span class="p">:</span><span class="w">  </span><span class="c1"># Can be &#39;counts&#39; or &#39;sine&#39;</span>
+<span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;counts&#39;</span>
+<span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;sine&#39;</span>
+<span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;sine&#39;</span>
+<span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;counts&#39;</span>
+<span class="w">            </span><span class="nt">data_type</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;float64&#39;</span>
+<span class="w">            </span><span class="nt">sample_timing</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;CONSTANT&#39;</span><span class="w">  </span><span class="c1"># Can be &#39;CONSTANT&#39;, &#39;TIMESTAMP&#39; or &#39;RANDOM&#39;</span>
+</pre></div>
+</div>
+</section>
+</div>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<p>Please, run Qudi with this configuration now, we are going to use it in what comes next.</p>
+</div>
+</section>
+</section>
+<section id="qudi-s-main-window">
+<h2>Qudi’s main window<a class="headerlink" href="#qudi-s-main-window" title="Link to this heading">¶</a></h2>
+<p>If you load the solution to the previous exercise in Qudi, you will get two windows. Among them is Qudi’s main window:</p>
+<figure class="align-left" id="id21">
+<a class="reference internal image-reference" href="_images/main_window_annotated.svg"><img alt="_images/main_window_annotated.svg" src="_images/main_window_annotated.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 13 </span><span class="caption-text">The main window in Qudi</span><a class="headerlink" href="#id21" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>You can figure by yourself what is feasible with the menu bar and the toolbar, items have either a self-explanatory name, or an explanation label appearing when hovering the mouse above them.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>It is possible to change quite a lot what the main window looks like, moving stuff around, closing pannels  etc. If you get lost, you can restore the default view using the menu bar <kbd class="kbd compound docutils literal notranslate"><kbd class="kbd docutils literal notranslate">View</kbd> <kbd class="kbd docutils literal notranslate">&gt;</kbd> <kbd class="kbd docutils literal notranslate">Restore</kbd> <kbd class="kbd docutils literal notranslate">default</kbd></kbd>.</p>
+</div>
+<section id="log-viewer">
+<h3>Log viewer<a class="headerlink" href="#log-viewer" title="Link to this heading">¶</a></h3>
+<p>A very helpful too is the log viewer, at the bottom of the window. This is where you can keep track of what is happening in Qudi. Each log entry is attributed a level: <code class="docutils literal notranslate"><span class="pre">debug</span></code>, <code class="docutils literal notranslate"><span class="pre">info</span></code>, <code class="docutils literal notranslate"><span class="pre">warning</span></code>, <code class="docutils literal notranslate"><span class="pre">error</span></code>, or <code class="docutils literal notranslate"><span class="pre">critical</span></code>. The <code class="docutils literal notranslate"><span class="pre">debug</span></code> level is only available if Qudi is started eith the <code class="docutils literal notranslate"><span class="pre">--debug</span></code> option. This pannel is especially important because this is where errors are reported.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>It can be very useful to read <a class="reference external" href="https://ulm-iqo.github.io/qudi-core/design_concepts/logging.html">section on logging in the Qudi documentation (link)</a>.</p>
+</div>
+<p>The logs are also systematically by Qudi and can be retrieved (this is particularly useful when an error causes Qudi to crash, or when reporting errors). They can be found in your home directory (for Linux and Mac users: <code class="docutils literal notranslate"><span class="pre">~/qudi/log</span></code>, for Windows users <code class="docutils literal notranslate"><span class="pre">C:/Users/&lt;you&gt;/qudi</span></code>). For example in my case I have the following files:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qudi</span><span class="o">.</span><span class="n">log</span>  <span class="n">qudi</span><span class="o">.</span><span class="n">log</span><span class="mf">.1</span>  <span class="n">qudi</span><span class="o">.</span><span class="n">log</span><span class="mf">.2</span>  <span class="n">qudi</span><span class="o">.</span><span class="n">log</span><span class="mf">.3</span>  <span class="n">qudi</span><span class="o">.</span><span class="n">log</span><span class="mf">.4</span>  <span class="n">qudi</span><span class="o">.</span><span class="n">log</span><span class="mf">.5</span>
+</pre></div>
+</div>
+<p>The most recent file is <code class="docutils literal notranslate"><span class="pre">qudi.log</span></code>, it contains the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>2025-11-27 12:35:21 info qudi.Qudi Starting qudi...
+2025-11-27 12:35:21 info qudi.Qudi Applying configuration from &quot;/home/klafyvel/Documents/qudi-lab-on-a-molecule-modules/exercise_1.cfg&quot;...
+2025-11-27 12:35:21 info qudi.Qudi Qudi configuration complete!
+2025-11-27 12:35:21 info qudi.core.gui.gui Activating main GUI module...
+2025-11-27 12:35:21 info qudi.core.servers Starting RPyC server &quot;local-namespace-server&quot; on [localhost]:18861
+2025-11-27 12:35:21 info qudi.core.gui.main_gui.main_gui.QudiMainGui IPython kernel for qudi main GUI successfully started.
+2025-11-27 12:35:21 info qudi.Qudi Loading startup module: time_series_gui
+2025-11-27 12:35:21 info qudi.core.modulemanager Activating gui module &quot;time_series.time_series_gui.TimeSeriesGui&quot;
+2025-11-27 12:35:22 info qudi.core.modulemanager Activating logic module &quot;time_series_reader_logic.TimeSeriesReaderLogic&quot;
+2025-11-27 12:35:22 info qudi.core.modulemanager Activating hardware module &quot;dummy.data_instream_dummy.InStreamDummy&quot;
+2025-11-27 12:35:23 info qudi.Qudi Initialization complete! Starting Qt event loop...
+2025-11-27 12:35:24 info qudi.core.services Client connected to local module service from [127.0.0.1]:42718
+2025-11-27 14:26:33 warning qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic Moving average width (9) is smaller than the trace window size. Will adjust trace window size to match.
+</pre></div>
+</div>
+<p>You can see that we retrieve all the informations displayed in the main window.</p>
+</section>
+<section id="python-console">
+<h3>Python console<a class="headerlink" href="#python-console" title="Link to this heading">¶</a></h3>
+<p>The Python console allows you to directly interact with the active module (more on activation in the next section). For example, you can query the <code class="docutils literal notranslate"><span class="pre">time_series_reader_logic</span></code> for the current trace data:</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">5</span><span class="p">]:</span> <span class="n">time_series_reader_logic</span><span class="o">.</span><span class="n">trace_data</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">5</span><span class="p">]:</span> 
+<span class="p">(</span><span class="n">array</span><span class="p">([</span><span class="o">...</span><span class="p">]),</span> <span class="p">{</span><span class="s1">&#39;digital 1&#39;</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span><span class="o">...</span><span class="p">]),</span> <span class="s1">&#39;analog 1&#39;</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span><span class="o">...</span><span class="p">]),</span> <span class="s1">&#39;analog 2&#39;</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span><span class="o">...</span><span class="p">]),</span> <span class="s1">&#39;digital 2&#39;</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span><span class="o">...</span><span class="p">])})</span>
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Of course, to understand what this does, you need to read the documentation of the <code class="docutils literal notranslate"><span class="pre">trace_data</span></code> method of <code class="docutils literal notranslate"><span class="pre">TimeSeriesReaderLogic</span></code>. In this specific case, the implementation looks like:</p>
+<div class="literal-block-wrapper docutils container" id="id22">
+<div class="code-block-caption"><span class="caption-number">Listing 4 </span><span class="caption-text">src/qudi/logic/time_series_reader_logic.py</span><a class="headerlink" href="#id22" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">trace_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Read-only property returning the x-axis of the data trace and a dictionary of the</span>
+<span class="sd">        corresponding trace data arrays for each channel</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data_offset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trace_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_moving_average_width</span> <span class="o">//</span> <span class="mi">2</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="n">ch</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trace_data</span><span class="p">[:</span><span class="n">data_offset</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ch</span> <span class="ow">in</span>
+                <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">active_channel_names</span><span class="p">)}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trace_times</span><span class="p">,</span> <span class="n">data</span>
+</pre></div>
+</div>
+</div>
+<p>which is self explanatory.</p>
+</div>
+</section>
+<section id="the-life-of-a-qudi-module-activation-and-de-activation">
+<h3>The life of a Qudi module: activation and de-activation<a class="headerlink" href="#the-life-of-a-qudi-module-activation-and-de-activation" title="Link to this heading">¶</a></h3>
+<figure class="align-default" id="id23">
+<a class="reference internal image-reference" href="_images/module_widget_annotated.svg"><img alt="_images/module_widget_annotated.svg" src="_images/module_widget_annotated.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 14 </span><span class="caption-text">The module widget</span><a class="headerlink" href="#id23" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>Perhaps the most interesting part of the main window is the modules tabs. Every modules present in the configuration file are listed there, and this is your first interaction point with them. At the moment, you should have three modules active: <code class="docutils literal notranslate"><span class="pre">time_series_gui</span></code>, <code class="docutils literal notranslate"><span class="pre">time_series_reader_logic</span></code>, and <code class="docutils literal notranslate"><span class="pre">instream_dummy</span></code>. They have been loaded automatically at startup, because our configuration file contains the following directive:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">global</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">startup_modules</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;time_series_gui&#39;</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+<p>Qudi saw that we requested <code class="docutils literal notranslate"><span class="pre">time_series_gui</span></code>, so it loaded all the modules it depends on by exploring the successive <code class="docutils literal notranslate"><span class="pre">connect</span></code> directive in the configuration. You can also de-activate a module by pressing the red cross. This will gently de-activate all the modules that depend on it. For example, if you press on the red cross in the hardware tab next to <code class="docutils literal notranslate"><span class="pre">instream_dummy</span></code>, you will deactivate all our modules.</p>
+</section>
+<section id="state-machines">
+<h3>State machines<a class="headerlink" href="#state-machines" title="Link to this heading">¶</a></h3>
+<p>Qudi modules’ life is ruled by a state machine</p>
+<figure class="align-default" id="id24">
+<a class="reference internal image-reference" href="https://ulm-iqo.github.io/qudi-core/images/module_fsm_diagram.svg"><img alt="https://ulm-iqo.github.io/qudi-core/images/module_fsm_diagram.svg" src="https://ulm-iqo.github.io/qudi-core/images/module_fsm_diagram.svg" style="width: 80%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 15 </span><span class="caption-text">The state machine of a Qudi module (reproduced from <a class="reference external" href="https://ulm-iqo.github.io/qudi-core/design_concepts/measurement_modules.html">Qudi’s documentation</a>).</span><a class="headerlink" href="#id24" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="status-variables">
+<h3>Status variables<a class="headerlink" href="#status-variables" title="Link to this heading">¶</a></h3>
+</section>
+</section>
+<section id="saving-things">
+<h2>Saving things<a class="headerlink" href="#saving-things" title="Link to this heading">¶</a></h2>
+<p>In this section: data formats used by Qudi + the one I added and is (I think) better.</p>
+</section>
+<section id="scripting-qudi-using-jupyter-notebooks">
+<h2>Scripting Qudi using Jupyter notebooks<a class="headerlink" href="#scripting-qudi-using-jupyter-notebooks" title="Link to this heading">¶</a></h2>
+<p>In this section: very simple codes to interact with the logics from the notebook. <strong>Don’t forget to talk about netobtain.</strong></p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Don’t forget to restart the kernel if you restart Qudi from <kbd class="kbd compound docutils literal notranslate"><kbd class="kbd docutils literal notranslate">Kernel</kbd> <kbd class="kbd docutils literal notranslate">&gt;</kbd> <kbd class="kbd docutils literal notranslate">Restart</kbd> <kbd class="kbd docutils literal notranslate">Kernel</kbd></kbd>.</p>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pl</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qudi.util.network</span><span class="w"> </span><span class="kn">import</span> <span class="n">netobtain</span>
+
+<span class="n">time</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">time_series_reader_logic</span><span class="o">.</span><span class="n">trace_data</span>
+<span class="n">time</span> <span class="o">=</span> <span class="n">netobtain</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">netobtain</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;analog 1&#39;</span><span class="p">])</span>
+<span class="n">pl</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+<span class="n">pl</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Time [s]&quot;</span><span class="p">)</span>
+<span class="n">pl</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Analog value [V]&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0, 0.5, &#39;Analog value [V]&#39;)
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/89728fd1a74dc602f40a3235176487b5e0e6e6114dda1538293b56cb6b9bfc6f.png"><img alt="_images/89728fd1a74dc602f40a3235176487b5e0e6e6114dda1538293b56cb6b9bfc6f.png" src="_images/89728fd1a74dc602f40a3235176487b5e0e6e6114dda1538293b56cb6b9bfc6f.png" style="width: 60%;" />
+</a>
+</div>
+</div>
+</section>
+<section id="finding-help">
+<h2>Finding help<a class="headerlink" href="#finding-help" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+<section id="when-things-go-wrong-understanding-errors">
+<h1>When things go wrong: understanding errors<a class="headerlink" href="#when-things-go-wrong-understanding-errors" title="Link to this heading">¶</a></h1>
+<figure class="align-default">
+<a class="reference internal image-reference" href="_images/fallen_me.jpeg"><img alt="a character has fallen on the ground and is dizzy. Next to them is a smoking laptop." src="_images/fallen_me.jpeg" style="width: 60%;" />
+</a>
+</figure>
+<section id="finding-useful-errors">
+<h2>Finding useful errors<a class="headerlink" href="#finding-useful-errors" title="Link to this heading">¶</a></h2>
+<p>In this section: explain where to find errors, how to read Python errors</p>
+</section>
+<section id="configuration-file-errors">
+<h2>Configuration file errors<a class="headerlink" href="#configuration-file-errors" title="Link to this heading">¶</a></h2>
+<p>Common errors in configuration files (incompatible interfaces)</p>
+<figure class="align-default">
+<a class="reference internal image-reference" href="_images/wrong_configuration.jpeg"><img alt="A character is trying to connect two pieces of a puzzle that cannot fit together" src="_images/wrong_configuration.jpeg" style="width: 30%;" />
+</a>
+</figure>
+<p>Explain yet again that yaml is complicated, you can make errors writing it. Mention the experimental configuration editor.</p>
+<figure class="align-default">
+<a class="reference internal image-reference" href="_images/yaml.jpeg"><img alt="A character is shaking at the thought of writing YAML" src="_images/yaml.jpeg" style="width: 30%;" />
+</a>
+</figure>
+<figure class="align-default" id="id25">
+<a class="reference internal image-reference" href="_images/config_editor.png"><img alt="_images/config_editor.png" src="_images/config_editor.png" style="width: 70%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 16 </span><span class="caption-text">The experimental configuration editor.</span><a class="headerlink" href="#id25" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="connectivity-errors">
+<h2>Connectivity errors<a class="headerlink" href="#connectivity-errors" title="Link to this heading">¶</a></h2>
+<p>Some common errors I have seen around, Qudi running multiple times, network not working…</p>
+<figure class="align-default">
+<a class="reference internal image-reference" href="_images/too_many_qudi.jpeg"><img alt="A character has been submersed by little Qudi logos. ontly his thumb up is emerging." src="_images/too_many_qudi.jpeg" style="width: 30%;" />
+</a>
+</figure>
+<figure class="align-default">
+<a class="reference internal image-reference" href="_images/network_failure.jpeg"><img alt="A character is perplexed by a knot of ethernet cables." src="_images/network_failure.jpeg" style="width: 30%;" />
+</a>
+</figure>
+</section>
+<section id="coding-errors">
+<h2>Coding errors<a class="headerlink" href="#coding-errors" title="Link to this heading">¶</a></h2>
+<p>How to spot a coding error.</p>
+<figure class="align-default">
+<a class="reference internal image-reference" href="_images/a_bug.jpeg"><img alt="A character is perplexed by a giant insect." src="_images/a_bug.jpeg" style="width: 30%;" />
+</a>
+</figure>
+</section>
+<section id="i-have-found-an-error-what-do-i-do">
+<h2>I have found an error, what do I do?<a class="headerlink" href="#i-have-found-an-error-what-do-i-do" title="Link to this heading">¶</a></h2>
+<p>How to report properly an error such that we can fix it (write things down, screenshots and not pictures taken with the phone because this is unreadable, log files…) Wither in a labbook, or on the github</p>
+</section>
+</section>
+<section id="interactive-activity-let-s-write-a-logic-module">
+<h1>Interactive activity: let’s write a logic module<a class="headerlink" href="#interactive-activity-let-s-write-a-logic-module" title="Link to this heading">¶</a></h1>
+<section id="level-0-let-s-not-write-a-logic-module">
+<h2>Level 0: Let’s <strong>not</strong> write a logic module<a class="headerlink" href="#level-0-let-s-not-write-a-logic-module" title="Link to this heading">¶</a></h2>
+<p>Use the notebook to query the dummy hardware.</p>
+</section>
+<section id="level-1-a-simple-logic-module-that-reads-values-and-print-them-in-the-logs">
+<h2>Level 1: A simple logic module that reads values and print them in the logs<a class="headerlink" href="#level-1-a-simple-logic-module-that-reads-values-and-print-them-in-the-logs" title="Link to this heading">¶</a></h2>
+</section>
+<section id="level-2-saving-data-to-a-file">
+<h2>Level 2: Saving data to a file<a class="headerlink" href="#level-2-saving-data-to-a-file" title="Link to this heading">¶</a></h2>
+</section>
+<section id="level-3-leveraging-the-qdplot-logic-to-display-data">
+<h2>Level 3: Leveraging the QDPlot logic to display data!<a class="headerlink" href="#level-3-leveraging-the-qdplot-logic-to-display-data" title="Link to this heading">¶</a></h2>
+</section>
+<section id="level-4-what-data-can-i-find-from-my-neighbor-s-computer">
+<h2>Level 4: What data can I find from my neighbor’s computer?<a class="headerlink" href="#level-4-what-data-can-i-find-from-my-neighbor-s-computer" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+<section id="the-modules-we-commonly-use">
+<h1>The modules we commonly use<a class="headerlink" href="#the-modules-we-commonly-use" title="Link to this heading">¶</a></h1>
+<p>In this section we are going to go through some common modules, especially user interfaces, that we use for single molecule applications. Please load the <code class="docutils literal notranslate"><span class="pre">default.cfg</span></code> configuration and restart Qudi.</p>
+<section id="the-time-series-gui">
+<h2>The time series GUI<a class="headerlink" href="#the-time-series-gui" title="Link to this heading">¶</a></h2>
+<p>Quickly go over some features of the time series (recording, snapshot, freeze y axis, trace view selection vs channel settings, effect of averagint)</p>
+<center>
+<figure >
+    <img src="attachment:d05f9218-80df-402c-8178-861740bfe77d.png" alt="Screenshot of the main time series window" style="max-width: 600px;"/>
+    <figcaption>The main time series window. Your (mostly) reliable best friend.</figcaption>
+</figure>
+</center><p>Controlling what you see and what you record: Channel settings and Trace view.</p>
+<center>
+<figure style="display: inline-block;">
+    <img src="attachment:b299ce92-904f-4d5e-84ed-2ef984923d2f.png" alt="Screenshot of the Channel settings window" style="max-width: 300px;"/>
+    <figcaption>The channel settings window.</figcaption>
+</figure>
+<figure style="display: inline-block;">
+    <img src="attachment:9cc0d46a-5641-478d-a15b-969249389619.png" alt="Screenshot of the trace view settings window" style="max-width: 300px;"/>
+    <figcaption>The trace view window.</figcaption>
+</figure>
+</center></section>
+<section id="the-scanner-gui-running-confocal-scans-and-controlling-the-galvo-mirror">
+<h2>The scanner GUI: running confocal scans and controlling the galvo mirror<a class="headerlink" href="#the-scanner-gui-running-confocal-scans-and-controlling-the-galvo-mirror" title="Link to this heading">¶</a></h2>
+<p>Features of the confocal scanner, when to use the automatic optimizer, the units of the plot, how useful the right click can be… Maybe make them load the default configuration file during the lecture to show that.</p>
+<center>
+<figure >
+    <img src="attachment:7494f332-1dfd-4d96-a33e-1d057a3a030b.png" alt="Screenshot of the main Qudi window" style="max-width: 600px;"/>
+    <figcaption>The Scanner GUI. Available axes may vary.</figcaption>
+</figure>
+</center>
+</section>
+<section id="the-national-instruments-hardwares-and-their-configurations">
+<h2>The National Instruments hardwares and their configurations<a class="headerlink" href="#the-national-instruments-hardwares-and-their-configurations" title="Link to this heading">¶</a></h2>
+<p>Probably not covered during the in-person lecture, but useful to explain some things (io vs input hardware modules, what you can and cannot do, wxplain a bit how the ports are named)</p>
+</section>
+</section>
+<section id="laser-scanners">
+<h1>Laser scanners<a class="headerlink" href="#laser-scanners" title="Link to this heading">¶</a></h1>
+<p>Here we go quickly over the logic of the laser scanner through their state machines. Give some illustrations and explanations of why they do certain things.</p>
+<section id="id5">
+<h2>State machines<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h2>
+<p>Reminder of state machines, use the dummy hardware to illustrate</p>
+<figure class="align-default" id="id26">
+<a class="reference internal image-reference" href="_images/qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.svg"><img alt="_images/qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.svg" src="_images/qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.svg" style="width: 60%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 17 </span><span class="caption-text">The state machine of the dummy laser. On the right the simplified version without the interuption routines.</span><a class="headerlink" href="#id26" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="an-example-state-machine-the-dfb-laser">
+<h2>An example state machine: the DFB laser<a class="headerlink" href="#an-example-state-machine-the-dfb-laser" title="Link to this heading">¶</a></h2>
+<p>Nothing really interesting to comment on here, we can just go fast on that.</p>
+<figure class="align-default" id="id27">
+<a class="reference internal image-reference" href="_images/qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.svg"><img alt="_images/qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.svg" src="_images/qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.svg" style="width: 60%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 18 </span><span class="caption-text">The state machine for the DFB laser. On the right, the simplified version with the interuption transition and the stopped state removed.</span><a class="headerlink" href="#id27" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="a-slightly-more-complicated-example-the-moglabs-cem-laser">
+<h2>A slightly more complicated example: the Moglabs CEM laser<a class="headerlink" href="#a-slightly-more-complicated-example-the-moglabs-cem-laser" title="Link to this heading">¶</a></h2>
+<p>Explain why we have a scan_idle state</p>
+<figure class="align-default" id="id28">
+<a class="reference internal image-reference" href="_images/qudi.hardware.interfuse.moglabs_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.svg"><img alt="_images/qudi.hardware.interfuse.moglabs_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.svg" src="_images/qudi.hardware.interfuse.moglabs_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.svg" style="width: 60%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 19 </span><span class="caption-text">The state machine for the Moglabls CEM laser. On the right, the simplified version with the interruption transitions and the stopped state removed.</span><a class="headerlink" href="#id28" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="a-more-complicated-example-the-matisse-laser">
+<h2>A more complicated example: the Matisse laser<a class="headerlink" href="#a-more-complicated-example-the-matisse-laser" title="Link to this heading">¶</a></h2>
+<p>Detail a bit more, explain that the matisse laser is in two part, one on the laser’s computer, not shown here, and one on the main computer.</p>
+<figure class="align-default" id="id29">
+<a class="reference internal image-reference" href="_images/qudi.hardware.interfuse.remote_matisse_scanner.RemoteMatisseScanner.svg"><img alt="_images/qudi.hardware.interfuse.remote_matisse_scanner.RemoteMatisseScanner.svg" src="_images/qudi.hardware.interfuse.remote_matisse_scanner.RemoteMatisseScanner.svg" style="width: 60%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 20 </span><span class="caption-text">The state machine for the Matisse laser. On the right, the simplified version where the interruption transitions and the stopped state have been removed.</span><a class="headerlink" href="#id29" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="the-laser-scanner-user-interface">
+<h2>The laser scanner user interface<a class="headerlink" href="#the-laser-scanner-user-interface" title="Link to this heading">¶</a></h2>
+<figure class="align-default" id="id30">
+<a class="reference internal image-reference" href="_images/laser_window_annotated.svg"><img alt="_images/laser_window_annotated.svg" src="_images/laser_window_annotated.svg" style="width: 70%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 21 </span><span class="caption-text">The laser scanner user interface</span><a class="headerlink" href="#id30" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>Explain that this interface is generic, and that the middle column changes for each laser. Explain notes, and scanner status. Explain the data pane, with how the fit region works, the fit button also. Explain how to control the idle value of the laser, <strong>that the <code class="docutils literal notranslate"><span class="pre">Laser</span> <span class="pre">follow</span> <span class="pre">cursor</span></code> switch needs to be enabled</strong>, the drag and drop of the green line, the slider and its scroll divider.</p>
+</section>
+<section id="the-laser-scanner-logic">
+<h2>The laser scanner logic<a class="headerlink" href="#the-laser-scanner-logic" title="Link to this heading">¶</a></h2>
+<p>Probably not covered in the in-person lecture, give some insights on how the logic works and what are some interesting control points for it.</p>
+</section>
+<section id="laser-specifics-dfb-laser">
+<h2>Laser specifics: DFB laser<a class="headerlink" href="#laser-specifics-dfb-laser" title="Link to this heading">¶</a></h2>
+<p>Explain that the DFB laser is controlld by a very generic hardware interfuse (essentially we use a NI instrument-like hardware), and that it can in addition control a <code class="docutils literal notranslate"><span class="pre">ControlSetpointInterface</span></code> (for example the cryo). That for simplicity we have two available configurations in 66.</p>
+<figure class="align-default" id="id31">
+<a class="reference internal image-reference" href="_images/5d3c2a5f-415a-40ae-bd7e-aa280971513f.png"><img alt="_images/5d3c2a5f-415a-40ae-bd7e-aa280971513f.png" src="_images/5d3c2a5f-415a-40ae-bd7e-aa280971513f.png" style="width: 60%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 22 </span><span class="caption-text">The DFB can have an external control hardware connected. For simplicity in Lab 66 we have two corresponding configurations available</span><a class="headerlink" href="#id31" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>Discuss a bit the control of the cryo, also that the temperature get saved as a global metadata!</p>
+<figure class="align-default" id="id32">
+<a class="reference internal image-reference" href="_images/ce06e35a-71d8-420d-88bb-e134a2f325f7.png"><img alt="_images/ce06e35a-71d8-420d-88bb-e134a2f325f7.png" src="_images/ce06e35a-71d8-420d-88bb-e134a2f325f7.png" style="width: 60%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 23 </span><span class="caption-text">Don’t forget to click on <kbd class="kbd compound docutils literal notranslate"><kbd class="kbd docutils literal notranslate">ENABLE</kbd> <kbd class="kbd docutils literal notranslate">EXTERNAL</kbd> <kbd class="kbd docutils literal notranslate">CONTROL</kbd></kbd> in the Cryostation software if you are using the dfb with the cryo.</span><a class="headerlink" href="#id32" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+</section>
+<section id="pulsers">
+<h1>Pulsers<a class="headerlink" href="#pulsers" title="Link to this heading">¶</a></h1>
+<p>Maybe skip that, and include in the documentation my research notebook to understand how it works.</p>
+</section>
+<section id="concluding-remarks">
+<h1>Concluding remarks<a class="headerlink" href="#concluding-remarks" title="Link to this heading">¶</a></h1>
+</section>
+
+
+          </div>
+          <div class="page-nav">
+            <div class="inner"><ul class="page-nav">
+  <li class="prev">
+    <a href="index.html"
+       title="previous chapter">← Qudi Lab on a Molecule Modules documentation</a>
+  </li>
+  <li class="next">
+    <a href="iqo-docs/setup_confocal_scanning.html"
+       title="next chapter">Setting up confocal scanning →</a>
+  </li>
+</ul><div class="footer" role="contentinfo">
+      &#169; Copyright 2025, Molecular Quantum Nanophotonics Lab @ LENS.
+    <br>
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.1.3 with <a href="https://github.com/schettino72/sphinx_press_theme">Press Theme</a> 0.9.1.
+</div>
+            </div>
+          </div>
+      </page>
+    </div></div>
+    
+    
+  </body>
+</html>

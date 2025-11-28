@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html  lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+      <title>Release Workflow</title>
+    
+          <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+          <link rel="stylesheet" href="../../_static/theme.css " type="text/css" />
+          <link rel="stylesheet" href="../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" type="text/css" />
+          <link rel="stylesheet" href="../../_static/exercise.css" type="text/css" />
+      
+      <!-- sphinx script_files -->
+        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+
+      
+      <!-- bundled in js (rollup iife) -->
+      <!-- <script src="../../_static/theme-vendors.js"></script> -->
+      <script src="../../_static/theme.js" defer></script>
+    
+  <link rel="index" title="Index" href="../../genindex.html" />
+  <link rel="search" title="Search" href="../../search.html" />
+  <link rel="prev" title="Module conversion from old qudi to new core {#module_conversion}" href="../module_conversion.html" /> 
+  </head>
+
+  <body>
+    <div id="app">
+    <div class="theme-container" :class="pageClasses"><navbar @toggle-sidebar="toggleSidebar">
+  <router-link to="../../index.html" class="home-link">
+    
+      <span class="site-name">Qudi Lab on a molecule modules</span>
+    
+  </router-link>
+
+  <div class="links">
+    <navlinks class="can-hide">
+
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Tutorials:
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+    </navlinks>
+  </div>
+</navbar>
+
+      
+      <div class="sidebar-mask" @click="toggleSidebar(false)">
+      </div>
+        <sidebar @toggle-sidebar="toggleSidebar">
+          
+          <navlinks>
+            
+
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Tutorials:
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+            
+          </navlinks><div id="searchbox" class="searchbox" role="search">
+  <div class="caption"><span class="caption-text">Quick search</span>
+    <div class="searchformwrapper">
+      <form class="search" action="../../search.html" method="get">
+        <input type="text" name="q" />
+        <input type="submit" value="Search" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div><div class="sidebar-links" role="navigation" aria-label="main navigation">
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation">Tutorials:</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../Crash%20course%20into%20Qudi.html" class="reference internal ">    Tutorial: a crash course into Qudi</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../setup_confocal_scanning.html" class="reference internal ">    Guide: Setting up confocal scanning</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../setup_odmr.html" class="reference internal ">    Guide: Setting up ODMR</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../setup_timeseries.html" class="reference internal ">    Guide: Setting up time series</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation">Contents:</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../installation.html" class="reference internal ">Installation</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../changelog-lens.html" class="reference internal ">Lens's changelog</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../changelog.html" class="reference internal ">Ulm IQO's changelog (parent repository)</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../programming-guides.html" class="reference internal ">Programming guides: writing your own modules and understanding our hardwares.</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../iqo-specifics.html" class="reference internal ">Ulm IQO's specific guides</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+</div>
+        </sidebar>
+
+      <page>
+          <div class="body-header" role="navigation" aria-label="navigation">
+  
+  <ul class="breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+    
+      <li><a href="../iqo-specifics.html">IQO-specific guides</a> &raquo;</li>
+    
+    <li>Release Workflow</li>
+  </ul>
+  
+
+  <ul class="page-nav">
+  <li class="prev">
+    <a href="../module_conversion.html"
+       title="previous chapter">← Module conversion from old qudi to new core {#module_conversion}</a>
+  </li>
+</ul>
+  
+</div>
+<hr>
+          <div class="content" role="main" v-pre>
+            
+  <section id="release-workflow">
+<h1>Release Workflow<a class="headerlink" href="#release-workflow" title="Link to this heading">¶</a></h1>
+<p>This document describes how IQO manages the release of a new <code class="docutils literal notranslate"><span class="pre">qudi-iqo-modules</span></code> version to github.
+If you are not the responsible release manager, it should be of no concern for you.</p>
+<section id="once-becoming-the-release-manager">
+<h2>Once: Becoming the release manager<a class="headerlink" href="#once-becoming-the-release-manager" title="Link to this heading">¶</a></h2>
+<p>Steps 2-5 () are only necessary for an initial setup of the publishing workflow.</p>
+<ol class="arabic simple">
+<li><p>Create seperate accounts at https://pypi.org/ and https://test.pypi.org/ and get maintain rights to qudi-iqo-modules by the current release manager.</p></li>
+<li><p>(Login to github and navigate to ‘Ulm-IQO/qudi-iqo-modules/Settings/Evvironments’)</p></li>
+<li><p>(Create new environment ‘release-test’. It will be registered with PyPi later. In the ‘Deployment branches and tags’ section, add a new branch ‘main’ that triggers deployment.
+Only changes of the VERSION file pushed to main will trigger deployment to test.pypi.)</p></li>
+<li><p>(Create new environment ‘release’. In the ‘Deployment branches and tags’ section, add a new tag ‘v*.<em>.</em>’ that triggers deployment. Only tags created on github will trigger deployment to pypi.)</p></li>
+<li><p>(On PyPi &amp; test.Pypi, login to your account and navigate to ‘Your Projects/Manage/Publish’. In the ‘Manage current publishers’, enter the details of the github repo and the previously created environment name.)</p></li>
+<li><p>Trigger an action and validate everything worked. Eg. you can create an commit to <code class="docutils literal notranslate"><span class="pre">qudi-iqo-modules/VERSIONS</span></code>.
+The success of the test release can be seen in Ulm-IQO/qudi-iqo-modules/Actions</p></li>
+</ol>
+</section>
+<section id="before-a-release">
+<h2>Before a release<a class="headerlink" href="#before-a-release" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>The maintenance team decides when a certain commit version is well enough tested for a release.
+For the testing, at least one setup must run on a stable set of dependency versions for a while. These versions will be
+fixed <code class="docutils literal notranslate"><span class="pre">==</span></code> in the release <code class="docutils literal notranslate"><span class="pre">setup.py</span></code>.</p></li>
+<li><p>Make sure that packages that are fixed (<code class="docutils literal notranslate"><span class="pre">==</span></code>) in the latest qudi-core release, are left mentioned, but
+unspecified in qudi-iqo-modules <code class="docutils literal notranslate"><span class="pre">setup.py</span></code>. This is most likely the case for the <code class="docutils literal notranslate"><span class="pre">PySide2</span></code> requirement.</p></li>
+<li><p>Go through the list of merged PRs since the last release. Check that the changes have been documented in
+<code class="docutils literal notranslate"><span class="pre">qudi-iqo-modules/docs/changelog.md</span></code>. From experience, not all PRs edit the changelog as required.</p></li>
+</ol>
+</section>
+<section id="performing-a-release">
+<h2>Performing a release<a class="headerlink" href="#performing-a-release" title="Link to this heading">¶</a></h2>
+<ol class="arabic">
+<li><p>Create a release branch eg, <code class="docutils literal notranslate"><span class="pre">release_vX.0.0</span></code> and collect all needed changes in here.</p></li>
+<li><p>Check <code class="docutils literal notranslate"><span class="pre">qudi-iqo-modules/setup.py</span></code> and fix all versions with <code class="docutils literal notranslate"><span class="pre">==</span></code> according to the versions of the test setup
+mentioned above.</p></li>
+<li><p>Test whether the installation runs flawlessly.
+To this end, create a new Python environment and activate it.
+Install qudi-core via</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  python -m pip install qudi-core 
+</pre></div>
+</div>
+<p>and install qudi-iqo-modules via</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  git clone https://github.com/Ulm-IQO/qudi-iqo-modules.git --branch release_vX.0.0
+  cd qudi-iqo-modules
+  python -m pip install -e .
+</pre></div>
+</div>
+<p>Quickly test running qudi with dummy.</p>
+</li>
+<li><p>Update <code class="docutils literal notranslate"><span class="pre">qudi-iqo-modules/docs/changelog.md</span></code>. All collected differences in the pre-release section should go to
+a new subsection that’s titled according to the new version number. Add a fresh, empty pre-release section.</p></li>
+<li><p>Edit <code class="docutils literal notranslate"><span class="pre">qudi-iqo-modules/.github/ISSUE_TEMPLATE/bug_report.yaml</span></code> and add the option to choose the release version
+that you just released.</p></li>
+<li><p>Edit the Troubleshooting section in <code class="docutils literal notranslate"><span class="pre">qudi-iqo-modules/docs/installation_guide.md</span></code> to point at installing the latest
+release. Eg. <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">checkout</span> <span class="pre">tags/v0.4.0</span></code></p></li>
+<li><p>Only after testing, create a PR and merge <code class="docutils literal notranslate"><span class="pre">release_vX.0.0</span></code> into <code class="docutils literal notranslate"><span class="pre">main</span></code>.</p></li>
+<li><p>Increment version number in <code class="docutils literal notranslate"><span class="pre">qudi-iqo-modules/VERSIONS</span></code>.
+This will already trigger a release from the main branch to test.pypi.</p></li>
+<li><p>Test whether the <code class="docutils literal notranslate"><span class="pre">test.pypi.org</span></code> release worked by installing it. For this:</p>
+<ul>
+<li><p>Create new python environment and activate it</p></li>
+<li><p>pip install the <code class="docutils literal notranslate"><span class="pre">test.pypi.org</span></code> release into it (replace all <code class="docutils literal notranslate"><span class="pre">X</span></code> with the correct version number)</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ qudi-iqo-modules==&lt;X.X.X.devX&gt;
+</pre></div>
+</div>
+</li>
+<li><p>Note: Using the <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span></code> command provided on <code class="docutils literal notranslate"><span class="pre">test.pypi.org</span></code>’s release page does not work</p></li>
+<li><p>Quickly test running qudi with dummy modules</p></li>
+</ul>
+</li>
+<li><p>Execute the release by navigating in github to qudi-iqo-modules. On the right bar you can ‘create a new release’ in
+the Releases section.
+By convention we tag releases by a string like ‘Release v0.1.0’.
+As the description text, you can copy the respective release section from <code class="docutils literal notranslate"><span class="pre">qudi-iqo-modules/docs/changelog.md</span></code>.
+Don’t add a heading like “Release v0.1.0”, this is automatically created by github.</p></li>
+<li><p>Change the requirement equalities (<code class="docutils literal notranslate"><span class="pre">==</span></code>) (branch <code class="docutils literal notranslate"><span class="pre">main</span></code>) in<code class="docutils literal notranslate"><span class="pre">qudi-iqo-modules/setup.py</span></code> back to <code class="docutils literal notranslate"><span class="pre">&gt;=</span></code>.</p></li>
+<li><p>Iterate the version number in <code class="docutils literal notranslate"><span class="pre">qudi-iqo-modules/VERSIONS</span></code> from release to development. Eg. 1.0.0 to 1.0.1.dev0</p></li>
+<li><p>Lean back and get some cold drink. You just released a new qudi-iqo-modules version!</p></li>
+</ol>
+</section>
+</section>
+
+
+          </div>
+          <div class="page-nav">
+            <div class="inner"><ul class="page-nav">
+  <li class="prev">
+    <a href="../module_conversion.html"
+       title="previous chapter">← Module conversion from old qudi to new core {#module_conversion}</a>
+  </li>
+</ul><div class="footer" role="contentinfo">
+      &#169; Copyright 2025, Molecular Quantum Nanophotonics Lab @ LENS.
+    <br>
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.1.3 with <a href="https://github.com/schettino72/sphinx_press_theme">Press Theme</a> 0.9.1.
+</div>
+            </div>
+          </div>
+      </page>
+    </div></div>
+    
+    
+  </body>
+</html>
