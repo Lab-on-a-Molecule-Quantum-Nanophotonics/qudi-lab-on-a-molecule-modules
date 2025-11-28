@@ -503,12 +503,14 @@ ls
 <p class="admonition-title">Important</p>
 <p>At this point, it helps a lot if you have already read and followed the <a class="reference internal" href="#before-the-lecture">Before the lecture</a> and <a class="reference internal" href="#at-the-beginning-of-the-lecture">At the beginning of the lecture</a> sections and installed the requirements to follow the interactive bits. However, if you joined-in late, you can still get the lecture notes and follow along.</p>
 </div>
-<center>
-<figure >
-    <img src="" alt="QR code towards the lecture notes" style="max-width: 600px;"/>
-    <figcaption>Get the lecture notes at <a href="https://github.com/Lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules">https://github.com/Lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules</a>.</figcaption>
+<figure class="align-default" id="id16">
+<a class="reference internal image-reference" href="_images/logo.svg"><img alt="_images/logo.svg" src="_images/logo.svg" style="width: 60%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 11 </span><span class="caption-text">Get the lecture notes at <a class="reference external" href="https://lab-on-a-molecule-quantum-nanophotonics.github.io/qudi-lab-on-a-molecule-modules/Crash%20course%20into%20Qudi.html">https://lab-on-a-molecule-quantum-nanophotonics.github.io/qudi-lab-on-a-molecule-modules/</a></span><a class="headerlink" href="#id16" title="Link to this image">¶</a></p>
+</figcaption>
 </figure>
-</center><p>Today, I want to discuss:</p>
+<p>Today, I want to discuss:</p>
 <ul class="simple">
 <li><p>Why we automate data aquisition and pre-analysis, why we use a framework / a library rather than a simple <em>ad-hoc</em> script, what tools are available, and why we choose Qudi;</p></li>
 <li><p>The structure and basics of Qudi, with a practical example (this is an interactive lecture!)</p></li>
@@ -588,11 +590,11 @@ ls
 <p class="admonition-title">Tip</p>
 <p>If you want a more technical explanation, you will find <a class="reference external" href="https://ulm-iqo.github.io/qudi-core/design_concepts/measurement_modules.html">the official Qudi documentation</a> useful.</p>
 </div>
-<figure class="align-default" id="id16">
+<figure class="align-default" id="id17">
 <a class="reference internal image-reference" href="_images/diagram.jpeg"><img alt="A diagram showing the module structure of Qudi." src="_images/diagram.jpeg" style="width: 50%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 11 </span><span class="caption-text">The basics of the basics: Hardware, interfaces, logics, and Graphical User Interfaces (GUI)</span><a class="headerlink" href="#id16" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 12 </span><span class="caption-text">The basics of the basics: Hardware, interfaces, logics, and Graphical User Interfaces (GUI)</span><a class="headerlink" href="#id17" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <section id="logic-modules">
@@ -647,11 +649,11 @@ ls
 <section id="writing-our-first-configuration-file">
 <h2>Writing our first configuration file<a class="headerlink" href="#writing-our-first-configuration-file" title="Link to this heading">¶</a></h2>
 <p>In this section, we will write (and hopefully understand) a Qudi configuration file. A configuration file can be understood as a recipe that explains to Qudi which modules (GUIs, logics, and hardwares) should be intancied, how they should connect to one another, and how they sould be configured. In addition, it provides some general configuration for Qudi. The configuration is stored in a text file, formated in YAML (Yet Another Markup Language, if you haven’t done so yet, you can check out <a class="reference external" href="https://learnxinyminutes.com/yaml/">this guide</a>). You can edit it with any text editor.</p>
-<figure class="align-default" id="id17">
+<figure class="align-default" id="id18">
 <a class="reference internal image-reference" href="_images/writing_configuration.jpeg"><img alt="A character is trying to connect a logic and a hardware modules." src="_images/writing_configuration.jpeg" style="width: 40%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 12 </span><span class="caption-text">Writing configuration is as easy as finding which pieces fit. Writing working configuration is a bit harder.</span><a class="headerlink" href="#id17" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 13 </span><span class="caption-text">Writing configuration is as easy as finding which pieces fit. Writing working configuration is a bit harder.</span><a class="headerlink" href="#id18" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <section id="configuration-file-layout">
@@ -724,8 +726,8 @@ ls
 </pre></div>
 </div>
 <p>If we look in <code class="docutils literal notranslate"><span class="pre">time_series_reader_logic.py</span></code> for example, we see the following class has been declared:</p>
-<div class="literal-block-wrapper docutils container" id="id18">
-<div class="code-block-caption"><span class="caption-number">Listing 1 </span><span class="caption-text">src/qudi/logic/time_series_reader_logic.py</span><a class="headerlink" href="#id18" title="Link to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id19">
+<div class="code-block-caption"><span class="caption-number">Listing 1 </span><span class="caption-text">src/qudi/logic/time_series_reader_logic.py</span><a class="headerlink" href="#id19" title="Link to this code">¶</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">TimeSeriesReaderLogic</span><span class="p">(</span><span class="n">LogicBase</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This logic module gathers data from a hardware streaming device.</span>
@@ -762,8 +764,8 @@ ls
 <section id="connectors">
 <h3>Connectors<a class="headerlink" href="#connectors" title="Link to this heading">¶</a></h3>
 <p>In the previous example configuration, there is a <code class="docutils literal notranslate"><span class="pre">connect</span></code> section. When Qudi initializes a module (more on that in a coming section), it looks for <strong>connectors</strong> in the class declaration and matches them with elements of the <code class="docutils literal notranslate"><span class="pre">connect</span></code> section of the configuration. If we look further in the source code of <code class="docutils literal notranslate"><span class="pre">TimeSeriesReaderLogic</span></code>, you’ll notice the following lines:</p>
-<div class="literal-block-wrapper docutils container" id="id19">
-<div class="code-block-caption"><span class="caption-number">Listing 2 </span><span class="caption-text">src/qudi/logic/time_series_reader_logic.py</span><a class="headerlink" href="#id19" title="Link to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id20">
+<div class="code-block-caption"><span class="caption-number">Listing 2 </span><span class="caption-text">src/qudi/logic/time_series_reader_logic.py</span><a class="headerlink" href="#id20" title="Link to this code">¶</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="c1"># declare connectors</span>
     <span class="n">_streamer</span> <span class="o">=</span> <span class="n">Connector</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;streamer&#39;</span><span class="p">,</span> <span class="n">interface</span><span class="o">=</span><span class="s1">&#39;DataInStreamInterface&#39;</span><span class="p">)</span>
 </pre></div>
@@ -781,8 +783,8 @@ When coding logics, if you need to refer to the connected module (in this exampl
 <h3>Configuration options<a class="headerlink" href="#configuration-options" title="Link to this heading">¶</a></h3>
 <p>Last, but not least, come the configuration options. They are static attributes that are defined directly in the configuration file. Typical use cases would include the USB address of a hardware, the default acquisition rate of an acquisition card, etc. Sticking with our <code class="docutils literal notranslate"><span class="pre">TimeSeriesReaderLogic</span></code> example, we have the possibility of configuring the maximum frame rate, the size of a channel buffer, and the maximum size of all data. Ideally these would be better documented. In practice you often need to read code to grasp what they do.</p>
 <p>In the code, these are declared using <code class="docutils literal notranslate"><span class="pre">ConfigOption</span></code>, in a similar way to the connectors. For example for <code class="docutils literal notranslate"><span class="pre">TimeSeriesReaderLogic</span></code>:</p>
-<div class="literal-block-wrapper docutils container" id="id20">
-<div class="code-block-caption"><span class="caption-number">Listing 3 </span><span class="caption-text">src/qudi/logic/time_series_reader_logic.py</span><a class="headerlink" href="#id20" title="Link to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id21">
+<div class="code-block-caption"><span class="caption-number">Listing 3 </span><span class="caption-text">src/qudi/logic/time_series_reader_logic.py</span><a class="headerlink" href="#id21" title="Link to this code">¶</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="c1"># config options</span>
     <span class="n">_max_frame_rate</span> <span class="o">=</span> <span class="n">ConfigOption</span><span class="p">(</span><span class="s1">&#39;max_frame_rate&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">missing</span><span class="o">=</span><span class="s1">&#39;warn&#39;</span><span class="p">)</span>
     <span class="n">_channel_buffer_size</span> <span class="o">=</span> <span class="n">ConfigOption</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;channel_buffer_size&#39;</span><span class="p">,</span>
@@ -890,11 +892,11 @@ When coding logics, if you need to refer to the connected module (in this exampl
 <section id="qudi-s-main-window">
 <h2>Qudi’s main window<a class="headerlink" href="#qudi-s-main-window" title="Link to this heading">¶</a></h2>
 <p>If you load the solution to the previous exercise in Qudi, you will get two windows. Among them is Qudi’s main window:</p>
-<figure class="align-left" id="id21">
+<figure class="align-left" id="id22">
 <a class="reference internal image-reference" href="_images/main_window_annotated.svg"><img alt="_images/main_window_annotated.svg" src="_images/main_window_annotated.svg" style="width: 100%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 13 </span><span class="caption-text">The main window in Qudi</span><a class="headerlink" href="#id21" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 14 </span><span class="caption-text">The main window in Qudi</span><a class="headerlink" href="#id22" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>You can figure by yourself what is feasible with the menu bar and the toolbar, items have either a self-explanatory name, or an explanation label appearing when hovering the mouse above them.</p>
@@ -942,8 +944,8 @@ When coding logics, if you need to refer to the connected module (in this exampl
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
 <p>Of course, to understand what this does, you need to read the documentation of the <code class="docutils literal notranslate"><span class="pre">trace_data</span></code> method of <code class="docutils literal notranslate"><span class="pre">TimeSeriesReaderLogic</span></code>. In this specific case, the implementation looks like:</p>
-<div class="literal-block-wrapper docutils container" id="id22">
-<div class="code-block-caption"><span class="caption-number">Listing 4 </span><span class="caption-text">src/qudi/logic/time_series_reader_logic.py</span><a class="headerlink" href="#id22" title="Link to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id23">
+<div class="code-block-caption"><span class="caption-number">Listing 4 </span><span class="caption-text">src/qudi/logic/time_series_reader_logic.py</span><a class="headerlink" href="#id23" title="Link to this code">¶</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">trace_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Read-only property returning the x-axis of the data trace and a dictionary of the</span>
@@ -961,11 +963,11 @@ When coding logics, if you need to refer to the connected module (in this exampl
 </section>
 <section id="the-life-of-a-qudi-module-activation-and-de-activation">
 <h3>The life of a Qudi module: activation and de-activation<a class="headerlink" href="#the-life-of-a-qudi-module-activation-and-de-activation" title="Link to this heading">¶</a></h3>
-<figure class="align-default" id="id23">
+<figure class="align-default" id="id24">
 <a class="reference internal image-reference" href="_images/module_widget_annotated.svg"><img alt="_images/module_widget_annotated.svg" src="_images/module_widget_annotated.svg" style="width: 100%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 14 </span><span class="caption-text">The module widget</span><a class="headerlink" href="#id23" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 15 </span><span class="caption-text">The module widget</span><a class="headerlink" href="#id24" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>Perhaps the most interesting part of the main window is the modules tabs. Every modules present in the configuration file are listed there, and this is your first interaction point with them. At the moment, you should have three modules active: <code class="docutils literal notranslate"><span class="pre">time_series_gui</span></code>, <code class="docutils literal notranslate"><span class="pre">time_series_reader_logic</span></code>, and <code class="docutils literal notranslate"><span class="pre">instream_dummy</span></code>. They have been loaded automatically at startup, because our configuration file contains the following directive:</p>
@@ -978,11 +980,11 @@ When coding logics, if you need to refer to the connected module (in this exampl
 <section id="state-machines">
 <h3>State machines<a class="headerlink" href="#state-machines" title="Link to this heading">¶</a></h3>
 <p>Qudi modules’ life is ruled by a state machine</p>
-<figure class="align-default" id="id24">
+<figure class="align-default" id="id25">
 <a class="reference internal image-reference" href="https://ulm-iqo.github.io/qudi-core/images/module_fsm_diagram.svg"><img alt="https://ulm-iqo.github.io/qudi-core/images/module_fsm_diagram.svg" src="https://ulm-iqo.github.io/qudi-core/images/module_fsm_diagram.svg" style="width: 80%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 15 </span><span class="caption-text">The state machine of a Qudi module (reproduced from <a class="reference external" href="https://ulm-iqo.github.io/qudi-core/design_concepts/measurement_modules.html">Qudi’s documentation</a>).</span><a class="headerlink" href="#id24" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 16 </span><span class="caption-text">The state machine of a Qudi module (reproduced from <a class="reference external" href="https://ulm-iqo.github.io/qudi-core/design_concepts/measurement_modules.html">Qudi’s documentation</a>).</span><a class="headerlink" href="#id25" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
@@ -1020,7 +1022,7 @@ When coding logics, if you need to refer to the connected module (in this exampl
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0, 0.5, &#39;Analog value [V]&#39;)
 </pre></div>
 </div>
-<a class="reference internal image-reference" href="_images/89728fd1a74dc602f40a3235176487b5e0e6e6114dda1538293b56cb6b9bfc6f.png"><img alt="_images/89728fd1a74dc602f40a3235176487b5e0e6e6114dda1538293b56cb6b9bfc6f.png" src="_images/89728fd1a74dc602f40a3235176487b5e0e6e6114dda1538293b56cb6b9bfc6f.png" style="width: 60%;" />
+<a class="reference internal image-reference" href="_images/541c27f861126168b2abe9ac3fd0e01186e574deb5343cedc352f48d6fdb2348.png"><img alt="_images/541c27f861126168b2abe9ac3fd0e01186e574deb5343cedc352f48d6fdb2348.png" src="_images/541c27f861126168b2abe9ac3fd0e01186e574deb5343cedc352f48d6fdb2348.png" style="width: 60%;" />
 </a>
 </div>
 </div>
@@ -1051,11 +1053,11 @@ When coding logics, if you need to refer to the connected module (in this exampl
 <a class="reference internal image-reference" href="_images/yaml.jpeg"><img alt="A character is shaking at the thought of writing YAML" src="_images/yaml.jpeg" style="width: 30%;" />
 </a>
 </figure>
-<figure class="align-default" id="id25">
+<figure class="align-default" id="id26">
 <a class="reference internal image-reference" href="_images/config_editor.png"><img alt="_images/config_editor.png" src="_images/config_editor.png" style="width: 70%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 16 </span><span class="caption-text">The experimental configuration editor.</span><a class="headerlink" href="#id25" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 17 </span><span class="caption-text">The experimental configuration editor.</span><a class="headerlink" href="#id26" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
@@ -1146,54 +1148,54 @@ When coding logics, if you need to refer to the connected module (in this exampl
 <section id="id5">
 <h2>State machines<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h2>
 <p>Reminder of state machines, use the dummy hardware to illustrate</p>
-<figure class="align-default" id="id26">
+<figure class="align-default" id="id27">
 <a class="reference internal image-reference" href="_images/qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.svg"><img alt="_images/qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.svg" src="_images/qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.svg" style="width: 60%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 17 </span><span class="caption-text">The state machine of the dummy laser. On the right the simplified version without the interuption routines.</span><a class="headerlink" href="#id26" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 18 </span><span class="caption-text">The state machine of the dummy laser. On the right the simplified version without the interuption routines.</span><a class="headerlink" href="#id27" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="an-example-state-machine-the-dfb-laser">
 <h2>An example state machine: the DFB laser<a class="headerlink" href="#an-example-state-machine-the-dfb-laser" title="Link to this heading">¶</a></h2>
 <p>Nothing really interesting to comment on here, we can just go fast on that.</p>
-<figure class="align-default" id="id27">
+<figure class="align-default" id="id28">
 <a class="reference internal image-reference" href="_images/qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.svg"><img alt="_images/qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.svg" src="_images/qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.svg" style="width: 60%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 18 </span><span class="caption-text">The state machine for the DFB laser. On the right, the simplified version with the interuption transition and the stopped state removed.</span><a class="headerlink" href="#id27" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 19 </span><span class="caption-text">The state machine for the DFB laser. On the right, the simplified version with the interuption transition and the stopped state removed.</span><a class="headerlink" href="#id28" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="a-slightly-more-complicated-example-the-moglabs-cem-laser">
 <h2>A slightly more complicated example: the Moglabs CEM laser<a class="headerlink" href="#a-slightly-more-complicated-example-the-moglabs-cem-laser" title="Link to this heading">¶</a></h2>
 <p>Explain why we have a scan_idle state</p>
-<figure class="align-default" id="id28">
+<figure class="align-default" id="id29">
 <a class="reference internal image-reference" href="_images/qudi.hardware.interfuse.moglabs_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.svg"><img alt="_images/qudi.hardware.interfuse.moglabs_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.svg" src="_images/qudi.hardware.interfuse.moglabs_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.svg" style="width: 60%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 19 </span><span class="caption-text">The state machine for the Moglabls CEM laser. On the right, the simplified version with the interruption transitions and the stopped state removed.</span><a class="headerlink" href="#id28" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 20 </span><span class="caption-text">The state machine for the Moglabls CEM laser. On the right, the simplified version with the interruption transitions and the stopped state removed.</span><a class="headerlink" href="#id29" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="a-more-complicated-example-the-matisse-laser">
 <h2>A more complicated example: the Matisse laser<a class="headerlink" href="#a-more-complicated-example-the-matisse-laser" title="Link to this heading">¶</a></h2>
 <p>Detail a bit more, explain that the matisse laser is in two part, one on the laser’s computer, not shown here, and one on the main computer.</p>
-<figure class="align-default" id="id29">
+<figure class="align-default" id="id30">
 <a class="reference internal image-reference" href="_images/qudi.hardware.interfuse.remote_matisse_scanner.RemoteMatisseScanner.svg"><img alt="_images/qudi.hardware.interfuse.remote_matisse_scanner.RemoteMatisseScanner.svg" src="_images/qudi.hardware.interfuse.remote_matisse_scanner.RemoteMatisseScanner.svg" style="width: 60%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 20 </span><span class="caption-text">The state machine for the Matisse laser. On the right, the simplified version where the interruption transitions and the stopped state have been removed.</span><a class="headerlink" href="#id29" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 21 </span><span class="caption-text">The state machine for the Matisse laser. On the right, the simplified version where the interruption transitions and the stopped state have been removed.</span><a class="headerlink" href="#id30" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="the-laser-scanner-user-interface">
 <h2>The laser scanner user interface<a class="headerlink" href="#the-laser-scanner-user-interface" title="Link to this heading">¶</a></h2>
-<figure class="align-default" id="id30">
+<figure class="align-default" id="id31">
 <a class="reference internal image-reference" href="_images/laser_window_annotated.svg"><img alt="_images/laser_window_annotated.svg" src="_images/laser_window_annotated.svg" style="width: 70%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 21 </span><span class="caption-text">The laser scanner user interface</span><a class="headerlink" href="#id30" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 22 </span><span class="caption-text">The laser scanner user interface</span><a class="headerlink" href="#id31" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>Explain that this interface is generic, and that the middle column changes for each laser. Explain notes, and scanner status. Explain the data pane, with how the fit region works, the fit button also. Explain how to control the idle value of the laser, <strong>that the <code class="docutils literal notranslate"><span class="pre">Laser</span> <span class="pre">follow</span> <span class="pre">cursor</span></code> switch needs to be enabled</strong>, the drag and drop of the green line, the slider and its scroll divider.</p>
@@ -1205,19 +1207,19 @@ When coding logics, if you need to refer to the connected module (in this exampl
 <section id="laser-specifics-dfb-laser">
 <h2>Laser specifics: DFB laser<a class="headerlink" href="#laser-specifics-dfb-laser" title="Link to this heading">¶</a></h2>
 <p>Explain that the DFB laser is controlld by a very generic hardware interfuse (essentially we use a NI instrument-like hardware), and that it can in addition control a <code class="docutils literal notranslate"><span class="pre">ControlSetpointInterface</span></code> (for example the cryo). That for simplicity we have two available configurations in 66.</p>
-<figure class="align-default" id="id31">
+<figure class="align-default" id="id32">
 <a class="reference internal image-reference" href="_images/5d3c2a5f-415a-40ae-bd7e-aa280971513f.png"><img alt="_images/5d3c2a5f-415a-40ae-bd7e-aa280971513f.png" src="_images/5d3c2a5f-415a-40ae-bd7e-aa280971513f.png" style="width: 60%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 22 </span><span class="caption-text">The DFB can have an external control hardware connected. For simplicity in Lab 66 we have two corresponding configurations available</span><a class="headerlink" href="#id31" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 23 </span><span class="caption-text">The DFB can have an external control hardware connected. For simplicity in Lab 66 we have two corresponding configurations available</span><a class="headerlink" href="#id32" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>Discuss a bit the control of the cryo, also that the temperature get saved as a global metadata!</p>
-<figure class="align-default" id="id32">
+<figure class="align-default" id="id33">
 <a class="reference internal image-reference" href="_images/ce06e35a-71d8-420d-88bb-e134a2f325f7.png"><img alt="_images/ce06e35a-71d8-420d-88bb-e134a2f325f7.png" src="_images/ce06e35a-71d8-420d-88bb-e134a2f325f7.png" style="width: 60%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 23 </span><span class="caption-text">Don’t forget to click on <kbd class="kbd compound docutils literal notranslate"><kbd class="kbd docutils literal notranslate">ENABLE</kbd> <kbd class="kbd docutils literal notranslate">EXTERNAL</kbd> <kbd class="kbd docutils literal notranslate">CONTROL</kbd></kbd> in the Cryostation software if you are using the dfb with the cryo.</span><a class="headerlink" href="#id32" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 24 </span><span class="caption-text">Don’t forget to click on <kbd class="kbd compound docutils literal notranslate"><kbd class="kbd docutils literal notranslate">ENABLE</kbd> <kbd class="kbd docutils literal notranslate">EXTERNAL</kbd> <kbd class="kbd docutils literal notranslate">CONTROL</kbd></kbd> in the Cryostation software if you are using the dfb with the cryo.</span><a class="headerlink" href="#id33" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>

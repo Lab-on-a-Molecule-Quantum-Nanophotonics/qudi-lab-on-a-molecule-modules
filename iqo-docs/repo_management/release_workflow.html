@@ -264,7 +264,7 @@ mentioned above.</p></li>
 <li><p>Test whether the installation runs flawlessly.
 To this end, create a new Python environment and activate it.
 Install qudi-core via</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  python -m pip install qudi-core 
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  python -m pip install qudi-core
 </pre></div>
 </div>
 <p>and install qudi-iqo-modules via</p>
@@ -281,6 +281,7 @@ a new subsection that’s titled according to the new version number. Add a fres
 that you just released.</p></li>
 <li><p>Edit the Troubleshooting section in <code class="docutils literal notranslate"><span class="pre">qudi-iqo-modules/docs/installation_guide.md</span></code> to point at installing the latest
 release. Eg. <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">checkout</span> <span class="pre">tags/v0.4.0</span></code></p></li>
+<li><p>If a python version requirement has changed, check that the test workflows in <code class="docutils literal notranslate"><span class="pre">qudi-iqo-modules/.github/workflows</span></code> test all possible python versions as well</p></li>
 <li><p>Only after testing, create a PR and merge <code class="docutils literal notranslate"><span class="pre">release_vX.0.0</span></code> into <code class="docutils literal notranslate"><span class="pre">main</span></code>.</p></li>
 <li><p>Increment version number in <code class="docutils literal notranslate"><span class="pre">qudi-iqo-modules/VERSIONS</span></code>.
 This will already trigger a release from the main branch to test.pypi.</p></li>
