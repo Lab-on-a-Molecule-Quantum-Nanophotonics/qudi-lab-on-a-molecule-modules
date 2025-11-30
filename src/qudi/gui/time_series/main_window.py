@@ -152,7 +152,7 @@ class TimeSeriesGuiMainWindow(QtWidgets.QMainWindow):
         self.close_action = QtGui.QAction(icon, 'Close', self)
         self.close_action.setCheckable(False)
         self.close_action.setToolTip('Close')
-        self.close_action.setShortcut(QtGui.QKeySequence(QtGui.Qt.CTRL | QtGui.Qt.Key.Key_Q))
+        self.close_action.setShortcut(QtGui.QKeySequence(QtGui.Qt.Key.Key_Control | QtGui.Qt.Key.Key_Q))
 
         # Create toolbar
         self.toolbar = QtWidgets.QToolBar('Trace controls')
@@ -194,7 +194,7 @@ class TimeSeriesGuiMainWindow(QtWidgets.QMainWindow):
         self.current_value_label.setFont(font)
         self.current_value_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignVCenter | QtCore.Qt.AlignmentFlag.AlignRight)
         self.current_value_combobox = QtWidgets.QComboBox()
-        self.current_value_combobox.setSizeAdjustPolicy(QtWidgets.QComboBox.AdjustToContents)
+        self.current_value_combobox.setSizeAdjustPolicy(QtWidgets.QComboBox.SizeAdjustPolicy.AdjustToContents)
         self.current_value_combobox.setMinimumContentsLength(20)
         self.current_value_combobox.setMaxVisibleItems(10)
 
@@ -206,7 +206,7 @@ class TimeSeriesGuiMainWindow(QtWidgets.QMainWindow):
         self.setCentralWidget(widget)
         label = QtWidgets.QLabel('Current value channel:')
         label.setAlignment(QtCore.Qt.AlignmentFlag.AlignVCenter | QtCore.Qt.AlignmentFlag.AlignRight)
-        label.setSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Preferred)
+        label.setSizePolicy(QtWidgets.QSizePolicy.Policy.MinimumExpanding, QtWidgets.QSizePolicy.Policy.Preferred)
         layout.addWidget(label, 0, 0)
         layout.addWidget(self.current_value_combobox, 0, 1)
         layout.addWidget(self.current_value_label, 1, 0, 1, 2)
@@ -214,7 +214,7 @@ class TimeSeriesGuiMainWindow(QtWidgets.QMainWindow):
 
         # Create and add trace settings QDockWidget
         self.settings_dockwidget = TraceSettingsDockWidget()
-        self.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self.settings_dockwidget)
+        self.addDockWidget(QtCore.Qt.DockWidgetArea.BottomDockWidgetArea, self.settings_dockwidget)
 
         # Connect some show/hide signals/actions
         self.show_toolbar_action.triggered[bool].connect(self.toolbar.setVisible)
