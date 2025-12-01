@@ -15,6 +15,7 @@ help:
 
 upload: html
 	$(eval TMP := $(shell mktemp -d))
+	git fetch origin
 	git worktree add $(TMP) $(GH_PAGES)
 	cp -r $(BUILDDIR)/html/* $(TMP)
 	git -C $(TMP) add $(TMP)
@@ -22,7 +23,6 @@ upload: html
 	git -C $(TMP) push
 	git worktree remove $(TMP)
 	git worktree prune
-	git push $(GH_PAGES)
 	rm -rf $(TMP)
 
 .PHONY: help Makefile upload
