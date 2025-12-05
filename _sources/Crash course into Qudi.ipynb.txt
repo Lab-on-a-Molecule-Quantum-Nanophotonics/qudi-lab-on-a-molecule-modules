@@ -41,7 +41,7 @@
     "## You need to know\n",
     "\n",
     "It helps a lot to be familiar with some tools:\n",
-    "- YAML (Yet Another Markup Language), you can read [this guide](https://learnxinyminutes.com/yaml/)\n",
+    "- YAML (YAML Ain't Markup Language), you can read [this guide](https://learnxinyminutes.com/yaml/)\n",
     "- Python. You can get a refresher here in [this short guide](https://learnxinyminutes.com/python/). In particular, I want you to be familiar with the idea of classes and objects in addition to the standard programming statements. It is useful to have the [official documentation](https://docs.python.org/3/) at hand. If you need a more in-depth introduction, read the [official python tutorial](https://docs.python.org/3/tutorial/index.html). There's also [the beginner's guide to python](https://wiki.python.org/moin/BeginnersGuide) for people lacking programming experience.\n",
     "\n",
     "## What I want you to install and download\n",
@@ -207,7 +207,7 @@
     "                        Absolute path to log directory to use instead of the default one \"<user_home>/qudi/log/\"\n",
     "```\n",
     "\n",
-    "The `--config` option is of peculiar interest to us. As we will see later, with Qudi we use a configuration file to describe the setup and how the various components are configured and connect to one another. This file uses [the YAML (Yet Another Markup Language) syntax](https://learnxinyminutes.com/yaml/), and we will play with it later. For now, you are provided with two configuration files:\n",
+    "The `--config` option is of peculiar interest to us. As we will see later, with Qudi we use a configuration file to describe the setup and how the various components are configured and connect to one another. This file uses [the YAML (YAML Ain't Markup Language) syntax](https://learnxinyminutes.com/yaml/), and we will play with it later. For now, you are provided with two configuration files:\n",
     "- The `default.cfg` file, located in `src/qudi/default.cfg`. This file is kindly provided by the developpers of the Ulm-IQO module, and showcases many possibilities of qudi using dummy hardwares.\n",
     "- The `crash_course.cfg` file, located in `src/qudi/crash_course.cfg`. We will use and edit this file to understand together how Qudi works.\n",
     "\n",
@@ -1356,7 +1356,7 @@
     "In this section: very simple codes to interact with the logics from the notebook. **Don't forget to talk about netobtain.**\n",
     "\n",
     "```{tip}\n",
-    "Don't forget to restart the kernel if you restart Qudi from {kbd}`Kernel > Restart Kernel`.\n",
+    "After changing the configuration, you may need to restart your Jupyter kernel using the menu: {kbd}`Kernel > Restart Kernel`.\n",
     "```"
    ]
   },
