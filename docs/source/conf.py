@@ -41,6 +41,7 @@ exclude_patterns = []
 
 html_theme = 'press'
 html_static_path = ['_static']
+html_favicon = '_static/logo.png'
 
 def linkcode_resolve(domain, info):
     if domain != 'py':
