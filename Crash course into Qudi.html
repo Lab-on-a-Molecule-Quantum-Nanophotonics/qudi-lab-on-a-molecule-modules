@@ -21,6 +21,7 @@
       <!-- <script src="_static/theme-vendors.js"></script> -->
       <script src="_static/theme.js" defer></script>
     
+      <link rel="shortcut icon" href="_static/logo.png"/>
   <link rel="index" title="Index" href="genindex.html" />
   <link rel="search" title="Search" href="search.html" />
   <link rel="next" title="Setting up confocal scanning" href="iqo-docs/setup_confocal_scanning.html" />
@@ -265,11 +266,8 @@
 </div>
 <section id="introduction-to-a-crash-course-into-qudi">
 <h1>Introduction to a crash course into Qudi<a class="headerlink" href="#introduction-to-a-crash-course-into-qudi" title="Link to this heading">¶</a></h1>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>This page is a work in progress.</p>
-</div>
-<p>The goal of this lecture is to get people to become familiar with Qudi. This is an <strong>interactive lecture</strong>. This means that people are expected to download Qudi and run this notebook on their computer. The <a class="reference internal" href="#before-the-lecture"><span class="std std-ref">Before the lecture</span></a> section covers the pre-requisites to follow the lecture and theinstallation of Qudi on your computer. The actual lecture is in the <a class="reference internal" href="#a-crash-course-into-qudi"><span class="std std-ref">A crash course into Qudi</span></a> section.</p>
+<p>The goal of this lecture is to get people to become familiar with Qudi, the Python framework we use in <a class="reference external" href="https://quantumnanophotonics-lab.ino.cnr.it/">the Molecular Quantum Photonics group in LENS</a>. This lecture is primarily targeted at members of the group to get them familiar with the framework, but is built such that it starts with a very general scope and focuses more and more on the specific modules we use. As such, it should be useful to anyone interested in the topic of experiments automations using Qudi, and you should be able to leave as soon as things gets too specific for your applications.</p>
+<p>This is an <strong>interactive lecture</strong>. This means that people are expected to download Qudi and run this notebook on their computer. The <a class="reference internal" href="#before-the-lecture"><span class="std std-ref">Before the lecture</span></a> section covers the pre-requisites to follow the lecture and theinstallation of Qudi on your computer. The actual lecture is in the <a class="reference internal" href="#a-crash-course-into-qudi"><span class="std std-ref">A crash course into Qudi</span></a> section.</p>
 </section>
 <section id="before-the-lecture">
 <span id="id1"></span><h1>Before the lecture<a class="headerlink" href="#before-the-lecture" title="Link to this heading">¶</a></h1>
@@ -488,6 +486,10 @@ ls
 </section>
 <section id="a-crash-course-into-qudi">
 <span id="id3"></span><h1>A crash course into Qudi<a class="headerlink" href="#a-crash-course-into-qudi" title="Link to this heading">¶</a></h1>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This is a work in progress.</p>
+</div>
 <center>
     Lecture notes by <b>Hugo Levy-Falk</b>, CNR-INO
 </center>
@@ -1027,7 +1029,11 @@ When coding logics, if you need to refer to the connected module (in this exampl
 </section>
 <section id="saving-things">
 <h2>Saving things<a class="headerlink" href="#saving-things" title="Link to this heading">¶</a></h2>
-<p>In this section: data formats used by Qudi + the one I added and is (I think) better.</p>
+<p>One great functionality of Qudi is it’s ability to save data from multiple instruments in a consistent way. You can configure it to have a daily directory, in which each module saving data has its own directory. Qudi also names the data files univocally, so you can understand what it is and when it was produced only with the file name. For example, our data directory looks something like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">TODO</span><span class="p">:</span> <span class="n">data</span> <span class="n">directory</span>
+</pre></div>
+</div>
+<p>This removes a lot of friction when saving data, as there are almost no decisions required when clicking <code class="docutils literal notranslate"><span class="pre">save</span></code>. Qudi also provides helpers to save data (typically Numpy arrays) with <strong>metadata</strong> (typically a dictionary). This means your file contains the experiment data, but also the settings of the instrument for example. There is also a mechanism to add <strong>global metadata</strong>, wich are metadata that are available globally. For example, the confocal scanner saves it’s current position in a global metadata each time there is a movement. This means that we have the position on the sample available in all data files saved by other logics.</p>
 </section>
 <section id="scripting-qudi-using-jupyter-notebooks">
 <h2>Scripting Qudi using Jupyter notebooks<a class="headerlink" href="#scripting-qudi-using-jupyter-notebooks" title="Link to this heading">¶</a></h2>
@@ -1060,13 +1066,14 @@ When coding logics, if you need to refer to the connected module (in this exampl
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0, 0.5, &#39;Analog value [V]&#39;)
 </pre></div>
 </div>
-<a class="reference internal image-reference" href="_images/179e455bb799f5c0e4bfae4c751047030f6061c7642ca3a25190297a7f4088a7.png"><img alt="_images/179e455bb799f5c0e4bfae4c751047030f6061c7642ca3a25190297a7f4088a7.png" src="_images/179e455bb799f5c0e4bfae4c751047030f6061c7642ca3a25190297a7f4088a7.png" style="width: 60%;" />
+<a class="reference internal image-reference" href="_images/c7da7a01c4f280e1277fe5dbf4d13a66a25ee48d69f9259b17cc1df5e6ebcab8.png"><img alt="_images/c7da7a01c4f280e1277fe5dbf4d13a66a25ee48d69f9259b17cc1df5e6ebcab8.png" src="_images/c7da7a01c4f280e1277fe5dbf4d13a66a25ee48d69f9259b17cc1df5e6ebcab8.png" style="width: 60%;" />
 </a>
 </div>
 </div>
 </section>
 <section id="finding-help">
 <h2>Finding help<a class="headerlink" href="#finding-help" title="Link to this heading">¶</a></h2>
+<p>Documentation, Official Qudi Github community questions, your colleagues</p>
 </section>
 </section>
 <section id="when-things-go-wrong-understanding-errors">
