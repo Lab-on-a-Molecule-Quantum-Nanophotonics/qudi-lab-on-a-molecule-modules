@@ -292,6 +292,10 @@
 <h2>Getting the lecture materials<a class="headerlink" href="#getting-the-lecture-materials" title="Link to this heading">¶</a></h2>
 <p>This section contains some commands that will get you the source code and setup qudi on you computer. Everything is installed in a Python virtual environment so the impact on your system should be minimal (you can simply delete the folder once the lecture is over if you want to get rid of it).</p>
 <p>Everything we need, including the interactive version of this notebook, is hosted in our <a class="reference external" href="https://github.com/Lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules">public repository</a>. The first task is to recover it using <code class="docutils literal notranslate"><span class="pre">git</span></code>. There are several ways of using the tool (VSCode users can do it from the editor I think), I will present the simplest: using it directly from the command line. For Mac and Linux users, your operating system already provide a decently functionnal command line interface, please open one. For Windows users, if you installed <code class="docutils literal notranslate"><span class="pre">git</span></code> following the instructions above, you also installed a tool called <code class="docutils literal notranslate"><span class="pre">Git</span> <span class="pre">Bash</span></code> that emulates the command line interface, you can launch it from the startup menu.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Windows provides natively a terminal emulator, but the commands are different from the commands provided by MacOS and Linux (and provides honnestly a pretty bad experience). To simplify this lecture I will make you use <code class="docutils literal notranslate"><span class="pre">Git</span> <span class="pre">Bash</span></code>, as it is modeled on a more standard command line interface.</p>
+</div>
 <p>You should now see a text window (likely with a black or white background). The text displayed depends on your specific configuration. For example, mine is very minimalistic.</p>
 <figure class="align-default" id="id6">
 <a class="reference internal image-reference" href="_images/af91774f-40f8-439f-a5eb-cde6a11e007e.png"><img alt="Screenshot of an empty terminal" src="_images/af91774f-40f8-439f-a5eb-cde6a11e007e.png" style="width: 60%;" />
@@ -300,6 +304,16 @@
 <p><span class="caption-number">Fig. 1 </span><span class="caption-text">Example of an empty terminal.</span><a class="headerlink" href="#id6" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
+<p>This is a way to interact with you computer using (mostly) text. It can seem a bit scary, but is actually very efficient. Instead of using your mouse, you will be typing <strong>commands</strong> that I will give you. If you need to copy and paste, the shortcuts might be a bit different than the ones you might be used to.</p>
+<ul class="simple">
+<li><p>On MacOS, you can copy and paste using <kbd class="kbd compound docutils literal notranslate"><kbd class="kbd docutils literal notranslate">Command</kbd>+<kbd class="kbd docutils literal notranslate">C</kbd></kbd> and , see <a class="reference external" href="https://support.apple.com/en-gb/guide/terminal/trmlshtcts/mac">this list of keyboard shortcuts on Mac</a>,</p></li>
+<li><p>On Linux, you can copy and paste using <kbd class="kbd compound docutils literal notranslate"><kbd class="kbd docutils literal notranslate">Control</kbd>+<kbd class="kbd docutils literal notranslate">Shift</kbd>+<kbd class="kbd docutils literal notranslate">C</kbd></kbd> and <kbd class="kbd compound docutils literal notranslate"><kbd class="kbd docutils literal notranslate">Control</kbd>+<kbd class="kbd docutils literal notranslate">Shift</kbd>+<kbd class="kbd docutils literal notranslate">V</kbd></kbd>,</p></li>
+<li><p>On Windows, using git bash, you can copy text by pressing <kbd class="kbd docutils literal notranslate">Shift</kbd> then selecting the text you want to copy using the mouse and then press <kbd class="kbd docutils literal notranslate">Enter</kbd>. You can paste text using <kbd class="kbd docutils literal notranslate">Insert</kbd>.</p></li>
+</ul>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Be mindful of what you are doing in a terminal. For example, pressing <kbd class="kbd compound docutils literal notranslate"><kbd class="kbd docutils literal notranslate">Control</kbd>+<kbd class="kbd docutils literal notranslate">C</kbd></kbd> will interrupt the currently running command! In doubt, ask for help.</p>
+</div>
 <p>The first step is to decide in which directory to put the materials for this lecture. To know where you currently are, you can run the <code class="docutils literal notranslate"><span class="pre">pwd</span></code> command: it returns the current directory. You can do so by typing <code class="docutils literal notranslate"><span class="pre">pwd</span></code>, then pressing <code class="docutils literal notranslate"><span class="pre">Enter</span></code>.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">pwd</span>
 </pre></div>
@@ -314,6 +328,17 @@
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">klafyvel</span><span class="o">/</span><span class="n">Documents</span>
 </pre></div>
+</div>
+<p>I can list the files in the current directory using the <code class="docutils literal notranslate"><span class="pre">ls</span></code> command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ls
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>My personal folders!
+</pre></div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Before launching commands that depend on the current directory, always check that you are in the correct directory! These commands <code class="docutils literal notranslate"><span class="pre">pwd</span></code>, <code class="docutils literal notranslate"><span class="pre">cd</span></code>, and <code class="docutils literal notranslate"><span class="pre">ls</span></code> are your best friends!</p>
 </div>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
@@ -350,8 +375,7 @@ ls
 <p>We all love Microsoft (no).
 <strong>Windows users</strong>: some libraries are complicated to install on Windows. If you are getting errors, you may get luckier using the <code class="docutils literal notranslate"><span class="pre">--no-dev</span></code> option to prevent <code class="docutils literal notranslate"><span class="pre">uv</span></code> from installing some developpment dependencies: <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">run</span> <span class="pre">--no-dev</span> <span class="pre">qudi-install-kernel</span></code>. If this fixes the issue, then you need to keep this <code class="docutils literal notranslate"><span class="pre">--no-dev</span></code> option for all <code class="docutils literal notranslate"><span class="pre">uv</span></code> calls used later.</p>
 </div>
-<p>Since it is the first time we invoke the <code class="docutils literal notranslate"><span class="pre">uv</span></code> command, it will install all the dependencies we need. <strong>This might take some time</strong>, so it is the good time to take a break and enjoy a coffee.
-<img alt="image.png" src="_images/." /></p>
+<p>Since it is the first time we invoke the <code class="docutils literal notranslate"><span class="pre">uv</span></code> command, it will install all the dependencies we need. <strong>This might take some time</strong>, so it is the good time to take a break and enjoy a coffee.</p>
 <figure class="align-default" id="id7">
 <a class="reference internal image-reference" href="_images/7210315e-1ae4-424a-9a7e-a24a33aa114a.png"><img alt="Screenshot of a terminal with the uv utility running." src="_images/7210315e-1ae4-424a-9a7e-a24a33aa114a.png" style="width: 60%;" />
 </a>
@@ -520,6 +544,12 @@ ls
 <li><p>A broad overview of the modules useful for single-molecule experiments</p></li>
 <li><p>A specific focus on the laser scanning module that we use for single-molecule experiments and laser control</p></li>
 </ul>
+<p>There are two levels for following this lecture:</p>
+<ol class="arabic simple">
+<li><p>Having a broad overview of how Qudi is built, being able to run a pre-written configuration, and deal with some errors,</p></li>
+<li><p>Being able to interact with Qudi using Python code, write some configuration, deal with more advanced errors.</p></li>
+</ol>
+<p>The notes are available online, so you can also come back on the examples later-on if needed.</p>
 </section>
 <section id="hello-qudi">
 <h1>Hello, Qudi!<a class="headerlink" href="#hello-qudi" title="Link to this heading">¶</a></h1>
@@ -543,6 +573,14 @@ ls
 <li><p>You will likely reinvent the wheel everytime,</p></li>
 <li><p>You will likely end-up with a single huge, poorly documented, fragile spaghetti-code script that nobody understands after two rotations of non-permanent people in the lab.</p></li>
 </ul>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Spaghetti code</p>
+<blockquote>
+<div><p>Spaghetti code is computer source code that encodes control flow that is convoluted, and therefore, hard to understand. Control statements direct program execution in ways that instead of having a quality of structure, resembles cooked spaghetti, twisted and tangled. The code tends to be hard to maintain.</p>
+<p>– <a class="reference external" href="https://en.wikipedia.org/wiki/Spaghetti_code">Wikipedia page on spaghetti code</a></p>
+</div></blockquote>
+</div>
 <p><strong>Designing (good) software is a job</strong>. Software engineering is challenging and is a skill that takes time and experience to acquire. What do we mean by “good” software?</p>
 <ul class="simple">
 <li><p>The software performs its task correctly,</p></li>
@@ -605,11 +643,11 @@ ls
 </section>
 <section id="hardwares">
 <h3>Hardwares<a class="headerlink" href="#hardwares" title="Link to this heading">¶</a></h3>
-<p>A hardware is a Python class that is tasked with interfacing with the actual hardware. To be able to be used by a specific logic, the hardware must implement the correct <a class="reference internal" href="#interfaces"><span class="std std-ref">Interfaces</span></a>.</p>
+<p>A hardware is a Python class that is tasked with interfacing with the actual hardware. To be able to be used by a specific logic, the hardware must implement the correct <a class="reference internal" href="#interfaces"><span class="std std-ref">Interfaces</span></a>. Concretely, the role of the hardware module is to abstract the specifics of an instrument or a piece of hardware, and make it behave like all the other hardwares of the same kind present in Qudi. For example, Thorlabs provides <a class="reference external" href="https://www.thorlabs.com/Software/Motion%20Control/APT_Communications_Protocol.pdf">the documentation for the communication protocol used for their motorized flip mounts</a>, as well as some <a class="reference external" href="https://github.com/Thorlabs/Motion_Control_Examples">code examples of how to use their flip mounts</a>. This is great (and sets them appart from many manufacturers!), but the code provided is not directly compatible with Qudi. To use them in Qudi, we want to write a hardware module that implements an <strong><a class="reference internal" href="#interfaces">interface</a></strong> that is understood by the logics of Qudi. In this case, the switch interface is well suited (after all, this is a hardware that has two states, just like a switch), and so we wrote <a class="reference external" href="https://github.com/Lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/blob/main/src/qudi/hardware/switches/thorlabs_flip_mount.py">some glue code that bridges the examples given by Thorlabs to Qudi by implementing the correct interface</a>.</p>
 </section>
 <section id="interfaces">
 <span id="id4"></span><h3>Interfaces<a class="headerlink" href="#interfaces" title="Link to this heading">¶</a></h3>
-<p>We want to keep the logics as generalistic as possible. Still keeping the example of the laser scanning logic, we want to be able to use if with all our lasers without rewriting it. This issue of being able to interface the same logic with a variety of hardwares that fill the same function is solved through <strong>interfaces</strong>. An interface can be understood as a promise that a hardware module will behave in a certain way and provide a set of methods. For example, the laser hardwares must implement the  <a class="reference external" href="https://github.com/Lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/blob/main/src/qudi/interface/excitation_scanner_interface.py"><code class="docutils literal notranslate"><span class="pre">ExcitationScannerInterface</span></code></a> to be compatible with the laser scanning logic. <strong>This is very powerful</strong>, because it means that often you can integrate a new hardware with the existing logics by simply reading its documentation and writing the adequate hardware module using the interface definition as a template.</p>
+<p>We want to keep the logics as generalistic as possible. Going back to the example of the laser scanning logic, we want to be able to use it with all our lasers without rewriting it. This issue of being able to interface the same logic with a variety of hardwares that fill the same function is solved through <strong>interfaces</strong>. An interface can be understood as a promise that a hardware module will behave in a certain way and provide a set of methods. For example, the laser hardwares must implement the  <a class="reference external" href="https://github.com/Lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/blob/main/src/qudi/interface/excitation_scanner_interface.py"><code class="docutils literal notranslate"><span class="pre">ExcitationScannerInterface</span></code></a> to be compatible with the laser scanning logic. <strong>This is very powerful</strong>, because it means that often you can integrate a new hardware with the existing logics by simply reading its documentation and writing the adequate hardware module using the interface definition as a template.</p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
 <p>You can also have a look at the <a class="reference external" href="https://ulm-iqo.github.io/qudi-core/design_concepts/hardware_interface.html">Hardware Interfaces</a> page of Qudi’s documentation.</p>
@@ -650,7 +688,7 @@ ls
 </section>
 <section id="writing-our-first-configuration-file">
 <h2>Writing our first configuration file<a class="headerlink" href="#writing-our-first-configuration-file" title="Link to this heading">¶</a></h2>
-<p>In this section, we will write (and hopefully understand) a Qudi configuration file. A configuration file can be understood as a recipe that explains to Qudi which modules (GUIs, logics, and hardwares) should be intancied, how they should connect to one another, and how they sould be configured. In addition, it provides some general configuration for Qudi. The configuration is stored in a text file, formated in YAML (Yet Another Markup Language, if you haven’t done so yet, you can check out <a class="reference external" href="https://learnxinyminutes.com/yaml/">this guide</a>). You can edit it with any text editor.</p>
+<p>In this section, we will write (and hopefully understand) a Qudi configuration file. A configuration file can be understood as a recipe that explains to Qudi which modules (GUIs, logics, and hardwares) should be instancied, how they should connect to one another, and how they sould be configured. In addition, it provides some general configuration for Qudi. The configuration is stored in a text file, formated in YAML (Yet Another Markup Language, if you haven’t done so yet, you can check out <a class="reference external" href="https://learnxinyminutes.com/yaml/">this guide</a>). You can edit it with any text editor.</p>
 <figure class="align-default" id="id18">
 <a class="reference internal image-reference" href="_images/writing_configuration.jpeg"><img alt="A character is trying to connect a logic and a hardware modules." src="_images/writing_configuration.jpeg" style="width: 40%;" />
 </a>
@@ -748,7 +786,30 @@ ls
 </pre></div>
 </div>
 </div>
-<p>It inherits from <code class="docutils literal notranslate"><span class="pre">LogicBase</span></code>, so that’s a logic, and the developper gives some example configuration. This means we could configure it as:</p>
+<p>It inherits from <code class="docutils literal notranslate"><span class="pre">LogicBase</span></code>, so that’s a logic, and the developper gives some example configuration.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>If inheritance in the context of programming does not mean anything to you, please read <a class="reference external" href="https://learnxinyminutes.com/python/">this short guide on Python programming</a>. In short, one of the powerful features of Object Oriented Programming is that the behavior of classes (the templates to create objects) can be inherited. This avoid repeating code that you already wrote. For example, you might write a class <code class="docutils literal notranslate"><span class="pre">Vehicle</span></code> and have children classes <code class="docutils literal notranslate"><span class="pre">Car</span></code>, and <code class="docutils literal notranslate"><span class="pre">Bicycle</span></code> inheriting it. This is done in Python by having the parent class in parentheses, as shown above for <code class="docutils literal notranslate"><span class="pre">TimeSeriesReaderLogic</span></code>. Say that the <code class="docutils literal notranslate"><span class="pre">Vehicle</span></code> class implements the <code class="docutils literal notranslate"><span class="pre">go_to</span></code> and <code class="docutils literal notranslate"><span class="pre">say_hi</span></code> methods. Both children classes <code class="docutils literal notranslate"><span class="pre">Car</span></code> and <code class="docutils literal notranslate"><span class="pre">Bicycle</span></code> have them available by default without you needing to rewrite them. That being said, you can decide to re-write some method in the children classes to specialize them. For example, the parent class might have the following definition:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Vehicle</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">say_hi</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hi, I am a vehicle!&quot;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">go_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;My new position is </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">!&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>and the children classes might choose to specialize only the <code class="docutils literal notranslate"><span class="pre">say_hi</span></code> method as:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Bicycle</span><span class="p">(</span><span class="n">Vehicle</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">say_hi</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># See: https://www.scientificamerican.com/article/a-human-on-a-bicycle-is-among-the-most-efficient-forms-of-travel-in-the/ </span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hi, I a human-powered transportation mean, actually one of the most efficient that exists!&quot;</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Car</span><span class="p">(</span><span class="n">Vehicle</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">say_hi</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hi, I am an evil transportation mean that destroys cities and makes them unsafe!&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>while still keeping the original <code class="docutils literal notranslate"><span class="pre">go_to</span></code> method definition.</p>
+</div>
+<p>This means we could configure it as:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">logic</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">time_series_reader_logic</span><span class="p">:</span>
 <span class="w">        </span><span class="nt">module.Class</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;time_series_reader_logic.TimeSeriesReaderLogic&#39;</span>
@@ -760,7 +821,7 @@ ls
 <span class="w">            </span><span class="nt">streamer</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_streamer</span>
 </pre></div>
 </div>
-<p>You can see that <code class="docutils literal notranslate"><span class="pre">module.Class</span></code> corresponds to the Python path to reach this calss. Also here are the options and connect sections.</p>
+<p>You can see that <code class="docutils literal notranslate"><span class="pre">module.Class</span></code> corresponds to the Python path to reach this class. Also here are the options and connect sections.</p>
 </section>
 </section>
 <section id="connectors">
@@ -1164,7 +1225,7 @@ When coding logics, if you need to refer to the connected module (in this exampl
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;/home/klafyvel/qudi/Data/2025/12/2025-12-05/20210506-1111-11_amplitude_measurement.dat&#39;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;/home/klafyvel/qudi/Data/2025/12/2025-12-08/20210506-1111-11_amplitude_measurement.dat&#39;
 </pre></div>
 </div>
 </div>
@@ -1216,7 +1277,7 @@ When coding logics, if you need to refer to the connected module (in this exampl
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;/home/klafyvel/qudi/Data/2025/12/2025-12-05/20210506-1111-11_amplitude_measurement.png&#39;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;/home/klafyvel/qudi/Data/2025/12/2025-12-08/20210506-1111-11_amplitude_measurement.png&#39;
 </pre></div>
 </div>
 </div>
@@ -1254,7 +1315,7 @@ When coding logics, if you need to refer to the connected module (in this exampl
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0, 0.5, &#39;Analog value [V]&#39;)
 </pre></div>
 </div>
-<a class="reference internal image-reference" href="_images/b990274b44ae31a3f325f17e8e6d07af40b530d56c513554fc8c3f3b8a76eba3.png"><img alt="_images/b990274b44ae31a3f325f17e8e6d07af40b530d56c513554fc8c3f3b8a76eba3.png" src="_images/b990274b44ae31a3f325f17e8e6d07af40b530d56c513554fc8c3f3b8a76eba3.png" style="width: 60%;" />
+<a class="reference internal image-reference" href="_images/7c76843ad0798174d21cd2085d99a57ee4c8593f41bed759b1c8d8c1034519be.png"><img alt="_images/7c76843ad0798174d21cd2085d99a57ee4c8593f41bed759b1c8d8c1034519be.png" src="_images/7c76843ad0798174d21cd2085d99a57ee4c8593f41bed759b1c8d8c1034519be.png" style="width: 60%;" />
 </a>
 </div>
 </div>
