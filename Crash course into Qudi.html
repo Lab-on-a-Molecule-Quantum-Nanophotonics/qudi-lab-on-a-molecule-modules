@@ -1348,7 +1348,12 @@ When coding logics, if you need to refer to the connected module (in this exampl
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;digital 1&#39;, &#39;analog 1&#39;, &#39;analog 2&#39;, &#39;digital 2&#39;]
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">7</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">time_series_reader_logic</span><span class="o">.</span><span class="n">active_channel_names</span>
+
+<span class="ne">NameError</span>: name &#39;time_series_reader_logic&#39; is not defined
 </pre></div>
 </div>
 </div>
@@ -1414,31 +1419,26 @@ When coding logics, if you need to refer to the connected module (in this exampl
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([ 0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
-        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
-        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
-        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
-        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
-        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
-        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
-        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
-        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
-        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
-        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
-        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
-        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
-        0.00000000e+00,  0.00000000e+00, -2.10930973e+00,  2.67902622e+00,
-        4.31152540e+00,  4.18334139e+00,  3.94142495e+00,  2.41978858e+00,
-        6.57629272e+00,  2.83845953e+00,  6.60936208e+00,  6.52335506e+00,
-        6.46234780e+00,  7.39876849e+00,  7.22130054e+00,  9.19161103e+00,
-        4.96305088e+00,  5.44728194e+00,  3.65643469e+00,  8.75405480e+00,
-        7.09588177e+00,  3.18097831e+00,  5.28560991e+00,  1.25682218e+00,
-        1.94634850e+00,  5.77630877e+00, -9.25411055e-03,  3.05869598e+00,
-        8.70853963e-01,  1.75853839e+00, -6.56880966e-02, -5.00362993e+00,
-       -1.03142293e+00, -3.05448075e+00, -6.02693994e+00, -3.16630800e+00,
-       -5.80281261e+00, -6.51906081e+00, -4.48108230e+00, -6.80813606e+00,
-       -5.94200048e+00, -8.77992367e+00, -7.85789660e+00, -9.30253356e+00,
-       -6.96332668e+00, -4.91824297e+00, -8.95426813e+00, -4.39041389e+00])
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
+        0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
+        0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
+        0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
+        0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
+        0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
+        0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
+        0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
+        0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
+        0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
+        0.        ,  0.        ,  0.        ,  0.        ,  0.06698023,
+        0.01506304,  3.64632618,  2.49793114,  3.48557959,  5.02556142,
+        4.06057504,  4.73545865,  4.65371359,  3.48637932,  2.26034397,
+        7.66790664,  2.94964391,  8.1436822 ,  7.93296847,  7.7837564 ,
+        8.85416867,  8.88805818,  4.34097689,  5.97260568,  6.61344725,
+        5.91208872,  8.86446977,  7.28261722,  7.46139949,  5.41658627,
+        3.25366366,  5.66301532,  5.75595789,  2.86211996,  5.40552875,
+        1.6837842 ,  5.74722921,  5.30131458,  3.78627703, -0.13560487,
+        0.20616062,  1.63436477, -1.51085868,  0.22346584,  1.1943417 ,
+       -2.64445668, -0.4621692 , -4.92496991, -2.29291868, -3.91197362])
 </pre></div>
 </div>
 </div>
@@ -1560,7 +1560,7 @@ When coding logics, if you need to refer to the connected module (in this exampl
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0, 0.5, &#39;Analog value [V]&#39;)
 </pre></div>
 </div>
-<a class="reference internal image-reference" href="_images/f6c22755c27a8c17b8ef0325a2fcb9b3f87e8c46eea05aabae6aa7673b69e379.png"><img alt="_images/f6c22755c27a8c17b8ef0325a2fcb9b3f87e8c46eea05aabae6aa7673b69e379.png" src="_images/f6c22755c27a8c17b8ef0325a2fcb9b3f87e8c46eea05aabae6aa7673b69e379.png" style="width: 60%;" />
+<a class="reference internal image-reference" href="_images/650f9320defd08d9998f7c1d5dddaaad0d7b784fc9f44cf85c6bbb5aed9a5395.png"><img alt="_images/650f9320defd08d9998f7c1d5dddaaad0d7b784fc9f44cf85c6bbb5aed9a5395.png" src="_images/650f9320defd08d9998f7c1d5dddaaad0d7b784fc9f44cf85c6bbb5aed9a5395.png" style="width: 60%;" />
 </a>
 </div>
 </div>
@@ -1937,32 +1937,59 @@ RuntimeError: Failed to activate hardware module &quot;instream_dummy&quot;!
 <p>In this section we are going to go through some common modules, especially user interfaces, that we use for single molecule applications. Please load the <code class="docutils literal notranslate"><span class="pre">default.cfg</span></code> configuration and restart Qudi.</p>
 <section id="the-time-series-gui">
 <h2>The time series GUI<a class="headerlink" href="#the-time-series-gui" title="Link to this heading">¶</a></h2>
-<p>Quickly go over some features of the time series (recording, snapshot, freeze y axis, trace view selection vs channel settings, effect of averagint)</p>
-<center>
-<figure >
-    <img src="attachment:d05f9218-80df-402c-8178-861740bfe77d.png" alt="Screenshot of the main time series window" style="max-width: 600px;"/>
-    <figcaption>The main time series window. Your (mostly) reliable best friend.</figcaption>
+<p>The GUI that we have been using the most during this lecture is the time series GUI. It is rather simple, reliable, and always useful. It is worth describing a bit some of its functionalities. This GUI and the corresponding <code class="docutils literal notranslate"><span class="pre">TimeSeriesReaderLogic</span></code> deal with hardwares implementing the <code class="docutils literal notranslate"><span class="pre">DataInStreamInterface</span></code>. They also calculate moving averages of the acquired signals.</p>
+<figure class="align-default" id="id39">
+<a class="reference internal image-reference" href="_images/time_series_illustration.svg"><img alt="_images/time_series_illustration.svg" src="_images/time_series_illustration.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 27 </span><span class="caption-text">The main time series window. Your (mostly) reliable best friend.</span><a class="headerlink" href="#id39" title="Link to this image">¶</a></p>
+</figcaption>
 </figure>
-</center><p>Controlling what you see and what you record: Channel settings and Trace view.</p>
-<center>
-<figure style="display: inline-block;">
-    <img src="attachment:b299ce92-904f-4d5e-84ed-2ef984923d2f.png" alt="Screenshot of the Channel settings window" style="max-width: 300px;"/>
-    <figcaption>The channel settings window.</figcaption>
+<p>Going from left to right and top to bottom in the previous figure, we have:</p>
+<ul class="simple">
+<li><p>The start/stop button, that… starts and stop the acquisition,</p></li>
+<li><p>The start/stop recording data, that will start recording a running acquisition for as long as you want,</p></li>
+<li><p>The take snapshot button. Did you see something interesting in the data trace but forgot to start the acquisition? quick! press this button!</p></li>
+<li><p>The freeze autoscaling of the Y axis button. This is an addition we made to the original Ulm IQO GUI to tame a bit the autoscaling. It is useful for example in situations where you are aligning on a weak signal, but have some strong signals that can come and parasite the data trace.</p></li>
+<li><p>The trace view selection and channel settings buttons, that open the corresponding setting windows that we detail below.</p></li>
+<li><p>The curent value channel combo box, that controls which measured value is being displayed.</p></li>
+<li><p>The trace length spin box, which controls how long the stored data are.</p></li>
+<li><p>The data rate spin box, which controls the data rate of the trace being displayed.</p></li>
+<li><p>The oversampling factor, which controls how much faster the hardware is acquiring data.</p></li>
+<li><p>The moving average width, which controls how many data points are used for calculating moving averages.</p></li>
+</ul>
+<p>There are two important control points that can be called using the trace view selection and channel settings buttons. The first one is the trace view window. It only controls what is being <strong>displayed</strong> in the window. The data that are hidden are still being acquired and will be saved to file if you request that.</p>
+<figure class="align-default" id="id40">
+<a class="reference internal image-reference" href="_images/trace_view_selection.png"><img alt="_images/trace_view_selection.png" src="_images/trace_view_selection.png" style="width: 40%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 28 </span><span class="caption-text">The trace view window.</span><a class="headerlink" href="#id40" title="Link to this image">¶</a></p>
+</figcaption>
 </figure>
-<figure style="display: inline-block;">
-    <img src="attachment:9cc0d46a-5641-478d-a15b-969249389619.png" alt="Screenshot of the trace view settings window" style="max-width: 300px;"/>
-    <figcaption>The trace view window.</figcaption>
+<p>The second control point is the channel settings window. It controls what data are actually being acquired. It is not accessible when data acquisition is running.</p>
+<figure class="align-default" id="id41">
+<a class="reference internal image-reference" href="_images/data_channel_settings.png"><img alt="_images/data_channel_settings.png" src="_images/data_channel_settings.png" style="width: 40%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 29 </span><span class="caption-text">The channel settings window.</span><a class="headerlink" href="#id41" title="Link to this image">¶</a></p>
+</figcaption>
 </figure>
-</center></section>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When performing alignement, it is sometimes useful to disable moving average acquisition. Indeed, calculating the moving average introduces a temporal lag in what is being displayed which can be annoying when aligning.</p>
+</div>
+<p>For an example of how to set-up the time series reader, please refer to <a class="reference external" href="https://lab-on-a-molecule-quantum-nanophotonics.github.io/qudi-lab-on-a-molecule-modules/iqo-docs/setup_timeseries.html">the guide on time series</a>.</p>
+</section>
 <section id="the-scanner-gui-running-confocal-scans-and-controlling-the-galvo-mirror">
 <h2>The scanner GUI: running confocal scans and controlling the galvo mirror<a class="headerlink" href="#the-scanner-gui-running-confocal-scans-and-controlling-the-galvo-mirror" title="Link to this heading">¶</a></h2>
 <p>Features of the confocal scanner, when to use the automatic optimizer, the units of the plot, how useful the right click can be… Maybe make them load the default configuration file during the lecture to show that.</p>
-<center>
-<figure >
-    <img src="attachment:7494f332-1dfd-4d96-a33e-1d057a3a030b.png" alt="Screenshot of the main Qudi window" style="max-width: 600px;"/>
-    <figcaption>The Scanner GUI. Available axes may vary.</figcaption>
+<figure class="align-default" id="id42">
+<a class="reference internal image-reference" href="_images/scanner_gui_annotated.svg"><img alt="_images/scanner_gui_annotated.svg" src="_images/scanner_gui_annotated.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 30 </span><span class="caption-text">The Scanner GUI. Available axes may vary.</span><a class="headerlink" href="#id42" title="Link to this image">¶</a></p>
+</figcaption>
 </figure>
-</center>
 </section>
 <section id="the-national-instruments-hardwares-and-their-configurations">
 <h2>The National Instruments hardwares and their configurations<a class="headerlink" href="#the-national-instruments-hardwares-and-their-configurations" title="Link to this heading">¶</a></h2>
@@ -1975,54 +2002,54 @@ RuntimeError: Failed to activate hardware module &quot;instream_dummy&quot;!
 <section id="id8">
 <h2>State machines<a class="headerlink" href="#id8" title="Link to this heading">¶</a></h2>
 <p>Reminder of state machines, use the dummy hardware to illustrate</p>
-<figure class="align-default" id="id39">
+<figure class="align-default" id="id43">
 <a class="reference internal image-reference" href="_images/qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.svg"><img alt="_images/qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.svg" src="_images/qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.svg" style="width: 60%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 27 </span><span class="caption-text">The state machine of the dummy laser. On the right the simplified version without the interuption routines.</span><a class="headerlink" href="#id39" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 31 </span><span class="caption-text">The state machine of the dummy laser. On the right the simplified version without the interuption routines.</span><a class="headerlink" href="#id43" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="an-example-state-machine-the-dfb-laser">
 <h2>An example state machine: the DFB laser<a class="headerlink" href="#an-example-state-machine-the-dfb-laser" title="Link to this heading">¶</a></h2>
 <p>Nothing really interesting to comment on here, we can just go fast on that.</p>
-<figure class="align-default" id="id40">
+<figure class="align-default" id="id44">
 <a class="reference internal image-reference" href="_images/qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.svg"><img alt="_images/qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.svg" src="_images/qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.svg" style="width: 60%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 28 </span><span class="caption-text">The state machine for the DFB laser. On the right, the simplified version with the interuption transition and the stopped state removed.</span><a class="headerlink" href="#id40" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 32 </span><span class="caption-text">The state machine for the DFB laser. On the right, the simplified version with the interuption transition and the stopped state removed.</span><a class="headerlink" href="#id44" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="a-slightly-more-complicated-example-the-moglabs-cem-laser">
 <h2>A slightly more complicated example: the Moglabs CEM laser<a class="headerlink" href="#a-slightly-more-complicated-example-the-moglabs-cem-laser" title="Link to this heading">¶</a></h2>
 <p>Explain why we have a scan_idle state</p>
-<figure class="align-default" id="id41">
+<figure class="align-default" id="id45">
 <a class="reference internal image-reference" href="_images/qudi.hardware.interfuse.moglabs_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.svg"><img alt="_images/qudi.hardware.interfuse.moglabs_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.svg" src="_images/qudi.hardware.interfuse.moglabs_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.svg" style="width: 60%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 29 </span><span class="caption-text">The state machine for the Moglabls CEM laser. On the right, the simplified version with the interruption transitions and the stopped state removed.</span><a class="headerlink" href="#id41" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 33 </span><span class="caption-text">The state machine for the Moglabls CEM laser. On the right, the simplified version with the interruption transitions and the stopped state removed.</span><a class="headerlink" href="#id45" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="a-more-complicated-example-the-matisse-laser">
 <h2>A more complicated example: the Matisse laser<a class="headerlink" href="#a-more-complicated-example-the-matisse-laser" title="Link to this heading">¶</a></h2>
 <p>Detail a bit more, explain that the matisse laser is in two part, one on the laser’s computer, not shown here, and one on the main computer.</p>
-<figure class="align-default" id="id42">
+<figure class="align-default" id="id46">
 <a class="reference internal image-reference" href="_images/qudi.hardware.interfuse.remote_matisse_scanner.RemoteMatisseScanner.svg"><img alt="_images/qudi.hardware.interfuse.remote_matisse_scanner.RemoteMatisseScanner.svg" src="_images/qudi.hardware.interfuse.remote_matisse_scanner.RemoteMatisseScanner.svg" style="width: 60%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 30 </span><span class="caption-text">The state machine for the Matisse laser. On the right, the simplified version where the interruption transitions and the stopped state have been removed.</span><a class="headerlink" href="#id42" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 34 </span><span class="caption-text">The state machine for the Matisse laser. On the right, the simplified version where the interruption transitions and the stopped state have been removed.</span><a class="headerlink" href="#id46" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="the-laser-scanner-user-interface">
 <h2>The laser scanner user interface<a class="headerlink" href="#the-laser-scanner-user-interface" title="Link to this heading">¶</a></h2>
-<figure class="align-default" id="id43">
+<figure class="align-default" id="id47">
 <a class="reference internal image-reference" href="_images/laser_window_annotated.svg"><img alt="_images/laser_window_annotated.svg" src="_images/laser_window_annotated.svg" style="width: 70%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 31 </span><span class="caption-text">The laser scanner user interface</span><a class="headerlink" href="#id43" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 35 </span><span class="caption-text">The laser scanner user interface</span><a class="headerlink" href="#id47" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>Explain that this interface is generic, and that the middle column changes for each laser. Explain notes, and scanner status. Explain the data pane, with how the fit region works, the fit button also. Explain how to control the idle value of the laser, <strong>that the <code class="docutils literal notranslate"><span class="pre">Laser</span> <span class="pre">follow</span> <span class="pre">cursor</span></code> switch needs to be enabled</strong>, the drag and drop of the green line, the slider and its scroll divider.</p>
@@ -2034,19 +2061,19 @@ RuntimeError: Failed to activate hardware module &quot;instream_dummy&quot;!
 <section id="laser-specifics-dfb-laser">
 <h2>Laser specifics: DFB laser<a class="headerlink" href="#laser-specifics-dfb-laser" title="Link to this heading">¶</a></h2>
 <p>Explain that the DFB laser is controlld by a very generic hardware interfuse (essentially we use a NI instrument-like hardware), and that it can in addition control a <code class="docutils literal notranslate"><span class="pre">ControlSetpointInterface</span></code> (for example the cryo). That for simplicity we have two available configurations in 66.</p>
-<figure class="align-default" id="id44">
+<figure class="align-default" id="id48">
 <a class="reference internal image-reference" href="_images/5d3c2a5f-415a-40ae-bd7e-aa280971513f.png"><img alt="_images/5d3c2a5f-415a-40ae-bd7e-aa280971513f.png" src="_images/5d3c2a5f-415a-40ae-bd7e-aa280971513f.png" style="width: 60%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 32 </span><span class="caption-text">The DFB can have an external control hardware connected. For simplicity in Lab 66 we have two corresponding configurations available</span><a class="headerlink" href="#id44" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 36 </span><span class="caption-text">The DFB can have an external control hardware connected. For simplicity in Lab 66 we have two corresponding configurations available</span><a class="headerlink" href="#id48" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>Discuss a bit the control of the cryo, also that the temperature get saved as a global metadata!</p>
-<figure class="align-default" id="id45">
+<figure class="align-default" id="id49">
 <a class="reference internal image-reference" href="_images/ce06e35a-71d8-420d-88bb-e134a2f325f7.png"><img alt="_images/ce06e35a-71d8-420d-88bb-e134a2f325f7.png" src="_images/ce06e35a-71d8-420d-88bb-e134a2f325f7.png" style="width: 60%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 33 </span><span class="caption-text">Don’t forget to click on <kbd class="kbd compound docutils literal notranslate"><kbd class="kbd docutils literal notranslate">ENABLE</kbd> <kbd class="kbd docutils literal notranslate">EXTERNAL</kbd> <kbd class="kbd docutils literal notranslate">CONTROL</kbd></kbd> in the Cryostation software if you are using the dfb with the cryo.</span><a class="headerlink" href="#id45" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 37 </span><span class="caption-text">Don’t forget to click on <kbd class="kbd compound docutils literal notranslate"><kbd class="kbd docutils literal notranslate">ENABLE</kbd> <kbd class="kbd docutils literal notranslate">EXTERNAL</kbd> <kbd class="kbd docutils literal notranslate">CONTROL</kbd></kbd> in the Cryostation software if you are using the dfb with the cryo.</span><a class="headerlink" href="#id49" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
