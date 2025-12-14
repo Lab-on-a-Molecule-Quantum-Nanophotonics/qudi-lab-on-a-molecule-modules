@@ -30,7 +30,7 @@ class SwitchDummy(SwitchInterface):
     Example config for copy-paste:
 
     switch_dummy:
-        module.Class: 'switches.switch_dummy.SwitchDummy'
+        module.Class: 'dummy.switch_dummy.SwitchDummy'
         options:
             name: 'First'  # optional
             remember_states: True  # optional

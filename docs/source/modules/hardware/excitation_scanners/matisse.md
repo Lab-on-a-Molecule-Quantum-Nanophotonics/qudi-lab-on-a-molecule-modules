@@ -19,7 +19,7 @@ render_plugin = "myst"
 
 For now this is intended to use the [matisse proxy](#qudi.hardware.laser.matisse.MatisseCommander) on a remote computer, but could be modified to use it on the same computer if needed.
 
-This hardware uses a [state machine](../state-machines) that is depicted below. The link are clickable and lead to the specific method documentation for the state.
+This hardware uses a state machine that is depicted below. The link are clickable and lead to the specific method documentation for the state.
 
 ```{statemachine} qudi.hardware.interfuse.remote_matisse_scanner.RemoteMatisseScanner
 ```
@@ -27,3 +27,4 @@ This hardware uses a [state machine](../state-machines) that is depicted below. 
 ```{autodoc2-object} qudi.hardware.interfuse.remote_matisse_scanner.RemoteMatisseScanner
 render_plugin = "myst"
 ```
+

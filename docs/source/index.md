@@ -11,6 +11,8 @@ If you are new to Qudi, we recommend starting with [the crash course tutorial](<
     :caption: Tutorials:
 
     Tutorial: a crash course into Qudi <Crash course into Qudi>
+    Guide: Excitation spectroscopy <guides/excitation-spectroscopy>
+    Guide: State machines <guides/state-machines>
     Guide: Setting up confocal scanning <iqo-docs/setup_confocal_scanning>
     Guide: Setting up ODMR <iqo-docs/setup_odmr>
     Guide: Setting up time series <iqo-docs/setup_timeseries>
@@ -23,6 +25,7 @@ If you are new to Qudi, we recommend starting with [the crash course tutorial](<
 
 installation
 Lens's changelog <changelog-lens>
+Documentation of all modules <modules/index>
 Ulm IQO's changelog (parent repository) <iqo-docs/changelog>
 programming-guides
 Ulm IQO's specific guides <iqo-docs/iqo-specifics>

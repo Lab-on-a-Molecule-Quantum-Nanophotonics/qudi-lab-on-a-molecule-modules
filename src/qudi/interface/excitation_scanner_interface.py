@@ -8,9 +8,11 @@ from dataclasses import InitVar, dataclass, field
 from qudi.core.module import Base
 _Variable_Type = Union[int, float, bool]
 
+__all__ = ['ExcitationScanDataFormat', 'ExcitationScanControlValue', 'ExcitationScanControlVariable', 'ExcitationScannerConstraints', 'ExcitationScannerInterface']
 
 @dataclass(frozen=True)
 class ExcitationScanDataFormat:
+    "Dataclass to store the data format of an excitation scanner."
     time_column_number: int
     step_number_column_number: int
     frequency_column_number: int
@@ -20,6 +22,10 @@ class ExcitationScanDataFormat:
 
 @dataclass
 class ExcitationScanControlValue:
+    """
+    Dataclass to store a control value (for example the scanner step in Hz) of
+    an excitation scanner.
+    """
     name: str
     value: _Variable_Type
     limits: Tuple[_Variable_Type, _Variable_Type]
@@ -28,6 +34,10 @@ class ExcitationScanControlValue:
 
 @dataclass
 class ExcitationScanControlVariable:
+    """
+    Dataclass to store a control variable of an excitation scanner. This can be 
+    seen as the blueprint to create am `ExcitationScanControlValue`.
+    """
     name: str
     limits: Tuple[_Variable_Type, _Variable_Type]
     type: Type[_Variable_Type]
@@ -35,6 +45,10 @@ class ExcitationScanControlVariable:
 
 @dataclass
 class ExcitationScannerConstraints:
+    """
+    This dataclass stores the constraints associated to an excitation scanner.
+    It can be seen as a container for `ExcitationScanControlVariable` objects.
+    """
     exposure_limits: Tuple[float, float]
     repeat_limits: Tuple[int, int]
     idle_value_limits: Tuple[float, float]
@@ -70,6 +84,11 @@ class ExcitationScannerConstraints:
 
 
 class ExcitationScannerInterface(Base):
+    """
+    An interface to represent an excitation scanner. It is meant to be used in 
+    excitation spectroscopy, where a laser scans the frequency and one records
+    the fluorescence rate of a sample.
+    """
     @property
     @abstractmethod
     def scan_running(self) -> bool:
