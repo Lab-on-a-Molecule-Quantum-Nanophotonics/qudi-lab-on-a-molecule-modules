@@ -1,0 +1,418 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="670.83875mm"
+   height="181.03336mm"
+   viewBox="0 0 670.83875 181.03335"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4.2 (ebf0e940d0, 2025-05-08)"
+   sodipodi:docname="python_error.svg"
+   inkscape:export-filename="python_error.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="0.38233482"
+     inkscape:cx="634.26084"
+     inkscape:cy="79.773012"
+     inkscape:window-width="1702"
+     inkscape:window-height="916"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1">
+    <marker
+       style="overflow:visible"
+       id="ArrowWideRounded"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Wide, rounded arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:1;stroke-linecap:round"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         sodipodi:nodetypes="ccc"
+         id="path2" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="Triangle"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Triangle arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path135" />
+    </marker>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(126.39282,-60.815088)">
+    <rect
+       style="fill:#0072b2;fill-opacity:1;stroke-width:11.3386;stroke-linecap:round;stroke-dasharray:none"
+       id="rect14"
+       width="628.3205"
+       height="48.724426"
+       x="-94.917755"
+       y="260.96469"
+       transform="matrix(0.26458333,0,0,0.26458333,-11.965267,35.427175)" />
+    <rect
+       style="fill:#0072b2;fill-opacity:1;stroke-width:11.3386;stroke-linecap:round;stroke-dasharray:none"
+       id="rect15"
+       width="631.00464"
+       height="48.724426"
+       x="-103.0608"
+       y="260.96469"
+       transform="matrix(0.26458333,0,0,0.26458333,-9.8107534,59.768845)" />
+    <rect
+       style="fill:#0072b2;fill-opacity:1;stroke-width:11.3386;stroke-linecap:round;stroke-dasharray:none"
+       id="rect16"
+       width="623.4129"
+       height="48.724426"
+       x="-97.632103"
+       y="260.96469"
+       transform="matrix(0.26458333,0,0,0.26458333,-9.8107534,84.639685)" />
+    <rect
+       style="fill:#0072b2;fill-opacity:1;stroke-width:11.3386;stroke-linecap:round;stroke-dasharray:none"
+       id="rect17"
+       width="1309.7958"
+       height="48.244118"
+       x="-98.291832"
+       y="260.96469"
+       transform="matrix(0.26458333,0,0,0.26458333,-9.8107534,108.98138)" />
+    <rect
+       style="fill:#e69f00;fill-opacity:1;stroke-width:11.3386;stroke-linecap:round;stroke-dasharray:none"
+       id="rect25"
+       width="73.701942"
+       height="48.724426"
+       x="-135.63297"
+       y="260.96469"
+       transform="matrix(0.26458333,0,0,0.26458333,203.93479,35.427175)" />
+    <rect
+       style="fill:#e69f00;fill-opacity:1;stroke-width:11.3386;stroke-linecap:round;stroke-dasharray:none"
+       id="rect26"
+       width="73.701942"
+       height="48.724426"
+       x="-135.63297"
+       y="260.96469"
+       transform="matrix(0.26458333,0,0,0.26458333,204.46396,59.239678)" />
+    <rect
+       style="fill:#e69f00;fill-opacity:1;stroke-width:11.3386;stroke-linecap:round;stroke-dasharray:none"
+       id="rect27"
+       width="73.701942"
+       height="48.724426"
+       x="-135.63297"
+       y="260.96469"
+       transform="matrix(0.26458333,0,0,0.26458333,204.46396,84.639679)" />
+    <rect
+       style="fill:#e69f00;fill-opacity:1;stroke-width:11.3386;stroke-linecap:round;stroke-dasharray:none"
+       id="rect28"
+       width="73.701942"
+       height="48.724426"
+       x="-135.63297"
+       y="260.96469"
+       transform="matrix(0.26458333,0,0,0.26458333,385.96819,108.98137)" />
+    <rect
+       style="fill:#009e73;fill-opacity:1;stroke-width:11.3386;stroke-linecap:round;stroke-dasharray:none"
+       id="rect29"
+       width="361.63419"
+       height="48.724426"
+       x="-135.63297"
+       y="260.96469"
+       transform="matrix(0.26458333,0,0,0.26458333,243.62227,35.427175)" />
+    <rect
+       style="fill:#009e73;fill-opacity:1;stroke-width:11.3386;stroke-linecap:round;stroke-dasharray:none"
+       id="rect30"
+       width="253.38898"
+       height="48.724426"
+       x="-135.63297"
+       y="260.96469"
+       transform="matrix(0.26458333,0,0,0.26458333,243.62227,59.768842)" />
+    <rect
+       style="fill:#009e73;fill-opacity:1;stroke-width:11.3386;stroke-linecap:round;stroke-dasharray:none"
+       id="rect31"
+       width="179.06061"
+       height="48.724426"
+       x="-135.63297"
+       y="260.96469"
+       transform="matrix(0.26458333,0,0,0.26458333,243.62227,84.110509)" />
+    <rect
+       style="fill:#009e73;fill-opacity:1;stroke-width:11.3386;stroke-linecap:round;stroke-dasharray:none"
+       id="rect32"
+       width="188.0786"
+       height="48.724426"
+       x="-146.52412"
+       y="260.96469"
+       transform="matrix(0.26458333,0,0,0.26458333,430.9474,108.98134)" />
+    <rect
+       style="fill:#cc79a7;fill-opacity:1;stroke-width:11.3386;stroke-linecap:round;stroke-dasharray:none"
+       id="rect33"
+       width="837.1554"
+       height="49.561401"
+       x="-112.29475"
+       y="260.96469"
+       transform="matrix(0.26458333,0,0,0.26458333,-31.544434,47.068843)" />
+    <rect
+       style="fill:#cc79a7;fill-opacity:1;stroke-width:11.3386;stroke-linecap:round;stroke-dasharray:none"
+       id="rect34"
+       width="661.50739"
+       height="48.724426"
+       x="-110.73888"
+       y="260.96469"
+       transform="matrix(0.26458333,0,0,0.26458333,-31.544434,72.468844)" />
+    <rect
+       style="fill:#cc79a7;fill-opacity:1;stroke-width:11.3386;stroke-linecap:round;stroke-dasharray:none"
+       id="rect35"
+       width="560.37512"
+       height="48.724426"
+       x="-106.07124"
+       y="260.96469"
+       transform="matrix(0.26458333,0,0,0.26458333,-31.544434,96.810514)" />
+    <rect
+       style="fill:#cc79a7;fill-opacity:1;stroke-width:11.3386;stroke-linecap:round;stroke-dasharray:none"
+       id="rect36"
+       width="1287.1798"
+       height="48.724426"
+       x="-110.73888"
+       y="260.96469"
+       transform="matrix(0.26458333,0,0,0.26458333,-31.544434,121.15221)" />
+    <rect
+       style="fill:#56b4e9;fill-opacity:1;stroke-width:11.3386;stroke-linecap:round;stroke-dasharray:none"
+       id="rect37"
+       width="1127.9891"
+       height="48.724426"
+       x="-135.63297"
+       y="260.96469"
+       transform="matrix(0.26458333,0,0,0.26458333,-45.30277,133.85223)"
+       inkscape:label="rect37" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:37.3333px;line-height:1.25;font-family:'CMU Typewriter Text';-inkscape-font-specification:'CMU Typewriter Text, Medium';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;display:inline"
+       x="468.33258"
+       y="468.33258"
+       id="text1"
+       transform="matrix(0.26458333,0,0,0.26458333,-202.76671,-22.529635)"><tspan
+         sodipodi:role="line"
+         id="tspan1"
+         x="468.33258"
+         y="468.33258">Traceback (most recent call last):</tspan><tspan
+         sodipodi:role="line"
+         x="468.33258"
+         y="514.99921"
+         id="tspan2">  File &quot;<tspan
+   style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:37.3333px;font-family:'CMU Typewriter Text';-inkscape-font-specification:'CMU Typewriter Text, Medium';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#ffffff;fill-opacity:1"
+   id="tspan24">/home/klafyvel/</tspan><tspan
+   style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:37.3333px;font-family:'CMU Typewriter Text';-inkscape-font-specification:'CMU Typewriter Text, Medium';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#ffffff;fill-opacity:1"
+   id="tspan11">[...]</tspan><tspan
+   style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:37.3333px;font-family:'CMU Typewriter Text';-inkscape-font-specification:'CMU Typewriter Text, Medium';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#ffffff;fill-opacity:1"
+   id="tspan25">/protocol.py</tspan>&quot;, line 359, in _dispatch_request</tspan><tspan
+         sodipodi:role="line"
+         x="468.33258"
+         y="561.66583"
+         id="tspan3">    res = self._HANDLERS[handler](self, *args)</tspan><tspan
+         sodipodi:role="line"
+         x="468.33258"
+         y="608.33246"
+         id="tspan4">  File &quot;<tspan
+   style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:37.3333px;font-family:'CMU Typewriter Text';-inkscape-font-specification:'CMU Typewriter Text, Medium';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#ffffff;fill-opacity:1"
+   id="tspan22">/home/klafyvel/</tspan><tspan
+   style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:37.3333px;font-family:'CMU Typewriter Text';-inkscape-font-specification:'CMU Typewriter Text, Medium';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#ffffff;fill-opacity:1"
+   id="tspan12">[...]</tspan><tspan
+   style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:37.3333px;font-family:'CMU Typewriter Text';-inkscape-font-specification:'CMU Typewriter Text, Medium';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#ffffff;fill-opacity:1"
+   id="tspan23">/protocol.py</tspan>&quot;, line 837, in _handle_call</tspan><tspan
+         sodipodi:role="line"
+         x="468.33258"
+         y="654.99908"
+         id="tspan5">    return obj(*args, **dict(kwargs))</tspan><tspan
+         sodipodi:role="line"
+         x="468.33258"
+         y="701.66571"
+         id="tspan6">  File &quot;<tspan
+   style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:37.3333px;font-family:'CMU Typewriter Text';-inkscape-font-specification:'CMU Typewriter Text, Medium';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#ffffff;fill-opacity:1"
+   id="tspan20">/home/klafyvel/</tspan><tspan
+   style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:37.3333px;font-family:'CMU Typewriter Text';-inkscape-font-specification:'CMU Typewriter Text, Medium';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#ffffff;fill-opacity:1"
+   id="tspan13">[...]</tspan><tspan
+   style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:37.3333px;font-family:'CMU Typewriter Text';-inkscape-font-specification:'CMU Typewriter Text, Medium';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#ffffff;fill-opacity:1"
+   id="tspan21">/services.py</tspan>&quot;, line 274, in wrapped</tspan><tspan
+         sodipodi:role="line"
+         x="468.33258"
+         y="748.33234"
+         id="tspan7">    return attr(*args, **kwargs)</tspan><tspan
+         sodipodi:role="line"
+         x="468.33258"
+         y="794.99896"
+         id="tspan8">  File &quot;<tspan
+   style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:37.3333px;font-family:'CMU Typewriter Text';-inkscape-font-specification:'CMU Typewriter Text, Medium';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#ffffff;fill-opacity:1"
+   id="tspan18">/home/klafyvel/</tspan><tspan
+   style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:37.3333px;font-family:'CMU Typewriter Text';-inkscape-font-specification:'CMU Typewriter Text, Medium';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#ffffff;fill-opacity:1"
+   id="tspan17">[...]</tspan><tspan
+   style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:37.3333px;font-family:'CMU Typewriter Text';-inkscape-font-specification:'CMU Typewriter Text, Medium';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#ffffff;fill-opacity:1"
+   id="tspan19">/src/qudi/hardware/dummy/data_instream_dummy.py</tspan>&quot;, line 544, in read_data</tspan><tspan
+         sodipodi:role="line"
+         x="468.33258"
+         y="841.66559"
+         id="tspan9">    raise RuntimeError('Unable to read data. Stream is not running.')</tspan><tspan
+         sodipodi:role="line"
+         x="468.33258"
+         y="888.33221"
+         id="tspan10">RuntimeError: Unable to read data. Stream is not running.</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:11.3386;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Triangle)"
+       d="M -437.99074,797.57573 V 378.51052"
+       id="path13"
+       transform="matrix(0.26458333,0,0,0.26458333,15.875,0)" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:53.3333px;line-height:1.25;font-family:'CMU Sans Serif';-inkscape-font-specification:'CMU Sans Serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+       x="-778.65021"
+       y="621.83868"
+       id="text14"
+       transform="matrix(0,-0.26458333,0.26458333,0,-280.73275,8.2026301)"><tspan
+         sodipodi:role="line"
+         id="tspan14"
+         x="-778.65021"
+         y="621.83868">Read in this direction</tspan></text>
+    <rect
+       style="fill:none;fill-opacity:1;stroke:#d55e00;stroke-width:11.3386;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       id="rect38"
+       width="2027.8717"
+       height="435.42703"
+       x="-268.45749"
+       y="-2.0973241"
+       transform="matrix(0.26458333,0,0,0.26458333,-12.407932,88.990309)" />
+    <path
+       style="fill:none;stroke:#56b4e9;stroke-width:11.3386;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       d="m -283.78703,894.19687 c 0,0 133.86181,-3.59915 133.86181,-78.60956"
+       id="path38"
+       transform="matrix(-0.26458333,0,0,0.26458333,-83.003022,0)"
+       sodipodi:nodetypes="cc" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:53.3333px;line-height:1.25;font-family:'CMU Sans Serif';-inkscape-font-specification:'CMU Sans Serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+       x="0"
+       y="879.08624"
+       id="text38"
+       transform="matrix(0.26458333,0,0,0.26458333,-2.1166667,6.3500001)"><tspan
+         sodipodi:role="line"
+         id="tspan38"
+         x="0"
+         y="879.08624">Error name and error message</tspan></text>
+    <path
+       style="fill:none;stroke:#d55e00;stroke-width:11.3386;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       d="m -283.78703,894.19687 c 0,0 133.86181,-3.59915 133.86181,-78.60956"
+       id="path38-3"
+       transform="matrix(-0.26458333,0,0,-0.26458333,239.07012,303.69703)"
+       sodipodi:nodetypes="cc" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:53.3333px;line-height:1.25;font-family:'CMU Sans Serif';-inkscape-font-specification:'CMU Sans Serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+       x="0"
+       y="879.08624"
+       id="text38-1"
+       transform="matrix(0.26458333,0,0,0.26458333,322.08448,-161.58826)"><tspan
+         sodipodi:role="line"
+         id="tspan38-2"
+         x="0"
+         y="879.08624">Traceback</tspan></text>
+    <path
+       style="fill:none;stroke:#f0e442;stroke-width:11.3386;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       d="m 712.00273,-57.117555 h 72.51416 V 27.91076 h -74.61472"
+       id="path40"
+       transform="matrix(0.26458333,0,0,0.26458333,256.19213,193.0824)"
+       sodipodi:nodetypes="cccc" />
+    <path
+       style="fill:none;stroke:#f0e442;stroke-width:11.3386;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       d="M 12.00272,-57.117555 H 784.51689 V 27.91076 H 9.9021603"
+       id="path41"
+       transform="matrix(0.26458333,0,0,0.26458333,256.19213,168.83777)"
+       sodipodi:nodetypes="cccc" />
+    <path
+       style="fill:none;stroke:#f0e442;stroke-width:11.3386;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       d="M 72.002721,-57.117555 H 784.51689 V 27.91076 H 69.902161"
+       id="path42"
+       transform="matrix(0.26458333,0,0,0.26458333,256.19213,143.34069)"
+       sodipodi:nodetypes="cccc" />
+    <path
+       style="fill:none;stroke:#f0e442;stroke-width:11.3386;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       d="M 180.00272,-57.117555 H 784.51689 V 27.91076 H 177.90216"
+       id="path43"
+       transform="matrix(0.26458333,0,0,0.26458333,256.19213,117.94068)"
+       sodipodi:nodetypes="cccc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:7.55906;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#ArrowWideRounded)"
+       d="m 1752.8021,715.15685 c 91.4911,0 86.8983,-91.63324 0,-91.63324"
+       id="path44"
+       transform="matrix(0.26458333,0,0,0.26458333,3.7041666,5.2916663)"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:7.55906;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#ArrowWideRounded)"
+       d="m 1752.8021,715.15685 c 91.4911,0 86.8983,-91.63324 0,-91.63324"
+       id="path45"
+       transform="matrix(0.26458333,0,0,0.26458333,3.7041666,-27.516665)"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:7.55906;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#ArrowWideRounded)"
+       d="m 1752.8021,715.15685 c 91.4911,0 86.8983,-91.63324 0,-91.63324"
+       id="path46"
+       transform="matrix(0.26458333,0,0,0.26458333,3.7041666,-59.266667)"
+       sodipodi:nodetypes="cc" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:53.3333px;line-height:1.25;font-family:'CMU Sans Serif';-inkscape-font-specification:'CMU Sans Serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+       x="1833.6952"
+       y="671.2157"
+       id="text46"
+       transform="matrix(0.26458333,0,0,0.26458333,5.2916667,8.2584441)"><tspan
+         sodipodi:role="line"
+         id="tspan46"
+         x="1833.6952"
+         y="671.2157">Called by</tspan></text>
+    <use
+       x="0"
+       y="0"
+       xlink:href="#text46"
+       id="use47"
+       transform="translate(-3.333339e-8,-33.866669)" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#use47"
+       id="use48"
+       transform="translate(-3.3333322e-8,-30.691668)" />
+  </g>
+</svg>
