@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html  lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+      <title>ProcessSetpointInterface</title>
+    
+          <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+          <link rel="stylesheet" href="../../_static/theme.css " type="text/css" />
+          <link rel="stylesheet" href="../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" type="text/css" />
+          <link rel="stylesheet" href="../../_static/exercise.css" type="text/css" />
+      
+      <!-- sphinx script_files -->
+        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+
+      
+      <!-- bundled in js (rollup iife) -->
+      <!-- <script src="../../_static/theme-vendors.js"></script> -->
+      <script src="../../_static/theme.js" defer></script>
+    
+      <link rel="shortcut icon" href="../../../../_static/logo.png"/>
+  <link rel="index" title="Index" href="../../genindex.html" />
+  <link rel="search" title="Search" href="../../search.html" />
+  <link rel="next" title="PulserInterface" href="pulser_interface.html" />
+  <link rel="prev" title="PIDControllerInterface" href="pid_controller_interface.html" /> 
+  </head>
+
+  <body>
+    <div id="app">
+    <div class="theme-container" :class="pageClasses"><navbar @toggle-sidebar="toggleSidebar">
+  <router-link to="../../index.html" class="home-link">
+    
+      <span class="site-name">Qudi Lab on a molecule modules</span>
+    
+  </router-link>
+
+  <div class="links">
+    <navlinks class="can-hide">
+
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Tutorials:
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+    </navlinks>
+  </div>
+</navbar>
+
+      
+      <div class="sidebar-mask" @click="toggleSidebar(false)">
+      </div>
+        <sidebar @toggle-sidebar="toggleSidebar">
+          
+          <navlinks>
+            
+
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Tutorials:
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+            
+          </navlinks><div id="searchbox" class="searchbox" role="search">
+  <div class="caption"><span class="caption-text">Quick search</span>
+    <div class="searchformwrapper">
+      <form class="search" action="../../search.html" method="get">
+        <input type="text" name="q" />
+        <input type="submit" value="Search" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div><div class="sidebar-links" role="navigation" aria-label="main navigation">
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation">Tutorials:</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../Crash%20course%20into%20Qudi.html" class="reference internal ">    Tutorial: a crash course into Qudi</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../guides/excitation-spectroscopy.html" class="reference internal ">    Guide: Excitation spectroscopy</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../guides/state-machines.html" class="reference internal ">    Guide: State machines</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/setup_confocal_scanning.html" class="reference internal ">    Guide: Setting up confocal scanning</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/setup_odmr.html" class="reference internal ">    Guide: Setting up ODMR</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/setup_timeseries.html" class="reference internal ">    Guide: Setting up time series</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation">Contents:</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../installation.html" class="reference internal ">Installation</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../changelog-lens.html" class="reference internal ">Lens's changelog</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../index.html" class="reference internal ">Documentation of all modules</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/changelog.html" class="reference internal ">Ulm IQO's changelog (parent repository)</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../programming-guides.html" class="reference internal ">Programming guides: writing your own modules and understanding our hardwares.</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/iqo-specifics.html" class="reference internal ">Ulm IQO's specific guides</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+</div>
+        </sidebar>
+
+      <page>
+          <div class="body-header" role="navigation" aria-label="navigation">
+  
+  <ul class="breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+    
+      <li><a href="../index.html">Documentation of all modules</a> &raquo;</li>
+    
+      <li><a href="../interface.html">Interfaces</a> &raquo;</li>
+    
+    <li>ProcessSetpointInterface</li>
+  </ul>
+  
+
+  <ul class="page-nav">
+  <li class="prev">
+    <a href="pid_controller_interface.html"
+       title="previous chapter">← PIDControllerInterface</a>
+  </li>
+  <li class="next">
+    <a href="pulser_interface.html"
+       title="next chapter">PulserInterface →</a>
+  </li>
+</ul>
+  
+</div>
+<hr>
+          <div class="content" role="main" v-pre>
+            
+  <section id="processsetpointinterface">
+<h1>ProcessSetpointInterface<a class="headerlink" href="#processsetpointinterface" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ProcessSetpointInterface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qudi_main_weakref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">qudi.interface.process_control_interface._ProcessControlInterfaceBase</span></code></p>
+<p>A simple interface to control the setpoint for one or multiple process values.</p>
+<p>This interface is in fact a very general/universal interface that can be used for a lot of
+things. It can be used to interface any hardware where one to control one or multiple control
+values, like a temperature or how much a PhD student get paid.</p>
+<p class="rubric">Initialization</p>
+<p>Initialise Base instance. Set up its state machine and initialize ConfigOption meta
+attributes from given config.</p>
+<p class="rubric" id="parameters">Parameters</p>
+<p>self : object
+The object being initialized.
+name : str
+Unique name for this module instance.
+configuration : dict
+Parameters from the configuration file.
+callbacks : dict
+Dictionary specifying functions to be run on state machine transitions.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.set_setpoint">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_setpoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">qudi.interface.process_control_interface._Real</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.set_setpoint" title="Link to this definition">¶</a></dt>
+<dd><p>Set new setpoint for a single channel</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.get_setpoint">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_setpoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">qudi.interface.process_control_interface._Real</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.get_setpoint" title="Link to this definition">¶</a></dt>
+<dd><p>Get current setpoint for a single channel</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.setpoints">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setpoints</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">qudi.interface.process_control_interface._Real</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.setpoints" title="Link to this definition">¶</a></dt>
+<dd><p>The current setpoints (values) for all channels (keys)</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.constraints">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">constraints</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlConstraints.ProcessControlConstraints" title="qudi.interface.process_control_interface.ProcessControlConstraints"><span class="pre">qudi.interface.process_control_interface.ProcessControlConstraints</span></a></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.constraints" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.set_activity_state">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_activity_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.set_activity_state" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.get_activity_state">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_activity_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.get_activity_state" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.activity_states">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">activity_states</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.activity_states" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.move_to_main_thread">
+<span class="sig-name descname"><span class="pre">move_to_main_thread</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.move_to_main_thread" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.module_thread">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_thread</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">PySide2.QtCore.QThread</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.module_thread" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.module_name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.module_name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.module_base">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_base</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.module_base" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.module_uuid">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_uuid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">uuid.UUID</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.module_uuid" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.module_default_data_dir">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_default_data_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.module_default_data_dir" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.module_status_variables">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_status_variables</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.module_status_variables" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.log">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">log</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">logging.Logger</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.log" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.is_module_threaded">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_module_threaded</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.is_module_threaded" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.connect_modules">
+<span class="sig-name descname"><span class="pre">connect_modules</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connections</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.connect_modules" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.disconnect_modules">
+<span class="sig-name descname"><span class="pre">disconnect_modules</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.disconnect_modules" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.on_activate">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_activate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.on_activate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.on_deactivate">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_deactivate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface.on_deactivate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ProcessValueInterface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qudi_main_weakref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">qudi.interface.process_control_interface._ProcessControlInterfaceBase</span></code></p>
+<p>A simple interface to read one or multiple process values.</p>
+<p>This interface is in fact a very general/universal interface that can be used for a lot of
+things. It can be used to interface any hardware where one to control one or multiple control
+values, like a temperature or how much a PhD student get paid.</p>
+<p class="rubric">Initialization</p>
+<p>Initialise Base instance. Set up its state machine and initialize ConfigOption meta
+attributes from given config.</p>
+<p class="rubric" id="id1">Parameters</p>
+<p>self : object
+The object being initialized.
+name : str
+Unique name for this module instance.
+configuration : dict
+Parameters from the configuration file.
+callbacks : dict
+Dictionary specifying functions to be run on state machine transitions.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface.get_process_value">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_process_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">qudi.interface.process_control_interface._Real</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface.get_process_value" title="Link to this definition">¶</a></dt>
+<dd><p>Get current process value for a single channel</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface.process_values">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">process_values</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">qudi.interface.process_control_interface._Real</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface.process_values" title="Link to this definition">¶</a></dt>
+<dd><p>Read-Only property returning a snapshot of current process values (values) for all
+channels (keys).</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface.constraints">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">constraints</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlConstraints.ProcessControlConstraints" title="qudi.interface.process_control_interface.ProcessControlConstraints"><span class="pre">qudi.interface.process_control_interface.ProcessControlConstraints</span></a></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface.constraints" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface.set_activity_state">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_activity_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface.set_activity_state" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface.get_activity_state">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_activity_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface.get_activity_state" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface.activity_states">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">activity_states</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface.activity_states" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface.move_to_main_thread">
+<span class="sig-name descname"><span class="pre">move_to_main_thread</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface.move_to_main_thread" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface.module_thread">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_thread</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">PySide2.QtCore.QThread</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface.module_thread" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface.module_name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface.module_name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface.module_base">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_base</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface.module_base" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface.module_uuid">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_uuid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">uuid.UUID</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface.module_uuid" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface.module_default_data_dir">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_default_data_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface.module_default_data_dir" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface.module_status_variables">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_status_variables</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface.module_status_variables" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface.log">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">log</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">logging.Logger</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface.log" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface.is_module_threaded">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_module_threaded</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface.is_module_threaded" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface.connect_modules">
+<span class="sig-name descname"><span class="pre">connect_modules</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connections</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface.connect_modules" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface.disconnect_modules">
+<span class="sig-name descname"><span class="pre">disconnect_modules</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface.disconnect_modules" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface.on_activate">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_activate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface.on_activate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface.on_deactivate">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_deactivate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface.on_deactivate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ProcessControlInterface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qudi_main_weakref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessSetpointInterface.ProcessSetpointInterface" title="qudi.interface.process_control_interface.ProcessSetpointInterface"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qudi.interface.process_control_interface.ProcessSetpointInterface</span></code></a>, <a class="reference internal" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessValueInterface.ProcessValueInterface" title="qudi.interface.process_control_interface.ProcessValueInterface"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qudi.interface.process_control_interface.ProcessValueInterface</span></code></a></p>
+<p>A simple interface to control the setpoints for and read one or multiple process values.</p>
+<p>This interface is in fact a very general/universal interface that can be used for a lot of
+things. It can be used to interface any hardware where one to control one or multiple control
+values, like a temperature or how much a PhD student get paid.</p>
+<p class="rubric">Initialization</p>
+<p>Initialise Base instance. Set up its state machine and initialize ConfigOption meta
+attributes from given config.</p>
+<p class="rubric" id="id2">Parameters</p>
+<p>self : object
+The object being initialized.
+name : str
+Unique name for this module instance.
+configuration : dict
+Parameters from the configuration file.
+callbacks : dict
+Dictionary specifying functions to be run on state machine transitions.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.set_setpoint">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_setpoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">qudi.interface.process_control_interface._Real</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.set_setpoint" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.get_setpoint">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_setpoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">qudi.interface.process_control_interface._Real</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.get_setpoint" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.setpoints">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setpoints</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">qudi.interface.process_control_interface._Real</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.setpoints" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.constraints">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">constraints</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlConstraints.ProcessControlConstraints" title="qudi.interface.process_control_interface.ProcessControlConstraints"><span class="pre">qudi.interface.process_control_interface.ProcessControlConstraints</span></a></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.constraints" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.set_activity_state">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_activity_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.set_activity_state" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.get_activity_state">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_activity_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.get_activity_state" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.activity_states">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">activity_states</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.activity_states" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.move_to_main_thread">
+<span class="sig-name descname"><span class="pre">move_to_main_thread</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.move_to_main_thread" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.module_thread">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_thread</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">PySide2.QtCore.QThread</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.module_thread" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.module_name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.module_name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.module_base">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_base</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.module_base" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.module_uuid">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_uuid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">uuid.UUID</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.module_uuid" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.module_default_data_dir">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_default_data_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.module_default_data_dir" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.module_status_variables">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_status_variables</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.module_status_variables" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.log">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">log</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">logging.Logger</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.log" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.is_module_threaded">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_module_threaded</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.is_module_threaded" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.connect_modules">
+<span class="sig-name descname"><span class="pre">connect_modules</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connections</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.connect_modules" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.disconnect_modules">
+<span class="sig-name descname"><span class="pre">disconnect_modules</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.disconnect_modules" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.on_activate">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_activate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.on_activate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.on_deactivate">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_deactivate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.on_deactivate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.get_process_value">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_process_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">qudi.interface.process_control_interface._Real</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.get_process_value" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.process_values">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">process_values</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">qudi.interface.process_control_interface._Real</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface.process_values" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlConstraints.ProcessControlConstraints">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ProcessControlConstraints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">setpoint_channels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process_channels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">qudi.interface.process_control_interface._Real</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">qudi.interface.process_control_interface._Real</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtypes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlConstraints.ProcessControlConstraints" title="Link to this definition">¶</a></dt>
+<dd><p>Data object holding the constraints for a set of process/setpoint channels.</p>
+<p class="rubric">Initialization</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlConstraints.ProcessControlConstraints.all_channels">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">all_channels</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlConstraints.ProcessControlConstraints.all_channels" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlConstraints.ProcessControlConstraints.setpoint_channels">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setpoint_channels</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlConstraints.ProcessControlConstraints.setpoint_channels" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlConstraints.ProcessControlConstraints.process_channels">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">process_channels</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlConstraints.ProcessControlConstraints.process_channels" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlConstraints.ProcessControlConstraints.channel_units">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">channel_units</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlConstraints.ProcessControlConstraints.channel_units" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlConstraints.ProcessControlConstraints.channel_limits">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">channel_limits</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">qudi.interface.process_control_interface._Real</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">qudi.interface.process_control_interface._Real</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlConstraints.ProcessControlConstraints.channel_limits" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlConstraints.ProcessControlConstraints.channel_dtypes">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">channel_dtypes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlConstraints.ProcessControlConstraints.channel_dtypes" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlConstraints.ProcessControlConstraints.channel_value_in_range">
+<span class="sig-name descname"><span class="pre">channel_value_in_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">qudi.interface.process_control_interface._Real</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">qudi.interface.process_control_interface._Real</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/process_control_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlConstraints.ProcessControlConstraints.channel_value_in_range" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          <div class="page-nav">
+            <div class="inner"><ul class="page-nav">
+  <li class="prev">
+    <a href="pid_controller_interface.html"
+       title="previous chapter">← PIDControllerInterface</a>
+  </li>
+  <li class="next">
+    <a href="pulser_interface.html"
+       title="next chapter">PulserInterface →</a>
+  </li>
+</ul><div class="footer" role="contentinfo">
+      &#169; Copyright 2025, Molecular Quantum Nanophotonics Lab @ LENS.
+    <br>
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.1.3 with <a href="https://github.com/schettino72/sphinx_press_theme">Press Theme</a> 0.9.1.
+</div>
+            </div>
+          </div>
+      </page>
+    </div></div>
+    
+    
+  </body>
+</html>

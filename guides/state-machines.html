@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html  lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+      <title>Guide: Writing state machines for hardwares or logics</title>
+    
+          <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+          <link rel="stylesheet" href="../_static/theme.css " type="text/css" />
+          <link rel="stylesheet" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" type="text/css" />
+          <link rel="stylesheet" href="../_static/exercise.css" type="text/css" />
+      
+      <!-- sphinx script_files -->
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+
+      
+      <!-- bundled in js (rollup iife) -->
+      <!-- <script src="../_static/theme-vendors.js"></script> -->
+      <script src="../_static/theme.js" defer></script>
+    
+      <link rel="shortcut icon" href="../../_static/logo.png"/>
+  <link rel="index" title="Index" href="../genindex.html" />
+  <link rel="search" title="Search" href="../search.html" />
+  <link rel="next" title="Setting up confocal scanning" href="../iqo-docs/setup_confocal_scanning.html" />
+  <link rel="prev" title="Guide: performing excitation spectroscopy" href="excitation-spectroscopy.html" /> 
+  </head>
+
+  <body>
+    <div id="app">
+    <div class="theme-container" :class="pageClasses"><navbar @toggle-sidebar="toggleSidebar">
+  <router-link to="../index.html" class="home-link">
+    
+      <span class="site-name">Qudi Lab on a molecule modules</span>
+    
+  </router-link>
+
+  <div class="links">
+    <navlinks class="can-hide">
+
+  
+    <div class="nav-item">
+      <a href="../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link  router-link-active">
+         Tutorials:
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+    </navlinks>
+  </div>
+</navbar>
+
+      
+      <div class="sidebar-mask" @click="toggleSidebar(false)">
+      </div>
+        <sidebar @toggle-sidebar="toggleSidebar">
+          
+          <navlinks>
+            
+
+  
+    <div class="nav-item">
+      <a href="../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link  router-link-active">
+         Tutorials:
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+            
+          </navlinks><div id="searchbox" class="searchbox" role="search">
+  <div class="caption"><span class="caption-text">Quick search</span>
+    <div class="searchformwrapper">
+      <form class="search" action="../search.html" method="get">
+        <input type="text" name="q" />
+        <input type="submit" value="Search" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div><div class="sidebar-links" role="navigation" aria-label="main navigation">
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../index.html#qudi-lab-on-a-molecule-modules-documentation">Tutorials:</a></span>
+      </p>
+      <ul class="current">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../Crash%20course%20into%20Qudi.html" class="reference internal ">    Tutorial: a crash course into Qudi</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="excitation-spectroscopy.html" class="reference internal ">    Guide: Excitation spectroscopy</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 current">
+            
+              <a href="#" class="reference internal current">    Guide: State machines</a>
+            
+
+            
+              <ul>
+                
+                  <li class="toctree-l2"><a href="#guide-writing-state-machines-for-hardwares-or-logics" class="reference internal">Guide: Writing state machines for hardwares or logics</a></li>
+                
+              </ul>
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../iqo-docs/setup_confocal_scanning.html" class="reference internal ">    Guide: Setting up confocal scanning</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../iqo-docs/setup_odmr.html" class="reference internal ">    Guide: Setting up ODMR</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../iqo-docs/setup_timeseries.html" class="reference internal ">    Guide: Setting up time series</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../index.html#qudi-lab-on-a-molecule-modules-documentation">Contents:</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../installation.html" class="reference internal ">Installation</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../changelog-lens.html" class="reference internal ">Lens's changelog</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../modules/index.html" class="reference internal ">Documentation of all modules</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../iqo-docs/changelog.html" class="reference internal ">Ulm IQO's changelog (parent repository)</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../programming-guides.html" class="reference internal ">Programming guides: writing your own modules and understanding our hardwares.</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../iqo-docs/iqo-specifics.html" class="reference internal ">Ulm IQO's specific guides</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+</div>
+        </sidebar>
+
+      <page>
+          <div class="body-header" role="navigation" aria-label="navigation">
+  
+  <ul class="breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+    
+    <li>Guide: Writing state machines for hardwares or logics</li>
+  </ul>
+  
+
+  <ul class="page-nav">
+  <li class="prev">
+    <a href="excitation-spectroscopy.html"
+       title="previous chapter">← Guide: performing excitation spectroscopy</a>
+  </li>
+  <li class="next">
+    <a href="../iqo-docs/setup_confocal_scanning.html"
+       title="next chapter">Setting up confocal scanning →</a>
+  </li>
+</ul>
+  
+</div>
+<hr>
+          <div class="content" role="main" v-pre>
+            
+  <section id="guide-writing-state-machines-for-hardwares-or-logics">
+<h1>Guide: Writing state machines for hardwares or logics<a class="headerlink" href="#guide-writing-state-machines-for-hardwares-or-logics" title="Link to this heading">¶</a></h1>
+<p>For convenience, it can be useful to implement a hardware or a logic as a <a class="reference external" href="https://en.wikipedia.org/wiki/Finite-state_machine">finite state machine</a> that runs in the background. This can be done by implementing the <a class="reference internal" href="../modules/interface/sampled_finite_state_interface.html"><span class="doc std std-doc"><code class="docutils literal notranslate"><span class="pre">SampledFiniteStateInterface</span></code></span></a>. You can refer to the linked documentation for details. An example of finite state interface implementation can be found in the <code class="docutils literal notranslate"><span class="pre">ExcitationScannerDummy</span></code> hardware documented below.</p>
+<p>It implements the following finite state machine:</p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 14.0.5 (0)
+ -->
+<!-- Title: statemachine_ExcitationScannerDummy Pages: 1 -->
+<svg width="267pt" height="476pt"
+ viewBox="0.00 0.00 267.00 476.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 472)">
+<title>statemachine_ExcitationScannerDummy</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-472 262.94,-472 262.94,4 -4,4"/>
+<!-- prepare_idle -->
+<g id="node1" class="node">
+<title>prepare_idle</title>
+<g id="a_node1"><a xlink:href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.prepare_idle" xlink:title="None">
+<polygon fill="none" stroke="black" points="192.31,-396 111.81,-396 111.81,-360 192.31,-360 192.31,-396"/>
+<text xml:space="preserve" text-anchor="middle" x="152.06" y="-372.95" font-family="Times,serif" font-size="14.00">prepare idle</text>
+</a>
+</g>
+</g>
+<!-- idle -->
+<g id="node2" class="node">
+<title>idle</title>
+<g id="a_node2"><a xlink:href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.idle" xlink:title="None">
+<polygon fill="none" stroke="black" points="77.06,-324 23.06,-324 23.06,-288 77.06,-288 77.06,-324"/>
+<text xml:space="preserve" text-anchor="middle" x="50.06" y="-300.95" font-family="Times,serif" font-size="14.00">idle</text>
+</a>
+</g>
+</g>
+<!-- prepare_idle&#45;&gt;idle -->
+<g id="edge6" class="edge">
+<title>prepare_idle&#45;&gt;idle</title>
+<path fill="none" stroke="black" d="M111.46,-372C83.01,-372 50.06,-372 50.06,-372 50.06,-372 50.06,-335.9 50.06,-335.9"/>
+<polygon fill="black" stroke="black" points="53.56,-335.9 50.06,-325.9 46.56,-335.9 53.56,-335.9"/>
+<text xml:space="preserve" text-anchor="middle" x="37.58" y="-375.2" font-family="Times,serif" font-size="14.00">start_idle</text>
+</g>
+<!-- prepare_scan -->
+<g id="node3" class="node">
+<title>prepare_scan</title>
+<g id="a_node3"><a xlink:href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.prepare_scan" xlink:title="None">
+<polygon fill="none" stroke="black" points="115.19,-252 30.94,-252 30.94,-216 115.19,-216 115.19,-252"/>
+<text xml:space="preserve" text-anchor="middle" x="73.06" y="-228.95" font-family="Times,serif" font-size="14.00">prepare scan</text>
+</a>
+</g>
+</g>
+<!-- idle&#45;&gt;prepare_scan -->
+<g id="edge7" class="edge">
+<title>idle&#45;&gt;prepare_scan</title>
+<path fill="none" stroke="black" d="M54,-287.83C54,-287.83 54,-263.93 54,-263.93"/>
+<polygon fill="black" stroke="black" points="57.5,-263.93 54,-253.93 50.5,-263.93 57.5,-263.93"/>
+<text xml:space="preserve" text-anchor="middle" x="27" y="-262.58" font-family="Times,serif" font-size="14.00">start_scan</text>
+</g>
+<!-- prepare_scan&#45;&gt;prepare_idle -->
+<g id="edge2" class="edge">
+<title>prepare_scan&#45;&gt;prepare_idle</title>
+<path fill="none" stroke="black" d="M94.44,-252.39C94.44,-292.45 94.44,-384 94.44,-384 94.44,-384 99.9,-384 99.9,-384"/>
+<polygon fill="black" stroke="black" points="99.9,-387.5 109.9,-384 99.9,-380.5 99.9,-387.5"/>
+<text xml:space="preserve" text-anchor="middle" x="133.06" y="-324.13" font-family="Times,serif" font-size="14.00">interrupt_scan</text>
+</g>
+<!-- prepare_step -->
+<g id="node4" class="node">
+<title>prepare_step</title>
+<g id="a_node4"><a xlink:href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.prepare_step" xlink:title="None">
+<polygon fill="none" stroke="black" points="171.06,-180 89.06,-180 89.06,-144 171.06,-144 171.06,-180"/>
+<text xml:space="preserve" text-anchor="middle" x="130.06" y="-156.95" font-family="Times,serif" font-size="14.00">prepare step</text>
+</a>
+</g>
+</g>
+<!-- prepare_scan&#45;&gt;prepare_step -->
+<g id="edge8" class="edge">
+<title>prepare_scan&#45;&gt;prepare_step</title>
+<path fill="none" stroke="black" d="M102.12,-215.83C102.12,-215.83 102.12,-191.93 102.12,-191.93"/>
+<polygon fill="black" stroke="black" points="105.63,-191.93 102.13,-181.93 98.63,-191.93 105.63,-191.93"/>
+<text xml:space="preserve" text-anchor="middle" x="52.62" y="-190.58" font-family="Times,serif" font-size="14.00">start_prepare_step</text>
+</g>
+<!-- prepare_step&#45;&gt;prepare_idle -->
+<g id="edge3" class="edge">
+<title>prepare_step&#45;&gt;prepare_idle</title>
+<path fill="none" stroke="black" d="M133.81,-180.42C133.81,-180.42 133.81,-348.12 133.81,-348.12"/>
+<polygon fill="black" stroke="black" points="130.31,-348.12 133.81,-358.12 137.31,-348.12 130.31,-348.12"/>
+<text xml:space="preserve" text-anchor="middle" x="95.19" y="-267.47" font-family="Times,serif" font-size="14.00">interrupt_scan</text>
+</g>
+<!-- prepare_step&#45;&gt;prepare_idle -->
+<g id="edge9" class="edge">
+<title>prepare_step&#45;&gt;prepare_idle</title>
+<path fill="none" stroke="black" d="M152.44,-180.42C152.44,-180.42 152.44,-348.12 152.44,-348.12"/>
+<polygon fill="black" stroke="black" points="148.94,-348.12 152.44,-358.12 155.94,-348.12 148.94,-348.12"/>
+<text xml:space="preserve" text-anchor="middle" x="180.94" y="-267.47" font-family="Times,serif" font-size="14.00">scan_done</text>
+</g>
+<!-- wait_ready -->
+<g id="node5" class="node">
+<title>wait_ready</title>
+<g id="a_node5"><a xlink:href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.wait_ready" xlink:title="None">
+<polygon fill="none" stroke="black" points="219.56,-108 146.56,-108 146.56,-72 219.56,-72 219.56,-108"/>
+<text xml:space="preserve" text-anchor="middle" x="183.06" y="-84.95" font-family="Times,serif" font-size="14.00">wait ready</text>
+</a>
+</g>
+</g>
+<!-- prepare_step&#45;&gt;wait_ready -->
+<g id="edge10" class="edge">
+<title>prepare_step&#45;&gt;wait_ready</title>
+<path fill="none" stroke="black" d="M158.81,-143.83C158.81,-143.83 158.81,-119.93 158.81,-119.93"/>
+<polygon fill="black" stroke="black" points="162.31,-119.93 158.81,-109.93 155.31,-119.93 162.31,-119.93"/>
+<text xml:space="preserve" text-anchor="middle" x="113.81" y="-118.58" font-family="Times,serif" font-size="14.00">start_wait_ready</text>
+</g>
+<!-- wait_ready&#45;&gt;prepare_idle -->
+<g id="edge4" class="edge">
+<title>wait_ready&#45;&gt;prepare_idle</title>
+<path fill="none" stroke="black" d="M181.69,-108.45C181.69,-108.45 181.69,-348.19 181.69,-348.19"/>
+<polygon fill="black" stroke="black" points="178.19,-348.19 181.69,-358.19 185.19,-348.19 178.19,-348.19"/>
+<text xml:space="preserve" text-anchor="middle" x="220.31" y="-231.52" font-family="Times,serif" font-size="14.00">interrupt_scan</text>
+</g>
+<!-- record_scan_step -->
+<g id="node6" class="node">
+<title>record_scan_step</title>
+<g id="a_node6"><a xlink:href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.record_scan_step" xlink:title="None">
+<polygon fill="none" stroke="black" points="234.94,-36 131.19,-36 131.19,0 234.94,0 234.94,-36"/>
+<text xml:space="preserve" text-anchor="middle" x="183.06" y="-12.95" font-family="Times,serif" font-size="14.00">record scan step</text>
+</a>
+</g>
+</g>
+<!-- wait_ready&#45;&gt;record_scan_step -->
+<g id="edge11" class="edge">
+<title>wait_ready&#45;&gt;record_scan_step</title>
+<path fill="none" stroke="black" d="M183.06,-71.83C183.06,-71.83 183.06,-47.93 183.06,-47.93"/>
+<polygon fill="black" stroke="black" points="186.56,-47.93 183.06,-37.93 179.56,-47.93 186.56,-47.93"/>
+<text xml:space="preserve" text-anchor="middle" x="141.81" y="-46.58" font-family="Times,serif" font-size="14.00">start_scan_step</text>
+</g>
+<!-- record_scan_step&#45;&gt;prepare_idle -->
+<g id="edge5" class="edge">
+<title>record_scan_step&#45;&gt;prepare_idle</title>
+<path fill="none" stroke="black" d="M227.25,-36.35C227.25,-109.71 227.25,-378 227.25,-378 227.25,-378 204.25,-378 204.25,-378"/>
+<polygon fill="black" stroke="black" points="204.25,-374.5 194.25,-378 204.25,-381.5 204.25,-374.5"/>
+<text xml:space="preserve" text-anchor="middle" x="188.62" y="-205.37" font-family="Times,serif" font-size="14.00">interrupt_scan</text>
+</g>
+<!-- record_scan_step&#45;&gt;prepare_step -->
+<g id="edge12" class="edge">
+<title>record_scan_step&#45;&gt;prepare_step</title>
+<path fill="none" stroke="black" d="M138.88,-36.24C138.88,-36.24 138.88,-132.4 138.88,-132.4"/>
+<polygon fill="black" stroke="black" points="135.38,-132.4 138.88,-142.4 142.38,-132.4 135.38,-132.4"/>
+<text xml:space="preserve" text-anchor="middle" x="111.5" y="-87.52" font-family="Times,serif" font-size="14.00">step_done</text>
+</g>
+<!-- begin -->
+<g id="node7" class="node">
+<title>begin</title>
+<polygon fill="none" stroke="black" points="179.06,-468 125.06,-468 125.06,-432 179.06,-432 179.06,-468"/>
+<text xml:space="preserve" text-anchor="middle" x="152.06" y="-444.95" font-family="Times,serif" font-size="14.00">begin</text>
+</g>
+<!-- begin&#45;&gt;prepare_idle -->
+<g id="edge1" class="edge">
+<title>begin&#45;&gt;prepare_idle</title>
+<path fill="none" stroke="black" d="M152.06,-431.83C152.06,-431.83 152.06,-407.93 152.06,-407.93"/>
+<polygon fill="black" stroke="black" points="155.56,-407.93 152.06,-397.93 148.56,-407.93 155.56,-407.93"/>
+<text xml:space="preserve" text-anchor="middle" x="133.69" y="-406.58" font-family="Times,serif" font-size="14.00">startup</text>
+</g>
+</g>
+</svg>
+<map id="statemachine_ExcitationScannerDummy" name="statemachine_ExcitationScannerDummy">
+<area shape="rect" id="node1" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.prepare_idle" title="None" alt="" coords="154,101,262,149"/>
+<area shape="rect" id="node2" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.idle" title="None" alt="" coords="36,197,108,245"/>
+<area shape="rect" id="node3" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.prepare_scan" title="None" alt="" coords="47,293,159,341"/>
+<area shape="rect" id="node4" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.prepare_step" title="None" alt="" coords="124,389,233,437"/>
+<area shape="rect" id="node5" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.wait_ready" title="None" alt="" coords="201,485,298,533"/>
+<area shape="rect" id="node6" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.record_scan_step" title="None" alt="" coords="180,581,319,629"/>
+</map>
+<dl class="py class">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ExcitationScannerDummy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../modules/interface/excitation_scanner_interface.html#qudi.interface.excitation_scanner_interface.qudi.interface.excitation_scanner_interface.ExcitationScannerInterface.ExcitationScannerInterface" title="qudi.interface.excitation_scanner_interface.ExcitationScannerInterface"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qudi.interface.excitation_scanner_interface.ExcitationScannerInterface</span></code></a>, <a class="reference internal" href="../modules/interface/sampled_finite_state_interface.html#qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface" title="qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface</span></code></a></p>
+<p>Copy and paste configuration example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="n">excitation_scanner_hardware</span><span class="p">:</span>
+    <span class="n">module</span><span class="o">.</span><span class="n">Class</span><span class="p">:</span> <span class="s1">&#39;dummy.excitation_scanner_dummy.ExcitationScannerDummy&#39;</span>
+    <span class="n">options</span><span class="p">:</span>
+      <span class="n">watchdog_delay</span><span class="p">:</span> <span class="mf">0.2</span> <span class="c1"># default</span>
+</pre></div>
+</div>
+<p class="rubric">Initialization</p>
+<p>Initialise Base instance. Set up its state machine and initialize ConfigOption meta
+attributes from given config.</p>
+<p class="rubric" id="parameters">Parameters</p>
+<p>self : object
+The object being initialized.
+name : str
+Unique name for this module instance.
+configuration : dict
+Parameters from the configuration file.
+callbacks : dict
+Dictionary specifying functions to be run on state machine transitions.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.on_activate">
+<span class="sig-name descname"><span class="pre">on_activate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.on_activate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.on_deactivate">
+<span class="sig-name descname"><span class="pre">on_deactivate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.on_deactivate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.scan_running">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">scan_running</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.scan_running" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.state_display">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">state_display</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.state_display" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.start_scan">
+<span class="sig-name descname"><span class="pre">start_scan</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.start_scan" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.stop_scan">
+<span class="sig-name descname"><span class="pre">stop_scan</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.stop_scan" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.constraints">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">constraints</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.constraints" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.set_control">
+<span class="sig-name descname"><span class="pre">set_control</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.set_control" title="Link to this definition">¶</a></dt>
+<dd><p>Set a control variable value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.get_control">
+<span class="sig-name descname"><span class="pre">get_control</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.get_control" title="Link to this definition">¶</a></dt>
+<dd><p>Get a control variable value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.get_current_data">
+<span class="sig-name descname"><span class="pre">get_current_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.get_current_data" title="Link to this definition">¶</a></dt>
+<dd><p>Return current scan data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.set_exposure_time">
+<span class="sig-name descname"><span class="pre">set_exposure_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.set_exposure_time" title="Link to this definition">¶</a></dt>
+<dd><p>Set exposure time for one data point.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.set_repeat_number">
+<span class="sig-name descname"><span class="pre">set_repeat_number</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.set_repeat_number" title="Link to this definition">¶</a></dt>
+<dd><p>Set number of repetition of each segment of the scan.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.set_idle_value">
+<span class="sig-name descname"><span class="pre">set_idle_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.set_idle_value" title="Link to this definition">¶</a></dt>
+<dd><p>Set idle value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.get_exposure_time">
+<span class="sig-name descname"><span class="pre">get_exposure_time</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.get_exposure_time" title="Link to this definition">¶</a></dt>
+<dd><p>Get exposure time for one data point.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.get_repeat_number">
+<span class="sig-name descname"><span class="pre">get_repeat_number</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.get_repeat_number" title="Link to this definition">¶</a></dt>
+<dd><p>Get number of repetition of each segment of the scan.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.get_idle_value">
+<span class="sig-name descname"><span class="pre">get_idle_value</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.get_idle_value" title="Link to this definition">¶</a></dt>
+<dd><p>Get idle value.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.data_format">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">data_format</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">qudi.interface.excitation_scanner_interface.ExcitationScanDataFormat</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.data_format" title="Link to this definition">¶</a></dt>
+<dd><p>Return the data format used in this implementation of the interface.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.prepare_idle">
+<span class="sig-name descname"><span class="pre">prepare_idle</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.prepare_idle" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.idle">
+<span class="sig-name descname"><span class="pre">idle</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.idle" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.prepare_scan">
+<span class="sig-name descname"><span class="pre">prepare_scan</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.prepare_scan" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.prepare_step">
+<span class="sig-name descname"><span class="pre">prepare_step</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.prepare_step" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.wait_ready">
+<span class="sig-name descname"><span class="pre">wait_ready</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.wait_ready" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.record_scan_step">
+<span class="sig-name descname"><span class="pre">record_scan_step</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.record_scan_step" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.control_dict">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">control_dict</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">collections.OrderedDict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../modules/interface/excitation_scanner_interface.html#qudi.interface.excitation_scanner_interface.qudi.interface.excitation_scanner_interface.ExcitationScanControlValue.ExcitationScanControlValue" title="qudi.interface.excitation_scanner_interface.ExcitationScanControlValue"><span class="pre">qudi.interface.excitation_scanner_interface.ExcitationScanControlValue</span></a><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.control_dict" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.frequency_column_number">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frequency_column_number</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.frequency_column_number" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.step_number_column_number">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">step_number_column_number</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.step_number_column_number" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.time_column_number">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">time_column_number</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.time_column_number" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.move_to_main_thread">
+<span class="sig-name descname"><span class="pre">move_to_main_thread</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.move_to_main_thread" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.module_thread">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_thread</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">PySide2.QtCore.QThread</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.module_thread" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.module_name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.module_name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.module_base">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_base</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.module_base" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.module_uuid">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_uuid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">uuid.UUID</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.module_uuid" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.module_default_data_dir">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_default_data_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.module_default_data_dir" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.module_status_variables">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_status_variables</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.module_status_variables" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.log">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">log</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">logging.Logger</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.log" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.is_module_threaded">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_module_threaded</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.is_module_threaded" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.connect_modules">
+<span class="sig-name descname"><span class="pre">connect_modules</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connections</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.connect_modules" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.disconnect_modules">
+<span class="sig-name descname"><span class="pre">disconnect_modules</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.disconnect_modules" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.sig_on_event">
+<span class="sig-name descname"><span class="pre">sig_on_event</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.sig_on_event" title="Link to this definition">¶</a></dt>
+<dd><p>‘Signal(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.sig_on_state">
+<span class="sig-name descname"><span class="pre">sig_on_state</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.sig_on_state" title="Link to this definition">¶</a></dt>
+<dd><p>‘Signal(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.sig_start_watchdog">
+<span class="sig-name descname"><span class="pre">sig_start_watchdog</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.sig_start_watchdog" title="Link to this definition">¶</a></dt>
+<dd><p>‘Signal(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.sig_stop_watchdog">
+<span class="sig-name descname"><span class="pre">sig_stop_watchdog</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.sig_stop_watchdog" title="Link to this definition">¶</a></dt>
+<dd><p>‘Signal(…)’</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.watchdog_state">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">watchdog_state</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.watchdog_state" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.watchdog_event">
+<span class="sig-name descname"><span class="pre">watchdog_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.watchdog_event" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.enable_watchdog">
+<span class="sig-name descname"><span class="pre">enable_watchdog</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.enable_watchdog" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.disable_watchdog">
+<span class="sig-name descname"><span class="pre">disable_watchdog</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.disable_watchdog" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.start_watchdog">
+<span class="sig-name descname"><span class="pre">start_watchdog</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.start_watchdog" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.stop_watchdog">
+<span class="sig-name descname"><span class="pre">stop_watchdog</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/dummy/excitation_scanner_dummy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.dummy.excitation_scanner_dummy.qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.ExcitationScannerDummy.stop_watchdog" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          <div class="page-nav">
+            <div class="inner"><ul class="page-nav">
+  <li class="prev">
+    <a href="excitation-spectroscopy.html"
+       title="previous chapter">← Guide: performing excitation spectroscopy</a>
+  </li>
+  <li class="next">
+    <a href="../iqo-docs/setup_confocal_scanning.html"
+       title="next chapter">Setting up confocal scanning →</a>
+  </li>
+</ul><div class="footer" role="contentinfo">
+      &#169; Copyright 2025, Molecular Quantum Nanophotonics Lab @ LENS.
+    <br>
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.1.3 with <a href="https://github.com/schettino72/sphinx_press_theme">Press Theme</a> 0.9.1.
+</div>
+            </div>
+          </div>
+      </page>
+    </div></div>
+    
+    
+  </body>
+</html>

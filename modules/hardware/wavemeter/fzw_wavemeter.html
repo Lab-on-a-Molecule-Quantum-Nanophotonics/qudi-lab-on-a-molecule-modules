@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html  lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+      <title>Moglabs Fizeau wavemeter</title>
+    
+          <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+          <link rel="stylesheet" href="../../../_static/theme.css " type="text/css" />
+          <link rel="stylesheet" href="../../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" type="text/css" />
+          <link rel="stylesheet" href="../../../_static/exercise.css" type="text/css" />
+      
+      <!-- sphinx script_files -->
+        <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+
+      
+      <!-- bundled in js (rollup iife) -->
+      <!-- <script src="../../../_static/theme-vendors.js"></script> -->
+      <script src="../../../_static/theme.js" defer></script>
+    
+      <link rel="shortcut icon" href="../../../../../../_static/logo.png"/>
+  <link rel="index" title="Index" href="../../../genindex.html" />
+  <link rel="search" title="Search" href="../../../search.html" />
+  <link rel="next" title="Logics" href="../../logic.html" />
+  <link rel="prev" title="Moglabs CEM laser" href="../excitation_scanners/moglabs.html" /> 
+  </head>
+
+  <body>
+    <div id="app">
+    <div class="theme-container" :class="pageClasses"><navbar @toggle-sidebar="toggleSidebar">
+  <router-link to="../../../index.html" class="home-link">
+    
+      <span class="site-name">Qudi Lab on a molecule modules</span>
+    
+  </router-link>
+
+  <div class="links">
+    <navlinks class="can-hide">
+
+  
+    <div class="nav-item">
+      <a href="../../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Tutorials:
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="../../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+    </navlinks>
+  </div>
+</navbar>
+
+      
+      <div class="sidebar-mask" @click="toggleSidebar(false)">
+      </div>
+        <sidebar @toggle-sidebar="toggleSidebar">
+          
+          <navlinks>
+            
+
+  
+    <div class="nav-item">
+      <a href="../../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Tutorials:
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="../../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+            
+          </navlinks><div id="searchbox" class="searchbox" role="search">
+  <div class="caption"><span class="caption-text">Quick search</span>
+    <div class="searchformwrapper">
+      <form class="search" action="../../../search.html" method="get">
+        <input type="text" name="q" />
+        <input type="submit" value="Search" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div><div class="sidebar-links" role="navigation" aria-label="main navigation">
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../../../index.html#qudi-lab-on-a-molecule-modules-documentation">Tutorials:</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../../Crash%20course%20into%20Qudi.html" class="reference internal ">    Tutorial: a crash course into Qudi</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../../guides/excitation-spectroscopy.html" class="reference internal ">    Guide: Excitation spectroscopy</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../../guides/state-machines.html" class="reference internal ">    Guide: State machines</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../../iqo-docs/setup_confocal_scanning.html" class="reference internal ">    Guide: Setting up confocal scanning</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../../iqo-docs/setup_odmr.html" class="reference internal ">    Guide: Setting up ODMR</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../../iqo-docs/setup_timeseries.html" class="reference internal ">    Guide: Setting up time series</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../../../index.html#qudi-lab-on-a-molecule-modules-documentation">Contents:</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../../installation.html" class="reference internal ">Installation</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../../changelog-lens.html" class="reference internal ">Lens's changelog</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../index.html" class="reference internal ">Documentation of all modules</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../../iqo-docs/changelog.html" class="reference internal ">Ulm IQO's changelog (parent repository)</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../../programming-guides.html" class="reference internal ">Programming guides: writing your own modules and understanding our hardwares.</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../../iqo-docs/iqo-specifics.html" class="reference internal ">Ulm IQO's specific guides</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+</div>
+        </sidebar>
+
+      <page>
+          <div class="body-header" role="navigation" aria-label="navigation">
+  
+  <ul class="breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+    
+      <li><a href="../../index.html">Documentation of all modules</a> &raquo;</li>
+    
+      <li><a href="../../hardware.html">Hardwares</a> &raquo;</li>
+    
+    <li>Moglabs Fizeau wavemeter</li>
+  </ul>
+  
+
+  <ul class="page-nav">
+  <li class="prev">
+    <a href="../excitation_scanners/moglabs.html"
+       title="previous chapter">← Moglabs CEM laser</a>
+  </li>
+  <li class="next">
+    <a href="../../logic.html"
+       title="next chapter">Logics →</a>
+  </li>
+</ul>
+  
+</div>
+<hr>
+          <div class="content" role="main" v-pre>
+            
+  <section id="moglabs-fizeau-wavemeter">
+<h1>Moglabs Fizeau wavemeter<a class="headerlink" href="#moglabs-fizeau-wavemeter" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MOGLabsFZW</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../../interface/data_instream_interface.html#qudi.interface.data_instream_interface.qudi.interface.data_instream_interface.DataInStreamInterface.DataInStreamInterface" title="qudi.interface.data_instream_interface.DataInStreamInterface"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qudi.interface.data_instream_interface.DataInStreamInterface</span></code></a>, <a class="reference internal" href="../../interface/switch_interface.html#qudi.interface.switch_interface.qudi.interface.switch_interface.SwitchInterface.SwitchInterface" title="qudi.interface.switch_interface.SwitchInterface"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qudi.interface.switch_interface.SwitchInterface</span></code></a>, <a class="reference internal" href="../../interface/finite_sampling_input_interface.html#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface" title="qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface</span></code></a>, <a class="reference internal" href="../../interface/process_control_interface.html#qudi.interface.process_control_interface.qudi.interface.process_control_interface.ProcessControlInterface.ProcessControlInterface" title="qudi.interface.process_control_interface.ProcessControlInterface"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qudi.interface.process_control_interface.ProcessControlInterface</span></code></a>, <a class="reference internal" href="../../interface/pid_controller_interface.html#qudi.interface.pid_controller_interface.qudi.interface.pid_controller_interface.PIDControllerInterface.PIDControllerInterface" title="qudi.interface.pid_controller_interface.PIDControllerInterface"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qudi.interface.pid_controller_interface.PIDControllerInterface</span></code></a></p>
+<p>A class to control our MOGLabs laser to perform excitation spectroscopy.
+Example config:</p>
+<p class="rubric">Initialization</p>
+<p>Initialise Base instance. Set up its state machine and initialize ConfigOption meta
+attributes from given config.</p>
+<p class="rubric" id="parameters">Parameters</p>
+<p>self : object
+The object being initialized.
+name : str
+Unique name for this module instance.
+configuration : dict
+Parameters from the configuration file.
+callbacks : dict
+Dictionary specifying functions to be run on state machine transitions.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.port">
+<span class="sig-name descname"><span class="pre">port</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.port" title="Link to this definition">¶</a></dt>
+<dd><p>‘ConfigOption(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.poll_time">
+<span class="sig-name descname"><span class="pre">poll_time</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.poll_time" title="Link to this definition">¶</a></dt>
+<dd><p>‘StatusVar(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.default_buffer_size">
+<span class="sig-name descname"><span class="pre">default_buffer_size</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.default_buffer_size" title="Link to this definition">¶</a></dt>
+<dd><p>‘ConfigOption(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.auto_start_acquisition">
+<span class="sig-name descname"><span class="pre">auto_start_acquisition</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.auto_start_acquisition" title="Link to this definition">¶</a></dt>
+<dd><p>‘ConfigOption(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.instream_rate">
+<span class="sig-name descname"><span class="pre">instream_rate</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.instream_rate" title="Link to this definition">¶</a></dt>
+<dd><p>‘StatusVar(…)’</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.on_activate">
+<span class="sig-name descname"><span class="pre">on_activate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.on_activate" title="Link to this definition">¶</a></dt>
+<dd><p>Activate module.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.on_deactivate">
+<span class="sig-name descname"><span class="pre">on_deactivate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.on_deactivate" title="Link to this definition">¶</a></dt>
+<dd><p>Deactivate module.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.send_and_recv">
+<span class="sig-name descname"><span class="pre">send_and_recv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_ok</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.send_and_recv" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.constraints">
+<span class="sig-name descname"><span class="pre">constraints</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.constraints" title="Link to this definition">¶</a></dt>
+<dd><p>‘OverloadedAttribute(…)’</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.start_stream">
+<span class="sig-name descname"><span class="pre">start_stream</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.start_stream" title="Link to this definition">¶</a></dt>
+<dd><p>Start the data acquisition/streaming</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.stop_stream">
+<span class="sig-name descname"><span class="pre">stop_stream</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.stop_stream" title="Link to this definition">¶</a></dt>
+<dd><p>Stop the data acquisition/streaming</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.read_data_into_buffer">
+<span class="sig-name descname"><span class="pre">read_data_into_buffer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_buffer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">samples_per_channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_buffer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.read_data_into_buffer" title="Link to this definition">¶</a></dt>
+<dd><p>Read data from the stream buffer into a 1D numpy array given as parameter.
+Samples of all channels are stored interleaved in contiguous memory.
+In case of a multidimensional buffer array, this buffer will be flattened before written
+into.
+The 1D data_buffer can be unraveled into channel and sample indexing with:
+data_buffer.reshape([&lt;samples_per_channel&gt;, &lt;channel_count&gt;])
+The data_buffer array must have the same data type as self.constraints.data_type.
+In case of SampleTiming.TIMESTAMP a 1D numpy.float64 timestamp_buffer array has to be
+provided to be filled with timestamps corresponding to the data_buffer array. It must be
+able to hold at least &lt;samples_per_channel&gt; items:
+This function is blocking until the required number of samples has been acquired.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.read_available_data_into_buffer">
+<span class="sig-name descname"><span class="pre">read_available_data_into_buffer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_buffer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_buffer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.read_available_data_into_buffer" title="Link to this definition">¶</a></dt>
+<dd><p>Read data from the stream buffer into a 1D numpy array given as parameter.
+All samples for each channel are stored in consecutive blocks one after the other.
+The number of samples read per channel is returned and can be used to slice out valid data
+from the buffer arrays like:
+valid_data = data_buffer[:&lt;channel_count&gt; * &lt;return_value&gt;]
+valid_timestamps = timestamp_buffer[:&lt;return_value&gt;]
+See “read_data_into_buffer” documentation for more details.
+This method will read all currently available samples into buffer. If number of available
+samples exceeds buffer size, read only as many samples as fit into the buffer.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.read_data">
+<span class="sig-name descname"><span class="pre">read_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples_per_channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.read_data" title="Link to this definition">¶</a></dt>
+<dd><p>Read data from the stream buffer into a 1D numpy array and return it.
+All samples for each channel are stored in consecutive blocks one after the other.
+The returned data_buffer can be unraveled into channel samples with:
+data_buffer.reshape([&lt;samples_per_channel&gt;, &lt;channel_count&gt;])
+The numpy array data type is the one defined in self.constraints.data_type.
+In case of SampleTiming.TIMESTAMP a 1D numpy.float64 timestamp_buffer array will be
+returned as well with timestamps corresponding to the data_buffer array.
+np.concatenate(np.array([self._time_offset]), wrapped)
+TypeError: only integer scalar arrays can be converted to a scalar index
+If samples_per_channel is omitted all currently available samples are read from buffer.
+This method will not return until all requested samples have been read or a timeout occurs.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.read_single_point">
+<span class="sig-name descname"><span class="pre">read_single_point</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.read_single_point" title="Link to this definition">¶</a></dt>
+<dd><p>This method will initiate a single sample read on each configured data channel.
+In general this sample may not be acquired simultaneous for all channels and timing in
+general can not be assured. Us this method if you want to have a non-timing-critical
+snapshot of your current data channel input.
+May not be available for all devices.
+The returned 1D numpy array will contain one sample for each channel.
+In case of SampleTiming.TIMESTAMP a single numpy.float64 timestamp value will be returned
+as well.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.available_samples">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">available_samples</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.available_samples" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.sample_rate">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sample_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.sample_rate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.channel_buffer_size">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">channel_buffer_size</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.channel_buffer_size" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.streaming_mode">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">streaming_mode</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../../interface/data_instream_interface.html#qudi.interface.data_instream_interface.qudi.interface.data_instream_interface.StreamingMode.StreamingMode" title="qudi.interface.data_instream_interface.StreamingMode"><span class="pre">qudi.interface.data_instream_interface.StreamingMode</span></a></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.streaming_mode" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.active_channels">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">active_channels</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.active_channels" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.configure">
+<span class="sig-name descname"><span class="pre">configure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">active_channels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">streaming_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../interface/data_instream_interface.html#qudi.interface.data_instream_interface.qudi.interface.data_instream_interface.StreamingMode.StreamingMode" title="qudi.interface.data_instream_interface.StreamingMode"><span class="pre">qudi.interface.data_instream_interface.StreamingMode</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel_buffer_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.configure" title="Link to this definition">¶</a></dt>
+<dd><p>Configure a data stream. See read-only properties for information on each parameter.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.available_states">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">available_states</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.available_states" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.get_state">
+<span class="sig-name descname"><span class="pre">get_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">switch</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.get_state" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.set_state">
+<span class="sig-name descname"><span class="pre">set_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">switch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.set_state" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.frame_size">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frame_size</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.frame_size" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.samples_in_buffer">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">samples_in_buffer</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.samples_in_buffer" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.set_active_channels">
+<span class="sig-name descname"><span class="pre">set_active_channels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.set_active_channels" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.set_sample_rate">
+<span class="sig-name descname"><span class="pre">set_sample_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rate</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.set_sample_rate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.set_frame_size">
+<span class="sig-name descname"><span class="pre">set_frame_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.set_frame_size" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.start_buffered_acquisition">
+<span class="sig-name descname"><span class="pre">start_buffered_acquisition</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.start_buffered_acquisition" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.stop_buffered_acquisition">
+<span class="sig-name descname"><span class="pre">stop_buffered_acquisition</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.stop_buffered_acquisition" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.get_buffered_samples">
+<span class="sig-name descname"><span class="pre">get_buffered_samples</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">number_of_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.get_buffered_samples" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.acquire_frame">
+<span class="sig-name descname"><span class="pre">acquire_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.acquire_frame" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.set_setpoint">
+<span class="sig-name descname"><span class="pre">set_setpoint</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.set_setpoint" title="Link to this definition">¶</a></dt>
+<dd><p>‘OverloadedAttribute(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.get_setpoint">
+<span class="sig-name descname"><span class="pre">get_setpoint</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.get_setpoint" title="Link to this definition">¶</a></dt>
+<dd><p>‘OverloadedAttribute(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.get_process_value">
+<span class="sig-name descname"><span class="pre">get_process_value</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.get_process_value" title="Link to this definition">¶</a></dt>
+<dd><p>‘OverloadedAttribute(…)’</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.set_activity_state">
+<span class="sig-name descname"><span class="pre">set_activity_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.set_activity_state" title="Link to this definition">¶</a></dt>
+<dd><p>Set activity state for given channel.
+State is bool type and refers to active (True) and inactive (False).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.get_activity_state">
+<span class="sig-name descname"><span class="pre">get_activity_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.get_activity_state" title="Link to this definition">¶</a></dt>
+<dd><p>Get activity state for given channel.
+State is bool type and refers to active (True) and inactive (False).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.get_kp">
+<span class="sig-name descname"><span class="pre">get_kp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.get_kp" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.set_kp">
+<span class="sig-name descname"><span class="pre">set_kp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kp</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.set_kp" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.get_ki">
+<span class="sig-name descname"><span class="pre">get_ki</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.get_ki" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.set_ki">
+<span class="sig-name descname"><span class="pre">set_ki</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ki</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.set_ki" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.get_kd">
+<span class="sig-name descname"><span class="pre">get_kd</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.get_kd" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.set_kd">
+<span class="sig-name descname"><span class="pre">set_kd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kd</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.set_kd" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.get_manual_value">
+<span class="sig-name descname"><span class="pre">get_manual_value</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.get_manual_value" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.set_manual_value">
+<span class="sig-name descname"><span class="pre">set_manual_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manual_value</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.set_manual_value" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.get_enabled">
+<span class="sig-name descname"><span class="pre">get_enabled</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.get_enabled" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.set_enabled">
+<span class="sig-name descname"><span class="pre">set_enabled</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">enabled</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.set_enabled" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.get_control_limits">
+<span class="sig-name descname"><span class="pre">get_control_limits</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.get_control_limits" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.set_control_limits">
+<span class="sig-name descname"><span class="pre">set_control_limits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">limits</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.set_control_limits" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.process_value_unit">
+<span class="sig-name descname"><span class="pre">process_value_unit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.process_value_unit" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.get_control_value">
+<span class="sig-name descname"><span class="pre">get_control_value</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.get_control_value" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.control_value_unit">
+<span class="sig-name descname"><span class="pre">control_value_unit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.control_value_unit" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.get_extra">
+<span class="sig-name descname"><span class="pre">get_extra</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.get_extra" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.move_to_main_thread">
+<span class="sig-name descname"><span class="pre">move_to_main_thread</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.move_to_main_thread" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.module_thread">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_thread</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">PySide2.QtCore.QThread</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.module_thread" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.module_name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.module_name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.module_base">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_base</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.module_base" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.module_uuid">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_uuid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">uuid.UUID</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.module_uuid" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.module_default_data_dir">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_default_data_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.module_default_data_dir" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.module_status_variables">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_status_variables</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.module_status_variables" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.log">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">log</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">logging.Logger</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.log" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.is_module_threaded">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_module_threaded</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.is_module_threaded" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.connect_modules">
+<span class="sig-name descname"><span class="pre">connect_modules</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connections</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.connect_modules" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.disconnect_modules">
+<span class="sig-name descname"><span class="pre">disconnect_modules</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.disconnect_modules" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.number_of_switches">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">number_of_switches</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.number_of_switches" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.switch_names">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">switch_names</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.switch_names" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.states">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">states</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.states" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.setpoints">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setpoints</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">qudi.interface.process_control_interface._Real</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.setpoints" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.activity_states">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">activity_states</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.activity_states" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.process_values">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">process_values</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">qudi.interface.process_control_interface._Real</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/wavemeter/fzw_wavemeter.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.wavemeter.fzw_wavemeter.qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW.MOGLabsFZW.process_values" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          <div class="page-nav">
+            <div class="inner"><ul class="page-nav">
+  <li class="prev">
+    <a href="../excitation_scanners/moglabs.html"
+       title="previous chapter">← Moglabs CEM laser</a>
+  </li>
+  <li class="next">
+    <a href="../../logic.html"
+       title="next chapter">Logics →</a>
+  </li>
+</ul><div class="footer" role="contentinfo">
+      &#169; Copyright 2025, Molecular Quantum Nanophotonics Lab @ LENS.
+    <br>
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.1.3 with <a href="https://github.com/schettino72/sphinx_press_theme">Press Theme</a> 0.9.1.
+</div>
+            </div>
+          </div>
+      </page>
+    </div></div>
+    
+    
+  </body>
+</html>

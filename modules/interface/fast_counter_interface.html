@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html  lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+      <title>FastCounterInterface</title>
+    
+          <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+          <link rel="stylesheet" href="../../_static/theme.css " type="text/css" />
+          <link rel="stylesheet" href="../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" type="text/css" />
+          <link rel="stylesheet" href="../../_static/exercise.css" type="text/css" />
+      
+      <!-- sphinx script_files -->
+        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+
+      
+      <!-- bundled in js (rollup iife) -->
+      <!-- <script src="../../_static/theme-vendors.js"></script> -->
+      <script src="../../_static/theme.js" defer></script>
+    
+      <link rel="shortcut icon" href="../../../../_static/logo.png"/>
+  <link rel="index" title="Index" href="../../genindex.html" />
+  <link rel="search" title="Search" href="../../search.html" />
+  <link rel="next" title="FiniteSamplingInputInterface" href="finite_sampling_input_interface.html" />
+  <link rel="prev" title="ExcitationScannerInterface" href="excitation_scanner_interface.html" /> 
+  </head>
+
+  <body>
+    <div id="app">
+    <div class="theme-container" :class="pageClasses"><navbar @toggle-sidebar="toggleSidebar">
+  <router-link to="../../index.html" class="home-link">
+    
+      <span class="site-name">Qudi Lab on a molecule modules</span>
+    
+  </router-link>
+
+  <div class="links">
+    <navlinks class="can-hide">
+
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Tutorials:
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+    </navlinks>
+  </div>
+</navbar>
+
+      
+      <div class="sidebar-mask" @click="toggleSidebar(false)">
+      </div>
+        <sidebar @toggle-sidebar="toggleSidebar">
+          
+          <navlinks>
+            
+
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Tutorials:
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+            
+          </navlinks><div id="searchbox" class="searchbox" role="search">
+  <div class="caption"><span class="caption-text">Quick search</span>
+    <div class="searchformwrapper">
+      <form class="search" action="../../search.html" method="get">
+        <input type="text" name="q" />
+        <input type="submit" value="Search" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div><div class="sidebar-links" role="navigation" aria-label="main navigation">
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation">Tutorials:</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../Crash%20course%20into%20Qudi.html" class="reference internal ">    Tutorial: a crash course into Qudi</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../guides/excitation-spectroscopy.html" class="reference internal ">    Guide: Excitation spectroscopy</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../guides/state-machines.html" class="reference internal ">    Guide: State machines</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/setup_confocal_scanning.html" class="reference internal ">    Guide: Setting up confocal scanning</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/setup_odmr.html" class="reference internal ">    Guide: Setting up ODMR</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/setup_timeseries.html" class="reference internal ">    Guide: Setting up time series</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation">Contents:</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../installation.html" class="reference internal ">Installation</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../changelog-lens.html" class="reference internal ">Lens's changelog</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../index.html" class="reference internal ">Documentation of all modules</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/changelog.html" class="reference internal ">Ulm IQO's changelog (parent repository)</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../programming-guides.html" class="reference internal ">Programming guides: writing your own modules and understanding our hardwares.</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/iqo-specifics.html" class="reference internal ">Ulm IQO's specific guides</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+</div>
+        </sidebar>
+
+      <page>
+          <div class="body-header" role="navigation" aria-label="navigation">
+  
+  <ul class="breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+    
+      <li><a href="../index.html">Documentation of all modules</a> &raquo;</li>
+    
+      <li><a href="../interface.html">Interfaces</a> &raquo;</li>
+    
+    <li>FastCounterInterface</li>
+  </ul>
+  
+
+  <ul class="page-nav">
+  <li class="prev">
+    <a href="excitation_scanner_interface.html"
+       title="previous chapter">← ExcitationScannerInterface</a>
+  </li>
+  <li class="next">
+    <a href="finite_sampling_input_interface.html"
+       title="next chapter">FiniteSamplingInputInterface →</a>
+  </li>
+</ul>
+  
+</div>
+<hr>
+          <div class="content" role="main" v-pre>
+            
+  <section id="fastcounterinterface">
+<h1>FastCounterInterface<a class="headerlink" href="#fastcounterinterface" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FastCounterInterface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qudi_main_weakref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/fast_counter_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">qudi.core.module.Base</span></code></p>
+<p>Interface class to define the controls for fast counting devices.</p>
+<p>A “fast counter” is a hardware device that count events with a “good” time resolution.
+The goal is generally to detect when events happen after an time defining trigger. These events can be photons
+arrival on a detector for example, and the trigger the start of the acquisition.
+This type of hardware regularly records millions of repeated acquisition (ie sweeps) in a few seconds,
+with one or multiple events per trigger (depending on the hardware constrains).
+It can be used in two modes :</p>
+<ul class="simple">
+<li><p>“Gated” : The result is a 2d array where each line correspond to a single trigger with one or multiple events
+in each line/box</p></li>
+<li><p>“Ungated” : Only the sum of the acquisition is acquired, building an histogram of the events times. This is
+generally enough for a lot of experiment, where a memory consuming 2d array is not necessary.</p></li>
+</ul>
+<p class="rubric">Initialization</p>
+<p>Initialise Base instance. Set up its state machine and initialize ConfigOption meta
+attributes from given config.</p>
+<p class="rubric" id="parameters">Parameters</p>
+<p>self : object
+The object being initialized.
+name : str
+Unique name for this module instance.
+configuration : dict
+Parameters from the configuration file.
+callbacks : dict
+Dictionary specifying functions to be run on state machine transitions.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.get_constraints">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_constraints</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/fast_counter_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.get_constraints" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieve the hardware constrains from the Fast counting device.</p>
+<p>&#64;return dict: dict with keys being the constraint names as string and
+items are the definition for the constaints.</p>
+<p>The keys of the returned dictionary are the str name for the constraints
+(which are set in this method).</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>        NO OTHER KEYS SHOULD BE INVENTED!
+</pre></div>
+</div>
+<p>If you are not sure about the meaning, look in other hardware files to
+get an impression. If still additional constraints are needed, then they
+have to be added to all files containing this interface.</p>
+<p>The items of the keys are again dictionaries which have the generic
+dictionary form:
+{‘min’: <value>,
+‘max’: <value>,
+‘step’: <value>,
+‘unit’: ‘<value>’}</p>
+<p>Only the key ‘hardware_binwidth_list’ differs, since they
+contain the list of possible binwidths.</p>
+<p>If the constraints cannot be set in the fast counting hardware then
+write just zero to each key of the generic dicts.
+Note that there is a difference between float input (0.0) and
+integer input (0), because some logic modules might rely on that
+distinction.</p>
+<p>ALL THE PRESENT KEYS OF THE CONSTRAINTS DICT MUST BE ASSIGNED!</p>
+<p class="rubric" id="example-for-configuration-with-default-values">Example for configuration with default values:</p>
+<p>constraints = dict()</p>
+<p class="rubric" id="the-unit-of-those-entries-are-seconds-per-bin-in-order-to-get-the">the unit of those entries are seconds per bin. In order to get the</p>
+<p class="rubric" id="current-binwidth-in-seonds-use-the-get-binwidth-method">current binwidth in seonds use the get_binwidth method.</p>
+<p>constraints[‘hardware_binwidth_list’] = []</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.configure">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">configure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bin_width_s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_length_s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_gates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/fast_counter_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.configure" title="Link to this definition">¶</a></dt>
+<dd><p>Configuration of the fast counter.</p>
+<p>&#64;param float bin_width_s: Length of a single time bin in the time race histogram in seconds.
+&#64;param float record_length_s: Total length of the timetrace/each single gate in seconds.
+&#64;param int number_of_gates: optional, number of gates in the pulse sequence. Ignore for not gated counter.</p>
+<p>&#64;return tuple(binwidth_s, record_length_s, number_of_gates):
+binwidth_s: float the actual set binwidth in seconds
+gate_length_s: the actual record length in seconds
+number_of_gates: the number of gated, which are accepted, None if not-gated</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.get_status">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_status</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/fast_counter_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.get_status" title="Link to this definition">¶</a></dt>
+<dd><p>Receives the current status of the hardware and outputs it as return value.</p>
+<p>0 = unconfigured
+1 = idle
+2 = running
+3 = paused
+-1 = error state</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.start_measure">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">start_measure</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/fast_counter_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.start_measure" title="Link to this definition">¶</a></dt>
+<dd><p>Start the fast counter.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.stop_measure">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">stop_measure</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/fast_counter_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.stop_measure" title="Link to this definition">¶</a></dt>
+<dd><p>Stop the fast counter.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.pause_measure">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pause_measure</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/fast_counter_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.pause_measure" title="Link to this definition">¶</a></dt>
+<dd><p>Pauses the current measurement.</p>
+<p>Fast counter must be initially in the run state to make it pause.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.continue_measure">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">continue_measure</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/fast_counter_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.continue_measure" title="Link to this definition">¶</a></dt>
+<dd><p>Continues the current measurement.</p>
+<p>If fast counter is in pause state, then fast counter will be continued.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.is_gated">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_gated</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/fast_counter_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.is_gated" title="Link to this definition">¶</a></dt>
+<dd><p>Check the gated counting possibility.</p>
+<p>&#64;return bool: Boolean value indicates if the fast counter is a gated
+counter (TRUE) or not (FALSE).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.get_binwidth">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_binwidth</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/fast_counter_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.get_binwidth" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the width of a single timebin in the timetrace in seconds.</p>
+<p>&#64;return float: current length of a single bin in seconds (seconds/bin)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.get_data_trace">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_data_trace</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/fast_counter_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.get_data_trace" title="Link to this definition">¶</a></dt>
+<dd><p>Polls the current timetrace data from the fast counter.</p>
+<p>Return value is a numpy array (dtype = int64).
+The binning, specified by calling configure() in forehand, must be
+taken care of in this hardware class. A possible overflow of the
+histogram bins must be caught here and taken care of.
+If the counter is NOT GATED it will return a tuple (1D-numpy-array, info_dict) with
+returnarray[timebin_index]
+If the counter is GATED it will return a tuple (2D-numpy-array, info_dict) with
+returnarray[gate_index, timebin_index]</p>
+<p>info_dict is a dictionary with keys :
+- ‘elapsed_sweeps’ : the elapsed number of sweeps
+- ‘elapsed_time’ : the elapsed time in seconds</p>
+<p>If the hardware does not support these features, the values should be None</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.move_to_main_thread">
+<span class="sig-name descname"><span class="pre">move_to_main_thread</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/fast_counter_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.move_to_main_thread" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.module_thread">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_thread</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">PySide2.QtCore.QThread</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/fast_counter_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.module_thread" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.module_name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/fast_counter_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.module_name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.module_base">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_base</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/fast_counter_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.module_base" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.module_uuid">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_uuid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">uuid.UUID</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/fast_counter_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.module_uuid" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.module_default_data_dir">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_default_data_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/fast_counter_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.module_default_data_dir" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.module_status_variables">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_status_variables</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/fast_counter_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.module_status_variables" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.log">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">log</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">logging.Logger</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/fast_counter_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.log" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.is_module_threaded">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_module_threaded</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/fast_counter_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.is_module_threaded" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.connect_modules">
+<span class="sig-name descname"><span class="pre">connect_modules</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connections</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/fast_counter_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.connect_modules" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.disconnect_modules">
+<span class="sig-name descname"><span class="pre">disconnect_modules</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/fast_counter_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.disconnect_modules" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.on_activate">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_activate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/fast_counter_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.on_activate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.on_deactivate">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_deactivate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/fast_counter_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.fast_counter_interface.qudi.interface.fast_counter_interface.FastCounterInterface.FastCounterInterface.on_deactivate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          <div class="page-nav">
+            <div class="inner"><ul class="page-nav">
+  <li class="prev">
+    <a href="excitation_scanner_interface.html"
+       title="previous chapter">← ExcitationScannerInterface</a>
+  </li>
+  <li class="next">
+    <a href="finite_sampling_input_interface.html"
+       title="next chapter">FiniteSamplingInputInterface →</a>
+  </li>
+</ul><div class="footer" role="contentinfo">
+      &#169; Copyright 2025, Molecular Quantum Nanophotonics Lab @ LENS.
+    <br>
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.1.3 with <a href="https://github.com/schettino72/sphinx_press_theme">Press Theme</a> 0.9.1.
+</div>
+            </div>
+          </div>
+      </page>
+    </div></div>
+    
+    
+  </body>
+</html>

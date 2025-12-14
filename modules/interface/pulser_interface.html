@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html  lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+      <title>PulserInterface</title>
+    
+          <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+          <link rel="stylesheet" href="../../_static/theme.css " type="text/css" />
+          <link rel="stylesheet" href="../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" type="text/css" />
+          <link rel="stylesheet" href="../../_static/exercise.css" type="text/css" />
+      
+      <!-- sphinx script_files -->
+        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+
+      
+      <!-- bundled in js (rollup iife) -->
+      <!-- <script src="../../_static/theme-vendors.js"></script> -->
+      <script src="../../_static/theme.js" defer></script>
+    
+      <link rel="shortcut icon" href="../../../../_static/logo.png"/>
+  <link rel="index" title="Index" href="../../genindex.html" />
+  <link rel="search" title="Search" href="../../search.html" />
+  <link rel="next" title="SampledFiniteStateInterface" href="sampled_finite_state_interface.html" />
+  <link rel="prev" title="ProcessSetpointInterface" href="process_control_interface.html" /> 
+  </head>
+
+  <body>
+    <div id="app">
+    <div class="theme-container" :class="pageClasses"><navbar @toggle-sidebar="toggleSidebar">
+  <router-link to="../../index.html" class="home-link">
+    
+      <span class="site-name">Qudi Lab on a molecule modules</span>
+    
+  </router-link>
+
+  <div class="links">
+    <navlinks class="can-hide">
+
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Tutorials:
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+    </navlinks>
+  </div>
+</navbar>
+
+      
+      <div class="sidebar-mask" @click="toggleSidebar(false)">
+      </div>
+        <sidebar @toggle-sidebar="toggleSidebar">
+          
+          <navlinks>
+            
+
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Tutorials:
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+            
+          </navlinks><div id="searchbox" class="searchbox" role="search">
+  <div class="caption"><span class="caption-text">Quick search</span>
+    <div class="searchformwrapper">
+      <form class="search" action="../../search.html" method="get">
+        <input type="text" name="q" />
+        <input type="submit" value="Search" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div><div class="sidebar-links" role="navigation" aria-label="main navigation">
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation">Tutorials:</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../Crash%20course%20into%20Qudi.html" class="reference internal ">    Tutorial: a crash course into Qudi</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../guides/excitation-spectroscopy.html" class="reference internal ">    Guide: Excitation spectroscopy</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../guides/state-machines.html" class="reference internal ">    Guide: State machines</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/setup_confocal_scanning.html" class="reference internal ">    Guide: Setting up confocal scanning</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/setup_odmr.html" class="reference internal ">    Guide: Setting up ODMR</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/setup_timeseries.html" class="reference internal ">    Guide: Setting up time series</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation">Contents:</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../installation.html" class="reference internal ">Installation</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../changelog-lens.html" class="reference internal ">Lens's changelog</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../index.html" class="reference internal ">Documentation of all modules</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/changelog.html" class="reference internal ">Ulm IQO's changelog (parent repository)</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../programming-guides.html" class="reference internal ">Programming guides: writing your own modules and understanding our hardwares.</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/iqo-specifics.html" class="reference internal ">Ulm IQO's specific guides</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+</div>
+        </sidebar>
+
+      <page>
+          <div class="body-header" role="navigation" aria-label="navigation">
+  
+  <ul class="breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+    
+      <li><a href="../index.html">Documentation of all modules</a> &raquo;</li>
+    
+      <li><a href="../interface.html">Interfaces</a> &raquo;</li>
+    
+    <li>PulserInterface</li>
+  </ul>
+  
+
+  <ul class="page-nav">
+  <li class="prev">
+    <a href="process_control_interface.html"
+       title="previous chapter">← ProcessSetpointInterface</a>
+  </li>
+  <li class="next">
+    <a href="sampled_finite_state_interface.html"
+       title="next chapter">SampledFiniteStateInterface →</a>
+  </li>
+</ul>
+  
+</div>
+<hr>
+          <div class="content" role="main" v-pre>
+            
+  <section id="pulserinterface">
+<h1>PulserInterface<a class="headerlink" href="#pulserinterface" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PulserInterface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qudi_main_weakref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">qudi.core.module.Base</span></code></p>
+<p>Interface class to define the abstract controls and communication with all pulsing devices.</p>
+<p>A pulsing device is a device that will generate outputs, generally voltages, to control an experiment in a timely
+resolved way. This is by example useful to control a modulator device with a short risetime on a very short
+timescale.</p>
+<p>An example in the lab is to use a pulser to send laser pulses of a given duration separated by another precisely
+controlled duration.</p>
+<p>This interface is used to program or or multiple sequences or waveform in the internal memory of a pulser hardware,
+then load one and play it.</p>
+<ul class="simple">
+<li><p>It handles digital and analog outputs of any number.</p></li>
+<li><p>It handles both -
+Waveform, where states (outputs) and durations of a waveform is programmed and played
+Sequence, where states (outputs) and durations and instructions are used, where one can program at the hardware
+level jumps and loops to create complex sequence with a limited device memory.</p></li>
+</ul>
+<p class="rubric">Initialization</p>
+<p>Initialise Base instance. Set up its state machine and initialize ConfigOption meta
+attributes from given config.</p>
+<p class="rubric" id="parameters">Parameters</p>
+<p>self : object
+The object being initialized.
+name : str
+Unique name for this module instance.
+configuration : dict
+Parameters from the configuration file.
+callbacks : dict
+Dictionary specifying functions to be run on state machine transitions.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.get_constraints">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_constraints</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.get_constraints" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieve the hardware constrains from the Pulsing device.</p>
+<p>&#64;return constraints object: object with pulser constraints as attributes.</p>
+<p>Provides all the constraints (e.g. sample_rate, amplitude, total_length_bins,
+channel_config, …) related to the pulse generator hardware to the caller.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SEE PulserConstraints CLASS IN pulser_interface.py FOR AVAILABLE CONSTRAINTS!!!
+</pre></div>
+</div>
+<p>If you are not sure about the meaning, look in other hardware files to get an impression.
+If still additional constraints are needed, then they have to be added to the
+PulserConstraints class.</p>
+<p>Each scalar parameter is an ScalarConstraints object defined in core.util.interfaces.
+Essentially it contains min/max values as well as min step size, default value and unit of
+the parameter.</p>
+<p>PulserConstraints.activation_config differs, since it contain the channel
+configuration/activation information of the form:
+{&lt;descriptor_str&gt;: &lt;channel_set&gt;,
+&lt;descriptor_str&gt;: &lt;channel_set&gt;,
+…}</p>
+<p>If the constraints cannot be set in the pulsing hardware (e.g. because it might have no
+sequence mode) just leave it out so that the default is used (only zeros).</p>
+<p class="rubric" id="example-for-configuration-with-default-values">Example for configuration with default values:</p>
+<p>constraints = PulserConstraints()</p>
+<p>constraints.sample_rate.min = 10.0e6
+constraints.sample_rate.max = 12.0e9
+constraints.sample_rate.step = 10.0e6
+constraints.sample_rate.default = 12.0e9</p>
+<p>constraints.a_ch_amplitude.min = 0.02
+constraints.a_ch_amplitude.max = 2.0
+constraints.a_ch_amplitude.step = 0.001
+constraints.a_ch_amplitude.default = 2.0</p>
+<p>constraints.a_ch_offset.min = -1.0
+constraints.a_ch_offset.max = 1.0
+constraints.a_ch_offset.step = 0.001
+constraints.a_ch_offset.default = 0.0</p>
+<p>constraints.d_ch_low.min = -1.0
+constraints.d_ch_low.max = 4.0
+constraints.d_ch_low.step = 0.01
+constraints.d_ch_low.default = 0.0</p>
+<p>constraints.d_ch_high.min = 0.0
+constraints.d_ch_high.max = 5.0
+constraints.d_ch_high.step = 0.01
+constraints.d_ch_high.default = 5.0</p>
+<p>constraints.waveform_length.min = 80
+constraints.waveform_length.max = 64800000
+constraints.waveform_length.step = 1
+constraints.waveform_length.default = 80</p>
+<p>constraints.waveform_num.min = 1
+constraints.waveform_num.max = 32000
+constraints.waveform_num.step = 1
+constraints.waveform_num.default = 1</p>
+<p>constraints.sequence_num.min = 1
+constraints.sequence_num.max = 8000
+constraints.sequence_num.step = 1
+constraints.sequence_num.default = 1</p>
+<p>constraints.subsequence_num.min = 1
+constraints.subsequence_num.max = 4000
+constraints.subsequence_num.step = 1
+constraints.subsequence_num.default = 1</p>
+<p class="rubric" id="if-sequencer-mode-is-available-then-these-should-be-specified">If sequencer mode is available then these should be specified</p>
+<p>constraints.repetitions.min = 0
+constraints.repetitions.max = 65539
+constraints.repetitions.step = 1
+constraints.repetitions.default = 0</p>
+<p>constraints.event_triggers = [‘A’, ‘B’]
+constraints.flags = [‘A’, ‘B’, ‘C’, ‘D’]</p>
+<p>constraints.sequence_steps.min = 0
+constraints.sequence_steps.max = 8000
+constraints.sequence_steps.step = 1
+constraints.sequence_steps.default = 0</p>
+<p class="rubric" id="the-name-a-ch-and-d-ch-are-generic-names-which-describe-unambiguously-the">the name a_ch<num> and d_ch<num> are generic names, which describe UNAMBIGUOUSLY the</p>
+<p class="rubric" id="channels-here-all-possible-channel-configurations-are-stated-where-only-the-generic">channels. Here all possible channel configurations are stated, where only the generic</p>
+<p class="rubric" id="names-should-be-used-the-names-for-the-different-configurations-can-be-customary-chosen">names should be used. The names for the different configurations can be customary chosen.</p>
+<p class="rubric" id="important-active-channel-sets-must-be-of-type-frozenset-to-properly-work-as-remote-module">IMPORTANT: Active channel sets must be of type frozenset to properly work as remote module</p>
+<p>activation_conf = dict()
+activation_conf[‘yourconf’] = frozenset(
+{‘a_ch1’, ‘d_ch1’, ‘d_ch2’, ‘a_ch2’, ‘d_ch3’, ‘d_ch4’})
+activation_conf[‘different_conf’] = frozenset({‘a_ch1’, ‘d_ch1’, ‘d_ch2’})
+activation_conf[‘something_else’] = frozenset({‘a_ch2’, ‘d_ch3’, ‘d_ch4’})
+constraints.activation_config = activation_conf</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.pulser_on">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pulser_on</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.pulser_on" title="Link to this definition">¶</a></dt>
+<dd><p>Switches the pulsing device on.</p>
+<p>&#64;return int: error code (0:OK, -1:error)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.pulser_off">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pulser_off</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.pulser_off" title="Link to this definition">¶</a></dt>
+<dd><p>Switches the pulsing device off.</p>
+<p>&#64;return int: error code (0:OK, -1:error)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.load_waveform">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load_waveform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">load_dict</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.load_waveform" title="Link to this definition">¶</a></dt>
+<dd><p>Loads a waveform to the specified channel of the pulsing device.</p>
+<p>&#64;param dict|list load_dict: a dictionary with keys being one of the available channel
+index and values being the name of the already written
+waveform to load into the channel.
+Examples:   {1: rabi_ch1, 2: rabi_ch2} or
+{1: rabi_ch2, 2: rabi_ch1}
+If just a list of waveform names if given, the channel
+association will be invoked from the channel
+suffix ‘_ch1’, ‘_ch2’ etc.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>                            {1: rabi_ch1, 2: rabi_ch2}
+                        or
+                            {1: rabi_ch2, 2: rabi_ch1}
+
+                        If just a list of waveform names if given,
+                        the channel association will be invoked from
+                        the channel suffix &#39;_ch1&#39;, &#39;_ch2&#39; etc. A
+                        possible configuration can be e.g.
+
+                            [&#39;rabi_ch1&#39;, &#39;rabi_ch2&#39;, &#39;rabi_ch3&#39;]
+</pre></div>
+</div>
+<p>&#64;return dict: Dictionary containing the actually loaded waveforms per
+channel.</p>
+<p>For devices that have a workspace (i.e. AWG) this will load the waveform
+from the device workspace into the channel. For a device without mass
+memory, this will make the waveform/pattern that has been previously
+written with self.write_waveform ready to play.</p>
+<p>Please note that the channel index used here is not to be confused with the number suffix
+in the generic channel descriptors (i.e. ‘d_ch1’, ‘a_ch1’). The channel index used here is
+highly hardware specific and corresponds to a collection of digital and analog channels
+being associated to a SINGLE wavfeorm asset.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.load_sequence">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load_sequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence_name</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.load_sequence" title="Link to this definition">¶</a></dt>
+<dd><p>Loads a sequence to the channels of the device in order to be ready for playback.
+For devices that have a workspace (i.e. AWG) this will load the sequence from the device
+workspace into the channels.
+For a device without mass memory this will make the waveform/pattern that has been
+previously written with self.write_waveform ready to play.</p>
+<p>&#64;param dict|list sequence_name: a dictionary with keys being one of the available channel
+index and values being the name of the already written
+waveform to load into the channel.
+Examples:   {1: rabi_ch1, 2: rabi_ch2} or
+{1: rabi_ch2, 2: rabi_ch1}
+If just a list of waveform names if given, the channel
+association will be invoked from the channel
+suffix ‘_ch1’, ‘_ch2’ etc.</p>
+<p>&#64;return dict: Dictionary containing the actually loaded waveforms per channel.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.get_loaded_assets">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_loaded_assets</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.get_loaded_assets" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieve the currently loaded asset names for each active channel of the device.
+The returned dictionary will have the channel numbers as keys.
+In case of loaded waveforms the dictionary values will be the waveform names.
+In case of a loaded sequence the values will be the sequence name appended by a suffix
+representing the track loaded to the respective channel (i.e. ‘&lt;sequence_name&gt;_1’).</p>
+<p>&#64;return (dict, str): Dictionary with keys being the channel number and values being the
+respective asset loaded into the channel,
+string describing the asset type (‘waveform’ or ‘sequence’)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.clear_all">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">clear_all</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.clear_all" title="Link to this definition">¶</a></dt>
+<dd><p>Clears all loaded waveforms from the pulse generators RAM/workspace.</p>
+<p>&#64;return int: error code (0:OK, -1:error)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.get_status">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_status</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.get_status" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieves the status of the pulsing hardware</p>
+<p>&#64;return (int, dict): tuple with an integer value of the current status and a corresponding
+dictionary containing status description for all the possible status
+variables of the pulse generator hardware.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.get_sample_rate">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_sample_rate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.get_sample_rate" title="Link to this definition">¶</a></dt>
+<dd><p>Get the sample rate of the pulse generator hardware</p>
+<p>&#64;return float: The current sample rate of the device (in Hz)</p>
+<p>Do not return a saved sample rate from an attribute, but instead retrieve the current
+sample rate directly from the device.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.set_sample_rate">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_sample_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample_rate</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.set_sample_rate" title="Link to this definition">¶</a></dt>
+<dd><p>Set the sample rate of the pulse generator hardware.</p>
+<p>&#64;param float sample_rate: The sampling rate to be set (in Hz)</p>
+<p>&#64;return float: the sample rate returned from the device (in Hz).</p>
+<p>Note: After setting the sampling rate of the device, use the actually set return value for
+further processing.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.get_analog_level">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_analog_level</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amplitude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.get_analog_level" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieve the analog amplitude and offset of the provided channels.</p>
+<p>&#64;param list amplitude: optional, if the amplitude value (in Volt peak to peak, i.e. the
+full amplitude) of a specific channel is desired.
+&#64;param list offset: optional, if the offset value (in Volt) of a specific channel is
+desired.</p>
+<p>&#64;return: (dict, dict): tuple of two dicts, with keys being the channel descriptor string
+(i.e. ‘a_ch1’) and items being the values for those channels.
+Amplitude is always denoted in Volt-peak-to-peak and Offset in volts.</p>
+<p>Note: Do not return a saved amplitude and/or offset value but instead retrieve the current
+amplitude and/or offset directly from the device.</p>
+<p>If nothing (or None) is passed then the levels of all channels will be returned. If no
+analog channels are present in the device, return just empty dicts.</p>
+<p>Example of a possible input:
+amplitude = [‘a_ch1’, ‘a_ch4’], offset = None
+to obtain the amplitude of channel 1 and 4 and the offset of all channels
+{‘a_ch1’: -0.5, ‘a_ch4’: 2.0} {‘a_ch1’: 0.0, ‘a_ch2’: 0.0, ‘a_ch3’: 1.0, ‘a_ch4’: 0.0}</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.set_analog_level">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_analog_level</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amplitude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.set_analog_level" title="Link to this definition">¶</a></dt>
+<dd><p>Set amplitude and/or offset value of the provided analog channel(s).</p>
+<p>&#64;param dict amplitude: dictionary, with key being the channel descriptor string
+(i.e. ‘a_ch1’, ‘a_ch2’) and items being the amplitude values
+(in Volt peak to peak, i.e. the full amplitude) for the desired
+channel.
+&#64;param dict offset: dictionary, with key being the channel descriptor string
+(i.e. ‘a_ch1’, ‘a_ch2’) and items being the offset values
+(in absolute volt) for the desired channel.</p>
+<p>&#64;return (dict, dict): tuple of two dicts with the actual set values for amplitude and
+offset for ALL channels.</p>
+<p>If nothing is passed then the command will return the current amplitudes/offsets.</p>
+<p>Note: After setting the amplitude and/or offset values of the device, use the actual set
+return values for further processing.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.get_digital_level">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_digital_level</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">low</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">high</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.get_digital_level" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieve the digital low and high level of the provided/all channels.</p>
+<p>&#64;param list low: optional, if the low value (in Volt) of a specific channel is desired.
+&#64;param list high: optional, if the high value (in Volt) of a specific channel is desired.</p>
+<p>&#64;return: (dict, dict): tuple of two dicts, with keys being the channel descriptor strings
+(i.e. ‘d_ch1’, ‘d_ch2’) and items being the values for those
+channels. Both low and high value of a channel is denoted in volts.</p>
+<p>Note: Do not return a saved low and/or high value but instead retrieve
+the current low and/or high value directly from the device.</p>
+<p>If nothing (or None) is passed then the levels of all channels are being returned.
+If no digital channels are present, return just an empty dict.</p>
+<p>Example of a possible input:
+low = [‘d_ch1’, ‘d_ch4’]
+to obtain the low voltage values of digital channel 1 an 4. A possible answer might be
+{‘d_ch1’: -0.5, ‘d_ch4’: 2.0} {‘d_ch1’: 1.0, ‘d_ch2’: 1.0, ‘d_ch3’: 1.0, ‘d_ch4’: 4.0}
+Since no high request was performed, the high values for ALL channels are returned (here 4).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.set_digital_level">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_digital_level</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">low</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">high</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.set_digital_level" title="Link to this definition">¶</a></dt>
+<dd><p>Set low and/or high value of the provided digital channel.</p>
+<p>&#64;param dict low: dictionary, with key being the channel descriptor string
+(i.e. ‘d_ch1’, ‘d_ch2’) and items being the low values (in volt) for the
+desired channel.
+&#64;param dict high: dictionary, with key being the channel descriptor string
+(i.e. ‘d_ch1’, ‘d_ch2’) and items being the high values (in volt) for the
+desired channel.</p>
+<p>&#64;return (dict, dict): tuple of two dicts where first dict denotes the current low value and
+the second dict the high value for ALL digital channels.
+Keys are the channel descriptor strings (i.e. ‘d_ch1’, ‘d_ch2’)</p>
+<p>If nothing is passed then the command will return the current voltage levels.</p>
+<p>Note: After setting the high and/or low values of the device, use the actual set return
+values for further processing.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.get_active_channels">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_active_channels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.get_active_channels" title="Link to this definition">¶</a></dt>
+<dd><p>Get the active channels of the pulse generator hardware.</p>
+<p>&#64;param list ch: optional, if specific analog or digital channels are needed to be asked
+without obtaining all the channels.</p>
+<p>&#64;return dict:  where keys denoting the channel string and items boolean expressions whether
+channel are active or not.</p>
+<p>Example for an possible input (order is not important):
+ch = [‘a_ch2’, ‘d_ch2’, ‘a_ch1’, ‘d_ch5’, ‘d_ch1’]
+then the output might look like
+{‘a_ch2’: True, ‘d_ch2’: False, ‘a_ch1’: False, ‘d_ch5’: True, ‘d_ch1’: False}</p>
+<p>If no parameter (or None) is passed to this method all channel states will be returned.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.set_active_channels">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_active_channels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.set_active_channels" title="Link to this definition">¶</a></dt>
+<dd><p>Set the active/inactive channels for the pulse generator hardware.
+The state of ALL available analog and digital channels will be returned
+(True: active, False: inactive).
+The actually set and returned channel activation must be part of the available
+activation_configs in the constraints.
+You can also activate/deactivate subsets of available channels but the resulting
+activation_config must still be valid according to the constraints.
+If the resulting set of active channels can not be found in the available
+activation_configs, the channel states must remain unchanged.</p>
+<p>&#64;param dict ch: dictionary with keys being the analog or digital string generic names for
+the channels (i.e. ‘d_ch1’, ‘a_ch2’) with items being a boolean value.
+True: Activate channel, False: Deactivate channel</p>
+<p>&#64;return dict: with the actual set values for ALL active analog and digital channels</p>
+<p>If nothing is passed then the command will simply return the unchanged current state.</p>
+<p>Note: After setting the active channels of the device, use the returned dict for further
+processing.</p>
+<p>Example for possible input:
+ch={‘a_ch2’: True, ‘d_ch1’: False, ‘d_ch3’: True, ‘d_ch4’: True}
+to activate analog channel 2 digital channel 3 and 4 and to deactivate
+digital channel 1. All other available channels will remain unchanged.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.write_waveform">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">write_waveform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">analog_samples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">digital_samples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_first_chunk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_last_chunk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_number_of_samples</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.write_waveform" title="Link to this definition">¶</a></dt>
+<dd><p>Write a new waveform or append samples to an already existing waveform on the device memory.
+The flags is_first_chunk and is_last_chunk can be used as indicator if a new waveform should
+be created or if the write process to a waveform should be terminated.</p>
+<p>NOTE: All sample arrays in analog_samples and digital_samples must be of equal length!</p>
+<p>&#64;param str name: the name of the waveform to be created/append to
+&#64;param dict analog_samples: keys are the generic analog channel names (i.e. ‘a_ch1’) and
+values are 1D numpy arrays of type float32 containing the
+voltage samples normalized to half Vpp (between -1 and 1).
+&#64;param dict digital_samples: keys are the generic digital channel names (i.e. ‘d_ch1’) and
+values are 1D numpy arrays of type bool containing the marker
+states.
+&#64;param bool is_first_chunk: Flag indicating if it is the first chunk to write.
+If True this method will create a new empty wavveform.
+If False the samples are appended to the existing waveform.
+&#64;param bool is_last_chunk:  Flag indicating if it is the last chunk to write.
+Some devices may need to know when to close the appending wfm.
+&#64;param int total_number_of_samples: The number of sample points for the entire waveform
+(not only the currently written chunk)</p>
+<p>&#64;return (int, list): Number of samples written (-1 indicates failed process) and list of
+created waveform names</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.write_sequence">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">write_sequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence_parameters</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.write_sequence" title="Link to this definition">¶</a></dt>
+<dd><p>Write a new sequence on the device memory.</p>
+<p>&#64;param str name: the name of the waveform to be created/append to
+&#64;param list sequence_parameters: List containing tuples of length 2. Each tuple represents
+a sequence step. The first entry of the tuple is a list of
+waveform names (str); one for each channel. The second
+tuple element is a SequenceStep instance containing the
+sequencing parameters for this step.</p>
+<p>&#64;return: int, number of sequence steps written (-1 indicates failed process)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.get_waveform_names">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_waveform_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.get_waveform_names" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieve the names of all uploaded waveforms on the device.</p>
+<p>&#64;return list: List of all uploaded waveform name strings in the device workspace.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.get_sequence_names">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_sequence_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.get_sequence_names" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieve the names of all uploaded sequence on the device.</p>
+<p>&#64;return list: List of all uploaded sequence name strings in the device workspace.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.delete_waveform">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">delete_waveform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">waveform_name</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.delete_waveform" title="Link to this definition">¶</a></dt>
+<dd><p>Delete the waveform with name “waveform_name” from the device memory.</p>
+<p>&#64;param str waveform_name: The name of the waveform to be deleted
+Optionally a list of waveform names can be passed.</p>
+<p>&#64;return list: a list of deleted waveform names.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.delete_sequence">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">delete_sequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence_name</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.delete_sequence" title="Link to this definition">¶</a></dt>
+<dd><p>Delete the sequence with name “sequence_name” from the device memory.</p>
+<p>&#64;param str sequence_name: The name of the sequence to be deleted
+Optionally a list of sequence names can be passed.</p>
+<p>&#64;return list: a list of deleted sequence names.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.get_interleave">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_interleave</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.get_interleave" title="Link to this definition">¶</a></dt>
+<dd><p>Check whether Interleave is ON or OFF in AWG.</p>
+<p>&#64;return bool: True: ON, False: OFF</p>
+<p>Will always return False for pulse generator hardware without interleave.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.set_interleave">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_interleave</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.set_interleave" title="Link to this definition">¶</a></dt>
+<dd><p>Turns the interleave of an AWG on or off.</p>
+<p>&#64;param bool state: The state the interleave should be set to
+(True: ON, False: OFF)</p>
+<p>&#64;return bool: actual interleave status (True: ON, False: OFF)</p>
+<p>Note: After setting the interleave of the device, retrieve the
+interleave again and use that information for further processing.</p>
+<p>Unused for pulse generator hardware other than an AWG.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.reset">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.reset" title="Link to this definition">¶</a></dt>
+<dd><p>Reset the device.</p>
+<p>&#64;return int: error code (0:OK, -1:error)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.move_to_main_thread">
+<span class="sig-name descname"><span class="pre">move_to_main_thread</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.move_to_main_thread" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.module_thread">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_thread</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">PySide2.QtCore.QThread</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.module_thread" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.module_name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.module_name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.module_base">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_base</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.module_base" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.module_uuid">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_uuid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">uuid.UUID</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.module_uuid" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.module_default_data_dir">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_default_data_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.module_default_data_dir" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.module_status_variables">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_status_variables</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.module_status_variables" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.log">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">log</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">logging.Logger</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.log" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.is_module_threaded">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_module_threaded</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.is_module_threaded" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.connect_modules">
+<span class="sig-name descname"><span class="pre">connect_modules</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connections</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.connect_modules" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.disconnect_modules">
+<span class="sig-name descname"><span class="pre">disconnect_modules</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.disconnect_modules" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.on_activate">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_activate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.on_activate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.on_deactivate">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_deactivate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserInterface.PulserInterface.on_deactivate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.SequenceOption.SequenceOption">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SequenceOption</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.SequenceOption.SequenceOption" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>Different options of the sequence mode in the pulser device.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.SequenceOption.SequenceOption.NON">
+<span class="sig-name descname"><span class="pre">NON</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.SequenceOption.SequenceOption.NON" title="Link to this definition">¶</a></dt>
+<dd><p>0</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.SequenceOption.SequenceOption.OPTIONAL">
+<span class="sig-name descname"><span class="pre">OPTIONAL</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.SequenceOption.SequenceOption.OPTIONAL" title="Link to this definition">¶</a></dt>
+<dd><p>1</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.SequenceOption.SequenceOption.FORCED">
+<span class="sig-name descname"><span class="pre">FORCED</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.SequenceOption.SequenceOption.FORCED" title="Link to this definition">¶</a></dt>
+<dd><p>2</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.SequenceOption.SequenceOption.name">
+<span class="sig-name descname"><span class="pre">name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.SequenceOption.SequenceOption.name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.SequenceOption.SequenceOption.value">
+<span class="sig-name descname"><span class="pre">value</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.SequenceOption.SequenceOption.value" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserConstraints.PulserConstraints">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PulserConstraints</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/pulser_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.pulser_interface.qudi.interface.pulser_interface.PulserConstraints.PulserConstraints" title="Link to this definition">¶</a></dt>
+<dd><p class="rubric">Initialization</p>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          <div class="page-nav">
+            <div class="inner"><ul class="page-nav">
+  <li class="prev">
+    <a href="process_control_interface.html"
+       title="previous chapter">← ProcessSetpointInterface</a>
+  </li>
+  <li class="next">
+    <a href="sampled_finite_state_interface.html"
+       title="next chapter">SampledFiniteStateInterface →</a>
+  </li>
+</ul><div class="footer" role="contentinfo">
+      &#169; Copyright 2025, Molecular Quantum Nanophotonics Lab @ LENS.
+    <br>
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.1.3 with <a href="https://github.com/schettino72/sphinx_press_theme">Press Theme</a> 0.9.1.
+</div>
+            </div>
+          </div>
+      </page>
+    </div></div>
+    
+    
+  </body>
+</html>

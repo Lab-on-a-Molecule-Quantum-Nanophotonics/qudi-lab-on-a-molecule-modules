@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html  lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+      <title>MotorInterface</title>
+    
+          <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+          <link rel="stylesheet" href="../../_static/theme.css " type="text/css" />
+          <link rel="stylesheet" href="../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" type="text/css" />
+          <link rel="stylesheet" href="../../_static/exercise.css" type="text/css" />
+      
+      <!-- sphinx script_files -->
+        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+
+      
+      <!-- bundled in js (rollup iife) -->
+      <!-- <script src="../../_static/theme-vendors.js"></script> -->
+      <script src="../../_static/theme.js" defer></script>
+    
+      <link rel="shortcut icon" href="../../../../_static/logo.png"/>
+  <link rel="index" title="Index" href="../../genindex.html" />
+  <link rel="search" title="Search" href="../../search.html" />
+  <link rel="next" title="PIDControllerInterface" href="pid_controller_interface.html" />
+  <link rel="prev" title="MicrowaveInterface" href="microwave_interface.html" /> 
+  </head>
+
+  <body>
+    <div id="app">
+    <div class="theme-container" :class="pageClasses"><navbar @toggle-sidebar="toggleSidebar">
+  <router-link to="../../index.html" class="home-link">
+    
+      <span class="site-name">Qudi Lab on a molecule modules</span>
+    
+  </router-link>
+
+  <div class="links">
+    <navlinks class="can-hide">
+
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Tutorials:
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+    </navlinks>
+  </div>
+</navbar>
+
+      
+      <div class="sidebar-mask" @click="toggleSidebar(false)">
+      </div>
+        <sidebar @toggle-sidebar="toggleSidebar">
+          
+          <navlinks>
+            
+
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Tutorials:
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+            
+          </navlinks><div id="searchbox" class="searchbox" role="search">
+  <div class="caption"><span class="caption-text">Quick search</span>
+    <div class="searchformwrapper">
+      <form class="search" action="../../search.html" method="get">
+        <input type="text" name="q" />
+        <input type="submit" value="Search" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div><div class="sidebar-links" role="navigation" aria-label="main navigation">
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation">Tutorials:</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../Crash%20course%20into%20Qudi.html" class="reference internal ">    Tutorial: a crash course into Qudi</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../guides/excitation-spectroscopy.html" class="reference internal ">    Guide: Excitation spectroscopy</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../guides/state-machines.html" class="reference internal ">    Guide: State machines</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/setup_confocal_scanning.html" class="reference internal ">    Guide: Setting up confocal scanning</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/setup_odmr.html" class="reference internal ">    Guide: Setting up ODMR</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/setup_timeseries.html" class="reference internal ">    Guide: Setting up time series</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation">Contents:</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../installation.html" class="reference internal ">Installation</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../changelog-lens.html" class="reference internal ">Lens's changelog</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../index.html" class="reference internal ">Documentation of all modules</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/changelog.html" class="reference internal ">Ulm IQO's changelog (parent repository)</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../programming-guides.html" class="reference internal ">Programming guides: writing your own modules and understanding our hardwares.</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/iqo-specifics.html" class="reference internal ">Ulm IQO's specific guides</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+</div>
+        </sidebar>
+
+      <page>
+          <div class="body-header" role="navigation" aria-label="navigation">
+  
+  <ul class="breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+    
+      <li><a href="../index.html">Documentation of all modules</a> &raquo;</li>
+    
+      <li><a href="../interface.html">Interfaces</a> &raquo;</li>
+    
+    <li>MotorInterface</li>
+  </ul>
+  
+
+  <ul class="page-nav">
+  <li class="prev">
+    <a href="microwave_interface.html"
+       title="previous chapter">← MicrowaveInterface</a>
+  </li>
+  <li class="next">
+    <a href="pid_controller_interface.html"
+       title="next chapter">PIDControllerInterface →</a>
+  </li>
+</ul>
+  
+</div>
+<hr>
+          <div class="content" role="main" v-pre>
+            
+  <section id="motorinterface">
+<h1>MotorInterface<a class="headerlink" href="#motorinterface" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MotorInterface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qudi_main_weakref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/motor_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">qudi.core.module.Base</span></code></p>
+<p>This is the Interface class to define the controls for the simple
+step motor device. The actual hardware implementation might have a
+different amount of axis. Implement each single axis as ‘private’
+methods for the hardware class, which get called by the general method.</p>
+<p class="rubric">Initialization</p>
+<p>Initialise Base instance. Set up its state machine and initialize ConfigOption meta
+attributes from given config.</p>
+<p class="rubric" id="parameters">Parameters</p>
+<p>self : object
+The object being initialized.
+name : str
+Unique name for this module instance.
+configuration : dict
+Parameters from the configuration file.
+callbacks : dict
+Dictionary specifying functions to be run on state machine transitions.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.get_constraints">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_constraints</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/motor_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.get_constraints" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieve the hardware constrains from the motor device.</p>
+<p>&#64;return dict: dict with constraints for the magnet hardware. These
+constraints will be passed via the logic to the GUI so
+that proper display elements with boundary conditions
+could be made.</p>
+<p>Provides all the constraints for each axis of a motorized stage
+(like total travel distance, velocity, …)
+Each axis has its own dictionary, where the label is used as the
+identifier throughout the whole module. The dictionaries for each axis
+are again grouped together in a constraints dictionary in the form</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;&lt;label_axis0&gt;&#39;: axis0 }
+</pre></div>
+</div>
+<p>where axis0 is again a dict with the possible values defined below. The
+possible keys in the constraint are defined here in the interface file.
+If the hardware does not support the values for the constraints, then
+insert just None. If you are not sure about the meaning, look in other
+hardware files to get an impression.</p>
+<p class="rubric" id="example-of-how-a-return-dict-with-constraints-might-look-like">Example of how a return dict with constraints might look like:</p>
+<p>constraints = {}</p>
+<p>axis0 = {}
+axis0[‘label’] = ‘x’    # it is very crucial that this label coincides
+# with the label set in the config.
+axis0[‘unit’] = ‘m’     # the SI units, only possible m or degree
+axis0[‘ramp’] = [‘Sinus’,’Linear’], # a possible list of ramps
+axis0[‘pos_min’] = 0,
+axis0[‘pos_max’] = 100,  # that is basically the traveling range
+axis0[‘pos_step’] = 100,
+axis0[‘vel_min’] = 0,
+axis0[‘vel_max’] = 100,
+axis0[‘vel_step’] = 0.01,
+axis0[‘acc_min’] = 0.1
+axis0[‘acc_max’] = 0.0
+axis0[‘acc_step’] = 0.0</p>
+<p>axis1 = {}
+axis1[‘label’] = ‘phi’   that axis label should be obtained from config
+axis1[‘unit’] = ‘degree’        # the SI units
+axis1[‘ramp’] = [‘Sinus’,’Trapez’], # a possible list of ramps
+axis1[‘pos_min’] = 0,
+axis1[‘pos_max’] = 360,  # that is basically the traveling range
+axis1[‘pos_step’] = 100,
+axis1[‘vel_min’] = 1,
+axis1[‘vel_max’] = 20,
+axis1[‘vel_step’] = 0.1,
+axis1[‘acc_min’] = None
+axis1[‘acc_max’] = None
+axis1[‘acc_step’] = None</p>
+<p class="rubric" id="assign-the-parameter-container-for-x-to-a-name-which-will-identify-it">assign the parameter container for x to a name which will identify it</p>
+<p>constraints[axis0[‘label’]] = axis0
+constraints[axis1[‘label’]] = axis1</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.move_rel">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">move_rel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_dict</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/motor_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.move_rel" title="Link to this definition">¶</a></dt>
+<dd><p>Moves stage in given direction (relative movement)</p>
+<p>&#64;param dict param_dict: dictionary, which passes all the relevant
+parameters, which should be changed. Usage:
+{‘axis_label’: <the-abs-pos-value>}.
+‘axis_label’ must correspond to a label given
+to one of the axis.</p>
+<p>A smart idea would be to ask the position after the movement.</p>
+<p>&#64;return int: error code (0:OK, -1:error)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.move_abs">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">move_abs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_dict</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/motor_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.move_abs" title="Link to this definition">¶</a></dt>
+<dd><p>Moves stage to absolute position (absolute movement)</p>
+<p>&#64;param dict param_dict: dictionary, which passes all the relevant
+parameters, which should be changed. Usage:
+{‘axis_label’: <the-abs-pos-value>}.
+‘axis_label’ must correspond to a label given
+to one of the axis.</p>
+<p>&#64;return int: error code (0:OK, -1:error)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.abort">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">abort</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/motor_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.abort" title="Link to this definition">¶</a></dt>
+<dd><p>Stops movement of the stage</p>
+<p>&#64;return int: error code (0:OK, -1:error)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.get_pos">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_pos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/motor_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.get_pos" title="Link to this definition">¶</a></dt>
+<dd><p>Gets current position of the stage arms</p>
+<p>&#64;param list param_list: optional, if a specific position of an axis
+is desired, then the labels of the needed
+axis should be passed in the param_list.
+If nothing is passed, then from each axis the
+position is asked.</p>
+<p>&#64;return dict: with keys being the axis labels and item the current
+position.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.get_status">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/motor_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.get_status" title="Link to this definition">¶</a></dt>
+<dd><p>Get the status of the position</p>
+<p>&#64;param list param_list: optional, if a specific status of an axis
+is desired, then the labels of the needed
+axis should be passed in the param_list.
+If nothing is passed, then from each axis the
+status is asked.</p>
+<p>&#64;return dict: with the axis label as key and the status number as item.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.calibrate">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calibrate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/motor_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.calibrate" title="Link to this definition">¶</a></dt>
+<dd><p>Calibrates the stage.</p>
+<p>&#64;param dict param_list: param_list: optional, if a specific calibration
+of an axis is desired, then the labels of the
+needed axis should be passed in the param_list.
+If nothing is passed, then all connected axis
+will be calibrated.</p>
+<p>&#64;return int: error code (0:OK, -1:error)</p>
+<p>After calibration the stage moves to home position which will be the
+zero point for the passed axis. The calibration procedure will be
+different for each stage.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.get_velocity">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_velocity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/motor_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.get_velocity" title="Link to this definition">¶</a></dt>
+<dd><p>Gets the current velocity for all connected axes.</p>
+<p>&#64;param dict param_list: optional, if a specific velocity of an axis
+is desired, then the labels of the needed
+axis should be passed as the param_list.
+If nothing is passed, then from each axis the
+velocity is asked.</p>
+<p>&#64;return dict : with the axis label as key and the velocity as item.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.set_velocity">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_velocity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_dict</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/motor_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.set_velocity" title="Link to this definition">¶</a></dt>
+<dd><p>Write new value for velocity.</p>
+<p>&#64;param dict param_dict: dictionary, which passes all the relevant
+parameters, which should be changed. Usage:
+{‘axis_label’: <the-velocity-value>}.
+‘axis_label’ must correspond to a label given
+to one of the axis.</p>
+<p>&#64;return int: error code (0:OK, -1:error)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.move_to_main_thread">
+<span class="sig-name descname"><span class="pre">move_to_main_thread</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/motor_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.move_to_main_thread" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.module_thread">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_thread</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">PySide2.QtCore.QThread</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/motor_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.module_thread" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.module_name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/motor_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.module_name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.module_base">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_base</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/motor_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.module_base" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.module_uuid">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_uuid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">uuid.UUID</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/motor_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.module_uuid" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.module_default_data_dir">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_default_data_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/motor_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.module_default_data_dir" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.module_status_variables">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_status_variables</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/motor_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.module_status_variables" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.log">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">log</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">logging.Logger</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/motor_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.log" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.is_module_threaded">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_module_threaded</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/motor_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.is_module_threaded" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.connect_modules">
+<span class="sig-name descname"><span class="pre">connect_modules</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connections</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/motor_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.connect_modules" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.disconnect_modules">
+<span class="sig-name descname"><span class="pre">disconnect_modules</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/motor_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.disconnect_modules" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.on_activate">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_activate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/motor_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.on_activate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.on_deactivate">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_deactivate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/motor_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.motor_interface.qudi.interface.motor_interface.MotorInterface.MotorInterface.on_deactivate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          <div class="page-nav">
+            <div class="inner"><ul class="page-nav">
+  <li class="prev">
+    <a href="microwave_interface.html"
+       title="previous chapter">← MicrowaveInterface</a>
+  </li>
+  <li class="next">
+    <a href="pid_controller_interface.html"
+       title="next chapter">PIDControllerInterface →</a>
+  </li>
+</ul><div class="footer" role="contentinfo">
+      &#169; Copyright 2025, Molecular Quantum Nanophotonics Lab @ LENS.
+    <br>
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.1.3 with <a href="https://github.com/schettino72/sphinx_press_theme">Press Theme</a> 0.9.1.
+</div>
+            </div>
+          </div>
+      </page>
+    </div></div>
+    
+    
+  </body>
+</html>

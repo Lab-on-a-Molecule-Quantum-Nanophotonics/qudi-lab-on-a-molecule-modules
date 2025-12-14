@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html  lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+      <title>ScanningProbeInterface</title>
+    
+          <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+          <link rel="stylesheet" href="../../_static/theme.css " type="text/css" />
+          <link rel="stylesheet" href="../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" type="text/css" />
+          <link rel="stylesheet" href="../../_static/exercise.css" type="text/css" />
+      
+      <!-- sphinx script_files -->
+        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+
+      
+      <!-- bundled in js (rollup iife) -->
+      <!-- <script src="../../_static/theme-vendors.js"></script> -->
+      <script src="../../_static/theme.js" defer></script>
+    
+      <link rel="shortcut icon" href="../../../../_static/logo.png"/>
+  <link rel="index" title="Index" href="../../genindex.html" />
+  <link rel="search" title="Search" href="../../search.html" />
+  <link rel="next" title="SimpleLaserInterface" href="simple_laser_interface.html" />
+  <link rel="prev" title="SampledFiniteStateInterface" href="sampled_finite_state_interface.html" /> 
+  </head>
+
+  <body>
+    <div id="app">
+    <div class="theme-container" :class="pageClasses"><navbar @toggle-sidebar="toggleSidebar">
+  <router-link to="../../index.html" class="home-link">
+    
+      <span class="site-name">Qudi Lab on a molecule modules</span>
+    
+  </router-link>
+
+  <div class="links">
+    <navlinks class="can-hide">
+
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Tutorials:
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+    </navlinks>
+  </div>
+</navbar>
+
+      
+      <div class="sidebar-mask" @click="toggleSidebar(false)">
+      </div>
+        <sidebar @toggle-sidebar="toggleSidebar">
+          
+          <navlinks>
+            
+
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Tutorials:
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+            
+          </navlinks><div id="searchbox" class="searchbox" role="search">
+  <div class="caption"><span class="caption-text">Quick search</span>
+    <div class="searchformwrapper">
+      <form class="search" action="../../search.html" method="get">
+        <input type="text" name="q" />
+        <input type="submit" value="Search" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div><div class="sidebar-links" role="navigation" aria-label="main navigation">
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation">Tutorials:</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../Crash%20course%20into%20Qudi.html" class="reference internal ">    Tutorial: a crash course into Qudi</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../guides/excitation-spectroscopy.html" class="reference internal ">    Guide: Excitation spectroscopy</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../guides/state-machines.html" class="reference internal ">    Guide: State machines</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/setup_confocal_scanning.html" class="reference internal ">    Guide: Setting up confocal scanning</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/setup_odmr.html" class="reference internal ">    Guide: Setting up ODMR</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/setup_timeseries.html" class="reference internal ">    Guide: Setting up time series</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation">Contents:</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../installation.html" class="reference internal ">Installation</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../changelog-lens.html" class="reference internal ">Lens's changelog</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../index.html" class="reference internal ">Documentation of all modules</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/changelog.html" class="reference internal ">Ulm IQO's changelog (parent repository)</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../programming-guides.html" class="reference internal ">Programming guides: writing your own modules and understanding our hardwares.</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/iqo-specifics.html" class="reference internal ">Ulm IQO's specific guides</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+</div>
+        </sidebar>
+
+      <page>
+          <div class="body-header" role="navigation" aria-label="navigation">
+  
+  <ul class="breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+    
+      <li><a href="../index.html">Documentation of all modules</a> &raquo;</li>
+    
+      <li><a href="../interface.html">Interfaces</a> &raquo;</li>
+    
+    <li>ScanningProbeInterface</li>
+  </ul>
+  
+
+  <ul class="page-nav">
+  <li class="prev">
+    <a href="sampled_finite_state_interface.html"
+       title="previous chapter">← SampledFiniteStateInterface</a>
+  </li>
+  <li class="next">
+    <a href="simple_laser_interface.html"
+       title="next chapter">SimpleLaserInterface →</a>
+  </li>
+</ul>
+  
+</div>
+<hr>
+          <div class="content" role="main" v-pre>
+            
+  <section id="scanningprobeinterface">
+<h1>ScanningProbeInterface<a class="headerlink" href="#scanningprobeinterface" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ScanningProbeInterface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">qudi.core.module.Base</span></code></p>
+<p>This is the Interface class to define the controls for a scanning probe device</p>
+<p>A scanner device is hardware that can move multiple axes.</p>
+<p class="rubric">Initialization</p>
+<p>Initialise Base instance. Set up its state machine and initialize ConfigOption meta
+attributes from given config.</p>
+<p class="rubric" id="parameters">Parameters</p>
+<p>self : object
+The object being initialized.
+name : str
+Unique name for this module instance.
+configuration : dict
+Parameters from the configuration file.
+callbacks : dict
+Dictionary specifying functions to be run on state machine transitions.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.coordinate_transform">
+<span class="sig-name descname"><span class="pre">coordinate_transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inverse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.coordinate_transform" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.set_coordinate_transform">
+<span class="sig-name descname"><span class="pre">set_coordinate_transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transform_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform_matrix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.set_coordinate_transform" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.coordinate_transform_enabled">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">coordinate_transform_enabled</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.coordinate_transform_enabled" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.supports_coordinate_transform">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">supports_coordinate_transform</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.supports_coordinate_transform" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.constraints">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">constraints</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanConstraints.ScanConstraints" title="qudi.interface.scanning_probe_interface.ScanConstraints"><span class="pre">qudi.interface.scanning_probe_interface.ScanConstraints</span></a></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.constraints" title="Link to this definition">¶</a></dt>
+<dd><p>Read-only property returning the constraints of this scanning probe hardware.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.reset">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.reset" title="Link to this definition">¶</a></dt>
+<dd><p>Hard reset of the hardware.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.scan_settings">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">scan_settings</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanSettings.ScanSettings" title="qudi.interface.scanning_probe_interface.ScanSettings"><span class="pre">qudi.interface.scanning_probe_interface.ScanSettings</span></a><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.scan_settings" title="Link to this definition">¶</a></dt>
+<dd><p>Property returning all parameters needed for a 1D or 2D scan. Returns None if not configured.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.back_scan_settings">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">back_scan_settings</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanSettings.ScanSettings" title="qudi.interface.scanning_probe_interface.ScanSettings"><span class="pre">qudi.interface.scanning_probe_interface.ScanSettings</span></a><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.back_scan_settings" title="Link to this definition">¶</a></dt>
+<dd><p>Property returning all parameters of the backwards scan. Returns None if not configured or not available.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.configure_scan">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">configure_scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanSettings.ScanSettings" title="qudi.interface.scanning_probe_interface.ScanSettings"><span class="pre">qudi.interface.scanning_probe_interface.ScanSettings</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.configure_scan" title="Link to this definition">¶</a></dt>
+<dd><p>Configure the hardware with all parameters needed for a 1D or 2D scan.
+Raise an exception if the settings are invalid and do not comply with the hardware constraints.
+Will reset back scan configuration if back scan is available.</p>
+<p>&#64;param ScanSettings settings: ScanSettings instance holding all parameters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.configure_back_scan">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">configure_back_scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanSettings.ScanSettings" title="qudi.interface.scanning_probe_interface.ScanSettings"><span class="pre">qudi.interface.scanning_probe_interface.ScanSettings</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.configure_back_scan" title="Link to this definition">¶</a></dt>
+<dd><p>Configure the hardware with all parameters of the backwards scan.
+Raise an exception if the settings are invalid and do not comply with the hardware constraints.
+If a back scan is not explicitly configured, hardware-specific default settings will be used.</p>
+<p>&#64;param ScanSettings settings: ScanSettings instance holding all parameters for the back scan</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.move_absolute">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">move_absolute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">position</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">velocity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blocking</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.move_absolute" title="Link to this definition">¶</a></dt>
+<dd><p>Move the scanning probe to an absolute position as fast as possible or with a defined
+velocity.</p>
+<p>Log error and return current target position if something fails or a scan is in progress.</p>
+<p>&#64;param dict position: absolute positions for all axes to move to, axis names as keys
+&#64;param float velocity: movement velocity
+&#64;param bool blocking: If True this call returns only after the final position is reached.</p>
+<p>&#64;return dict: new position of all axes</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.move_relative">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">move_relative</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">velocity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blocking</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.move_relative" title="Link to this definition">¶</a></dt>
+<dd><p>Move the scanning probe by a relative distance from the current target position as fast
+as possible or with a defined velocity.</p>
+<p>Log error if something fails or a 1D/2D scan is in progress.</p>
+<p>&#64;param dict distance: relative distance for all axes to move by, axis names as keys
+&#64;param float velocity: movement velocity
+&#64;param bool blocking: If True this call returns only after the final position is reached.</p>
+<p>&#64;return dict: new position of all axes</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.get_target">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_target</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.get_target" title="Link to this definition">¶</a></dt>
+<dd><p>Get the current target position of the scanner hardware
+(i.e. the “theoretical” position).</p>
+<p>&#64;return dict: current target position per axis.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.get_position">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_position</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.get_position" title="Link to this definition">¶</a></dt>
+<dd><p>Get a snapshot of the actual scanner position (i.e. from position feedback sensors).
+For the same target this value can fluctuate according to the scanners positioning accuracy.</p>
+<p>For scanning devices that do not have position feedback sensors, simply return the target
+position (see also: ScanningProbeInterface.get_target).</p>
+<p>&#64;return dict: current position per axis.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.start_scan">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">start_scan</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.start_scan" title="Link to this definition">¶</a></dt>
+<dd><p>Start a scan as configured beforehand.
+Log an error if something fails or a 1D/2D scan is in progress.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.stop_scan">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">stop_scan</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.stop_scan" title="Link to this definition">¶</a></dt>
+<dd><p>Stop the currently running scan.
+Log an error if something fails or no 1D/2D scan is in progress.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.get_scan_data">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_scan_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanData.ScanData" title="qudi.interface.scanning_probe_interface.ScanData"><span class="pre">qudi.interface.scanning_probe_interface.ScanData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.get_scan_data" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieve the ScanData instance used in the scan.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.get_back_scan_data">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_back_scan_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanData.ScanData" title="qudi.interface.scanning_probe_interface.ScanData"><span class="pre">qudi.interface.scanning_probe_interface.ScanData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.get_back_scan_data" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieve the ScanData instance used in the backwards scan.
+Return None if back scan was not configured or is not available at all.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.emergency_stop">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">emergency_stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.emergency_stop" title="Link to this definition">¶</a></dt>
+<dd><p>TODO: document what this should to differently than stop_scan.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.move_to_main_thread">
+<span class="sig-name descname"><span class="pre">move_to_main_thread</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.move_to_main_thread" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.module_thread">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_thread</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">PySide2.QtCore.QThread</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.module_thread" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.module_name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.module_name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.module_base">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_base</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.module_base" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.module_uuid">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_uuid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">uuid.UUID</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.module_uuid" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.module_default_data_dir">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_default_data_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.module_default_data_dir" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.module_status_variables">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_status_variables</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.module_status_variables" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.log">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">log</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">logging.Logger</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.log" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.is_module_threaded">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_module_threaded</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.is_module_threaded" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.connect_modules">
+<span class="sig-name descname"><span class="pre">connect_modules</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connections</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.connect_modules" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.disconnect_modules">
+<span class="sig-name descname"><span class="pre">disconnect_modules</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.disconnect_modules" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.on_activate">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_activate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.on_activate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.on_deactivate">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_deactivate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanningProbeInterface.ScanningProbeInterface.on_deactivate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanImage.ScanImage">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ScanImage</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanImage.ScanImage" title="Link to this definition">¶</a></dt>
+<dd><p>Immutable class containing all data associated to a SPM image.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanImage.ScanImage.axis_units">
+<span class="sig-name descname"><span class="pre">axis_units</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanImage.ScanImage.axis_units" title="Link to this definition">¶</a></dt>
+<dd><p>None</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanImage.ScanImage.axis_names">
+<span class="sig-name descname"><span class="pre">axis_names</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanImage.ScanImage.axis_names" title="Link to this definition">¶</a></dt>
+<dd><p>None</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanImage.ScanImage.ranges">
+<span class="sig-name descname"><span class="pre">ranges</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanImage.ScanImage.ranges" title="Link to this definition">¶</a></dt>
+<dd><p>None</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanImage.ScanImage.data">
+<span class="sig-name descname"><span class="pre">data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanImage.ScanImage.data" title="Link to this definition">¶</a></dt>
+<dd><p>None</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanImage.ScanImage.data_name">
+<span class="sig-name descname"><span class="pre">data_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanImage.ScanImage.data_name" title="Link to this definition">¶</a></dt>
+<dd><p>None</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanImage.ScanImage.data_unit">
+<span class="sig-name descname"><span class="pre">data_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanImage.ScanImage.data_unit" title="Link to this definition">¶</a></dt>
+<dd><p>None</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanImage.ScanImage.from_scan_data">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_scan_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scan_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanData.ScanData" title="qudi.interface.scanning_probe_interface.ScanData"><span class="pre">qudi.interface.scanning_probe_interface.ScanData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanImage.ScanImage" title="qudi.interface.scanning_probe_interface.ScanImage"><span class="pre">qudi.interface.scanning_probe_interface.ScanImage</span></a></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanImage.ScanImage.from_scan_data" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanImage.ScanImage.scan_resolutions">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">scan_resolutions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanImage.ScanImage.scan_resolutions" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanImage.ScanImage.scan_dimension">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">scan_dimension</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanImage.ScanImage.scan_dimension" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanImage.ScanImage.scan_ranges">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">scan_ranges</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanImage.ScanImage.scan_ranges" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanImage.ScanImage.si_factors">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">si_factors</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">qudi.util.units.ScaledFloat</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanImage.ScanImage.si_factors" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanData.ScanData">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ScanData</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanData.ScanData" title="Link to this definition">¶</a></dt>
+<dd><p>Data class representing settings and results of a scanning probe measurement.</p>
+<p>scanner_target_at_start may contain positions of axes other than the axes used in this scan.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanData.ScanData.settings">
+<span class="sig-name descname"><span class="pre">settings</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanSettings.ScanSettings" title="qudi.interface.scanning_probe_interface.ScanSettings"><span class="pre">qudi.interface.scanning_probe_interface.ScanSettings</span></a></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanData.ScanData.settings" title="Link to this definition">¶</a></dt>
+<dd><p>None</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanData.ScanData.scanner_target_at_start">
+<span class="sig-name descname"><span class="pre">scanner_target_at_start</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanData.ScanData.scanner_target_at_start" title="Link to this definition">¶</a></dt>
+<dd><p>‘field(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanData.ScanData.timestamp">
+<span class="sig-name descname"><span class="pre">timestamp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime.datetime</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanData.ScanData.timestamp" title="Link to this definition">¶</a></dt>
+<dd><p>None</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanData.ScanData.coord_transform_info">
+<span class="sig-name descname"><span class="pre">coord_transform_info</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanData.ScanData.coord_transform_info" title="Link to this definition">¶</a></dt>
+<dd><p>‘field(…)’</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanData.ScanData.from_constraints">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_constraints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanSettings.ScanSettings" title="qudi.interface.scanning_probe_interface.ScanSettings"><span class="pre">qudi.interface.scanning_probe_interface.ScanSettings</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraints</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanConstraints.ScanConstraints" title="qudi.interface.scanning_probe_interface.ScanConstraints"><span class="pre">qudi.interface.scanning_probe_interface.ScanConstraints</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanData.ScanData.from_constraints" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanData.ScanData.from_dict">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dict_repr</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanData.ScanData.from_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Create a class instance from a dictionary.
+ScanData contains ScanSettings, which is itself a dataclass
+and needs to be reconstructed separately.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanData.ScanData.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanData.ScanData.to_dict" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanData.ScanData.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanData.ScanData.copy" title="Link to this definition">¶</a></dt>
+<dd><p>Create a copy of this object.
+Take care to copy all (mutable) arrays and dicts.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanData.ScanData.channel_units">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">channel_units</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanData.ScanData.channel_units" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanData.ScanData.channel_dtypes">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">channel_dtypes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanData.ScanData.channel_dtypes" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanData.ScanData.axis_units">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">axis_units</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanData.ScanData.axis_units" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanData.ScanData.data">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanData.ScanData.data" title="Link to this definition">¶</a></dt>
+<dd><p>Dict of channel data arrays with channel names as keys.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanData.ScanData.position_data">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">position_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanData.ScanData.position_data" title="Link to this definition">¶</a></dt>
+<dd><p>Dict of (axis) position data arrays with axis names as keys.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanData.ScanData.new_scan">
+<span class="sig-name descname"><span class="pre">new_scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timestamp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanData.ScanData.new_scan" title="Link to this definition">¶</a></dt>
+<dd><p>Reset data and position data and update the timestamp.
+&#64;param timestamp:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanConstraints.ScanConstraints">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ScanConstraints</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanConstraints.ScanConstraints" title="Link to this definition">¶</a></dt>
+<dd><p>Data class representing the complete constraints of a scanning probe measurement.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanConstraints.ScanConstraints.channel_objects">
+<span class="sig-name descname"><span class="pre">channel_objects</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScannerChannel.ScannerChannel" title="qudi.interface.scanning_probe_interface.ScannerChannel"><span class="pre">qudi.interface.scanning_probe_interface.ScannerChannel</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanConstraints.ScanConstraints.channel_objects" title="Link to this definition">¶</a></dt>
+<dd><p>None</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanConstraints.ScanConstraints.axis_objects">
+<span class="sig-name descname"><span class="pre">axis_objects</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScannerAxis.ScannerAxis" title="qudi.interface.scanning_probe_interface.ScannerAxis"><span class="pre">qudi.interface.scanning_probe_interface.ScannerAxis</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanConstraints.ScanConstraints.axis_objects" title="Link to this definition">¶</a></dt>
+<dd><p>None</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanConstraints.ScanConstraints.back_scan_capability">
+<span class="sig-name descname"><span class="pre">back_scan_capability</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">qudi.interface.scanning_probe_interface.BackScanCapability</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanConstraints.ScanConstraints.back_scan_capability" title="Link to this definition">¶</a></dt>
+<dd><p>None</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanConstraints.ScanConstraints.has_position_feedback">
+<span class="sig-name descname"><span class="pre">has_position_feedback</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanConstraints.ScanConstraints.has_position_feedback" title="Link to this definition">¶</a></dt>
+<dd><p>None</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanConstraints.ScanConstraints.square_px_only">
+<span class="sig-name descname"><span class="pre">square_px_only</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanConstraints.ScanConstraints.square_px_only" title="Link to this definition">¶</a></dt>
+<dd><p>None</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanConstraints.ScanConstraints.channels">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">channels</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScannerChannel.ScannerChannel" title="qudi.interface.scanning_probe_interface.ScannerChannel"><span class="pre">qudi.interface.scanning_probe_interface.ScannerChannel</span></a><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanConstraints.ScanConstraints.channels" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanConstraints.ScanConstraints.axes">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">axes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScannerAxis.ScannerAxis" title="qudi.interface.scanning_probe_interface.ScannerAxis"><span class="pre">qudi.interface.scanning_probe_interface.ScannerAxis</span></a><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanConstraints.ScanConstraints.axes" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanConstraints.ScanConstraints.check_settings">
+<span class="sig-name descname"><span class="pre">check_settings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanSettings.ScanSettings" title="qudi.interface.scanning_probe_interface.ScanSettings"><span class="pre">qudi.interface.scanning_probe_interface.ScanSettings</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanConstraints.ScanConstraints.check_settings" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanConstraints.ScanConstraints.check_back_scan_settings">
+<span class="sig-name descname"><span class="pre">check_back_scan_settings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backward_settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanSettings.ScanSettings" title="qudi.interface.scanning_probe_interface.ScanSettings"><span class="pre">qudi.interface.scanning_probe_interface.ScanSettings</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">forward_settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanSettings.ScanSettings" title="qudi.interface.scanning_probe_interface.ScanSettings"><span class="pre">qudi.interface.scanning_probe_interface.ScanSettings</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanConstraints.ScanConstraints.check_back_scan_settings" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanConstraints.ScanConstraints.check_channels">
+<span class="sig-name descname"><span class="pre">check_channels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanSettings.ScanSettings" title="qudi.interface.scanning_probe_interface.ScanSettings"><span class="pre">qudi.interface.scanning_probe_interface.ScanSettings</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanConstraints.ScanConstraints.check_channels" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanConstraints.ScanConstraints.check_axes_names">
+<span class="sig-name descname"><span class="pre">check_axes_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanSettings.ScanSettings" title="qudi.interface.scanning_probe_interface.ScanSettings"><span class="pre">qudi.interface.scanning_probe_interface.ScanSettings</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanConstraints.ScanConstraints.check_axes_names" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanConstraints.ScanConstraints.check_axes">
+<span class="sig-name descname"><span class="pre">check_axes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanSettings.ScanSettings" title="qudi.interface.scanning_probe_interface.ScanSettings"><span class="pre">qudi.interface.scanning_probe_interface.ScanSettings</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanConstraints.ScanConstraints.check_axes" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanConstraints.ScanConstraints.check_feedback">
+<span class="sig-name descname"><span class="pre">check_feedback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanSettings.ScanSettings" title="qudi.interface.scanning_probe_interface.ScanSettings"><span class="pre">qudi.interface.scanning_probe_interface.ScanSettings</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanConstraints.ScanConstraints.check_feedback" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanConstraints.ScanConstraints.clip">
+<span class="sig-name descname"><span class="pre">clip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanSettings.ScanSettings" title="qudi.interface.scanning_probe_interface.ScanSettings"><span class="pre">qudi.interface.scanning_probe_interface.ScanSettings</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanSettings.ScanSettings" title="qudi.interface.scanning_probe_interface.ScanSettings"><span class="pre">qudi.interface.scanning_probe_interface.ScanSettings</span></a></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanConstraints.ScanConstraints.clip" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanSettings.ScanSettings">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ScanSettings</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanSettings.ScanSettings" title="Link to this definition">¶</a></dt>
+<dd><p>Data class representing all settings specifying a scanning probe measurement.</p>
+<p>&#64;param str[] channels: names of scanner channels involved in this scan
+&#64;param str[] axes: names of scanner axes involved in this scan
+&#64;param float[][2] range: inclusive range for each scan axis
+&#64;param int[] resolution: planned number of points for each scan axis
+&#64;param float frequency: Scan pixel frequency of the fast axis
+&#64;param str[] position_feedback_axes: optional, names of axes for which to acquire position
+feedback during the scan.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanSettings.ScanSettings.channels">
+<span class="sig-name descname"><span class="pre">channels</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanSettings.ScanSettings.channels" title="Link to this definition">¶</a></dt>
+<dd><p>None</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanSettings.ScanSettings.axes">
+<span class="sig-name descname"><span class="pre">axes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanSettings.ScanSettings.axes" title="Link to this definition">¶</a></dt>
+<dd><p>None</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanSettings.ScanSettings.range">
+<span class="sig-name descname"><span class="pre">range</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanSettings.ScanSettings.range" title="Link to this definition">¶</a></dt>
+<dd><p>None</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanSettings.ScanSettings.resolution">
+<span class="sig-name descname"><span class="pre">resolution</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanSettings.ScanSettings.resolution" title="Link to this definition">¶</a></dt>
+<dd><p>None</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanSettings.ScanSettings.frequency">
+<span class="sig-name descname"><span class="pre">frequency</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanSettings.ScanSettings.frequency" title="Link to this definition">¶</a></dt>
+<dd><p>None</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanSettings.ScanSettings.position_feedback_axes">
+<span class="sig-name descname"><span class="pre">position_feedback_axes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanSettings.ScanSettings.position_feedback_axes" title="Link to this definition">¶</a></dt>
+<dd><p>‘field(…)’</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanSettings.ScanSettings.from_dict">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dict_repr</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanSettings.ScanSettings.from_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Create instance from dict taking care to convert arguments to tuples.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanSettings.ScanSettings.has_position_feedback">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">has_position_feedback</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanSettings.ScanSettings.has_position_feedback" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanSettings.ScanSettings.scan_dimension">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">scan_dimension</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScanSettings.ScanSettings.scan_dimension" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScannerAxis.ScannerAxis">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ScannerAxis</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScannerAxis.ScannerAxis" title="Link to this definition">¶</a></dt>
+<dd><p>Data class representing a scan axis and its constraints.
+Then scan axes are swept during a scanning probe measurement.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScannerAxis.ScannerAxis.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScannerAxis.ScannerAxis.name" title="Link to this definition">¶</a></dt>
+<dd><p>None</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScannerAxis.ScannerAxis.unit">
+<span class="sig-name descname"><span class="pre">unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScannerAxis.ScannerAxis.unit" title="Link to this definition">¶</a></dt>
+<dd><p>None</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScannerAxis.ScannerAxis.position">
+<span class="sig-name descname"><span class="pre">position</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">qudi.util.constraints.ScalarConstraint</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScannerAxis.ScannerAxis.position" title="Link to this definition">¶</a></dt>
+<dd><p>None</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScannerAxis.ScannerAxis.step">
+<span class="sig-name descname"><span class="pre">step</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">qudi.util.constraints.ScalarConstraint</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScannerAxis.ScannerAxis.step" title="Link to this definition">¶</a></dt>
+<dd><p>None</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScannerAxis.ScannerAxis.resolution">
+<span class="sig-name descname"><span class="pre">resolution</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">qudi.util.constraints.ScalarConstraint</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScannerAxis.ScannerAxis.resolution" title="Link to this definition">¶</a></dt>
+<dd><p>None</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScannerAxis.ScannerAxis.frequency">
+<span class="sig-name descname"><span class="pre">frequency</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">qudi.util.constraints.ScalarConstraint</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScannerAxis.ScannerAxis.frequency" title="Link to this definition">¶</a></dt>
+<dd><p>None</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScannerChannel.ScannerChannel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ScannerChannel</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScannerChannel.ScannerChannel" title="Link to this definition">¶</a></dt>
+<dd><p>Data class representing a scanner channel and its constraints.
+A scanner channel is the probe device of a scanning probe measurement,
+e.g. a counter connected to an APD or other single-photon counting module.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScannerChannel.ScannerChannel.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScannerChannel.ScannerChannel.name" title="Link to this definition">¶</a></dt>
+<dd><p>None</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScannerChannel.ScannerChannel.unit">
+<span class="sig-name descname"><span class="pre">unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;Multiline-String&gt;</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScannerChannel.ScannerChannel.unit" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScannerChannel.ScannerChannel.dtype">
+<span class="sig-name descname"><span class="pre">dtype</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/scanning_probe_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.scanning_probe_interface.qudi.interface.scanning_probe_interface.ScannerChannel.ScannerChannel.dtype" title="Link to this definition">¶</a></dt>
+<dd><p>‘float64’</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          <div class="page-nav">
+            <div class="inner"><ul class="page-nav">
+  <li class="prev">
+    <a href="sampled_finite_state_interface.html"
+       title="previous chapter">← SampledFiniteStateInterface</a>
+  </li>
+  <li class="next">
+    <a href="simple_laser_interface.html"
+       title="next chapter">SimpleLaserInterface →</a>
+  </li>
+</ul><div class="footer" role="contentinfo">
+      &#169; Copyright 2025, Molecular Quantum Nanophotonics Lab @ LENS.
+    <br>
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.1.3 with <a href="https://github.com/schettino72/sphinx_press_theme">Press Theme</a> 0.9.1.
+</div>
+            </div>
+          </div>
+      </page>
+    </div></div>
+    
+    
+  </body>
+</html>

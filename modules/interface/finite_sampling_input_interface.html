@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html  lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+      <title>FiniteSamplingInputInterface</title>
+    
+          <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+          <link rel="stylesheet" href="../../_static/theme.css " type="text/css" />
+          <link rel="stylesheet" href="../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" type="text/css" />
+          <link rel="stylesheet" href="../../_static/exercise.css" type="text/css" />
+      
+      <!-- sphinx script_files -->
+        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+
+      
+      <!-- bundled in js (rollup iife) -->
+      <!-- <script src="../../_static/theme-vendors.js"></script> -->
+      <script src="../../_static/theme.js" defer></script>
+    
+      <link rel="shortcut icon" href="../../../../_static/logo.png"/>
+  <link rel="index" title="Index" href="../../genindex.html" />
+  <link rel="search" title="Search" href="../../search.html" />
+  <link rel="next" title="FiniteSamplingIOInterface" href="finite_sampling_io_interface.html" />
+  <link rel="prev" title="FastCounterInterface" href="fast_counter_interface.html" /> 
+  </head>
+
+  <body>
+    <div id="app">
+    <div class="theme-container" :class="pageClasses"><navbar @toggle-sidebar="toggleSidebar">
+  <router-link to="../../index.html" class="home-link">
+    
+      <span class="site-name">Qudi Lab on a molecule modules</span>
+    
+  </router-link>
+
+  <div class="links">
+    <navlinks class="can-hide">
+
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Tutorials:
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+    </navlinks>
+  </div>
+</navbar>
+
+      
+      <div class="sidebar-mask" @click="toggleSidebar(false)">
+      </div>
+        <sidebar @toggle-sidebar="toggleSidebar">
+          
+          <navlinks>
+            
+
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Tutorials:
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+            
+          </navlinks><div id="searchbox" class="searchbox" role="search">
+  <div class="caption"><span class="caption-text">Quick search</span>
+    <div class="searchformwrapper">
+      <form class="search" action="../../search.html" method="get">
+        <input type="text" name="q" />
+        <input type="submit" value="Search" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div><div class="sidebar-links" role="navigation" aria-label="main navigation">
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation">Tutorials:</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../Crash%20course%20into%20Qudi.html" class="reference internal ">    Tutorial: a crash course into Qudi</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../guides/excitation-spectroscopy.html" class="reference internal ">    Guide: Excitation spectroscopy</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../guides/state-machines.html" class="reference internal ">    Guide: State machines</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/setup_confocal_scanning.html" class="reference internal ">    Guide: Setting up confocal scanning</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/setup_odmr.html" class="reference internal ">    Guide: Setting up ODMR</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/setup_timeseries.html" class="reference internal ">    Guide: Setting up time series</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation">Contents:</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../installation.html" class="reference internal ">Installation</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../changelog-lens.html" class="reference internal ">Lens's changelog</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../index.html" class="reference internal ">Documentation of all modules</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/changelog.html" class="reference internal ">Ulm IQO's changelog (parent repository)</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../programming-guides.html" class="reference internal ">Programming guides: writing your own modules and understanding our hardwares.</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/iqo-specifics.html" class="reference internal ">Ulm IQO's specific guides</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+</div>
+        </sidebar>
+
+      <page>
+          <div class="body-header" role="navigation" aria-label="navigation">
+  
+  <ul class="breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+    
+      <li><a href="../index.html">Documentation of all modules</a> &raquo;</li>
+    
+      <li><a href="../interface.html">Interfaces</a> &raquo;</li>
+    
+    <li>FiniteSamplingInputInterface</li>
+  </ul>
+  
+
+  <ul class="page-nav">
+  <li class="prev">
+    <a href="fast_counter_interface.html"
+       title="previous chapter">← FastCounterInterface</a>
+  </li>
+  <li class="next">
+    <a href="finite_sampling_io_interface.html"
+       title="next chapter">FiniteSamplingIOInterface →</a>
+  </li>
+</ul>
+  
+</div>
+<hr>
+          <div class="content" role="main" v-pre>
+            
+  <section id="finitesamplinginputinterface">
+<h1>FiniteSamplingInputInterface<a class="headerlink" href="#finitesamplinginputinterface" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FiniteSamplingInputInterface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qudi_main_weakref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/finite_sampling_input_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">qudi.core.module.Base</span></code></p>
+<p>Interface for input of data of a certain length at a given sampling rate and data type.</p>
+<p class="rubric">Initialization</p>
+<p>Initialise Base instance. Set up its state machine and initialize ConfigOption meta
+attributes from given config.</p>
+<p class="rubric" id="parameters">Parameters</p>
+<p>self : object
+The object being initialized.
+name : str
+Unique name for this module instance.
+configuration : dict
+Parameters from the configuration file.
+callbacks : dict
+Dictionary specifying functions to be run on state machine transitions.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.constraints">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">constraints</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/finite_sampling_input_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.constraints" title="Link to this definition">¶</a></dt>
+<dd><p>Constraints of the sampling input as specified in the FiniteSamplingInputConstraints class.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.active_channels">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">active_channels</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/finite_sampling_input_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.active_channels" title="Link to this definition">¶</a></dt>
+<dd><p>Names of all currently active channels.</p>
+<p>&#64;return frozenset: The active channel name strings as set</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.sample_rate">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sample_rate</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/finite_sampling_input_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.sample_rate" title="Link to this definition">¶</a></dt>
+<dd><p>The sample rate (in Hz) at which the samples will be acquired.</p>
+<p>&#64;return float: The current sample rate in Hz</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.frame_size">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frame_size</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/finite_sampling_input_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.frame_size" title="Link to this definition">¶</a></dt>
+<dd><p>Currently set number of samples per channel to acquire for each data frame.</p>
+<p>&#64;return int: Number of samples per frame</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.samples_in_buffer">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">samples_in_buffer</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/finite_sampling_input_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.samples_in_buffer" title="Link to this definition">¶</a></dt>
+<dd><p>Currently available samples per channel being held in the input buffer.
+This is the current minimum number of samples to be read with “get_buffered_samples()”
+without blocking.</p>
+<p>&#64;return int: Number of unread samples per channel</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.set_sample_rate">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_sample_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rate</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/finite_sampling_input_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.set_sample_rate" title="Link to this definition">¶</a></dt>
+<dd><p>Will set the sample rate to a new value.</p>
+<p>&#64;param float rate: The sample rate to set</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.set_active_channels">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_active_channels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channels</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/finite_sampling_input_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.set_active_channels" title="Link to this definition">¶</a></dt>
+<dd><p>Will set the currently active channels. All other channels will be deactivated.</p>
+<p>&#64;param iterable(str) channels: Iterable of channel names to set active.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.set_frame_size">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_frame_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/finite_sampling_input_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.set_frame_size" title="Link to this definition">¶</a></dt>
+<dd><p>Will set the number of samples per channel to acquire within one frame.</p>
+<p>&#64;param int size: The sample rate to set</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.start_buffered_acquisition">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">start_buffered_acquisition</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/finite_sampling_input_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.start_buffered_acquisition" title="Link to this definition">¶</a></dt>
+<dd><p>Will start the acquisition of a data frame in a non-blocking way.
+Must return immediately and not wait for the data acquisition to finish.</p>
+<p>Must raise exception if data acquisition can not be started.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.stop_buffered_acquisition">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">stop_buffered_acquisition</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/finite_sampling_input_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.stop_buffered_acquisition" title="Link to this definition">¶</a></dt>
+<dd><p>Will abort the currently running data frame acquisition.
+Will return AFTER the data acquisition has been terminated without waiting for all samples
+to be acquired (if possible).</p>
+<p>Must NOT raise exceptions if no data acquisition is running.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.get_buffered_samples">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_buffered_samples</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">number_of_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/finite_sampling_input_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.get_buffered_samples" title="Link to this definition">¶</a></dt>
+<dd><p>Returns a chunk of the current data frame for all active channels read from the frame
+buffer.
+If parameter &lt;number_of_samples&gt; is omitted, this method will return the currently
+available samples within the frame buffer (i.e. the value of property &lt;samples_in_buffer&gt;).
+If &lt;number_of_samples&gt; is exceeding the currently available samples in the frame buffer,
+this method will block until the requested number of samples is available.
+If the explicitly requested number of samples is exceeding the number of samples pending
+for acquisition in the rest of this frame, raise an exception.</p>
+<p>Samples that have been already returned from an earlier call to this method are not
+available anymore and can be considered discarded by the hardware. So this method is
+effectively decreasing the value of property &lt;samples_in_buffer&gt; (until new samples have
+been read).</p>
+<p>If the data acquisition has been stopped before the frame has been acquired completely,
+this method must still return all available samples already read into buffer.</p>
+<p>&#64;param int number_of_samples: optional, the number of samples to read from buffer</p>
+<p>&#64;return dict: Sample arrays (values) for each active channel (keys)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.acquire_frame">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">acquire_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/finite_sampling_input_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.acquire_frame" title="Link to this definition">¶</a></dt>
+<dd><p>Acquire a single data frame for all active channels.
+This method call is blocking until the entire data frame has been acquired.</p>
+<p>If an explicit frame_size is given as parameter, it will not overwrite the property
+&lt;frame_size&gt; but just be valid for this single frame.</p>
+<p>See &lt;start_buffered_acquisition&gt;, &lt;stop_buffered_acquisition&gt; and &lt;get_buffered_samples&gt;
+for more details.</p>
+<p>&#64;param int frame_size: optional, the number of samples to acquire in this frame</p>
+<p>&#64;return dict: Sample arrays (values) for each active channel (keys)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.move_to_main_thread">
+<span class="sig-name descname"><span class="pre">move_to_main_thread</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/finite_sampling_input_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.move_to_main_thread" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.module_thread">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_thread</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">PySide2.QtCore.QThread</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/finite_sampling_input_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.module_thread" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.module_name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/finite_sampling_input_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.module_name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.module_base">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_base</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/finite_sampling_input_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.module_base" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.module_uuid">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_uuid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">uuid.UUID</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/finite_sampling_input_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.module_uuid" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.module_default_data_dir">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_default_data_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/finite_sampling_input_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.module_default_data_dir" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.module_status_variables">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_status_variables</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/finite_sampling_input_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.module_status_variables" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.log">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">log</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">logging.Logger</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/finite_sampling_input_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.log" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.is_module_threaded">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_module_threaded</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/finite_sampling_input_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.is_module_threaded" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.connect_modules">
+<span class="sig-name descname"><span class="pre">connect_modules</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connections</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/finite_sampling_input_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.connect_modules" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.disconnect_modules">
+<span class="sig-name descname"><span class="pre">disconnect_modules</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/finite_sampling_input_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.disconnect_modules" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.on_activate">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_activate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/finite_sampling_input_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.on_activate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.on_deactivate">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_deactivate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/finite_sampling_input_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputInterface.FiniteSamplingInputInterface.on_deactivate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputConstraints.FiniteSamplingInputConstraints">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FiniteSamplingInputConstraints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel_units</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_size_limits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_rate_limits</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/finite_sampling_input_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputConstraints.FiniteSamplingInputConstraints" title="Link to this definition">¶</a></dt>
+<dd><p>A container to hold all constraints for finite input sampling devices.</p>
+<p class="rubric">Initialization</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputConstraints.FiniteSamplingInputConstraints.channel_units">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">channel_units</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/finite_sampling_input_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputConstraints.FiniteSamplingInputConstraints.channel_units" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputConstraints.FiniteSamplingInputConstraints.channel_names">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">channel_names</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/finite_sampling_input_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputConstraints.FiniteSamplingInputConstraints.channel_names" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputConstraints.FiniteSamplingInputConstraints.sample_rate_limits">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sample_rate_limits</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/finite_sampling_input_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputConstraints.FiniteSamplingInputConstraints.sample_rate_limits" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputConstraints.FiniteSamplingInputConstraints.min_sample_rate">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">min_sample_rate</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/finite_sampling_input_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputConstraints.FiniteSamplingInputConstraints.min_sample_rate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputConstraints.FiniteSamplingInputConstraints.max_sample_rate">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_sample_rate</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/finite_sampling_input_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputConstraints.FiniteSamplingInputConstraints.max_sample_rate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputConstraints.FiniteSamplingInputConstraints.frame_size_limits">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frame_size_limits</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/finite_sampling_input_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputConstraints.FiniteSamplingInputConstraints.frame_size_limits" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputConstraints.FiniteSamplingInputConstraints.min_frame_size">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">min_frame_size</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/finite_sampling_input_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputConstraints.FiniteSamplingInputConstraints.min_frame_size" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputConstraints.FiniteSamplingInputConstraints.max_frame_size">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_frame_size</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/finite_sampling_input_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputConstraints.FiniteSamplingInputConstraints.max_frame_size" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputConstraints.FiniteSamplingInputConstraints.channel_valid">
+<span class="sig-name descname"><span class="pre">channel_valid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/finite_sampling_input_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputConstraints.FiniteSamplingInputConstraints.channel_valid" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputConstraints.FiniteSamplingInputConstraints.sample_rate_in_range">
+<span class="sig-name descname"><span class="pre">sample_rate_in_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rate</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/finite_sampling_input_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputConstraints.FiniteSamplingInputConstraints.sample_rate_in_range" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputConstraints.FiniteSamplingInputConstraints.frame_size_in_range">
+<span class="sig-name descname"><span class="pre">frame_size_in_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/finite_sampling_input_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.finite_sampling_input_interface.qudi.interface.finite_sampling_input_interface.FiniteSamplingInputConstraints.FiniteSamplingInputConstraints.frame_size_in_range" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          <div class="page-nav">
+            <div class="inner"><ul class="page-nav">
+  <li class="prev">
+    <a href="fast_counter_interface.html"
+       title="previous chapter">← FastCounterInterface</a>
+  </li>
+  <li class="next">
+    <a href="finite_sampling_io_interface.html"
+       title="next chapter">FiniteSamplingIOInterface →</a>
+  </li>
+</ul><div class="footer" role="contentinfo">
+      &#169; Copyright 2025, Molecular Quantum Nanophotonics Lab @ LENS.
+    <br>
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.1.3 with <a href="https://github.com/schettino72/sphinx_press_theme">Press Theme</a> 0.9.1.
+</div>
+            </div>
+          </div>
+      </page>
+    </div></div>
+    
+    
+  </body>
+</html>

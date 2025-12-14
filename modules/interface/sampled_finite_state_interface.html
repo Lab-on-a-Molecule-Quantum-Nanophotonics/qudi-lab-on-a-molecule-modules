@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html  lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+      <title>SampledFiniteStateInterface</title>
+    
+          <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+          <link rel="stylesheet" href="../../_static/theme.css " type="text/css" />
+          <link rel="stylesheet" href="../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" type="text/css" />
+          <link rel="stylesheet" href="../../_static/exercise.css" type="text/css" />
+      
+      <!-- sphinx script_files -->
+        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+
+      
+      <!-- bundled in js (rollup iife) -->
+      <!-- <script src="../../_static/theme-vendors.js"></script> -->
+      <script src="../../_static/theme.js" defer></script>
+    
+      <link rel="shortcut icon" href="../../../../_static/logo.png"/>
+  <link rel="index" title="Index" href="../../genindex.html" />
+  <link rel="search" title="Search" href="../../search.html" />
+  <link rel="next" title="ScanningProbeInterface" href="scanning_probe_interface.html" />
+  <link rel="prev" title="PulserInterface" href="pulser_interface.html" /> 
+  </head>
+
+  <body>
+    <div id="app">
+    <div class="theme-container" :class="pageClasses"><navbar @toggle-sidebar="toggleSidebar">
+  <router-link to="../../index.html" class="home-link">
+    
+      <span class="site-name">Qudi Lab on a molecule modules</span>
+    
+  </router-link>
+
+  <div class="links">
+    <navlinks class="can-hide">
+
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Tutorials:
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+    </navlinks>
+  </div>
+</navbar>
+
+      
+      <div class="sidebar-mask" @click="toggleSidebar(false)">
+      </div>
+        <sidebar @toggle-sidebar="toggleSidebar">
+          
+          <navlinks>
+            
+
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Tutorials:
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+            
+          </navlinks><div id="searchbox" class="searchbox" role="search">
+  <div class="caption"><span class="caption-text">Quick search</span>
+    <div class="searchformwrapper">
+      <form class="search" action="../../search.html" method="get">
+        <input type="text" name="q" />
+        <input type="submit" value="Search" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div><div class="sidebar-links" role="navigation" aria-label="main navigation">
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation">Tutorials:</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../Crash%20course%20into%20Qudi.html" class="reference internal ">    Tutorial: a crash course into Qudi</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../guides/excitation-spectroscopy.html" class="reference internal ">    Guide: Excitation spectroscopy</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../guides/state-machines.html" class="reference internal ">    Guide: State machines</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/setup_confocal_scanning.html" class="reference internal ">    Guide: Setting up confocal scanning</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/setup_odmr.html" class="reference internal ">    Guide: Setting up ODMR</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/setup_timeseries.html" class="reference internal ">    Guide: Setting up time series</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation">Contents:</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../installation.html" class="reference internal ">Installation</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../changelog-lens.html" class="reference internal ">Lens's changelog</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../index.html" class="reference internal ">Documentation of all modules</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/changelog.html" class="reference internal ">Ulm IQO's changelog (parent repository)</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../programming-guides.html" class="reference internal ">Programming guides: writing your own modules and understanding our hardwares.</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/iqo-specifics.html" class="reference internal ">Ulm IQO's specific guides</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+</div>
+        </sidebar>
+
+      <page>
+          <div class="body-header" role="navigation" aria-label="navigation">
+  
+  <ul class="breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+    
+      <li><a href="../index.html">Documentation of all modules</a> &raquo;</li>
+    
+      <li><a href="../interface.html">Interfaces</a> &raquo;</li>
+    
+    <li>SampledFiniteStateInterface</li>
+  </ul>
+  
+
+  <ul class="page-nav">
+  <li class="prev">
+    <a href="pulser_interface.html"
+       title="previous chapter">← PulserInterface</a>
+  </li>
+  <li class="next">
+    <a href="scanning_probe_interface.html"
+       title="next chapter">ScanningProbeInterface →</a>
+  </li>
+</ul>
+  
+</div>
+<hr>
+          <div class="content" role="main" v-pre>
+            
+  <section id="sampledfinitestateinterface">
+<h1>SampledFiniteStateInterface<a class="headerlink" href="#sampledfinitestateinterface" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SampledFiniteStateInterface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/sampled_finite_state_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">qudi.core.module.Base</span></code></p>
+<p>An interface to simplify using a fysom finite state machine to control a process.</p>
+<p>You can mark states and the associated transitions using the <code class="docutils literal notranslate"><span class="pre">&#64;state</span></code>, <code class="docutils literal notranslate"><span class="pre">&#64;transition_from</span></code>, and <code class="docutils literal notranslate"><span class="pre">&#64;transition_to</span></code> decorators.</p>
+<p>An example usage is given in hardware/dummy/excitation_scanner_dummy.py.</p>
+<p>This will define a watchdog that will be polled each <code class="docutils literal notranslate"><span class="pre">self._watchdog_delay</span></code> seconds (this is a <code class="docutils literal notranslate"><span class="pre">ConfigOption</span></code>) and call the appropriate method for the current state. You can transition between state using the <code class="docutils literal notranslate"><span class="pre">watchdog_event</span></code> method.</p>
+<p>Remember to activate and start the watchdog in your <code class="docutils literal notranslate"><span class="pre">on_activate</span></code> method, and
+to deactivate it in the <code class="docutils literal notranslate"><span class="pre">on_deactivate</span></code> method.</p>
+<p class="rubric">Initialization</p>
+<p>Initialise Base instance. Set up its state machine and initialize ConfigOption meta
+attributes from given config.</p>
+<p class="rubric" id="parameters">Parameters</p>
+<p>self : object
+The object being initialized.
+name : str
+Unique name for this module instance.
+configuration : dict
+Parameters from the configuration file.
+callbacks : dict
+Dictionary specifying functions to be run on state machine transitions.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.sig_on_event">
+<span class="sig-name descname"><span class="pre">sig_on_event</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/sampled_finite_state_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.sig_on_event" title="Link to this definition">¶</a></dt>
+<dd><p>‘Signal(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.sig_on_state">
+<span class="sig-name descname"><span class="pre">sig_on_state</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/sampled_finite_state_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.sig_on_state" title="Link to this definition">¶</a></dt>
+<dd><p>‘Signal(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.sig_start_watchdog">
+<span class="sig-name descname"><span class="pre">sig_start_watchdog</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/sampled_finite_state_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.sig_start_watchdog" title="Link to this definition">¶</a></dt>
+<dd><p>‘Signal(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.sig_stop_watchdog">
+<span class="sig-name descname"><span class="pre">sig_stop_watchdog</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/sampled_finite_state_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.sig_stop_watchdog" title="Link to this definition">¶</a></dt>
+<dd><p>‘Signal(…)’</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.watchdog_state">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">watchdog_state</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/sampled_finite_state_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.watchdog_state" title="Link to this definition">¶</a></dt>
+<dd><p>Query the current state of the watchdog.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.watchdog_event">
+<span class="sig-name descname"><span class="pre">watchdog_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/sampled_finite_state_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.watchdog_event" title="Link to this definition">¶</a></dt>
+<dd><p>Trigger a watchdog event that must have beed declared beforehand.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.enable_watchdog">
+<span class="sig-name descname"><span class="pre">enable_watchdog</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/sampled_finite_state_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.enable_watchdog" title="Link to this definition">¶</a></dt>
+<dd><p>Enable the watchdog mechanism.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.disable_watchdog">
+<span class="sig-name descname"><span class="pre">disable_watchdog</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/sampled_finite_state_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.disable_watchdog" title="Link to this definition">¶</a></dt>
+<dd><p>Disable the watchdog mechanism. Will interrupt the watchdog if necessary.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.start_watchdog">
+<span class="sig-name descname"><span class="pre">start_watchdog</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/sampled_finite_state_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.start_watchdog" title="Link to this definition">¶</a></dt>
+<dd><p>Start the watchdog. The mechanism must have been enabled beforehand.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.stop_watchdog">
+<span class="sig-name descname"><span class="pre">stop_watchdog</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/sampled_finite_state_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.stop_watchdog" title="Link to this definition">¶</a></dt>
+<dd><p>Interrupt the watchdog.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.move_to_main_thread">
+<span class="sig-name descname"><span class="pre">move_to_main_thread</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/sampled_finite_state_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.move_to_main_thread" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.module_thread">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_thread</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">PySide2.QtCore.QThread</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/sampled_finite_state_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.module_thread" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.module_name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/sampled_finite_state_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.module_name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.module_base">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_base</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/sampled_finite_state_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.module_base" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.module_uuid">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_uuid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">uuid.UUID</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/sampled_finite_state_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.module_uuid" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.module_default_data_dir">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_default_data_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/sampled_finite_state_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.module_default_data_dir" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.module_status_variables">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_status_variables</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/sampled_finite_state_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.module_status_variables" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.log">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">log</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">logging.Logger</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/sampled_finite_state_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.log" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.is_module_threaded">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_module_threaded</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/sampled_finite_state_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.is_module_threaded" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.connect_modules">
+<span class="sig-name descname"><span class="pre">connect_modules</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connections</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/sampled_finite_state_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.connect_modules" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.disconnect_modules">
+<span class="sig-name descname"><span class="pre">disconnect_modules</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/sampled_finite_state_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.disconnect_modules" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.on_activate">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_activate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/sampled_finite_state_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.on_activate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.on_deactivate">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_deactivate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/sampled_finite_state_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.sampled_finite_state_interface.qudi.interface.sampled_finite_state_interface.SampledFiniteStateInterface.SampledFiniteStateInterface.on_deactivate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qudi.interface.sampled_finite_state_interface.state">
+<span class="sig-prename descclassname"><span class="pre">qudi.interface.sampled_finite_state_interface.</span></span><span class="sig-name descname"><span class="pre">state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Callable</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/sampled_finite_state_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.sampled_finite_state_interface.state" title="Link to this definition">¶</a></dt>
+<dd><p>Decorator for marking a method as a watchog state.</p>
+<p>The method should not expect any parameter other than <code class="docutils literal notranslate"><span class="pre">self</span></code>.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyClass</span><span class="p">(</span><span class="n">SampledFiniteStateInterface</span><span class="p">):</span>
+    <span class="nd">@state</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">say_hi</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;hi&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qudi.interface.sampled_finite_state_interface.initial">
+<span class="sig-prename descclassname"><span class="pre">qudi.interface.sampled_finite_state_interface.</span></span><span class="sig-name descname"><span class="pre">initial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Callable</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/sampled_finite_state_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.sampled_finite_state_interface.initial" title="Link to this definition">¶</a></dt>
+<dd><p>Decorator for marking a state as the initial state.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyClass</span><span class="p">(</span><span class="n">SampledFiniteStateInterface</span><span class="p">):</span>
+    <span class="nd">@state</span>
+    <span class="nd">@initial</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">say_hi</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;hi&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qudi.interface.sampled_finite_state_interface.transition_to">
+<span class="sig-prename descclassname"><span class="pre">qudi.interface.sampled_finite_state_interface.</span></span><span class="sig-name descname"><span class="pre">transition_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Callable</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/sampled_finite_state_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.sampled_finite_state_interface.transition_to" title="Link to this definition">¶</a></dt>
+<dd><p>Decorator for listing the allowed transitions from a given watchdog state (the decorated method).</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyClass</span><span class="p">(</span><span class="n">SampledFiniteStateInterface</span><span class="p">):</span>
+    <span class="nd">@state</span>
+    <span class="nd">@transition_to</span><span class="p">((</span><span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="s2">&quot;say_hi), (&quot;</span><span class="n">bar</span><span class="s2">&quot;, &quot;</span><span class="n">say_bar</span><span class="s2">&quot;))</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">say_foo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;foo&quot;</span><span class="p">)</span>
+    <span class="nd">@state</span>
+    <span class="nd">@transition_to</span><span class="p">((</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="s2">&quot;say_foo&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="s2">&quot;say_hi&quot;</span><span class="p">))</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">say_bar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;bar&quot;</span><span class="p">)</span>
+    <span class="nd">@state</span>
+    <span class="nd">@transition_to</span><span class="p">((</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="s2">&quot;say_foo&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;bar&quot;</span><span class="p">,</span> <span class="s2">&quot;say_bar&quot;</span><span class="p">))</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">say_hi</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;hi&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qudi.interface.sampled_finite_state_interface.transition_from">
+<span class="sig-prename descclassname"><span class="pre">qudi.interface.sampled_finite_state_interface.</span></span><span class="sig-name descname"><span class="pre">transition_from</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Callable</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/interface/sampled_finite_state_interface.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.interface.sampled_finite_state_interface.transition_from" title="Link to this definition">¶</a></dt>
+<dd><p>Decorator for listing the allowed transitions to a given watchdog state (the decorated method).</p>
+<p># Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyClass</span><span class="p">(</span><span class="n">SampledFiniteStateInterface</span><span class="p">):</span>
+    <span class="nd">@state</span>
+    <span class="nd">@transition_to</span><span class="p">((</span><span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="s2">&quot;say_hi), (&quot;</span><span class="n">bar</span><span class="s2">&quot;, &quot;</span><span class="n">say_bar</span><span class="s2">&quot;))</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">say_foo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;foo&quot;</span><span class="p">)</span>
+    <span class="nd">@state</span>
+    <span class="nd">@transition_to</span><span class="p">((</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="s2">&quot;say_foo&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="s2">&quot;say_hi&quot;</span><span class="p">))</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">say_bar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;bar&quot;</span><span class="p">)</span>
+    <span class="nd">@state</span>
+    <span class="nd">@transition_to</span><span class="p">((</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="s2">&quot;say_foo&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;bar&quot;</span><span class="p">,</span> <span class="s2">&quot;say_bar&quot;</span><span class="p">))</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">say_hi</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;hi&quot;</span><span class="p">)</span>
+    <span class="nd">@state</span>
+    <span class="nd">@transition_from</span><span class="p">((</span><span class="s2">&quot;sink&quot;</span><span class="p">,</span> <span class="s2">&quot;*&quot;</span><span class="p">))</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sink_event</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sank.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          <div class="page-nav">
+            <div class="inner"><ul class="page-nav">
+  <li class="prev">
+    <a href="pulser_interface.html"
+       title="previous chapter">← PulserInterface</a>
+  </li>
+  <li class="next">
+    <a href="scanning_probe_interface.html"
+       title="next chapter">ScanningProbeInterface →</a>
+  </li>
+</ul><div class="footer" role="contentinfo">
+      &#169; Copyright 2025, Molecular Quantum Nanophotonics Lab @ LENS.
+    <br>
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.1.3 with <a href="https://github.com/schettino72/sphinx_press_theme">Press Theme</a> 0.9.1.
+</div>
+            </div>
+          </div>
+      </page>
+    </div></div>
+    
+    
+  </body>
+</html>
