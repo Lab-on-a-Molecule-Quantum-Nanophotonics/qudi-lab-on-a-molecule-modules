@@ -1470,7 +1470,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 7,
+   "execution_count": 3,
    "id": "d5fd1ec4-5a4c-49be-8b6d-a3c19d08fe48",
    "metadata": {},
    "outputs": [
@@ -1480,7 +1480,7 @@
        "['digital 1', 'analog 1', 'analog 2', 'digital 2']"
       ]
      },
-     "execution_count": 7,
+     "execution_count": 3,
      "metadata": {},
      "output_type": "execute_result"
     }
