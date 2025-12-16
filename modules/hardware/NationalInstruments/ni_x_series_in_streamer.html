@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html  lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+      <title>NIXSeriesInStreamer</title>
+    
+          <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+          <link rel="stylesheet" href="../../../_static/theme.css " type="text/css" />
+          <link rel="stylesheet" href="../../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" type="text/css" />
+          <link rel="stylesheet" href="../../../_static/exercise.css" type="text/css" />
+      
+      <!-- sphinx script_files -->
+        <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+
+      
+      <!-- bundled in js (rollup iife) -->
+      <!-- <script src="../../../_static/theme-vendors.js"></script> -->
+      <script src="../../../_static/theme.js" defer></script>
+    
+      <link rel="shortcut icon" href="../../../../../../_static/logo.png"/>
+  <link rel="index" title="Index" href="../../../genindex.html" />
+  <link rel="search" title="Search" href="../../../search.html" />
+  <link rel="next" title="Logics" href="../../logic.html" />
+  <link rel="prev" title="NIXSeriesFiniteSamplingIO" href="ni_x_series_finite_sampling_io.html" /> 
+  </head>
+
+  <body>
+    <div id="app">
+    <div class="theme-container" :class="pageClasses"><navbar @toggle-sidebar="toggleSidebar">
+  <router-link to="../../../index.html" class="home-link">
+    
+      <span class="site-name">Qudi Lab on a molecule modules</span>
+    
+  </router-link>
+
+  <div class="links">
+    <navlinks class="can-hide">
+
+  
+    <div class="nav-item">
+      <a href="../../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Tutorials:
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="../../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+    </navlinks>
+  </div>
+</navbar>
+
+      
+      <div class="sidebar-mask" @click="toggleSidebar(false)">
+      </div>
+        <sidebar @toggle-sidebar="toggleSidebar">
+          
+          <navlinks>
+            
+
+  
+    <div class="nav-item">
+      <a href="../../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Tutorials:
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="../../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+            
+          </navlinks><div id="searchbox" class="searchbox" role="search">
+  <div class="caption"><span class="caption-text">Quick search</span>
+    <div class="searchformwrapper">
+      <form class="search" action="../../../search.html" method="get">
+        <input type="text" name="q" />
+        <input type="submit" value="Search" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div><div class="sidebar-links" role="navigation" aria-label="main navigation">
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../../../index.html#qudi-lab-on-a-molecule-modules-documentation">Tutorials:</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../../Crash%20course%20into%20Qudi.html" class="reference internal ">    Tutorial: a crash course into Qudi</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../../guides/excitation-spectroscopy.html" class="reference internal ">    Guide: Excitation spectroscopy</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../../guides/state-machines.html" class="reference internal ">    Guide: State machines</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../../iqo-docs/setup_confocal_scanning.html" class="reference internal ">    Guide: Setting up confocal scanning</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../../iqo-docs/setup_odmr.html" class="reference internal ">    Guide: Setting up ODMR</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../../iqo-docs/setup_timeseries.html" class="reference internal ">    Guide: Setting up time series</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../../../index.html#qudi-lab-on-a-molecule-modules-documentation">Contents:</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../../installation.html" class="reference internal ">Installation</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../../changelog-lens.html" class="reference internal ">Lens's changelog</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../index.html" class="reference internal ">Documentation of all modules</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../../iqo-docs/changelog.html" class="reference internal ">Ulm IQO's changelog (parent repository)</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../../programming-guides.html" class="reference internal ">Programming guides: writing your own modules and understanding our hardwares.</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../../iqo-docs/iqo-specifics.html" class="reference internal ">Ulm IQO's specific guides</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+</div>
+        </sidebar>
+
+      <page>
+          <div class="body-header" role="navigation" aria-label="navigation">
+  
+  <ul class="breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+    
+      <li><a href="../../index.html">Documentation of all modules</a> &raquo;</li>
+    
+      <li><a href="../../hardware.html">Hardwares</a> &raquo;</li>
+    
+      <li><a href="ni_x_series.html">NI X-Series</a> &raquo;</li>
+    
+    <li>NIXSeriesInStreamer</li>
+  </ul>
+  
+
+  <ul class="page-nav">
+  <li class="prev">
+    <a href="ni_x_series_finite_sampling_io.html"
+       title="previous chapter">← NIXSeriesFiniteSamplingIO</a>
+  </li>
+  <li class="next">
+    <a href="../../logic.html"
+       title="next chapter">Logics →</a>
+  </li>
+</ul>
+  
+</div>
+<hr>
+          <div class="content" role="main" v-pre>
+            
+  <section id="nixseriesinstreamer">
+<h1>NIXSeriesInStreamer<a class="headerlink" href="#nixseriesinstreamer" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NIXSeriesInStreamer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/ni_x_series/ni_x_series_in_streamer.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../../interface/data_instream_interface.html#qudi.interface.data_instream_interface.qudi.interface.data_instream_interface.DataInStreamInterface.DataInStreamInterface" title="qudi.interface.data_instream_interface.DataInStreamInterface"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qudi.interface.data_instream_interface.DataInStreamInterface</span></code></a></p>
+<p>A National Instruments device that can detect and count digital pulses and measure analog
+voltages as data stream.</p>
+<p>!!!!!! NI USB 63XX, NI PCIe 63XX and NI PXIe 63XX DEVICES ONLY !!!!!!</p>
+<p>See [National Instruments X Series Documentation](&#64;ref nidaq-x-series) for details.</p>
+<p>Example config for copy-paste:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">nicard_6343_instreamer</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">module.Class</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer&#39;</span>
+<span class="w">    </span><span class="nt">options</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">device_name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;Dev1&#39;</span>
+<span class="w">        </span><span class="nt">digital_sources</span><span class="p">:</span><span class="w">  </span><span class="c1"># optional</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;PFI15&#39;</span>
+<span class="w">        </span><span class="nt">analog_sources</span><span class="p">:</span><span class="w">  </span><span class="c1"># optional</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;ai0&#39;</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;ai1&#39;</span>
+<span class="w">        </span><span class="c1"># external_sample_clock_source: &#39;PFI0&#39;  # optional</span>
+<span class="w">        </span><span class="c1"># external_sample_clock_frequency: 1000  # optional</span>
+<span class="w">        </span><span class="nt">adc_voltage_range</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">-10</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">10</span><span class="p p-Indicator">]</span><span class="w">  </span><span class="c1"># optional</span>
+<span class="w">        </span><span class="nt">max_channel_samples_buffer</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10000000</span><span class="w">  </span><span class="c1"># optional</span>
+<span class="w">        </span><span class="nt">read_write_timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10</span><span class="w">  </span><span class="c1"># optional</span>
+</pre></div>
+</div>
+<p class="rubric">Initialization</p>
+<p>Initialise Base instance. Set up its state machine and initialize ConfigOption meta
+attributes from given config.</p>
+<p class="rubric" id="parameters">Parameters</p>
+<p>self : object
+The object being initialized.
+name : str
+Unique name for this module instance.
+configuration : dict
+Parameters from the configuration file.
+callbacks : dict
+Dictionary specifying functions to be run on state machine transitions.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.on_activate">
+<span class="sig-name descname"><span class="pre">on_activate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/ni_x_series/ni_x_series_in_streamer.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.on_activate" title="Link to this definition">¶</a></dt>
+<dd><p>Starts up the NI-card and performs sanity checks.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.on_deactivate">
+<span class="sig-name descname"><span class="pre">on_deactivate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/ni_x_series/ni_x_series_in_streamer.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.on_deactivate" title="Link to this definition">¶</a></dt>
+<dd><p>Shut down the NI card.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.constraints">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">constraints</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../../interface/data_instream_interface.html#qudi.interface.data_instream_interface.qudi.interface.data_instream_interface.DataInStreamConstraints.DataInStreamConstraints" title="qudi.interface.data_instream_interface.DataInStreamConstraints"><span class="pre">qudi.interface.data_instream_interface.DataInStreamConstraints</span></a></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/ni_x_series/ni_x_series_in_streamer.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.constraints" title="Link to this definition">¶</a></dt>
+<dd><p>Read-only property returning the constraints on the settings for this data streamer.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.sample_rate">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sample_rate</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/ni_x_series/ni_x_series_in_streamer.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.sample_rate" title="Link to this definition">¶</a></dt>
+<dd><p>Read-only property returning the currently set sample rate in Hz.
+For SampleTiming.CONSTANT this is the sample rate of the hardware, for any other timing mode
+this property represents only a hint to the actual hardware timebase and can not be
+considered accurate.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.channel_buffer_size">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">channel_buffer_size</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/ni_x_series/ni_x_series_in_streamer.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.channel_buffer_size" title="Link to this definition">¶</a></dt>
+<dd><p>Read-only property returning the currently set buffer size in samples per channel.
+The total buffer size in bytes can be estimated by:
+&lt;buffer_size&gt; * &lt;channel_count&gt; * numpy.nbytes[&lt;data_type&gt;]</p>
+<p>For StreamingMode.FINITE this will also be the total number of samples to acquire per
+channel.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.streaming_mode">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">streaming_mode</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../../interface/data_instream_interface.html#qudi.interface.data_instream_interface.qudi.interface.data_instream_interface.StreamingMode.StreamingMode" title="qudi.interface.data_instream_interface.StreamingMode"><span class="pre">qudi.interface.data_instream_interface.StreamingMode</span></a></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/ni_x_series/ni_x_series_in_streamer.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.streaming_mode" title="Link to this definition">¶</a></dt>
+<dd><p>Read-only property returning the currently configured StreamingMode Enum</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.active_channels">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">active_channels</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/ni_x_series/ni_x_series_in_streamer.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.active_channels" title="Link to this definition">¶</a></dt>
+<dd><p>Read-only property returning the currently configured active channel names</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.configure">
+<span class="sig-name descname"><span class="pre">configure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">active_channels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">streaming_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../interface/data_instream_interface.html#qudi.interface.data_instream_interface.qudi.interface.data_instream_interface.StreamingMode.StreamingMode" title="qudi.interface.data_instream_interface.StreamingMode"><span class="pre">qudi.interface.data_instream_interface.StreamingMode</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel_buffer_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/ni_x_series/ni_x_series_in_streamer.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.configure" title="Link to this definition">¶</a></dt>
+<dd><p>Configure a data stream. See read-only properties for information on each parameter.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.available_samples">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">available_samples</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/ni_x_series/ni_x_series_in_streamer.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.available_samples" title="Link to this definition">¶</a></dt>
+<dd><p>Read-only property to return the currently available number of samples per channel ready
+to read from buffer.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.start_stream">
+<span class="sig-name descname"><span class="pre">start_stream</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/ni_x_series/ni_x_series_in_streamer.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.start_stream" title="Link to this definition">¶</a></dt>
+<dd><p>Start the data acquisition/streaming</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.stop_stream">
+<span class="sig-name descname"><span class="pre">stop_stream</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/ni_x_series/ni_x_series_in_streamer.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.stop_stream" title="Link to this definition">¶</a></dt>
+<dd><p>Stop the data acquisition/streaming</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.read_data_into_buffer">
+<span class="sig-name descname"><span class="pre">read_data_into_buffer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_buffer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">samples_per_channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_buffer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/ni_x_series/ni_x_series_in_streamer.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.read_data_into_buffer" title="Link to this definition">¶</a></dt>
+<dd><p>Read data from the stream buffer into a 1D numpy array given as parameter.
+Samples of all channels are stored interleaved in contiguous memory.
+In case of a multidimensional buffer array, this buffer will be flattened before written
+into.
+The 1D data_buffer can be unraveled into channel and sample indexing with:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>data_buffer.reshape([&lt;samples_per_channel&gt;, &lt;channel_count&gt;])
+</pre></div>
+</div>
+<p>The data_buffer array must have the same data type as self.constraints.data_type.</p>
+<p>In case of SampleTiming.TIMESTAMP a 1D numpy.float64 timestamp_buffer array has to be
+provided to be filled with timestamps corresponding to the data_buffer array. It must be
+able to hold at least &lt;samples_per_channel&gt; items:</p>
+<p>This function is blocking until the required number of samples has been acquired.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.read_available_data_into_buffer">
+<span class="sig-name descname"><span class="pre">read_available_data_into_buffer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_buffer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_buffer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/ni_x_series/ni_x_series_in_streamer.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.read_available_data_into_buffer" title="Link to this definition">¶</a></dt>
+<dd><p>Read data from the stream buffer into a 1D numpy array given as parameter.
+All samples for each channel are stored in consecutive blocks one after the other.
+The number of samples read per channel is returned and can be used to slice out valid data
+from the buffer arrays like:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>valid_data = data_buffer[:&lt;channel_count&gt; * &lt;return_value&gt;]
+valid_timestamps = timestamp_buffer[:&lt;return_value&gt;]
+</pre></div>
+</div>
+<p>See “read_data_into_buffer” documentation for more details.</p>
+<p>This method will read all currently available samples into buffer. If number of available
+samples exceeds buffer size, read only as many samples as fit into the buffer.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.read_data">
+<span class="sig-name descname"><span class="pre">read_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples_per_channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/ni_x_series/ni_x_series_in_streamer.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.read_data" title="Link to this definition">¶</a></dt>
+<dd><p>Read data from the stream buffer into a 1D numpy array and return it.
+All samples for each channel are stored in consecutive blocks one after the other.
+The returned data_buffer can be unraveled into channel samples with:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>data_buffer.reshape([&lt;channel_count&gt;, number_of_samples])
+</pre></div>
+</div>
+<p>The numpy array data type is the one defined in self.constraints.data_type.</p>
+<p>In case of SampleTiming.TIMESTAMP a 1D numpy.float64 timestamp_buffer array will be
+returned as well with timestamps corresponding to the data_buffer array.</p>
+<p>If number_of_samples is omitted all currently available samples are read from buffer.
+This method will not return until all requested samples have been read or a timeout occurs.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.read_single_point">
+<span class="sig-name descname"><span class="pre">read_single_point</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/ni_x_series/ni_x_series_in_streamer.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.read_single_point" title="Link to this definition">¶</a></dt>
+<dd><p>This method will initiate a single sample read on each configured data channel.
+In general this sample may not be acquired simultaneous for all channels and timing in
+general can not be assured. Us this method if you want to have a non-timing-critical
+snapshot of your current data channel input.
+May not be available for all devices.
+The returned 1D numpy array will contain one sample for each channel.</p>
+<p>In case of SampleTiming.TIMESTAMP a single numpy.float64 timestamp value will be returned
+as well.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.move_to_main_thread">
+<span class="sig-name descname"><span class="pre">move_to_main_thread</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/ni_x_series/ni_x_series_in_streamer.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.move_to_main_thread" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.module_thread">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_thread</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">PySide2.QtCore.QThread</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/ni_x_series/ni_x_series_in_streamer.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.module_thread" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.module_name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/ni_x_series/ni_x_series_in_streamer.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.module_name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.module_base">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_base</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/ni_x_series/ni_x_series_in_streamer.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.module_base" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.module_uuid">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_uuid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">uuid.UUID</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/ni_x_series/ni_x_series_in_streamer.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.module_uuid" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.module_default_data_dir">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_default_data_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/ni_x_series/ni_x_series_in_streamer.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.module_default_data_dir" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.module_status_variables">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_status_variables</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/ni_x_series/ni_x_series_in_streamer.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.module_status_variables" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.log">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">log</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">logging.Logger</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/ni_x_series/ni_x_series_in_streamer.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.log" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.is_module_threaded">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_module_threaded</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/ni_x_series/ni_x_series_in_streamer.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.is_module_threaded" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.connect_modules">
+<span class="sig-name descname"><span class="pre">connect_modules</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connections</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/ni_x_series/ni_x_series_in_streamer.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.connect_modules" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.disconnect_modules">
+<span class="sig-name descname"><span class="pre">disconnect_modules</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/hardware/ni_x_series/ni_x_series_in_streamer.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.hardware.ni_x_series.ni_x_series_in_streamer.qudi.hardware.ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer.NIXSeriesInStreamer.disconnect_modules" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          <div class="page-nav">
+            <div class="inner"><ul class="page-nav">
+  <li class="prev">
+    <a href="ni_x_series_finite_sampling_io.html"
+       title="previous chapter">← NIXSeriesFiniteSamplingIO</a>
+  </li>
+  <li class="next">
+    <a href="../../logic.html"
+       title="next chapter">Logics →</a>
+  </li>
+</ul><div class="footer" role="contentinfo">
+      &#169; Copyright 2025, Molecular Quantum Nanophotonics Lab @ LENS.
+    <br>
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.1.3 with <a href="https://github.com/schettino72/sphinx_press_theme">Press Theme</a> 0.9.1.
+</div>
+            </div>
+          </div>
+      </page>
+    </div></div>
+    
+    
+  </body>
+</html>

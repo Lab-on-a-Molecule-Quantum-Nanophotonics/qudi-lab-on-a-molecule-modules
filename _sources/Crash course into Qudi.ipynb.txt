@@ -2077,7 +2077,7 @@
     "To avoid issues with tabulation characters, I advise configuring your text editor to make it automatically replace tabulation characters by four spaces.\n",
     "```\n",
     "\n",
-    "To avoid having to deal with YAML, Qudi provides an experimental graphical editor for configuration files. The interface is rather explicit, and you can try to play with it if you are curious.\n",
+    "To avoid having to deal with YAML, Qudi provides an experimental graphical editor for configuration files, accessible from the main window. The interface is rather explicit, and you can try to play with it if you are curious.\n",
     "\n",
     "```{figure} crash_course_sources/config_editor.png\n",
     ":width: 70%\n",
@@ -2339,9 +2339,7 @@
    "source": [
     "## The scanner GUI: running confocal scans and controlling the galvo mirror\n",
     "\n",
-    "Features of the confocal scanner, when to use the automatic optimizer, the units of the plot, how useful the right click can be... Maybe make them load the default configuration file during the lecture to show that.\n",
-    "\n",
-    "\n",
+    "If you do confocal microscopy, this setup is very useful. It allows scanning the sample plane in as many dimensions as are available and optimizing on punctual sources.\n",
     "\n",
     "```{figure} crash_course_sources/scanner_gui_annotated.svg\n",
     ":width: 100%\n",
@@ -2352,10 +2350,34 @@
   },
   {
    "cell_type": "markdown",
+   "id": "6c8c4712-2866-4776-bbff-50ac64f22c9f",
+   "metadata": {},
+   "source": [
+    "This window includes many features. You can scan pairs of axes, or axes alone. You can navigate through the history of scans (this will also move the cursor to the saved position). Finally, you can also move the position manually and use the automatic optimization feature to get the best position on a punctual emitter. Some notes on the features:\n",
+    "\n",
+    "* You can add tags to the saved file names,\n",
+    "* The amplitude of the movements of the cursor (the green cross) depends on the level of zoom. If you want to perform precise movements, zoom-in!\n",
+    "* There is a tilt-correction feature where you specify three points that you know for sure are in focus, and the logic tries to correct the movements so that planar movements are parallel to the sample surface.\n",
+    "* The optimizer is very useful, and also very dumb. I will fit 2D or 1D Gaussians successively and go to the maximum, whatever the result of the fit is. This means that when you work in low signal situations, you are at risk of losing your position. Be ready to jump on the stop button before it goes crazy!"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "851adf9b-5f4f-4b7a-9c4c-caafab9e0d7d",
+   "metadata": {},
+   "source": [
+    "If you are interested in setting up confocal scanning, have a look at [the guide on confocal scanning](https://lab-on-a-molecule-quantum-nanophotonics.github.io/qudi-lab-on-a-molecule-modules/iqo-docs/setup_confocal_scanning.html)."
+   ]
+  },
+  {
+   "cell_type": "markdown",
    "id": "8fa4fb94-c11a-4ac5-a53f-6503d333d7c6",
    "metadata": {},
    "source": [
     "## The National Instruments hardwares and their configurations\n",
+    "\n",
+    "One of the best handled piece of hardware in Qudi are the National Instruments DAQ cards. This is probably due to historical reasons and their widespread use in fields doing confocal micrsocopy. There are no less than 4 hardware modules that can deal with them. Some notes:\n",
+    "* \n",
     "\n",
     "Probably not covered during the in-person lecture, but useful to explain some things (io vs input hardware modules, what you can and cannot do, wxplain a bit how the ports are named)"
    ]
@@ -2366,9 +2388,19 @@
    "id": "b6fbf32e-8bbd-42bd-ac00-c25e1703c15f",
    "metadata": {},
    "source": [
-    "# Laser scanners\n",
+    "## Laser scanners\n",
     "\n",
-    "Here we go quickly over the logic of the laser scanner through their state machines. Give some illustrations and explanations of why they do certain things."
+    "Here we go quickly over the logic of the laser scanner through their state machines. Give some illustrations and explanations of why they do certain things.\n",
+    "\n",
+    "### The laser scanner user interface\n",
+    "\n",
+    "```{figure} crash_course_sources/laser_window_annotated.svg\n",
+    ":width: 70%\n",
+    "\n",
+    "The laser scanner user interface\n",
+    "```\n",
+    "\n",
+    "Explain that this interface is generic, and that the middle column changes for each laser. Explain notes, and scanner status. Explain the data pane, with how the fit region works, the fit button also. Explain how to control the idle value of the laser, **that the `Laser follow cursor` switch needs to be enabled**, the drag and drop of the green line, the slider and its scroll divider."
    ]
   },
   {
@@ -2376,7 +2408,7 @@
    "id": "bf0c8d3b-8c82-4ab9-9d61-aa6aae7fe7e7",
    "metadata": {},
    "source": [
-    "## State machines\n",
+    "### Hardwares and State machines\n",
     "\n",
     "Reminder of state machines, use the dummy hardware to illustrate\n",
     "\n",
@@ -2392,7 +2424,7 @@
    "id": "02114d3d-9861-466a-b1c6-5152c1123e4a",
    "metadata": {},
    "source": [
-    "## An example state machine: the DFB laser\n",
+    "#### An example state machine: the DFB laser\n",
     "\n",
     "Nothing really interesting to comment on here, we can just go fast on that.\n",
     "\n",
@@ -2408,7 +2440,7 @@
    "id": "f4107c3e-641d-49b2-9ab2-862eef1c3e1d",
    "metadata": {},
    "source": [
-    "## A slightly more complicated example: the Moglabs CEM laser\n",
+    "#### A slightly more complicated example: the Moglabs CEM laser\n",
     "\n",
     "Explain why we have a scan_idle state\n",
     "\n",
@@ -2424,7 +2456,7 @@
    "id": "537dd73d-67ab-48cf-86bc-2987acd11272",
    "metadata": {},
    "source": [
-    "## A more complicated example: the Matisse laser\n",
+    "#### A more complicated example: the Matisse laser\n",
     "\n",
     "Detail a bit more, explain that the matisse laser is in two part, one on the laser's computer, not shown here, and one on the main computer.\n",
     "\n",
@@ -2439,24 +2471,14 @@
    "cell_type": "markdown",
    "id": "b90973b6-9a8f-4a21-bcae-5c1857bd481e",
    "metadata": {},
-   "source": [
-    "## The laser scanner user interface\n",
-    "\n",
-    "```{figure} crash_course_sources/laser_window_annotated.svg\n",
-    ":width: 70%\n",
-    "\n",
-    "The laser scanner user interface\n",
-    "```"
-   ]
+   "source": []
   },
   {
    "attachments": {},
    "cell_type": "markdown",
    "id": "17e9aee6-dbfe-498e-a09f-f1c4828ba861",
    "metadata": {},
-   "source": [
-    "Explain that this interface is generic, and that the middle column changes for each laser. Explain notes, and scanner status. Explain the data pane, with how the fit region works, the fit button also. Explain how to control the idle value of the laser, **that the `Laser follow cursor` switch needs to be enabled**, the drag and drop of the green line, the slider and its scroll divider."
-   ]
+   "source": []
   },
   {
    "cell_type": "markdown",
