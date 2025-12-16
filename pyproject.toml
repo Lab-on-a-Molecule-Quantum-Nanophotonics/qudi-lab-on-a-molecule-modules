@@ -90,7 +90,6 @@ sirah-matisse-commander = { git = "https://github.com/nelsond/sirah-matisse-comm
 [dependency-groups]
 dev = [
     "myst-parser>=3.0.1",
-    "pygraphviz>=1.11",
     "sphinx>=7.4.7",
     "sphinx-autodoc2>=0.5.0",
     "sphinx-press-theme>=0.9.1",
