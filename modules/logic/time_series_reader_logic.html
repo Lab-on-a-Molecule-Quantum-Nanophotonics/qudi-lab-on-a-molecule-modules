@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html  lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+      <title>Time Series Reader Logic</title>
+    
+          <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+          <link rel="stylesheet" href="../../_static/theme.css " type="text/css" />
+          <link rel="stylesheet" href="../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" type="text/css" />
+          <link rel="stylesheet" href="../../_static/exercise.css" type="text/css" />
+      
+      <!-- sphinx script_files -->
+        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+
+      
+      <!-- bundled in js (rollup iife) -->
+      <!-- <script src="../../_static/theme-vendors.js"></script> -->
+      <script src="../../_static/theme.js" defer></script>
+    
+      <link rel="shortcut icon" href="../../../../_static/logo.png"/>
+  <link rel="index" title="Index" href="../../genindex.html" />
+  <link rel="search" title="Search" href="../../search.html" />
+  <link rel="next" title="Graphical User Interfaces" href="../gui.html" />
+  <link rel="prev" title="Logics" href="../logic.html" /> 
+  </head>
+
+  <body>
+    <div id="app">
+    <div class="theme-container" :class="pageClasses"><navbar @toggle-sidebar="toggleSidebar">
+  <router-link to="../../index.html" class="home-link">
+    
+      <span class="site-name">Qudi Lab on a molecule modules</span>
+    
+  </router-link>
+
+  <div class="links">
+    <navlinks class="can-hide">
+
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Tutorials:
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+    </navlinks>
+  </div>
+</navbar>
+
+      
+      <div class="sidebar-mask" @click="toggleSidebar(false)">
+      </div>
+        <sidebar @toggle-sidebar="toggleSidebar">
+          
+          <navlinks>
+            
+
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Tutorials:
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+            
+          </navlinks><div id="searchbox" class="searchbox" role="search">
+  <div class="caption"><span class="caption-text">Quick search</span>
+    <div class="searchformwrapper">
+      <form class="search" action="../../search.html" method="get">
+        <input type="text" name="q" />
+        <input type="submit" value="Search" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div><div class="sidebar-links" role="navigation" aria-label="main navigation">
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation">Tutorials:</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../Crash%20course%20into%20Qudi.html" class="reference internal ">    Tutorial: a crash course into Qudi</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../guides/excitation-spectroscopy.html" class="reference internal ">    Guide: Excitation spectroscopy</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../guides/state-machines.html" class="reference internal ">    Guide: State machines</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/setup_confocal_scanning.html" class="reference internal ">    Guide: Setting up confocal scanning</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/setup_odmr.html" class="reference internal ">    Guide: Setting up ODMR</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/setup_timeseries.html" class="reference internal ">    Guide: Setting up time series</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation">Contents:</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../installation.html" class="reference internal ">Installation</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../changelog-lens.html" class="reference internal ">Lens's changelog</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../index.html" class="reference internal ">Documentation of all modules</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/changelog.html" class="reference internal ">Ulm IQO's changelog (parent repository)</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../programming-guides.html" class="reference internal ">Programming guides: writing your own modules and understanding our hardwares.</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/iqo-specifics.html" class="reference internal ">Ulm IQO's specific guides</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+</div>
+        </sidebar>
+
+      <page>
+          <div class="body-header" role="navigation" aria-label="navigation">
+  
+  <ul class="breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+    
+      <li><a href="../index.html">Documentation of all modules</a> &raquo;</li>
+    
+      <li><a href="../logic.html">Logics</a> &raquo;</li>
+    
+    <li>Time Series Reader Logic</li>
+  </ul>
+  
+
+  <ul class="page-nav">
+  <li class="prev">
+    <a href="../logic.html"
+       title="previous chapter">← Logics</a>
+  </li>
+  <li class="next">
+    <a href="../gui.html"
+       title="next chapter">Graphical User Interfaces →</a>
+  </li>
+</ul>
+  
+</div>
+<hr>
+          <div class="content" role="main" v-pre>
+            
+  <section id="time-series-reader-logic">
+<h1>Time Series Reader Logic<a class="headerlink" href="#time-series-reader-logic" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">TimeSeriesReaderLogic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">qudi.core.module.LogicBase</span></code></p>
+<p>This logic module gathers data from a hardware streaming device.</p>
+<p>Example config for copy-paste:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">time_series_reader_logic</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">module.Class</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;time_series_reader_logic.TimeSeriesReaderLogic&#39;</span>
+<span class="w">    </span><span class="nt">options</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">max_frame_rate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20</span><span class="w">  </span><span class="c1"># optional (default: 20Hz)</span>
+<span class="w">        </span><span class="nt">channel_buffer_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1048576</span><span class="w">  </span><span class="c1"># optional (default: 1MSample)</span>
+<span class="w">        </span><span class="nt">max_raw_data_bytes</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1073741824</span><span class="w">  </span><span class="c1"># optional (default: 1GB)</span>
+<span class="w">    </span><span class="nt">connect</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">streamer</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;streamer_name&gt;</span>
+</pre></div>
+</div>
+<p class="rubric">Initialization</p>
+<p>Initialise Base instance. Set up its state machine and initialize ConfigOption meta
+attributes from given config.</p>
+<p class="rubric" id="parameters">Parameters</p>
+<p>self : object
+The object being initialized.
+name : str
+Unique name for this module instance.
+configuration : dict
+Parameters from the configuration file.
+callbacks : dict
+Dictionary specifying functions to be run on state machine transitions.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.sigDataChanged">
+<span class="sig-name descname"><span class="pre">sigDataChanged</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.sigDataChanged" title="Link to this definition">¶</a></dt>
+<dd><p>‘Signal(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.sigNewRawData">
+<span class="sig-name descname"><span class="pre">sigNewRawData</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.sigNewRawData" title="Link to this definition">¶</a></dt>
+<dd><p>‘Signal(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.sigStatusChanged">
+<span class="sig-name descname"><span class="pre">sigStatusChanged</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.sigStatusChanged" title="Link to this definition">¶</a></dt>
+<dd><p>‘Signal(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.sigTraceSettingsChanged">
+<span class="sig-name descname"><span class="pre">sigTraceSettingsChanged</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.sigTraceSettingsChanged" title="Link to this definition">¶</a></dt>
+<dd><p>‘Signal(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.sigChannelSettingsChanged">
+<span class="sig-name descname"><span class="pre">sigChannelSettingsChanged</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.sigChannelSettingsChanged" title="Link to this definition">¶</a></dt>
+<dd><p>‘Signal(…)’</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.on_activate">
+<span class="sig-name descname"><span class="pre">on_activate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.on_activate" title="Link to this definition">¶</a></dt>
+<dd><p>Initialisation performed during activation of the module.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.on_deactivate">
+<span class="sig-name descname"><span class="pre">on_deactivate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.on_deactivate" title="Link to this definition">¶</a></dt>
+<dd><p>De-initialisation performed during deactivation of the module.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.streamer_constraints">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">streamer_constraints</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../interface/data_instream_interface.html#qudi.interface.data_instream_interface.qudi.interface.data_instream_interface.DataInStreamConstraints.DataInStreamConstraints" title="qudi.interface.data_instream_interface.DataInStreamConstraints"><span class="pre">qudi.interface.data_instream_interface.DataInStreamConstraints</span></a></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.streamer_constraints" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieve the hardware constrains from the counter device</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.data_rate">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">data_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.data_rate" title="Link to this definition">¶</a></dt>
+<dd><p>Data rate in Hz. The data rate describes the effective sample rate of the processed
+sample trace taking into account oversampling:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>data_rate = hardware_sample_rate / oversampling_factor
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.trace_window_size">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">trace_window_size</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.trace_window_size" title="Link to this definition">¶</a></dt>
+<dd><p>The size of the running trace window in seconds</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.moving_average_width">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">moving_average_width</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.moving_average_width" title="Link to this definition">¶</a></dt>
+<dd><p>The width of the moving average filter in samples. Must be an odd number.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.data_recording_active">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">data_recording_active</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.data_recording_active" title="Link to this definition">¶</a></dt>
+<dd><p>Read-only bool flag indicating active data logging so it can be saved to file later</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.oversampling_factor">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">oversampling_factor</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.oversampling_factor" title="Link to this definition">¶</a></dt>
+<dd><p>This integer value determines how many times more samples are acquired by the hardware
+and averaged before being processed by the trace logic.
+An oversampling factor &lt;= 1 means no oversampling is performed.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.sampling_rate">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sampling_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.sampling_rate" title="Link to this definition">¶</a></dt>
+<dd><p>Read-only property returning the actually set sample rate of the streaming hardware.
+If not oversampling is used, this should be the same value as data_rate.
+If oversampling is active, this value will be larger (by the oversampling factor) than
+data_rate.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.active_channel_names">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">active_channel_names</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.active_channel_names" title="Link to this definition">¶</a></dt>
+<dd><p>Read-only property returning the currently active channel names</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.averaged_channel_names">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">averaged_channel_names</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.averaged_channel_names" title="Link to this definition">¶</a></dt>
+<dd><p>Read-only property returning the currently active and averaged channel names</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.trace_data">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">trace_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.trace_data" title="Link to this definition">¶</a></dt>
+<dd><p>Read-only property returning the x-axis of the data trace and a dictionary of the
+corresponding trace data arrays for each channel</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.averaged_trace_data">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">averaged_trace_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.averaged_trace_data" title="Link to this definition">¶</a></dt>
+<dd><p>Read-only property returning the x-axis of the averaged data trace and a dictionary of
+the corresponding averaged trace data arrays for each channel</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.trace_settings">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">trace_settings</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.trace_settings" title="Link to this definition">¶</a></dt>
+<dd><p>Read-only property returning the current trace settings as dictionary</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.channel_settings">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">channel_settings</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.channel_settings" title="Link to this definition">¶</a></dt>
+<dd><p>Read-only property returning the currently active channel names and the currently
+averaged channel names.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.set_trace_settings">
+<span class="sig-name descname"><span class="pre">set_trace_settings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">settings_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.set_trace_settings" title="Link to this definition">¶</a></dt>
+<dd><p>Method to set new trace settings.
+Can either provide (a subset of) trace_settings via dict as first positional argument
+and/or as keyword arguments (**kwargs overwrites settings_dict for duplicate keys).</p>
+<p>See property trace_settings for valid setting keywords.</p>
+<p>Calling this method while a trace is running will stop the trace first and restart after
+successful application of new settings.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.set_channel_settings">
+<span class="sig-name descname"><span class="pre">set_channel_settings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">enabled</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">averaged</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.set_channel_settings" title="Link to this definition">¶</a></dt>
+<dd><p>Method to set new channel settings by providing a sequence of active channel names
+(enabled) as well as a sequence of channel names to be averaged (averaged).</p>
+<p>Calling this method while a trace is running will stop the trace first and restart after
+successful application of new settings.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.start_reading">
+<span class="sig-name descname"><span class="pre">start_reading</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.start_reading" title="Link to this definition">¶</a></dt>
+<dd><p>Start data acquisition loop</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.stop_reading">
+<span class="sig-name descname"><span class="pre">stop_reading</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.stop_reading" title="Link to this definition">¶</a></dt>
+<dd><p>Send a request to stop counting</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.start_recording">
+<span class="sig-name descname"><span class="pre">start_recording</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.start_recording" title="Link to this definition">¶</a></dt>
+<dd><p>Will start to continuously accumulate raw data from the streaming hardware (without
+running average and oversampling). Data will be saved to file once the trace acquisition is
+stopped.
+If the streamer is not running it will be started in order to have data to save.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.stop_recording">
+<span class="sig-name descname"><span class="pre">stop_recording</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.stop_recording" title="Link to this definition">¶</a></dt>
+<dd><p>Stop the accumulative data recording and save data to file. Will not stop the data
+streaming. Ignored if no stream is running (module is in idle state).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.save_trace_snapshot">
+<span class="sig-name descname"><span class="pre">save_trace_snapshot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name_tag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_figure</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.save_trace_snapshot" title="Link to this definition">¶</a></dt>
+<dd><p>A snapshot of the current data trace window will be saved</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.move_to_main_thread">
+<span class="sig-name descname"><span class="pre">move_to_main_thread</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.move_to_main_thread" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.module_thread">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_thread</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">PySide2.QtCore.QThread</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.module_thread" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.module_name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.module_name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.module_base">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_base</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.module_base" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.module_uuid">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_uuid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">uuid.UUID</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.module_uuid" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.module_default_data_dir">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_default_data_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.module_default_data_dir" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.module_status_variables">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_status_variables</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.module_status_variables" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.log">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">log</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">logging.Logger</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.log" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.is_module_threaded">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_module_threaded</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.is_module_threaded" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.connect_modules">
+<span class="sig-name descname"><span class="pre">connect_modules</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connections</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.connect_modules" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.disconnect_modules">
+<span class="sig-name descname"><span class="pre">disconnect_modules</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/time_series_reader_logic.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.time_series_reader_logic.qudi.logic.time_series_reader_logic.TimeSeriesReaderLogic.TimeSeriesReaderLogic.disconnect_modules" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          <div class="page-nav">
+            <div class="inner"><ul class="page-nav">
+  <li class="prev">
+    <a href="../logic.html"
+       title="previous chapter">← Logics</a>
+  </li>
+  <li class="next">
+    <a href="../gui.html"
+       title="next chapter">Graphical User Interfaces →</a>
+  </li>
+</ul><div class="footer" role="contentinfo">
+      &#169; Copyright 2025, Molecular Quantum Nanophotonics Lab @ LENS.
+    <br>
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.1.3 with <a href="https://github.com/schettino72/sphinx_press_theme">Press Theme</a> 0.9.1.
+</div>
+            </div>
+          </div>
+      </page>
+    </div></div>
+    
+    
+  </body>
+</html>

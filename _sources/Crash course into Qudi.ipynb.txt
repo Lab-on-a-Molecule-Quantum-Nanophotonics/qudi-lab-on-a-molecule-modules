@@ -2377,7 +2377,8 @@
     "## The National Instruments hardwares and their configurations\n",
     "\n",
     "One of the best handled piece of hardware in Qudi are the National Instruments DAQ cards. This is probably due to historical reasons and their widespread use in fields doing confocal micrsocopy. There are no less than 4 hardware modules that can deal with them. Some notes:\n",
-    "* \n",
+    "* The [NIXSeriesFiniteSamplingIO](https://lab-on-a-molecule-quantum-nanophotonics.github.io/qudi-lab-on-a-molecule-modules/modules/hardware/NationalInstruments/ni_x_series_analog_output.html) hardware is one of the simplest. It does not handle any timing, and allows you to control analog outputs on-the-go. This is typically what you manipulate through the cursor of the confocal scanner, some setpoints for the lasers, etc.\n",
+    "* The [NIXSeriesInStreamer](https://lab-on-a-molecule-quantum-nanophotonics.github.io/qudi-lab-on-a-molecule-modules/modules/hardware/NationalInstruments/ni_x_series_in_streamer.html) implements the [DataInStreamInterface](https://lab-on-a-molecule-quantum-nanophotonics.github.io/qudi-lab-on-a-molecule-modules/modules/interface/data_instream_interface.html). This is typically what you will plug into the \n",
     "\n",
     "Probably not covered during the in-person lecture, but useful to explain some things (io vs input hardware modules, what you can and cannot do, wxplain a bit how the ports are named)"
    ]
