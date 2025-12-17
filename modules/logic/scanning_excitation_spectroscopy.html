@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html  lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+      <title>Scanning excitation spectroscopy</title>
+    
+          <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+          <link rel="stylesheet" href="../../_static/theme.css " type="text/css" />
+          <link rel="stylesheet" href="../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" type="text/css" />
+          <link rel="stylesheet" href="../../_static/exercise.css" type="text/css" />
+      
+      <!-- sphinx script_files -->
+        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+
+      
+      <!-- bundled in js (rollup iife) -->
+      <!-- <script src="../../_static/theme-vendors.js"></script> -->
+      <script src="../../_static/theme.js" defer></script>
+    
+      <link rel="shortcut icon" href="../../../../_static/logo.png"/>
+  <link rel="index" title="Index" href="../../genindex.html" />
+  <link rel="search" title="Search" href="../../search.html" />
+  <link rel="next" title="Graphical User Interfaces" href="../gui.html" />
+  <link rel="prev" title="Time Series Reader Logic" href="time_series_reader_logic.html" /> 
+  </head>
+
+  <body>
+    <div id="app">
+    <div class="theme-container" :class="pageClasses"><navbar @toggle-sidebar="toggleSidebar">
+  <router-link to="../../index.html" class="home-link">
+    
+      <span class="site-name">Qudi Lab on a molecule modules</span>
+    
+  </router-link>
+
+  <div class="links">
+    <navlinks class="can-hide">
+
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Tutorials:
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+    </navlinks>
+  </div>
+</navbar>
+
+      
+      <div class="sidebar-mask" @click="toggleSidebar(false)">
+      </div>
+        <sidebar @toggle-sidebar="toggleSidebar">
+          
+          <navlinks>
+            
+
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Tutorials:
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation"
+         class="nav-link ">
+         Contents:
+      </a>
+    </div>
+  
+
+
+
+            
+          </navlinks><div id="searchbox" class="searchbox" role="search">
+  <div class="caption"><span class="caption-text">Quick search</span>
+    <div class="searchformwrapper">
+      <form class="search" action="../../search.html" method="get">
+        <input type="text" name="q" />
+        <input type="submit" value="Search" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div><div class="sidebar-links" role="navigation" aria-label="main navigation">
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation">Tutorials:</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../Crash%20course%20into%20Qudi.html" class="reference internal ">    Tutorial: a crash course into Qudi</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../guides/excitation-spectroscopy.html" class="reference internal ">    Guide: Excitation spectroscopy</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../guides/state-machines.html" class="reference internal ">    Guide: State machines</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/setup_confocal_scanning.html" class="reference internal ">    Guide: Setting up confocal scanning</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/setup_odmr.html" class="reference internal ">    Guide: Setting up ODMR</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/setup_timeseries.html" class="reference internal ">    Guide: Setting up time series</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../../index.html#qudi-lab-on-a-molecule-modules-documentation">Contents:</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../installation.html" class="reference internal ">Installation</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../changelog-lens.html" class="reference internal ">Lens's changelog</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../index.html" class="reference internal ">Documentation of all modules</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/changelog.html" class="reference internal ">Ulm IQO's changelog (parent repository)</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../programming-guides.html" class="reference internal ">Programming guides: writing your own modules and understanding our hardwares.</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="../../iqo-docs/iqo-specifics.html" class="reference internal ">Ulm IQO's specific guides</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+</div>
+        </sidebar>
+
+      <page>
+          <div class="body-header" role="navigation" aria-label="navigation">
+  
+  <ul class="breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+    
+      <li><a href="../index.html">Documentation of all modules</a> &raquo;</li>
+    
+      <li><a href="../logic.html">Logics</a> &raquo;</li>
+    
+    <li>Scanning excitation spectroscopy</li>
+  </ul>
+  
+
+  <ul class="page-nav">
+  <li class="prev">
+    <a href="time_series_reader_logic.html"
+       title="previous chapter">← Time Series Reader Logic</a>
+  </li>
+  <li class="next">
+    <a href="../gui.html"
+       title="next chapter">Graphical User Interfaces →</a>
+  </li>
+</ul>
+  
+</div>
+<hr>
+          <div class="content" role="main" v-pre>
+            
+  <section id="scanning-excitation-spectroscopy">
+<h1>Scanning excitation spectroscopy<a class="headerlink" href="#scanning-excitation-spectroscopy" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ScanningExcitationLogic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">qudi.core.module.LogicBase</span></code></p>
+<p>A logic to pilot an <code class="docutils literal notranslate"><span class="pre">ExcitationScannerInterface</span></code>.</p>
+<p>Copy and paste configuration example:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">excitation_scanner_logic</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">module.Class</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;scanning_excitation_spectroscopy.ScanningExcitationLogic&#39;</span>
+<span class="w">    </span><span class="nt">options</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">beep</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"> </span><span class="c1"># default</span>
+<span class="w">        </span><span class="nt">watchdog_repeat_time_ms</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">500</span><span class="w"> </span><span class="c1"># default</span>
+<span class="w">        </span><span class="nt">save_idle_to_global_metadata</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"> </span><span class="c1"># save the current idle value to global metadata</span>
+<span class="w">    </span><span class="nt">connect</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">scanner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">excitation_scanner_hardware</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">beep</span></code> option makes the computer beep when a scan finishes to make sure any
+low attention-span postdoc notices the end of the acquisition. The
+<code class="docutils literal notranslate"><span class="pre">watchdog_repeat_time_ms</span></code> COntrols how often the logic checks on the scanning
+hardware. The <code class="docutils literal notranslate"><span class="pre">save_idle_to_global_metadata</span></code> option makes the idle frequency being saved
+in the global metadata of Qudi.</p>
+<p class="rubric">Initialization</p>
+<p>Initialise Base instance. Set up its state machine and initialize ConfigOption meta
+attributes from given config.</p>
+<p class="rubric" id="parameters">Parameters</p>
+<p>self : object
+The object being initialized.
+name : str
+Unique name for this module instance.
+configuration : dict
+Parameters from the configuration file.
+callbacks : dict
+Dictionary specifying functions to be run on state machine transitions.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.sig_data_updated">
+<span class="sig-name descname"><span class="pre">sig_data_updated</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.sig_data_updated" title="Link to this definition">¶</a></dt>
+<dd><p>‘Signal(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.sig_state_updated">
+<span class="sig-name descname"><span class="pre">sig_state_updated</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.sig_state_updated" title="Link to this definition">¶</a></dt>
+<dd><p>‘Signal(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.sig_scanner_state_updated">
+<span class="sig-name descname"><span class="pre">sig_scanner_state_updated</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.sig_scanner_state_updated" title="Link to this definition">¶</a></dt>
+<dd><p>‘Signal(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.sig_scanner_variables_updated">
+<span class="sig-name descname"><span class="pre">sig_scanner_variables_updated</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.sig_scanner_variables_updated" title="Link to this definition">¶</a></dt>
+<dd><p>‘Signal(…)’</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.sig_fit_updated">
+<span class="sig-name descname"><span class="pre">sig_fit_updated</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.sig_fit_updated" title="Link to this definition">¶</a></dt>
+<dd><p>‘Signal(…)’</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.on_activate">
+<span class="sig-name descname"><span class="pre">on_activate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.on_activate" title="Link to this definition">¶</a></dt>
+<dd><p>Initialisation performed during activation of the module.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.on_deactivate">
+<span class="sig-name descname"><span class="pre">on_deactivate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.on_deactivate" title="Link to this definition">¶</a></dt>
+<dd><p>Reverse steps of activation</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.stop">
+<span class="sig-name descname"><span class="pre">stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.stop" title="Link to this definition">¶</a></dt>
+<dd><p>Stop any currently running acquisition.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.run_get_spectrum">
+<span class="sig-name descname"><span class="pre">run_get_spectrum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.run_get_spectrum" title="Link to this definition">¶</a></dt>
+<dd><p>Run <code class="docutils literal notranslate"><span class="pre">get_spectrum</span></code> in the thread of the logic.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.get_spectrum">
+<span class="sig-name descname"><span class="pre">get_spectrum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.typing.NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.get_spectrum" title="Link to this definition">¶</a></dt>
+<dd><p>Acquire a spectrum with the current settings.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">reset</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, clear the old data before running the acquisition.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.acquisition_running">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">acquisition_running</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.acquisition_running" title="Link to this definition">¶</a></dt>
+<dd><p>Returns <code class="docutils literal notranslate"><span class="pre">True</span></code> when an acquisition is running.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.spectrum">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">spectrum</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.typing.NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.spectrum" title="Link to this definition">¶</a></dt>
+<dd><p>Get the current spectrum, accounting for the current <code class="docutils literal notranslate"><span class="pre">display_channel_column_number</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.get_spectrum_at_x">
+<span class="sig-name descname"><span class="pre">get_spectrum_at_x</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.float64</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.get_spectrum_at_x" title="Link to this definition">¶</a></dt>
+<dd><p>Get the value of the current spectrum at frequency <code class="docutils literal notranslate"><span class="pre">x</span></code>, for step number <code class="docutils literal notranslate"><span class="pre">step_num</span></code>.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.frequency">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frequency</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.typing.NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.frequency" title="Link to this definition">¶</a></dt>
+<dd><p>Get the current frequency array.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.step_number">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">step_number</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.typing.NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.step_number" title="Link to this definition">¶</a></dt>
+<dd><p>Get the current step number array.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.time">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.typing.NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.time" title="Link to this definition">¶</a></dt>
+<dd><p>Get the current step time array.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.save_spectrum_data">
+<span class="sig-name descname"><span class="pre">save_spectrum_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name_tag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.save_spectrum_data" title="Link to this definition">¶</a></dt>
+<dd><p>Saves the current spectrum data to a file.
+&#64;param string name_tag: postfix name tag for saved filename.
+&#64;param string root_dir: overwrite the file position in necessary
+&#64;param dict parameter: additional parameters to add to the saved file</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.exposure_time">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">exposure_time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.exposure_time" title="Link to this definition">¶</a></dt>
+<dd><p>Get the current exposure time.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.repetitions">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">repetitions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.repetitions" title="Link to this definition">¶</a></dt>
+<dd><p>Get the current number of repetitions.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.idle">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">idle</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.idle" title="Link to this definition">¶</a></dt>
+<dd><p>Get the current idle value.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.notes">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">notes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.notes" title="Link to this definition">¶</a></dt>
+<dd><p>Get the current text notes.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.variables">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">variables</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.variables" title="Link to this definition">¶</a></dt>
+<dd><p>Get the current fictionary of control variables.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.set_variable">
+<span class="sig-name descname"><span class="pre">set_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.set_variable" title="Link to this definition">¶</a></dt>
+<dd><p>Set the <code class="docutils literal notranslate"><span class="pre">value</span></code> of control variable <code class="docutils literal notranslate"><span class="pre">name</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.available_channels">
+<span class="sig-name descname"><span class="pre">available_channels</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.available_channels" title="Link to this definition">¶</a></dt>
+<dd><p>List the available data channels.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.display_channel_column_number">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">display_channel_column_number</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.display_channel_column_number" title="Link to this definition">¶</a></dt>
+<dd><p>Get the column number of the data channel currently selected for display.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.set_display_channel_from_name">
+<span class="sig-name descname"><span class="pre">set_display_channel_from_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.set_display_channel_from_name" title="Link to this definition">¶</a></dt>
+<dd><p>Set <code class="docutils literal notranslate"><span class="pre">display_channel_column_number</span></code> from the name of the channel.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.fit_config_model">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fit_config_model</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.fit_config_model" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.fit_container">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fit_container</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.fit_container" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.do_fit">
+<span class="sig-name descname"><span class="pre">do_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fit_method</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.do_fit" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.fit_results">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fit_results</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.fit_results" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.fit_method">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fit_method</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.fit_method" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.fit_region">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fit_region</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.fit_region" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.idle_value_limits">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">idle_value_limits</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.idle_value_limits" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.scroll_divider_decade">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">scroll_divider_decade</span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.scroll_divider_decade" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.set_scroll_divider_decade">
+<span class="sig-name descname"><span class="pre">set_scroll_divider_decade</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.set_scroll_divider_decade" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.move_to_main_thread">
+<span class="sig-name descname"><span class="pre">move_to_main_thread</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.move_to_main_thread" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.module_thread">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_thread</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">PySide2.QtCore.QThread</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.module_thread" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.module_name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.module_name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.module_base">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_base</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.module_base" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.module_uuid">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_uuid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">uuid.UUID</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.module_uuid" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.module_default_data_dir">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_default_data_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.module_default_data_dir" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.module_status_variables">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">module_status_variables</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.module_status_variables" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.log">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">log</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">logging.Logger</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.log" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.is_module_threaded">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_module_threaded</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.is_module_threaded" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.connect_modules">
+<span class="sig-name descname"><span class="pre">connect_modules</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connections</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.connect_modules" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.disconnect_modules">
+<span class="sig-name descname"><span class="pre">disconnect_modules</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules/src/qudi/qudi/logic/scanning_excitation_spectroscopy.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qudi.logic.scanning_excitation_spectroscopy.qudi.logic.scanning_excitation_spectroscopy.ScanningExcitationLogic.ScanningExcitationLogic.disconnect_modules" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          <div class="page-nav">
+            <div class="inner"><ul class="page-nav">
+  <li class="prev">
+    <a href="time_series_reader_logic.html"
+       title="previous chapter">← Time Series Reader Logic</a>
+  </li>
+  <li class="next">
+    <a href="../gui.html"
+       title="next chapter">Graphical User Interfaces →</a>
+  </li>
+</ul><div class="footer" role="contentinfo">
+      &#169; Copyright 2025, Molecular Quantum Nanophotonics Lab @ LENS.
+    <br>
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.1.3 with <a href="https://github.com/schettino72/sphinx_press_theme">Press Theme</a> 0.9.1.
+</div>
+            </div>
+          </div>
+      </page>
+    </div></div>
+    
+    
+  </body>
+</html>

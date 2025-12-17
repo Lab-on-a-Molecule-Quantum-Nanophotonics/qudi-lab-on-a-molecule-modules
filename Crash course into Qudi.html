@@ -134,8 +134,6 @@
                 
                   <li class="toctree-l2"><a href="#the-modules-we-commonly-use" class="reference internal">The modules we commonly use</a></li>
                 
-                  <li class="toctree-l2"><a href="#pulsers" class="reference internal">Pulsers</a></li>
-                
                   <li class="toctree-l2"><a href="#concluding-remarks" class="reference internal">Concluding remarks</a></li>
                 
               </ul>
@@ -308,10 +306,72 @@
 <section id="what-i-want-you-to-install-and-download">
 <h2>What I want you to install and download<a class="headerlink" href="#what-i-want-you-to-install-and-download" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>We use the <code class="docutils literal notranslate"><span class="pre">uv</span></code> package manager. Please read and follow the <a class="reference external" href="https://docs.astral.sh/uv/getting-started/">getting started</a> guide. <strong>Ask me for help if you are struggling.</strong></p></li>
+<li><p>We use the <code class="docutils literal notranslate"><span class="pre">uv</span></code> package manager. Please read and follow the <a class="reference external" href="https://docs.astral.sh/uv/getting-started/">getting started</a> guide. <strong>Windows users: see below how to install it. Ask me for help if you are struggling.</strong></p></li>
 <li><p>We will need <code class="docutils literal notranslate"><span class="pre">git</span></code>. This is a version control system (a tool to work collaboratively on code. For example, this is the tool behind <a class="reference external" href="https://github.com">GitHub</a>). Explaining this tool is out of scope, please <a class="reference external" href="https://git-scm.com/install/">install it</a>. If you want to learn more, you might read <a class="reference external" href="https://learnxinyminutes.com/git/">this short guide</a> or look for a more extensive tutorial.</p></li>
 <li><p>A text editor. In theory the simplest notepad is enough, but you may find more advanced applications useful. If you just need somethin lightwight, you can use <a class="reference external" href="https://notepad-plus-plus.org/">Notepad++</a>. Other people like <a class="reference external" href="https://code.visualstudio.com/">VSCode</a>, although I do not use it so I cannot help you much with that.</p></li>
 </ul>
+<section id="windows-users-installing-uv">
+<h3>Windows users: installing uv<a class="headerlink" href="#windows-users-installing-uv" title="Link to this heading">¶</a></h3>
+<p>For most of the course I want you to use Git Bash. However, to install <code class="docutils literal notranslate"><span class="pre">uv</span></code>, you need the native Windows shell. Type <kbd class="kbd docutils literal notranslate">Windows</kbd> to open the start menu, then type cmd to bring the native Windows shell. Then, you need to copy the following code:</p>
+<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="n">powershell</span> <span class="n">-ExecutionPolicy</span> <span class="n">ByPass</span> <span class="n">-c</span> <span class="s2">&quot;irm https://astral.sh/uv/install.ps1 | iex&quot;</span>
+</pre></div>
+</div>
+<p>and paste it in the Windows shell using right click. Finally press <kbd class="kbd docutils literal notranslate">Enter</kbd> to execute it. It will download the <code class="docutils literal notranslate"><span class="pre">uv</span></code> executable and make it accessible in <code class="docutils literal notranslate"><span class="pre">C:/Users/&lt;you&gt;/.local/bin</span></code>. To check that everyting worked, open Git Bash and type <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">help</span></code> followed by <kbd class="kbd docutils literal notranslate">Enter</kbd>. You should see the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>An extremely fast Python package manager.
+
+Usage: uv [OPTIONS] &lt;COMMAND&gt;
+
+Commands:
+  auth                       Manage authentication
+  run                        Run a command or script
+  init                       Create a new project
+  add                        Add dependencies to the project
+  remove                     Remove dependencies from the project
+  version                    Read or update the project&#39;s version
+  sync                       Update the project&#39;s environment
+  lock                       Update the project&#39;s lockfile
+  export                     Export the project&#39;s lockfile to an alternate format
+  tree                       Display the project&#39;s dependency tree
+  format                     Format Python code in the project
+  tool                       Run and install commands provided by Python packages
+  python                     Manage Python versions and installations
+  pip                        Manage Python packages with a pip-compatible interface
+  venv                       Create a virtual environment
+  build                      Build Python packages into source distributions and wheels
+  publish                    Upload distributions to an index
+  cache                      Manage uv&#39;s cache
+  self                       Manage the uv executable
+  generate-shell-completion  Generate shell completion
+  help                       Display documentation for a command
+
+Cache options:
+  -n, --no-cache               Avoid reading from or writing to the cache, instead using a temporary directory for the duration of the operation [env: UV_NO_CACHE=]
+      --cache-dir &lt;CACHE_DIR&gt;  Path to the cache directory [env: UV_CACHE_DIR=]
+
+Python options:
+      --managed-python       Require use of uv-managed Python versions [env: UV_MANAGED_PYTHON=]
+      --no-managed-python    Disable use of uv-managed Python versions [env: UV_NO_MANAGED_PYTHON=]
+      --no-python-downloads  Disable automatic downloads of Python. [env: &quot;UV_PYTHON_DOWNLOADS=never&quot;]
+
+Global options:
+  -q, --quiet...                                   Use quiet output
+  -v, --verbose...                                 Use verbose output
+      --color &lt;COLOR_CHOICE&gt;                       Control the use of color in output [possible values: auto, always, never]
+      --native-tls                                 Whether to load TLS certificates from the platform&#39;s native certificate store [env: UV_NATIVE_TLS=]
+      --offline                                    Disable network access [env: UV_OFFLINE=]
+      --allow-insecure-host &lt;ALLOW_INSECURE_HOST&gt;  Allow insecure connections to a host [env: UV_INSECURE_HOST=]
+      --no-progress                                Hide all progress outputs [env: UV_NO_PROGRESS=]
+      --directory &lt;DIRECTORY&gt;                      Change to the given directory prior to running the command [env: UV_WORKING_DIR=]
+      --project &lt;PROJECT&gt;                          Discover a project in the given directory [env: UV_PROJECT=]
+      --config-file &lt;CONFIG_FILE&gt;                  The path to a `uv.toml` file to use for configuration [env: UV_CONFIG_FILE=]
+      --no-config                                  Avoid discovering configuration files (`pyproject.toml`, `uv.toml`) [env: UV_NO_CONFIG=]
+  -h, --help                                       Display the concise help for this command
+  -V, --version                                    Display the uv version
+
+Use `uv help &lt;command&gt;` for more information on a specific command.
+</pre></div>
+</div>
+</section>
 </section>
 <section id="getting-the-lecture-materials">
 <h2>Getting the lecture materials<a class="headerlink" href="#getting-the-lecture-materials" title="Link to this heading">¶</a></h2>
@@ -322,11 +382,11 @@
 <p>Windows provides natively a terminal emulator, but the commands are different from the commands provided by MacOS and Linux (and provides honnestly a pretty bad experience). To simplify this lecture I will make you use <code class="docutils literal notranslate"><span class="pre">Git</span> <span class="pre">Bash</span></code>, as it is modeled on a more standard command line interface.</p>
 </div>
 <p>You should now see a text window (likely with a black or white background). The text displayed depends on your specific configuration. For example, mine is very minimalistic.</p>
-<figure class="align-default" id="id8">
+<figure class="align-default" id="id10">
 <a class="reference internal image-reference" href="_images/af91774f-40f8-439f-a5eb-cde6a11e007e.png"><img alt="Screenshot of an empty terminal" src="_images/af91774f-40f8-439f-a5eb-cde6a11e007e.png" style="width: 60%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 1 </span><span class="caption-text">Example of an empty terminal.</span><a class="headerlink" href="#id8" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 1 </span><span class="caption-text">Example of an empty terminal.</span><a class="headerlink" href="#id10" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>This is a way to interact with you computer using (mostly) text. It can seem a bit scary, but is actually very efficient. Instead of using your mouse, you will be typing <strong>commands</strong> that I will give you. If you need to copy and paste, the shortcuts might be a bit different than the ones you might be used to.</p>
@@ -401,11 +461,11 @@ ls
 <strong>Windows users</strong>: some libraries are complicated to install on Windows. If you are getting errors, you may get luckier using the <code class="docutils literal notranslate"><span class="pre">--no-dev</span></code> option to prevent <code class="docutils literal notranslate"><span class="pre">uv</span></code> from installing some developpment dependencies: <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">run</span> <span class="pre">--no-dev</span> <span class="pre">qudi-install-kernel</span></code>. If this fixes the issue, then you need to keep this <code class="docutils literal notranslate"><span class="pre">--no-dev</span></code> option for all <code class="docutils literal notranslate"><span class="pre">uv</span></code> calls used later.</p>
 </div>
 <p>Since it is the first time we invoke the <code class="docutils literal notranslate"><span class="pre">uv</span></code> command, it will install all the dependencies we need. <strong>This might take some time</strong>, so it is the good time to take a break and enjoy a coffee.</p>
-<figure class="align-default" id="id9">
+<figure class="align-default" id="id11">
 <a class="reference internal image-reference" href="_images/7210315e-1ae4-424a-9a7e-a24a33aa114a.png"><img alt="Screenshot of a terminal with the uv utility running." src="_images/7210315e-1ae4-424a-9a7e-a24a33aa114a.png" style="width: 60%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 2 </span><span class="caption-text">Example of the output of the previous command while <code class="docutils literal notranslate"><span class="pre">uv</span></code> is installing dependencies.</span><a class="headerlink" href="#id9" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 2 </span><span class="caption-text">Example of the output of the previous command while <code class="docutils literal notranslate"><span class="pre">uv</span></code> is installing dependencies.</span><a class="headerlink" href="#id11" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
@@ -453,27 +513,27 @@ ls
 <p>On the computers of the setups, we have a shortcut that runs Qudi for us. There is no underlying magic: it simply opens a terminal at the right location and runs the above command!</p>
 </div>
 <p>The goal of this section is not to explore the main Qudi interface. However, it is useful to see that it displays the name of the currently loaded configuration file at the very bottom:</p>
-<figure class="align-default" id="id10">
+<figure class="align-default" id="id12">
 <a class="reference internal image-reference" href="_images/b5e71907-597a-40ba-b774-bff484374926.png"><img alt="Screenshot of the bottom of the main Qudi window." src="_images/b5e71907-597a-40ba-b774-bff484374926.png" style="width: 100%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 3 </span><span class="caption-text">The very bottom of the main Qudi window, displaying the version number and the path of the configuration file loaded.</span><a class="headerlink" href="#id10" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 3 </span><span class="caption-text">The very bottom of the main Qudi window, displaying the version number and the path of the configuration file loaded.</span><a class="headerlink" href="#id12" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>You can choose another file from the menu by clicking on <code class="docutils literal notranslate"><span class="pre">File</span> <span class="pre">&gt;</span> <span class="pre">Load</span> <span class="pre">configuration</span></code></p>
-<figure class="align-default" id="id11">
+<figure class="align-default" id="id13">
 <a class="reference internal image-reference" href="_images/ac4463e1-e59c-4f0d-8f61-de54d68881c1.png"><img alt="Screenshot of the file explorer showing a configuration file." src="_images/ac4463e1-e59c-4f0d-8f61-de54d68881c1.png" style="width: 60%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 4 </span><span class="caption-text">The file explorer window to select the configuration file may vary depending on your specific configuration</span><a class="headerlink" href="#id11" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 4 </span><span class="caption-text">The file explorer window to select the configuration file may vary depending on your specific configuration</span><a class="headerlink" href="#id13" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>After selecting the file, Qudi will ask you to restart the program to load the new configuration. Click on “Yes”.</p>
-<figure class="align-default" id="id12">
+<figure class="align-default" id="id14">
 <a class="reference internal image-reference" href="_images/3d77eeac-ba7a-4845-beca-01fc92821911.png"><img alt="Screenshot of the dialog window asking if you want to restart Qudi." src="_images/3d77eeac-ba7a-4845-beca-01fc92821911.png" style="width: 60%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 5 </span><span class="caption-text">Yes, we want to restart Qudi!</span><a class="headerlink" href="#id12" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 5 </span><span class="caption-text">Yes, we want to restart Qudi!</span><a class="headerlink" href="#id14" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
@@ -486,36 +546,36 @@ ls
 </pre></div>
 </div>
 <p>This will open a web browser and display a page listing the current directory:</p>
-<figure class="align-default" id="id13">
+<figure class="align-default" id="id15">
 <a class="reference internal image-reference" href="_images/7c9411a8-83e4-434c-918e-f747d55cfea4.png"><img alt="Screenshot of the jupyter file explorer." src="_images/7c9411a8-83e4-434c-918e-f747d55cfea4.png" style="width: 60%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 6 </span><span class="caption-text">The jupyter file explorer.</span><a class="headerlink" href="#id13" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 6 </span><span class="caption-text">The jupyter file explorer.</span><a class="headerlink" href="#id15" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>Navigate to the folder <code class="docutils literal notranslate"><span class="pre">docs/source</span></code>, where the interactive version of this notebook lives:</p>
-<figure class="align-default" id="id14">
+<figure class="align-default" id="id16">
 <a class="reference internal image-reference" href="_images/0add01ec-7e1f-4953-89df-677302243964.png"><img alt="Screenshot of the jupyter file explorer." src="_images/0add01ec-7e1f-4953-89df-677302243964.png" style="width: 60%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 7 </span><span class="caption-text">The jupyter file explorer showing the directory where this tutorial lives.</span><a class="headerlink" href="#id14" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 7 </span><span class="caption-text">The jupyter file explorer showing the directory where this tutorial lives.</span><a class="headerlink" href="#id16" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>And then double-click on the file “Crash course into Qudi.ipynb”.</p>
 <p>For comfort, you might want to enable the Table of Contents pannel. You can do this by clicking on <code class="docutils literal notranslate"><span class="pre">View</span> <span class="pre">&gt;</span> <span class="pre">Table</span> <span class="pre">of</span> <span class="pre">Contents</span></code>.</p>
-<figure class="align-default" id="id15">
+<figure class="align-default" id="id17">
 <a class="reference internal image-reference" href="_images/6792b125-e465-4d14-9e9f-9619bd40279b.png"><img alt="Screenshot of the jupyter toolbar to enable the table of contents." src="_images/6792b125-e465-4d14-9e9f-9619bd40279b.png" style="width: 30%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 8 </span><span class="caption-text">The jupyter toolbar to enable the table of contents.</span><a class="headerlink" href="#id15" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 8 </span><span class="caption-text">The jupyter toolbar to enable the table of contents.</span><a class="headerlink" href="#id17" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>In the Qudi main window, you should see a log line in the Qudi main window that tells you that the jupyter kernel connected to Qudi.</p>
-<figure class="align-default" id="id16">
+<figure class="align-default" id="id18">
 <a class="reference internal image-reference" href="_images/3aab4ccd-d298-4c26-a158-884ae95b8a4d.png"><img alt="Screenshot of the Qudi main window log viewer." src="_images/3aab4ccd-d298-4c26-a158-884ae95b8a4d.png" style="width: 100%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 9 </span><span class="caption-text">The jupyter kernel connected to my Qudi application.</span><a class="headerlink" href="#id16" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 9 </span><span class="caption-text">The jupyter kernel connected to my Qudi application.</span><a class="headerlink" href="#id18" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p><strong>You are ready!</strong></p>
@@ -542,11 +602,11 @@ ls
 <center>
     Lecture notes by <b>Hugo Levy-Falk</b>, CNR-INO
 </center>
-<figure class="align-center" id="id17">
+<figure class="align-center" id="id19">
 <a class="reference internal image-reference" href="_images/lazy_me.jpeg"><img alt="A comics showing expectations vs reality when automating setups. One expects to relax while the setup is running automatically, while in reality one can only dream of that while fixing code." src="_images/lazy_me.jpeg" style="width: 60%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 10 </span><span class="caption-text">The reality of automating experiments.</span><a class="headerlink" href="#id17" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 10 </span><span class="caption-text">The reality of automating experiments.</span><a class="headerlink" href="#id19" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <br/>
@@ -554,11 +614,11 @@ ls
 <p class="admonition-title">Important</p>
 <p>At this point, it helps a lot if you have already read and followed the <a class="reference internal" href="#before-the-lecture">Before the lecture</a> and <a class="reference internal" href="#at-the-beginning-of-the-lecture">At the beginning of the lecture</a> sections and installed the requirements to follow the interactive bits. However, if you joined-in late, you can still get the lecture notes and follow along.</p>
 </div>
-<figure class="align-default" id="id18">
+<figure class="align-default" id="id20">
 <a class="reference internal image-reference" href="_images/logo.svg"><img alt="_images/logo.svg" src="_images/logo.svg" style="width: 60%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 11 </span><span class="caption-text">Get the lecture notes at <a class="reference external" href="https://lab-on-a-molecule-quantum-nanophotonics.github.io/qudi-lab-on-a-molecule-modules/Crash%20course%20into%20Qudi.html">https://lab-on-a-molecule-quantum-nanophotonics.github.io/qudi-lab-on-a-molecule-modules/</a></span><a class="headerlink" href="#id18" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 11 </span><span class="caption-text">Get the lecture notes at <a class="reference external" href="https://lab-on-a-molecule-quantum-nanophotonics.github.io/qudi-lab-on-a-molecule-modules/Crash%20course%20into%20Qudi.html">https://lab-on-a-molecule-quantum-nanophotonics.github.io/qudi-lab-on-a-molecule-modules/</a></span><a class="headerlink" href="#id20" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>Today, I want to discuss:</p>
@@ -657,11 +717,11 @@ If you don’t need any of the instruments, logics, or user interfaces provided,
 <p class="admonition-title">Tip</p>
 <p>If you want a more technical explanation, you will find <a class="reference external" href="https://ulm-iqo.github.io/qudi-core/design_concepts/measurement_modules.html">the official Qudi documentation</a> useful.</p>
 </div>
-<figure class="align-default" id="id19">
+<figure class="align-default" id="id21">
 <a class="reference internal image-reference" href="_images/diagram.jpeg"><img alt="A diagram showing the module structure of Qudi." src="_images/diagram.jpeg" style="width: 50%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 12 </span><span class="caption-text">The basics of the basics: Hardware, interfaces, logics, and Graphical User Interfaces (GUI)</span><a class="headerlink" href="#id19" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 12 </span><span class="caption-text">The basics of the basics: Hardware, interfaces, logics, and Graphical User Interfaces (GUI)</span><a class="headerlink" href="#id21" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <section id="logic-modules">
@@ -716,11 +776,11 @@ If you don’t need any of the instruments, logics, or user interfaces provided,
 <section id="writing-our-first-configuration-file">
 <h2>Writing our first configuration file<a class="headerlink" href="#writing-our-first-configuration-file" title="Link to this heading">¶</a></h2>
 <p>In this section, we will write (and hopefully understand) a Qudi configuration file. A configuration file can be understood as a recipe that explains to Qudi which modules (GUIs, logics, and hardwares) should be instancied, how they should connect to one another, and how they sould be configured. In addition, it provides some general configuration for Qudi. The configuration is stored in a text file, formated in YAML (Yet Another Markup Language, if you haven’t done so yet, you can check out <a class="reference external" href="https://learnxinyminutes.com/yaml/">this guide</a>). You can edit it with any text editor.</p>
-<figure class="align-default" id="id20">
+<figure class="align-default" id="id22">
 <a class="reference internal image-reference" href="_images/writing_configuration.jpeg"><img alt="A character is trying to connect a logic and a hardware modules." src="_images/writing_configuration.jpeg" style="width: 40%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 13 </span><span class="caption-text">Writing configuration is as easy as finding which pieces fit. Writing working configuration is a bit harder.</span><a class="headerlink" href="#id20" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 13 </span><span class="caption-text">Writing configuration is as easy as finding which pieces fit. Writing working configuration is a bit harder.</span><a class="headerlink" href="#id22" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <section id="configuration-file-layout">
@@ -793,8 +853,8 @@ If you don’t need any of the instruments, logics, or user interfaces provided,
 </pre></div>
 </div>
 <p>If we look in <code class="docutils literal notranslate"><span class="pre">time_series_reader_logic.py</span></code> for example, we see the following class has been declared:</p>
-<div class="literal-block-wrapper docutils container" id="id21">
-<div class="code-block-caption"><span class="caption-number">Listing 1 </span><span class="caption-text">src/qudi/logic/time_series_reader_logic.py</span><a class="headerlink" href="#id21" title="Link to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id23">
+<div class="code-block-caption"><span class="caption-number">Listing 1 </span><span class="caption-text">src/qudi/logic/time_series_reader_logic.py</span><a class="headerlink" href="#id23" title="Link to this code">¶</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">TimeSeriesReaderLogic</span><span class="p">(</span><span class="n">LogicBase</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This logic module gathers data from a hardware streaming device.</span>
@@ -854,8 +914,8 @@ If you don’t need any of the instruments, logics, or user interfaces provided,
 <section id="connectors">
 <h3>Connectors<a class="headerlink" href="#connectors" title="Link to this heading">¶</a></h3>
 <p>In the previous example configuration, there is a <code class="docutils literal notranslate"><span class="pre">connect</span></code> section. When Qudi initializes a module (more on that in a coming section), it looks for <strong>connectors</strong> in the class declaration and matches them with elements of the <code class="docutils literal notranslate"><span class="pre">connect</span></code> section of the configuration. If we look further in the source code of <code class="docutils literal notranslate"><span class="pre">TimeSeriesReaderLogic</span></code>, you’ll notice the following lines:</p>
-<div class="literal-block-wrapper docutils container" id="id22">
-<div class="code-block-caption"><span class="caption-number">Listing 2 </span><span class="caption-text">src/qudi/logic/time_series_reader_logic.py</span><a class="headerlink" href="#id22" title="Link to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id24">
+<div class="code-block-caption"><span class="caption-number">Listing 2 </span><span class="caption-text">src/qudi/logic/time_series_reader_logic.py</span><a class="headerlink" href="#id24" title="Link to this code">¶</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="c1"># declare connectors</span>
     <span class="n">_streamer</span> <span class="o">=</span> <span class="n">Connector</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;streamer&#39;</span><span class="p">,</span> <span class="n">interface</span><span class="o">=</span><span class="s1">&#39;DataInStreamInterface&#39;</span><span class="p">)</span>
 </pre></div>
@@ -873,8 +933,8 @@ When coding logics, if you need to refer to the connected module (in this exampl
 <h3>Configuration options<a class="headerlink" href="#configuration-options" title="Link to this heading">¶</a></h3>
 <p>Last, but not least, come the configuration options. They are static attributes that are defined directly in the configuration file. Typical use cases would include the USB address of a hardware, the default acquisition rate of an acquisition card, etc. Sticking with our <code class="docutils literal notranslate"><span class="pre">TimeSeriesReaderLogic</span></code> example, we have the possibility of configuring the maximum frame rate, the size of a channel buffer, and the maximum size of all data. Ideally these would be better documented. In practice you often need to read code to grasp what they do.</p>
 <p>In the code, these are declared using <code class="docutils literal notranslate"><span class="pre">ConfigOption</span></code>, in a similar way to the connectors. For example for <code class="docutils literal notranslate"><span class="pre">TimeSeriesReaderLogic</span></code>:</p>
-<div class="literal-block-wrapper docutils container" id="id23">
-<div class="code-block-caption"><span class="caption-number">Listing 3 </span><span class="caption-text">src/qudi/logic/time_series_reader_logic.py</span><a class="headerlink" href="#id23" title="Link to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id25">
+<div class="code-block-caption"><span class="caption-number">Listing 3 </span><span class="caption-text">src/qudi/logic/time_series_reader_logic.py</span><a class="headerlink" href="#id25" title="Link to this code">¶</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="c1"># config options</span>
     <span class="n">_max_frame_rate</span> <span class="o">=</span> <span class="n">ConfigOption</span><span class="p">(</span><span class="s1">&#39;max_frame_rate&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">missing</span><span class="o">=</span><span class="s1">&#39;warn&#39;</span><span class="p">)</span>
     <span class="n">_channel_buffer_size</span> <span class="o">=</span> <span class="n">ConfigOption</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;channel_buffer_size&#39;</span><span class="p">,</span>
@@ -982,11 +1042,11 @@ When coding logics, if you need to refer to the connected module (in this exampl
 <section id="qudi-s-main-window">
 <h2>Qudi’s main window<a class="headerlink" href="#qudi-s-main-window" title="Link to this heading">¶</a></h2>
 <p>If you load the solution to the previous exercise in Qudi, you will get two windows. Among them is Qudi’s main window:</p>
-<figure class="align-default" id="id24">
+<figure class="align-default" id="id26">
 <a class="reference internal image-reference" href="_images/main_window_annotated.svg"><img alt="_images/main_window_annotated.svg" src="_images/main_window_annotated.svg" style="width: 100%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 14 </span><span class="caption-text">The main window in Qudi</span><a class="headerlink" href="#id24" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 14 </span><span class="caption-text">The main window in Qudi</span><a class="headerlink" href="#id26" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>You can figure by yourself what is feasible with the menu bar and the toolbar, items have either a self-explanatory name, or an explanation label appearing when hovering the mouse above them.</p>
@@ -1034,8 +1094,8 @@ When coding logics, if you need to refer to the connected module (in this exampl
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
 <p>Of course, to understand what this does, you need to read the documentation of the <code class="docutils literal notranslate"><span class="pre">trace_data</span></code> method of <code class="docutils literal notranslate"><span class="pre">TimeSeriesReaderLogic</span></code>. In this specific case, the implementation looks like:</p>
-<div class="literal-block-wrapper docutils container" id="id25">
-<div class="code-block-caption"><span class="caption-number">Listing 4 </span><span class="caption-text">src/qudi/logic/time_series_reader_logic.py</span><a class="headerlink" href="#id25" title="Link to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id27">
+<div class="code-block-caption"><span class="caption-number">Listing 4 </span><span class="caption-text">src/qudi/logic/time_series_reader_logic.py</span><a class="headerlink" href="#id27" title="Link to this code">¶</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">trace_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Read-only property returning the x-axis of the data trace and a dictionary of the</span>
@@ -1053,11 +1113,11 @@ When coding logics, if you need to refer to the connected module (in this exampl
 </section>
 <section id="the-life-of-a-qudi-module-activation-and-de-activation">
 <h3>The life of a Qudi module: activation and de-activation<a class="headerlink" href="#the-life-of-a-qudi-module-activation-and-de-activation" title="Link to this heading">¶</a></h3>
-<figure class="align-default" id="id26">
+<figure class="align-default" id="id28">
 <a class="reference internal image-reference" href="_images/module_widget_annotated.svg"><img alt="_images/module_widget_annotated.svg" src="_images/module_widget_annotated.svg" style="width: 100%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 15 </span><span class="caption-text">The module widget</span><a class="headerlink" href="#id26" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 15 </span><span class="caption-text">The module widget</span><a class="headerlink" href="#id28" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>Perhaps the most interesting part of the main window is the modules tabs. Every modules present in the configuration file are listed there, and this is your first interaction point with them. At the moment, you should have three modules active: <code class="docutils literal notranslate"><span class="pre">time_series_gui</span></code>, <code class="docutils literal notranslate"><span class="pre">time_series_reader_logic</span></code>, and <code class="docutils literal notranslate"><span class="pre">instream_dummy</span></code>. They have been loaded automatically at startup, because our configuration file contains the following directive:</p>
@@ -1070,11 +1130,11 @@ When coding logics, if you need to refer to the connected module (in this exampl
 <section id="state-machines">
 <h3>State machines<a class="headerlink" href="#state-machines" title="Link to this heading">¶</a></h3>
 <p>Qudi modules’ life is ruled by a state machine. As physicists this is <a class="reference external" href="https://en.wikipedia.org/wiki/State_pattern">a software design pattern</a> that resonates a lot. When using this pattern, the state of the program is represented by a <strong>state machine</strong>. The program will have a different behavior depending on the <strong>state</strong> in which it currently is. For each of these states, there is a set of <strong>transitions</strong> possible towards other states. The state machine is typically represented y an oriented graph, such as below.</p>
-<figure class="align-default" id="id27">
+<figure class="align-default" id="id29">
 <a class="reference internal image-reference" href="_images/module_fsm_diagram.svg"><img alt="_images/module_fsm_diagram.svg" src="_images/module_fsm_diagram.svg" style="width: 80%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 16 </span><span class="caption-text">The state machine of a Qudi module (reproduced from <a class="reference external" href="https://ulm-iqo.github.io/qudi-core/design_concepts/measurement_modules.html">Qudi’s documentation</a>). The rectangles represent states, the arrows represent transitions. The black dot indicates the initial state.</span><a class="headerlink" href="#id27" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 16 </span><span class="caption-text">The state machine of a Qudi module (reproduced from <a class="reference external" href="https://ulm-iqo.github.io/qudi-core/design_concepts/measurement_modules.html">Qudi’s documentation</a>). The rectangles represent states, the arrows represent transitions. The black dot indicates the initial state.</span><a class="headerlink" href="#id29" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>All modules start in the <code class="docutils literal notranslate"><span class="pre">deactivated</span></code> state. Then, when we click on their button in the main window, or if they are configured to be launched at startup, Qudi will use the <code class="docutils literal notranslate"><span class="pre">activate</span></code> transition to put the module in the <code class="docutils literal notranslate"><span class="pre">idle</span></code> state. In doing so, it will call the <code class="docutils literal notranslate"><span class="pre">on_activate</span></code> method of the module. This method is responsible for the initialization of the module. For example, hardware modules use it to initialize their connection to physical instruments, logic modules may use it to initialize their data storage buffers, GUI modules their windows, etc… Similarly, wen we de-activate a module, Qudi will use the <code class="docutils literal notranslate"><span class="pre">deactivate</span></code> transition to bring it to the <code class="docutils literal notranslate"><span class="pre">deactivated</span></code> state. It will call the <code class="docutils literal notranslate"><span class="pre">on_deactivate</span></code> method of the module beforehand. In this method, modules typically disconnect from physical instruments, clear out buffer, maybe save some data, etc…</p>
@@ -1252,7 +1312,7 @@ When coding logics, if you need to refer to the connected module (in this exampl
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;/home/klafyvel/qudi/Data/2025/12/2025-12-16/20210506-1111-11_amplitude_measurement.dat&#39;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;/home/klafyvel/qudi/Data/2025/12/2025-12-17/20210506-1111-11_amplitude_measurement.dat&#39;
 </pre></div>
 </div>
 </div>
@@ -1304,7 +1364,7 @@ When coding logics, if you need to refer to the connected module (in this exampl
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;/home/klafyvel/qudi/Data/2025/12/2025-12-16/20210506-1111-11_amplitude_measurement.png&#39;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;/home/klafyvel/qudi/Data/2025/12/2025-12-17/20210506-1111-11_amplitude_measurement.png&#39;
 </pre></div>
 </div>
 </div>
@@ -1319,19 +1379,19 @@ When coding logics, if you need to refer to the connected module (in this exampl
 </div>
 <p>We’ve already started using notebook to script Qudi, but haven’t been interacting with the instruments yet! This is also possible in Qudi, and provides a nice trade-off between writing full-blown logic and GUI modules and not using automation at all.</p>
 <p>To create a jupyter notebook that works with Qudi, you need to use the Qudi jupyter kernel. Using the jupyter installation provided with Qudi (check also the section “<a class="reference internal" href="#running-qudi-and-the-interactive-notes"><span class="std std-ref">Running Qudi and the interactive notes</span></a>), you can select this kernel when creating a new notebook.</p>
-<figure class="align-default" id="id28">
+<figure class="align-default" id="id30">
 <a class="reference internal image-reference" href="_images/new_notebook.png"><img alt="_images/new_notebook.png" src="_images/new_notebook.png" style="width: 200px;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 17 </span><span class="caption-text">The <kbd class="kbd docutils literal notranslate">New</kbd> menu in the jupyter explorer allows selecting a kernel. If you are creating a new notebook for using Qudi, you must choose <code class="docutils literal notranslate"><span class="pre">qudi</span></code>.</span><a class="headerlink" href="#id28" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 17 </span><span class="caption-text">The <kbd class="kbd docutils literal notranslate">New</kbd> menu in the jupyter explorer allows selecting a kernel. If you are creating a new notebook for using Qudi, you must choose <code class="docutils literal notranslate"><span class="pre">qudi</span></code>.</span><a class="headerlink" href="#id30" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>You can check that you are running the correct kernel from the top-right section of the notebook. For example, if you are following along the tutorial using the notebook version of the notes, you should see the following:</p>
-<figure class="align-default" id="id29">
+<figure class="align-default" id="id31">
 <a class="reference internal image-reference" href="_images/running_notebook.png"><img alt="_images/running_notebook.png" src="_images/running_notebook.png" style="width: 200px;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 18 </span><span class="caption-text">The notebook displays the currently used kernel, here the <code class="docutils literal notranslate"><span class="pre">qudi</span></code> kernel.</span><a class="headerlink" href="#id29" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 18 </span><span class="caption-text">The notebook displays the currently used kernel, here the <code class="docutils literal notranslate"><span class="pre">qudi</span></code> kernel.</span><a class="headerlink" href="#id31" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <div class="admonition tip">
@@ -1582,20 +1642,20 @@ When coding logics, if you need to refer to the connected module (in this exampl
 </div>
 </div>
 <p>You will see the following message in the logger:</p>
-<figure class="align-default" id="id30">
+<figure class="align-default" id="id32">
 <a class="reference internal image-reference" href="_images/error_message_main_window.png"><img alt="_images/error_message_main_window.png" src="_images/error_message_main_window.png" style="width: 80%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 19 </span><span class="caption-text">The error message we just printed!</span><a class="headerlink" href="#id30" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 19 </span><span class="caption-text">The error message we just printed!</span><a class="headerlink" href="#id32" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>You can double click on the message to copy and paste it to report it, or look for solutions online for example. You can see that Qudi tells you which Python module produced the message and at which time. This kind of error message happens when the person that coded the module anticipated that an error could occur and decided to alert the user. This means it is up to the programmer to make the error message useful in helping you fix the error!</p>
 <p>If you have a look at the terminal in which Qudi is running, you will see that the error message also appears there, albeit with less informations available.</p>
-<figure class="align-default" id="id31">
+<figure class="align-default" id="id33">
 <a class="reference internal image-reference" href="_images/error_message_terminal.png"><img alt="_images/error_message_terminal.png" src="_images/error_message_terminal.png" style="width: 30%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 20 </span><span class="caption-text">The error message in the terminal</span><a class="headerlink" href="#id31" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 20 </span><span class="caption-text">The error message in the terminal</span><a class="headerlink" href="#id33" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>This redundancy is useful if the main window comes to crash for example. The last place where you can find errors is in the log file (see <a class="reference internal" href="#log-viewer"><span class="std std-ref">Log viewer</span></a> section to locate this file). Always with our example, Qudi outputed the following line in my file when I ran it:</p>
@@ -1677,11 +1737,11 @@ Qudi is rather good at catching errors. However, some error will fail silently a
 </div>
 </div>
 <p>Everything exploded! Since we are running code in a notebook, two errors are reported. One is local to the notebook (the first one) and you can ignore it, and the other corresponds to the error in Qudi (you can see that it mention a <code class="docutils literal notranslate"><span class="pre">Remote</span> <span class="pre">Traceback</span></code>, this is because the Python instance that runs Qudi is considered a remote excecution thread by the notebook). If Qudi had caught this error in a module (for example if your logic module was flawed), it would have only printed the last bit in the log viewer. Let’s try to go through this error to learn to read it.</p>
-<figure class="align-default" id="id32">
+<figure class="align-default" id="id34">
 <a class="reference internal image-reference" href="_images/python_error.png"><img alt="_images/python_error.png" src="_images/python_error.png" style="width: 100%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 21 </span><span class="caption-text">The error message with flashy colors. Everything is better in flashy colors. :)</span><a class="headerlink" href="#id32" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 21 </span><span class="caption-text">The error message with flashy colors. Everything is better in flashy colors. :)</span><a class="headerlink" href="#id34" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>The error should be read from bottom to top. The first, and maybe most important bit is the error name and the error message, highlighted in light blue. The error name gives you an idea of the kind of error that happened. Python provides <a class="reference external" href="https://docs.python.org/3/library/exceptions.html">a set of built-in exceptions</a>, and developpers are free to add their own. For example, a developper wanting to report an error related to a division by zero might use <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ZeroDivisionError"><code class="docutils literal notranslate"><span class="pre">ZeroDivisionError</span></code></a>. The message is a hint left by the developper to understand the origin and reason for the error to happen, and maybe help you fix it.</p>
@@ -1691,11 +1751,11 @@ Qudi is rather good at catching errors. However, some error will fail silently a
 <section id="configuration-file-errors">
 <h2>Configuration file errors<a class="headerlink" href="#configuration-file-errors" title="Link to this heading">¶</a></h2>
 <p>In this section, I list some common errors that can be linked to configuration files</p>
-<figure class="align-default" id="id33">
+<figure class="align-default" id="id35">
 <a class="reference internal image-reference" href="_images/wrong_configuration.jpeg"><img alt="A character is trying to connect two pieces of a puzzle that cannot fit together" src="_images/wrong_configuration.jpeg" style="width: 30%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 22 </span><span class="caption-text">Connectors must match the expected interfaces.</span><a class="headerlink" href="#id33" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 22 </span><span class="caption-text">Connectors must match the expected interfaces.</span><a class="headerlink" href="#id35" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <section id="wrong-interfaces">
@@ -1750,11 +1810,11 @@ Qudi is rather good at catching errors. However, some error will fail silently a
 <section id="yaml-errors">
 <h3>YAML errors<a class="headerlink" href="#yaml-errors" title="Link to this heading">¶</a></h3>
 <p>YAML is a tricky file format to work with. It is especially fragile to indentation errors, and even experienced developpers can have issues using it.</p>
-<figure class="align-default" id="id34">
+<figure class="align-default" id="id36">
 <a class="reference internal image-reference" href="_images/yaml.jpeg"><img alt="A character is shaking at the thought of writing YAML" src="_images/yaml.jpeg" style="width: 30%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 23 </span><span class="caption-text">The cry of the postdoc condemned to write YAML, circa 2025.</span><a class="headerlink" href="#id34" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 23 </span><span class="caption-text">The cry of the postdoc condemned to write YAML, circa 2025.</span><a class="headerlink" href="#id36" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>For example, if I sneak <a class="reference external" href="https://en.wikipedia.org/wiki/Tab_key">a tabulation character</a> in my configuration file, Qudi will crash trying to load the file.</p>
@@ -1794,11 +1854,11 @@ Qudi is rather good at catching errors. However, some error will fail silently a
 <p>To avoid issues with tabulation characters, I advise configuring your text editor to make it automatically replace tabulation characters by four spaces.</p>
 </div>
 <p>To avoid having to deal with YAML, Qudi provides an experimental graphical editor for configuration files, accessible from the main window. The interface is rather explicit, and you can try to play with it if you are curious.</p>
-<figure class="align-default" id="id35">
+<figure class="align-default" id="id37">
 <a class="reference internal image-reference" href="_images/config_editor.png"><img alt="_images/config_editor.png" src="_images/config_editor.png" style="width: 70%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 24 </span><span class="caption-text">The experimental configuration editor.</span><a class="headerlink" href="#id35" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 24 </span><span class="caption-text">The experimental configuration editor.</span><a class="headerlink" href="#id37" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
@@ -1806,19 +1866,19 @@ Qudi is rather good at catching errors. However, some error will fail silently a
 <section id="connectivity-errors">
 <h2>Connectivity errors<a class="headerlink" href="#connectivity-errors" title="Link to this heading">¶</a></h2>
 <p>I briefly mentionned in the section on configuration the existence of <a class="reference external" href="https://ulm-iqo.github.io/qudi-core/design_concepts/remote_modules.html">remote modules</a>. Connectivity error can also concern local modules. You will obviously encouter errors if the hardware you are trying to access is not connected. An error that I have often seen in the lab is having multiple Qudi instances running. This is often due to people thinking they closed a previous instance of Qudi by clicking on the red cross on the top-right of the main window. This does not close Qudi and can lead to errors. Close Qudi instances by using the <kbd class="kbd compound docutils literal notranslate"><kbd class="kbd docutils literal notranslate">File</kbd> <kbd class="kbd docutils literal notranslate">&gt;</kbd> <kbd class="kbd docutils literal notranslate">Quit</kbd> <kbd class="kbd docutils literal notranslate">qudi</kbd></kbd> menu in the main window preferably, or by closing the terminal in case QUdi crashed (but be aware that this is an extreme measure, and will not go through the usual extinction procedure).</p>
-<figure class="align-default" id="id36">
+<figure class="align-default" id="id38">
 <a class="reference internal image-reference" href="_images/too_many_qudi.jpeg"><img alt="A character has been submersed by little Qudi logos. only his thumb up is emerging." src="_images/too_many_qudi.jpeg" style="width: 30%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 25 </span><span class="caption-text">Multiple Qudi instances running in parallel will interfere with one another.</span><a class="headerlink" href="#id36" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 25 </span><span class="caption-text">Multiple Qudi instances running in parallel will interfere with one another.</span><a class="headerlink" href="#id38" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>It is probably rather clear why when the network is not working, you might have errors if you rely on it! To diagnose this kind of problems, you might try to visit a website if your network is supposed to be connected to the internet, verify that ethernet cables are connected, etc. Note that when you connect to a Qudi instance running on another computer, there might be issues when Qudi is closed on the main computer but is kept running on the remote computer. One solution is to close both Qudi instances, then starting the remote Qudi instance and finally the local Qudi instance.</p>
-<figure class="align-default" id="id37">
+<figure class="align-default" id="id39">
 <a class="reference internal image-reference" href="_images/network_failure.jpeg"><img alt="A character is perplexed by a knot of ethernet cables." src="_images/network_failure.jpeg" style="width: 30%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 26 </span><span class="caption-text">If you rely on hardware accessed through the network, you are dependent on the network working.</span><a class="headerlink" href="#id37" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 26 </span><span class="caption-text">If you rely on hardware accessed through the network, you are dependent on the network working.</span><a class="headerlink" href="#id39" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
@@ -1936,11 +1996,11 @@ RuntimeError: Failed to activate hardware module &quot;instream_dummy&quot;!
 <section id="the-time-series-gui">
 <h2>The time series GUI<a class="headerlink" href="#the-time-series-gui" title="Link to this heading">¶</a></h2>
 <p>The GUI that we have been using the most during this lecture is the time series GUI. It is rather simple, reliable, and always useful. It is worth describing a bit some of its functionalities. This GUI and the corresponding <code class="docutils literal notranslate"><span class="pre">TimeSeriesReaderLogic</span></code> deal with hardwares implementing the <code class="docutils literal notranslate"><span class="pre">DataInStreamInterface</span></code>. They also calculate moving averages of the acquired signals.</p>
-<figure class="align-default" id="id38">
+<figure class="align-default" id="id40">
 <a class="reference internal image-reference" href="_images/time_series_illustration.svg"><img alt="_images/time_series_illustration.svg" src="_images/time_series_illustration.svg" style="width: 100%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 27 </span><span class="caption-text">The main time series window. Your (mostly) reliable best friend.</span><a class="headerlink" href="#id38" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 27 </span><span class="caption-text">The main time series window. Your (mostly) reliable best friend.</span><a class="headerlink" href="#id40" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>Going from left to right and top to bottom in the previous figure, we have:</p>
@@ -1957,19 +2017,19 @@ RuntimeError: Failed to activate hardware module &quot;instream_dummy&quot;!
 <li><p>The moving average width, which controls how many data points are used for calculating moving averages.</p></li>
 </ul>
 <p>There are two important control points that can be called using the trace view selection and channel settings buttons. The first one is the trace view window. It only controls what is being <strong>displayed</strong> in the window. The data that are hidden are still being acquired and will be saved to file if you request that.</p>
-<figure class="align-default" id="id39">
+<figure class="align-default" id="id41">
 <a class="reference internal image-reference" href="_images/trace_view_selection.png"><img alt="_images/trace_view_selection.png" src="_images/trace_view_selection.png" style="width: 40%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 28 </span><span class="caption-text">The trace view window.</span><a class="headerlink" href="#id39" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 28 </span><span class="caption-text">The trace view window.</span><a class="headerlink" href="#id41" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>The second control point is the channel settings window. It controls what data are actually being acquired. It is not accessible when data acquisition is running.</p>
-<figure class="align-default" id="id40">
+<figure class="align-default" id="id42">
 <a class="reference internal image-reference" href="_images/data_channel_settings.png"><img alt="_images/data_channel_settings.png" src="_images/data_channel_settings.png" style="width: 40%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 29 </span><span class="caption-text">The channel settings window.</span><a class="headerlink" href="#id40" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 29 </span><span class="caption-text">The channel settings window.</span><a class="headerlink" href="#id42" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <div class="admonition note">
@@ -1981,11 +2041,11 @@ RuntimeError: Failed to activate hardware module &quot;instream_dummy&quot;!
 <section id="the-scanner-gui-running-confocal-scans-and-controlling-the-galvo-mirror">
 <h2>The scanner GUI: running confocal scans and controlling the galvo mirror<a class="headerlink" href="#the-scanner-gui-running-confocal-scans-and-controlling-the-galvo-mirror" title="Link to this heading">¶</a></h2>
 <p>If you do confocal microscopy, this setup is very useful. It allows scanning the sample plane in as many dimensions as are available and optimizing on punctual sources.</p>
-<figure class="align-default" id="id41">
+<figure class="align-default" id="id43">
 <a class="reference internal image-reference" href="_images/scanner_gui_annotated.svg"><img alt="_images/scanner_gui_annotated.svg" src="_images/scanner_gui_annotated.svg" style="width: 100%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 30 </span><span class="caption-text">The Scanner GUI. Available axes may vary.</span><a class="headerlink" href="#id41" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 30 </span><span class="caption-text">The Scanner GUI. Available axes may vary.</span><a class="headerlink" href="#id43" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>This window includes many features. You can scan pairs of axes, or axes alone. You can navigate through the history of scans (this will also move the cursor to the saved position). Finally, you can also move the position manually and use the automatic optimization feature to get the best position on a punctual emitter. Some notes on the features:</p>
@@ -2002,99 +2062,155 @@ RuntimeError: Failed to activate hardware module &quot;instream_dummy&quot;!
 <p>One of the best handled piece of hardware in Qudi are the National Instruments DAQ cards. This is probably due to historical reasons and their widespread use in fields doing confocal micrsocopy. There are no less than 4 hardware modules that can deal with them. Some notes:</p>
 <ul class="simple">
 <li><p>The <a class="reference external" href="https://lab-on-a-molecule-quantum-nanophotonics.github.io/qudi-lab-on-a-molecule-modules/modules/hardware/NationalInstruments/ni_x_series_analog_output.html">NIXSeriesFiniteSamplingIO</a> hardware is one of the simplest. It does not handle any timing, and allows you to control analog outputs on-the-go. This is typically what you manipulate through the cursor of the confocal scanner, some setpoints for the lasers, etc.</p></li>
-<li><p>The <a class="reference external" href="https://lab-on-a-molecule-quantum-nanophotonics.github.io/qudi-lab-on-a-molecule-modules/modules/hardware/NationalInstruments/ni_x_series_in_streamer.html">NIXSeriesInStreamer</a> implements the <a class="reference external" href="https://lab-on-a-molecule-quantum-nanophotonics.github.io/qudi-lab-on-a-molecule-modules/modules/interface/data_instream_interface.html">DataInStreamInterface</a>. This is typically what you will plug into the</p></li>
+<li><p>The <a class="reference external" href="https://lab-on-a-molecule-quantum-nanophotonics.github.io/qudi-lab-on-a-molecule-modules/modules/hardware/NationalInstruments/ni_x_series_in_streamer.html">NIXSeriesInStreamer</a> implements the <a class="reference external" href="https://lab-on-a-molecule-quantum-nanophotonics.github.io/qudi-lab-on-a-molecule-modules/modules/interface/data_instream_interface.html">DataInStreamInterface</a>. This is typically what you will plug into the <a class="reference external" href="https://lab-on-a-molecule-quantum-nanophotonics.github.io/qudi-lab-on-a-molecule-modules/modules/logic/time_series_reader_logic.html">TimeSeriesReaderLogic</a>.</p></li>
+<li><p>The <a class="reference external" href="https://lab-on-a-molecule-quantum-nanophotonics.github.io/qudi-lab-on-a-molecule-modules/modules/hardware/NationalInstruments/ni_x_series_finite_sampling_io.html">NIXSeriesFiniteSamplingIO</a> implements the <a class="reference external" href="https://lab-on-a-molecule-quantum-nanophotonics.github.io/qudi-lab-on-a-molecule-modules/modules/interface/finite_sampling_io_interface.html"><code class="docutils literal notranslate"><span class="pre">FiniteSamplingIOInterface</span></code></a>, which we did not cover. Its role is to acquire and/or output a finite number of analog and/or digital values with a precise timing. This is typically what you will use to acquire a scan with the confocal scanner or with the laser excitation scanners. You can also use one of it’s output to synchronize other acquisition hardwares (for example, and EMCCD camera!).</p></li>
+<li><p>The <a class="reference external" href="https://lab-on-a-molecule-quantum-nanophotonics.github.io/qudi-lab-on-a-molecule-modules/modules/hardware/NationalInstruments/ni_x_series_finite_sampling_input.html">NIXSeriesFiniteSamplingInput</a> implements the <a class="reference external" href="https://lab-on-a-molecule-quantum-nanophotonics.github.io/qudi-lab-on-a-molecule-modules/modules/interface/finite_sampling_input_interface.html"><code class="docutils literal notranslate"><span class="pre">FiniteSamplingInputInterface</span></code></a>, which we did not cover. It is a restricted version of the previous hardware, dealing only with input. As much as it is possible, I recommend against using it, as it will interfere with the time series if both are running at the same time.</p></li>
 </ul>
-<p>Probably not covered during the in-person lecture, but useful to explain some things (io vs input hardware modules, what you can and cannot do, wxplain a bit how the ports are named)</p>
 </section>
 <section id="laser-scanners">
 <h2>Laser scanners<a class="headerlink" href="#laser-scanners" title="Link to this heading">¶</a></h2>
-<p>Here we go quickly over the logic of the laser scanner through their state machines. Give some illustrations and explanations of why they do certain things.</p>
+<p>The excitation spectroscopy setup is something we developped internally in the group. It revolves around the <a class="reference external" href="https://lab-on-a-molecule-quantum-nanophotonics.github.io/qudi-lab-on-a-molecule-modules/modules/interface/excitation_scanner_interface.html">Excitationscanner interface</a>, the <a class="reference external" href="https://lab-on-a-molecule-quantum-nanophotonics.github.io/qudi-lab-on-a-molecule-modules/modules/logic/scanning_excitation_spectroscopy.html">Scanning Excitation Logic</a>, and the <a class="reference external" href="https://lab-on-a-molecule-quantum-nanophotonics.github.io/qudi-lab-on-a-molecule-modules/modules/gui/scanning_excitation_spectroscopy.html">Scanning excitation spectroscopy GUI</a>.</p>
 <section id="the-laser-scanner-user-interface">
 <h3>The laser scanner user interface<a class="headerlink" href="#the-laser-scanner-user-interface" title="Link to this heading">¶</a></h3>
-<figure class="align-default" id="id42">
-<a class="reference internal image-reference" href="_images/laser_window_annotated.svg"><img alt="_images/laser_window_annotated.svg" src="_images/laser_window_annotated.svg" style="width: 70%;" />
+<figure class="align-default" id="id44">
+<a class="reference internal image-reference" href="_images/laser_window_annotated.svg"><img alt="_images/laser_window_annotated.svg" src="_images/laser_window_annotated.svg" style="width: 100%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 31 </span><span class="caption-text">The laser scanner user interface</span><a class="headerlink" href="#id42" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 31 </span><span class="caption-text">The laser scanner user interface</span><a class="headerlink" href="#id44" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
-<p>Explain that this interface is generic, and that the middle column changes for each laser. Explain notes, and scanner status. Explain the data pane, with how the fit region works, the fit button also. Explain how to control the idle value of the laser, <strong>that the <code class="docutils literal notranslate"><span class="pre">Laser</span> <span class="pre">follow</span> <span class="pre">cursor</span></code> switch needs to be enabled</strong>, the drag and drop of the green line, the slider and its scroll divider.</p>
+<p>Because each laser and acquisition system has its own specificities for how we control and scan the frequencies, the logic and the GUI are very generalistic. This reflects in the control part of the GUI where we separate the common settings (exposure time, number of repetitions, and the scanner status), and the laser-specific part. In my screenshot we have the specific controls for the 785nm dfb laser, that we control by sending an analog voltage for the setpoint of its temperature PID. There is also a section to write free-form textual notes that are useful to keep track of some other experimental parameters.</p>
+<p>The second half of the window is dedicated to data exploration and control of the laser frequency. After a scan has been run, you can select a fit region either by entering manually the region boundaries, or by drag-and-dropping the yellow boundaries in the plot. If the displayed fit region becomes cumbersome, you can also hide it. You can also select which repetition number to fit (it starts at 0). The fit models available are in the drop-down menu in the highlighted blue region. Other models are available and can be added using the fit coniguration window. You can open it from the <kbd class="kbd compound docutils literal notranslate"><kbd class="kbd docutils literal notranslate">View</kbd> <kbd class="kbd docutils literal notranslate">&gt;</kbd> <kbd class="kbd docutils literal notranslate">Show</kbd> <kbd class="kbd docutils literal notranslate">Fit</kbd> <kbd class="kbd docutils literal notranslate">Settings</kbd></kbd> menu.</p>
+<figure class="align-default" id="id45">
+<a class="reference internal image-reference" href="_images/fit_configuration.png"><img alt="_images/fit_configuration.png" src="_images/fit_configuration.png" style="width: 70%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 32 </span><span class="caption-text">The fit configuration window</span><a class="headerlink" href="#id45" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>Finally, you can control the current frequency of the laser through 3 different inputs.</p>
+<ol class="arabic simple">
+<li><p>By directly inputing a number in the <code class="docutils literal notranslate"><span class="pre">X</span></code> input of the <code class="docutils literal notranslate"><span class="pre">Target</span></code> group,</p></li>
+<li><p>By drag-and-dropping the green cursor in the plot,</p></li>
+<li><p>Using the cursor at the very bottom. This also supports mousewheel interactions when the mouse hovers it. The displacement amount of one step of the mousewheel is given by the full available scan range divided by the <code class="docutils literal notranslate"><span class="pre">Scroll</span> <span class="pre">step</span> <span class="pre">divider</span></code>. In the screenshot above, since the full available range is roughly 260GHz, and because the divider is $10^{3}$, this means one step is 260MHz.</p></li>
+</ol>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>For the laser frequency control to work, you need to have the <code class="docutils literal notranslate"><span class="pre">Laser</span> <span class="pre">follow</span> <span class="pre">cursor</span></code> switch enabled.</p>
+</div>
 </section>
-<section id="hardwares-and-state-machines">
-<h3>Hardwares and State machines<a class="headerlink" href="#hardwares-and-state-machines" title="Link to this heading">¶</a></h3>
-<p>Reminder of state machines, use the dummy hardware to illustrate</p>
-<figure class="align-default" id="id43">
+<section id="the-laser-scanner-logic">
+<h3>The laser scanner logic<a class="headerlink" href="#the-laser-scanner-logic" title="Link to this heading">¶</a></h3>
+<p>The <a class="reference external" href="https://lab-on-a-molecule-quantum-nanophotonics.github.io/qudi-lab-on-a-molecule-modules/modules/logic/scanning_excitation_spectroscopy.html">Scanning Excitation Logic</a> is responsible for driving the scan hardwares on a high-level view. It can be used to start and stop scans, setting scan parameters, laser frequency, fitting, and saving the data.</p>
+</section>
+<section id="id8">
+<h3>Hardwares<a class="headerlink" href="#id8" title="Link to this heading">¶</a></h3>
+<p>We have hardware implemented foreach of our lasers. Depending on the laser capabilities (or the manufacturer good will to document them), the acquisition method is different. There roughly two methods:</p>
+<ol class="arabic simple">
+<li><p>Lasers for which we are able to synchronize the scanning timing with the reading of the detector. They typically use a <a class="reference external" href="https://lab-on-a-molecule-quantum-nanophotonics.github.io/qudi-lab-on-a-molecule-modules/modules/interface/finite_sampling_io_interface.html"><code class="docutils literal notranslate"><span class="pre">FiniteSamplingIOInterface</span></code></a> for acquisition <em>and</em> control,</p></li>
+<li><p>Lasers for which we can’t do that. In these cases, we typically use the finite sampling for acquisition, start the scanning and the acquisition at the same time, and sample the frequency from time to time during the scan to interpolate it a posteriori. This is obviously less reliable since it uses the timing of the computer (and even the network!) to sample the frequency.</p></li>
+</ol>
+<section id="id9">
+<h4>State machines<a class="headerlink" href="#id9" title="Link to this heading">¶</a></h4>
+<p>Although this is not a requirement to implement a hardware for the laser scanner logic, I’ve found it useful to use a finite state machine design pattern. This is done using the <a class="reference external" href="https://lab-on-a-molecule-quantum-nanophotonics.github.io/qudi-lab-on-a-molecule-modules/modules/interface/sampled_finite_state_interface.html"><code class="docutils literal notranslate"><span class="pre">SampledFiniteStateInterface</span></code></a>, check its documentation if you are curious. An example finite state machine is the dummy hardware <code class="docutils literal notranslate"><span class="pre">ExcitationScannerDummy</span></code>, whose finite state machine is depicted below. You can also get inspiration from it to implement your own hardwares.</p>
+<figure class="align-default" id="id46">
 <a class="reference internal image-reference" href="_images/qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.svg"><img alt="_images/qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.svg" src="_images/qudi.hardware.dummy.excitation_scanner_dummy.ExcitationScannerDummy.svg" style="width: 60%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 32 </span><span class="caption-text">The state machine of the dummy laser. On the right the simplified version without the interuption routines.</span><a class="headerlink" href="#id43" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 33 </span><span class="caption-text">The state machine of the dummy laser. On the right the simplified version without the interuption routines.</span><a class="headerlink" href="#id46" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
-<section id="an-example-state-machine-the-dfb-laser">
-<h4>An example state machine: the DFB laser<a class="headerlink" href="#an-example-state-machine-the-dfb-laser" title="Link to this heading">¶</a></h4>
-<p>Nothing really interesting to comment on here, we can just go fast on that.</p>
-<figure class="align-default" id="id44">
+<p>As you can see, the state machine is quite simple once you remove the transitions corresponding to scan interruption. It is also quite representative of the other state machines for the rel lasers. Typically, you have</p>
+<ul class="simple">
+<li><p>a <code class="docutils literal notranslate"><span class="pre">prepare</span> <span class="pre">idle</span></code> and an <code class="docutils literal notranslate"><span class="pre">idle</span></code> states whose job is just to set the frequency when we are not scanning (typically to go in resonance with a molecule),</p></li>
+<li><p>a <code class="docutils literal notranslate"><span class="pre">prepare</span> <span class="pre">scan</span></code> state, which allocates the buffers in wich we will store the data, and prepares the hardware,</p></li>
+<li><p>a <code class="docutils literal notranslate"><span class="pre">prepare</span> <span class="pre">step</span></code> state, which prepares the hardware to perform one repetition of the scan and stops the scan once all repetitions have been made,</p></li>
+<li><p>a <code class="docutils literal notranslate"><span class="pre">wait</span> <span class="pre">ready</span></code> state, which waits for the hardware to be ready to scan,</p></li>
+<li><p>and a <code class="docutils literal notranslate"><span class="pre">record</span> <span class="pre">scan</span> <span class="pre">step</span></code> state, which stores the acquired data in the buffers.</p></li>
+</ul>
+<p>This states are typically displayed in the scanning excitation GUI.</p>
+</section>
+<section id="finite-sampling-excitation-interfuse">
+<h4>Finite sampling excitation interfuse<a class="headerlink" href="#finite-sampling-excitation-interfuse" title="Link to this heading">¶</a></h4>
+<p>We use the <a class="reference external" href="https://lab-on-a-molecule-quantum-nanophotonics.github.io/qudi-lab-on-a-molecule-modules/modules/hardware/excitation_scanners/finite_sampling_scanning_excitation.html"><code class="docutils literal notranslate"><span class="pre">FiniteSamplingScanningExcitationInterfuse</span></code></a> hardware to control the 785nm DFB laser. As you can see this is a “good” laser, and it reflects in the simplicity of its state machine:</p>
+<figure class="align-default" id="id47">
 <a class="reference internal image-reference" href="_images/qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.svg"><img alt="_images/qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.svg" src="_images/qudi.hardware.interfuse.finite_sampling_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.svg" style="width: 60%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 33 </span><span class="caption-text">The state machine for the DFB laser. On the right, the simplified version with the interuption transition and the stopped state removed.</span><a class="headerlink" href="#id44" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 34 </span><span class="caption-text">The state machine for the finite sampling scanning excitation interfuse. On the right, the simplified version with the interuption transition and the stopped state removed.</span><a class="headerlink" href="#id47" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>An interfuse is a qudi-specific term to call a hardware that fuses together one or several hardware to provide a new interface implementation.</p>
+</div>
+<p>Optionally, this hardware is able to control a <a class="reference external" href="https://lab-on-a-molecule-quantum-nanophotonics.github.io/qudi-lab-on-a-molecule-modules/modules/interface/process_control_interface.html"><code class="docutils literal notranslate"><span class="pre">ProcessSetpointInterface</span></code></a>, which value will be update every few scan repetitions. The typical use would be changing the temperature of a cryostat, or the power of a laser, every few scan repetition. Right now the way to do it is a bit clunky, I hope we can make it easier in the future, and/or move this to the logic rather than the hardware. When an external process setpoint is configured,</p>
+<figure class="align-default" id="id48">
+<a class="reference internal image-reference" href="_images/external_setpoint_scanner.jpg"><img alt="_images/external_setpoint_scanner.jpg" src="_images/external_setpoint_scanner.jpg" style="width: 60%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 35 </span><span class="caption-text">The control variables with an external process setpoint configured. Here a cryostat.</span><a class="headerlink" href="#id48" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>When <code class="docutils literal notranslate"><span class="pre">External</span>&#160; <span class="pre">enabled</span></code> is ticked, the hardware will set the external process setpoint to <code class="docutils literal notranslate"><span class="pre">First</span> <span class="pre">external</span> <span class="pre">setpoint</span></code> (20K), and change the setpoint every three scans. This means that the temperature step will be 12K, to reach 32K. the <code class="docutils literal notranslate"><span class="pre">External</span> <span class="pre">setpoint</span> <span class="pre">repeat</span> <span class="pre">per</span> <span class="pre">step</span></code> and <code class="docutils literal notranslate"><span class="pre">External</span> <span class="pre">setpoint</span> <span class="pre">step</span></code> settings are linked to the number of repetitions you set. <strong>Check that these values correspond to what you want to do before running scans!</strong> There is also an additional waiting time that lets the external process stabilize after changing the setpoint before scanning the frequencies.</p>
+<p>Optionally, the hardware is able to read a <a class="reference external" href="https://lab-on-a-molecule-quantum-nanophotonics.github.io/qudi-lab-on-a-molecule-modules/modules/interface/process_control_interface.html"><code class="docutils literal notranslate"><span class="pre">ProcessValueInterface</span></code></a> to read its value at the beginning and at the end of each step. The intermediary values (during the acquisition) are automatically interpolated.</p>
+<section id="laser-specifics-dfb-laser">
+<h5>Laser specifics: DFB laser<a class="headerlink" href="#laser-specifics-dfb-laser" title="Link to this heading">¶</a></h5>
+<p>The example taken above is for the DFB laser and the cryostat. In the lab, we have two pre-configured hardwares. One where we speak to the cryostat, and another where we don’t. When we connect to the cryostat, we use the sepoint to set the temperature, and the temperature value for the stored process value.</p>
+<figure class="align-default" id="id49">
+<a class="reference internal image-reference" href="_images/5d3c2a5f-415a-40ae-bd7e-aa280971513f.png"><img alt="_images/5d3c2a5f-415a-40ae-bd7e-aa280971513f.png" src="_images/5d3c2a5f-415a-40ae-bd7e-aa280971513f.png" style="width: 60%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 36 </span><span class="caption-text">The DFB can have an external control hardware connected. For simplicity in Lab 66 we have two corresponding configurations available</span><a class="headerlink" href="#id49" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>If you want to use the setup with the cryo, don’t forget to enable external controls in the Cryostation software to allow Qudi to connect!</p>
+<figure class="align-default" id="id50">
+<a class="reference internal image-reference" href="_images/ce06e35a-71d8-420d-88bb-e134a2f325f7.png"><img alt="_images/ce06e35a-71d8-420d-88bb-e134a2f325f7.png" src="_images/ce06e35a-71d8-420d-88bb-e134a2f325f7.png" style="width: 60%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 37 </span><span class="caption-text">Don’t forget to click on <kbd class="kbd compound docutils literal notranslate"><kbd class="kbd docutils literal notranslate">ENABLE</kbd> <kbd class="kbd docutils literal notranslate">EXTERNAL</kbd> <kbd class="kbd docutils literal notranslate">CONTROL</kbd></kbd> in the Cryostation software if you are using the dfb with the cryo.</span><a class="headerlink" href="#id50" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
+</section>
 <section id="a-slightly-more-complicated-example-the-moglabs-cem-laser">
 <h4>A slightly more complicated example: the Moglabs CEM laser<a class="headerlink" href="#a-slightly-more-complicated-example-the-moglabs-cem-laser" title="Link to this heading">¶</a></h4>
-<p>Explain why we have a scan_idle state</p>
-<figure class="align-default" id="id45">
+<p>We can use the Moglabs Cat-Eye motorised laser to perform excitation spectroscopy.</p>
+<figure class="align-default" id="id51">
 <a class="reference internal image-reference" href="_images/qudi.hardware.interfuse.moglabs_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.svg"><img alt="_images/qudi.hardware.interfuse.moglabs_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.svg" src="_images/qudi.hardware.interfuse.moglabs_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.svg" style="width: 60%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 34 </span><span class="caption-text">The state machine for the Moglabls CEM laser. On the right, the simplified version with the interruption transitions and the stopped state removed.</span><a class="headerlink" href="#id45" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 38 </span><span class="caption-text">The state machine for the Moglabls CEM laser. On the right, the simplified version with the interruption transitions and the stopped state removed.</span><a class="headerlink" href="#id51" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="a-more-complicated-example-the-matisse-laser">
 <h4>A more complicated example: the Matisse laser<a class="headerlink" href="#a-more-complicated-example-the-matisse-laser" title="Link to this heading">¶</a></h4>
 <p>Detail a bit more, explain that the matisse laser is in two part, one on the laser’s computer, not shown here, and one on the main computer.</p>
-<figure class="align-default" id="id46">
+<figure class="align-default" id="id52">
 <a class="reference internal image-reference" href="_images/qudi.hardware.interfuse.remote_matisse_scanner.RemoteMatisseScanner.svg"><img alt="_images/qudi.hardware.interfuse.remote_matisse_scanner.RemoteMatisseScanner.svg" src="_images/qudi.hardware.interfuse.remote_matisse_scanner.RemoteMatisseScanner.svg" style="width: 60%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 35 </span><span class="caption-text">The state machine for the Matisse laser. On the right, the simplified version where the interruption transitions and the stopped state have been removed.</span><a class="headerlink" href="#id46" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 39 </span><span class="caption-text">The state machine for the Matisse laser. On the right, the simplified version where the interruption transitions and the stopped state have been removed.</span><a class="headerlink" href="#id52" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
-</section>
-</section>
-<section id="the-laser-scanner-logic">
-<h2>The laser scanner logic<a class="headerlink" href="#the-laser-scanner-logic" title="Link to this heading">¶</a></h2>
-<p>Probably not covered in the in-person lecture, give some insights on how the logic works and what are some interesting control points for it.</p>
-</section>
-<section id="laser-specifics-dfb-laser">
-<h2>Laser specifics: DFB laser<a class="headerlink" href="#laser-specifics-dfb-laser" title="Link to this heading">¶</a></h2>
-<p>Explain that the DFB laser is controlld by a very generic hardware interfuse (essentially we use a NI instrument-like hardware), and that it can in addition control a <code class="docutils literal notranslate"><span class="pre">ControlSetpointInterface</span></code> (for example the cryo). That for simplicity we have two available configurations in 66.</p>
-<figure class="align-default" id="id47">
-<a class="reference internal image-reference" href="_images/5d3c2a5f-415a-40ae-bd7e-aa280971513f.png"><img alt="_images/5d3c2a5f-415a-40ae-bd7e-aa280971513f.png" src="_images/5d3c2a5f-415a-40ae-bd7e-aa280971513f.png" style="width: 60%;" />
-</a>
-<figcaption>
-<p><span class="caption-number">Fig. 36 </span><span class="caption-text">The DFB can have an external control hardware connected. For simplicity in Lab 66 we have two corresponding configurations available</span><a class="headerlink" href="#id47" title="Link to this image">¶</a></p>
-</figcaption>
-</figure>
-<p>Discuss a bit the control of the cryo, also that the temperature get saved as a global metadata!</p>
-<figure class="align-default" id="id48">
-<a class="reference internal image-reference" href="_images/ce06e35a-71d8-420d-88bb-e134a2f325f7.png"><img alt="_images/ce06e35a-71d8-420d-88bb-e134a2f325f7.png" src="_images/ce06e35a-71d8-420d-88bb-e134a2f325f7.png" style="width: 60%;" />
-</a>
-<figcaption>
-<p><span class="caption-number">Fig. 37 </span><span class="caption-text">Don’t forget to click on <kbd class="kbd compound docutils literal notranslate"><kbd class="kbd docutils literal notranslate">ENABLE</kbd> <kbd class="kbd docutils literal notranslate">EXTERNAL</kbd> <kbd class="kbd docutils literal notranslate">CONTROL</kbd></kbd> in the Cryostation software if you are using the dfb with the cryo.</span><a class="headerlink" href="#id48" title="Link to this image">¶</a></p>
-</figcaption>
-</figure>
 </section>
 </section>
 <section id="pulsers">
-<h1>Pulsers<a class="headerlink" href="#pulsers" title="Link to this heading">¶</a></h1>
-<p>Maybe skip that, and include in the documentation my research notebook to understand how it works.</p>
+<h2>Pulsers<a class="headerlink" href="#pulsers" title="Link to this heading">¶</a></h2>
+<p>Unfortunately, I haven’t experimented too much with those yet. This is also a part that is being actively developped at IQO, so it might change in the future. However, I can give a brief overview or things that are currently possible.</p>
+</section>
 </section>
 <section id="concluding-remarks">
 <h1>Concluding remarks<a class="headerlink" href="#concluding-remarks" title="Link to this heading">¶</a></h1>
+<p>Things I want to say:</p>
+<ul class="simple">
+<li><p>Get involved!</p></li>
+<li><p>“Be a good citizen” -&gt; share what you do!</p></li>
+<li><p>Participating is not necessarily coding, it is tremendously helpful to document things. -&gt; We have documentation on documentation!</p></li>
+</ul>
 </section>
 
 
