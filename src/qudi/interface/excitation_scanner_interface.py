@@ -1,6 +1,7 @@
 from abc import abstractmethod
 from collections import OrderedDict
 from typing import Iterable, Union, Tuple, Type
+import numpy.typing as npt
 from collections import OrderedDict
 import numpy as np
 from dataclasses import InitVar, dataclass, field
@@ -134,7 +135,7 @@ class ExcitationScannerInterface(Base):
         ])
 
     @abstractmethod
-    def get_current_data(self) -> np.ndarray:
+    def get_current_data(self) -> npt.NDArray[np.float64]:
         """Return current scan data. 
 
         It is an array of dimensions (number_of_repetitions * number_of_samples_per_step, 3 + n)

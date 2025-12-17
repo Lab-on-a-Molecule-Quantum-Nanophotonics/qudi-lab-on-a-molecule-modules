@@ -45,6 +45,7 @@ class TimeSeriesReaderLogic(LogicBase):
 
     Example config for copy-paste:
 
+    ```yaml
     time_series_reader_logic:
         module.Class: 'time_series_reader_logic.TimeSeriesReaderLogic'
         options:
@@ -53,6 +54,7 @@ class TimeSeriesReaderLogic(LogicBase):
             max_raw_data_bytes: 1073741824  # optional (default: 1GB)
         connect:
             streamer: <streamer_name>
+    ```
     """
     # declare signals
     sigDataChanged = QtCore.Signal(object, object, object, object)

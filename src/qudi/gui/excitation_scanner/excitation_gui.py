@@ -30,13 +30,13 @@ import qudi.gui.excitation_scanner.excitation_window as excitation_window
 
 
 class ScanningExcitationGui(GuiBase):
-    """ The GUI class for scanning excitation control.
+    """ The GUI class for scanning excitation control. Works with a `ScanningExcitationLogic`. 
     Example config for copy-paste:
-    ```
-      excitation_scanner_gui:
+    ```yaml
+    excitation_scanner_gui:
         module.Class: 'excitation_scanner.excitation_gui.ScanningExcitationGui'
         connect:
-          excitation_logic: excitation_scanner_logic
+            excitation_logic: excitation_scanner_logic
     ```
     """
 

@@ -54,6 +54,7 @@ class NIXSeriesFiniteSamplingIO(FiniteSamplingIOInterface):
 
     Example config for copy-paste:
 
+    ```yaml
     ni_finite_sampling_io:
         module.Class: 'ni_x_series.ni_x_series_finite_sampling_io.NIXSeriesFiniteSamplingIO'
         options:
@@ -83,6 +84,7 @@ class NIXSeriesFiniteSamplingIO(FiniteSamplingIOInterface):
             default_output_mode: 'JUMP_LIST' # optional, must be name of SamplingOutputMode
             read_write_timeout: 10  # optional
             sample_clock_output: '/Dev1/PFI11' # optional: routing of sample clock to a physical connection
+    ```
 
     """
 

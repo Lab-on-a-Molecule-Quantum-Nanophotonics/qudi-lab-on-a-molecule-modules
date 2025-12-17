@@ -6,11 +6,11 @@ from qudi.interface.sampled_finite_state_interface import SampledFiniteStateInte
 class ExcitationScannerDummy(ExcitationScannerInterface, SampledFiniteStateInterface):
     """
     Copy and paste configuration example:
-    ```
-      excitation_scanner_hardware:
+    ```yaml
+    excitation_scanner_hardware:
         module.Class: 'dummy.excitation_scanner_dummy.ExcitationScannerDummy'
         options:
-          watchdog_delay: 0.2 # default
+            watchdog_delay: 0.2 # default
     ```
 
     """

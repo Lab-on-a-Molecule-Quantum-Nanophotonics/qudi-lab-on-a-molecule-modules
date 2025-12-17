@@ -1,6 +1,8 @@
 from PySide2 import QtCore
 from PySide2 import QtWidgets
+from typing import Iterable, Union, Tuple, Type, Optional
 import numpy as np
+import numpy.typing as npt
 import matplotlib.pyplot as plt
 from datetime import datetime
 import traceback
@@ -22,15 +24,21 @@ class ScanningExcitationLogic(LogicBase):
 
     Copy and paste configuration example:
     ```yaml
-      excitation_scanner_logic:
+    excitation_scanner_logic:
         module.Class: 'scanning_excitation_spectroscopy.ScanningExcitationLogic'
         options:
-          beep: True # default
-          watchdog_repeat_time_ms: 500 # default
-          save_idle_to_global_metadata: True # save the current idle value to global metadata
+            beep: True # default
+            watchdog_repeat_time_ms: 500 # default
+            save_idle_to_global_metadata: True # save the current idle value to global metadata
         connect:
-          scanner: excitation_scanner_hardware
+            scanner: excitation_scanner_hardware
     ```
+
+    The `beep` option makes the computer beep when a scan finishes to make sure any
+    low attention-span postdoc notices the end of the acquisition. The 
+    `watchdog_repeat_time_ms` COntrols how often the logic checks on the scanning
+    hardware. The `save_idle_to_global_metadata` option makes the idle frequency being saved
+    in the global metadata of Qudi.
     """
     _scanner = Connector(name='scanner', interface='ExcitationScannerInterface')
 
@@ -100,13 +108,20 @@ class ScanningExcitationLogic(LogicBase):
         self._sig_get_spectrum.disconnect()
         self._fit_config = self._fit_config_model.dump_configs()
 
-    def stop(self):
+    def stop(self) -> None:
+        """Stop any currently running acquisition."""
         self._stop_acquisition = True
 
-    def run_get_spectrum(self, reset=True):
+    def run_get_spectrum(self, reset:bool=True):
+        """Run `get_spectrum` in the thread of the logic."""
         self._sig_get_spectrum.emit(reset)
 
-    def get_spectrum(self, reset=True):
+    def get_spectrum(self, reset:bool=True) -> npt.NDArray[np.float64]:
+        """
+        Acquire a spectrum with the current settings.
+
+        If `reset` is `True`, clear the old data before running the acquisition.
+        """
         self._stop_acquisition = False
         if reset:
             ncols = len(self._scanner().data_format.data_column_names)
@@ -136,44 +151,52 @@ class ScanningExcitationLogic(LogicBase):
             self.log.exception("")
 
     @property
-    def acquisition_running(self):
+    def acquisition_running(self) -> bool:
+        """Returns `True` when an acquisition is running."""
         return self._scanner().scan_running
 
     @property
-    def spectrum(self):
+    def spectrum(self) -> npt.NDArray[np.float64]:
+        """Get the current spectrum, accounting for the current `display_channel_column_number`."""
         with self._lock:
             if self._spectrum[self._display_channel_column_number] is None:
                 return None
             return np.copy(self._spectrum[self._display_channel_column_number])
 
-    def get_spectrum_at_x(self, x, step_num=0):
+    def get_spectrum_at_x(self, x:float, step_num:int=0) -> np.float64:
+        """
+        Get the value of the current spectrum at frequency `x`, for step number `step_num`.
+        """
         if self.frequency is None or self.spectrum is None:
             return -1
         roi = self.step_number==step_num
         return np.interp(x, self.frequency[roi], self.spectrum[roi])
 
     @property
-    def frequency(self):
+    def frequency(self) -> npt.NDArray[np.float64]:
+        """Get the current frequency array."""
         with self._lock:
             if self._spectrum[self._scanner().data_format.frequency_column_number] is None:
                 return None
             return np.copy(self._spectrum[self._scanner().data_format.frequency_column_number])
 
     @property
-    def step_number(self):
+    def step_number(self) -> npt.NDArray[np.float64]:
+        """Get the current step number array."""
         with self._lock:
             if self._spectrum[self._scanner().data_format.step_number_column_number] is None:
                 return None
             return np.copy(self._spectrum[self._scanner().data_format.step_number_column_number])
 
     @property
-    def time(self):
+    def time(self) -> npt.NDArray[np.float64]:
+        """Get the current step time array."""
         with self._lock:
             if self._spectrum[self._scanner().data_format.time_column_number] is None:
                 return None
         return np.copy(self._spectrum[self._scanner().data_format.time_column_number])
 
-    def save_spectrum_data(self, name_tag='', root_dir=None, parameter=None):
+    def save_spectrum_data(self, name_tag:str='', root_dir:Optional[str]=None, parameter:Optional[dict]=None) -> str:
         """ Saves the current spectrum data to a file.
         @param string name_tag: postfix name tag for saved filename.
         @param string root_dir: overwrite the file position in necessary
@@ -280,7 +303,7 @@ class ScanningExcitationLogic(LogicBase):
         return file_path
 
     @staticmethod
-    def _get_si_scaling(number):
+    def _get_si_scaling(number:float) -> Tuple[float, str]:
 
         prefix = ['', 'k', 'M', 'G', 'T', 'P']
         prefix_index = 0
@@ -295,54 +318,63 @@ class ScanningExcitationLogic(LogicBase):
         return rescale_factor, intensity_prefix
 
     @property
-    def exposure_time(self):
+    def exposure_time(self) -> float:
+        """Get the current exposure time."""
         return self._scanner().get_exposure_time()
 
     @exposure_time.setter
-    def exposure_time(self, value):
+    def exposure_time(self, value:float):
         self._scanner().set_exposure_time(value)
         self.sig_state_updated.emit()
 
     @property
-    def repetitions(self):
+    def repetitions(self) -> int:
+        """Get the current number of repetitions."""
         return self._scanner().get_repeat_number()
     @repetitions.setter
-    def repetitions(self, v):
+    def repetitions(self, v:int):
         self._scanner().set_repeat_number(v)
     @property
-    def idle(self):
+    def idle(self)->float:
+        """Get the current idle value."""
         return self._scanner().get_idle_value()
     @idle.setter
-    def idle(self, v):
+    def idle(self, v:float):
         if self._save_idle_to_global_metadata:
             DataStorageBase.add_global_metadata(self.module_name, {"idle": v, "idle_unit": "Hz"}, overwrite=True)
         self._scanner().set_idle_value(v)
     @property
-    def notes(self):
+    def notes(self)->str:
+        """Get the current text notes."""
         return self._notes
     @notes.setter
-    def notes(self, v):
+    def notes(self, v:float):
         self._notes = str(v)
 
     @property 
-    def variables(self):
+    def variables(self)->dict:
+        """Get the current fictionary of control variables."""
         return self._scanner().control_dict
-    def set_variable(self, name, value):
+    def set_variable(self, name:str, value):
+        """Set the `value` of control variable `name`."""
         self._scanner().set_control(name, value)
         self.sig_scanner_variables_updated.emit()
 
-    def available_channels(self):
+    def available_channels(self)->Iterable[str]:
+        """List the available data channels."""
         indices = self._scanner().data_format.data_column_number
         return [self._scanner().data_format.data_column_names[i] for i in indices]
 
     @property
-    def display_channel_column_number(self):
+    def display_channel_column_number(self)->int:
+        """Get the column number of the data channel currently selected for display."""
         return self._display_channel_column_number
     @display_channel_column_number.setter
-    def display_channel_column_number(self, v):
+    def display_channel_column_number(self, v:int):
         self._display_channel_column_number = v
         self.sig_data_updated.emit()
-    def set_display_channel_from_name(self, name):
+    def set_display_channel_from_name(self, name:str):
+        """Set `display_channel_column_number` from the name of the channel."""
         self.display_channel_column_number = self._scanner().data_format.data_column_names.index(name)
 
     def _watchdog(self):

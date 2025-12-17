@@ -45,6 +45,7 @@ class NIXSeriesFiniteSamplingInput(FiniteSamplingInputInterface):
 
     Example config for copy-paste:
 
+    ```yaml
     ni_finite_sampling_input:
         module.Class: 'ni_x_series.ni_x_series_finite_sampling_input.NIXSeriesFiniteSamplingInput'
         options:
@@ -61,6 +62,7 @@ class NIXSeriesFiniteSamplingInput(FiniteSamplingInputInterface):
             read_write_timeout: 10  # optional, default 10
             sample_clock_output: '/Dev1/PFI20'  # optional
             trigger_edge: RISING  # optional
+    ```
 
     """
 
