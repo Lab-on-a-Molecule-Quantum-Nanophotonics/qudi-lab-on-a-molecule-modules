@@ -179,7 +179,7 @@
             
               <ul>
                 
-                  <li class="toctree-l2"><a href="#installation" class="reference internal">Installation</a></li>
+                  <li class="toctree-l2"><a href="#pre-requisites" class="reference internal">Pre-requisites</a></li>
                 
               </ul>
             
@@ -264,7 +264,91 @@
             
   <section id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h1>
-<p>This is a quick guide to (re)installing Qudi and these modules for an experiment. We do it in a slightly diffrent way from the original <a class="reference internal" href="iqo-docs/installation_guide.html"><span class="doc std std-doc">Ulm IQO’s recommandation</span></a>.</p>
+<p>This is a quick guide to (re)installing Qudi and these modules for an experiment. We do it in a slightly diffrent way from the original <a class="reference internal" href="iqo-docs/installation_guide.html"><span class="doc std std-doc">Ulm IQO’s recommandation</span></a>. This is mostly a copy of the relevant section of the [Crash course tutorial](Crash course into Qudi).</p>
+<section id="pre-requisites">
+<h2>Pre-requisites<a class="headerlink" href="#pre-requisites" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>We use the <code class="docutils literal notranslate"><span class="pre">uv</span></code> package manager. Please read and follow the <a class="reference external" href="https://docs.astral.sh/uv/getting-started/">getting started</a> guide. <strong>Windows users: see below how to install it.</strong></p></li>
+<li><p>We will need <code class="docutils literal notranslate"><span class="pre">git</span></code>. This is a version control system (a tool to work collaboratively on code. For example, this is the tool behind <a class="reference external" href="https://github.com">GitHub</a>). Please <a class="reference external" href="https://git-scm.com/install/">install it</a>. If you want to learn more, you might read <a class="reference external" href="https://learnxinyminutes.com/git/">this short guide</a> or look for a more extensive tutorial.</p></li>
+<li><p>A text editor (optional). In theory the simplest notepad is enough, but you may find more advanced applications useful. If you just need somethin lightweight, you can use <a class="reference external" href="https://notepad-plus-plus.org/">Notepad++</a>.</p></li>
+</ul>
+<section id="windows-users-installing-uv">
+<h3>Windows users: installing uv<a class="headerlink" href="#windows-users-installing-uv" title="Link to this heading">¶</a></h3>
+<p>To install <code class="docutils literal notranslate"><span class="pre">uv</span></code>, you need to use the native Windows shell. Press the <kbd class="kbd docutils literal notranslate">Windows</kbd> key to open the start menu, then type cmd to bring the native Windows shell. Then, you need to copy the following code:</p>
+<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="n">powershell</span> <span class="n">-ExecutionPolicy</span> <span class="n">ByPass</span> <span class="n">-c</span> <span class="s2">&quot;irm https://astral.sh/uv/install.ps1 | iex&quot;</span>
+</pre></div>
+</div>
+<p>and paste it in the Windows shell using right click. Finally press <kbd class="kbd docutils literal notranslate">Enter</kbd> to execute it. It will download the <code class="docutils literal notranslate"><span class="pre">uv</span></code> executable and make it accessible in <code class="docutils literal notranslate"><span class="pre">C:/Users/&lt;you&gt;/.local/bin</span></code>. To check that everyting worked, open Git Bash and type <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">help</span></code> followed by <kbd class="kbd docutils literal notranslate">Enter</kbd>. You should see the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>An extremely fast Python package manager.
+
+Usage: uv [OPTIONS] &lt;COMMAND&gt;
+
+Commands:
+  auth                       Manage authentication
+  run                        Run a command or script
+  init                       Create a new project
+  add                        Add dependencies to the project
+  remove                     Remove dependencies from the project
+  version                    Read or update the project&#39;s version
+  sync                       Update the project&#39;s environment
+  lock                       Update the project&#39;s lockfile
+  export                     Export the project&#39;s lockfile to an alternate format
+  tree                       Display the project&#39;s dependency tree
+  format                     Format Python code in the project
+  tool                       Run and install commands provided by Python packages
+  python                     Manage Python versions and installations
+  pip                        Manage Python packages with a pip-compatible interface
+  venv                       Create a virtual environment
+  build                      Build Python packages into source distributions and wheels
+  publish                    Upload distributions to an index
+  cache                      Manage uv&#39;s cache
+  self                       Manage the uv executable
+  generate-shell-completion  Generate shell completion
+  help                       Display documentation for a command
+
+Cache options:
+  -n, --no-cache               Avoid reading from or writing to the cache, instead using a temporary directory for the duration of the operation [env: UV_NO_CACHE=]
+      --cache-dir &lt;CACHE_DIR&gt;  Path to the cache directory [env: UV_CACHE_DIR=]
+
+Python options:
+      --managed-python       Require use of uv-managed Python versions [env: UV_MANAGED_PYTHON=]
+      --no-managed-python    Disable use of uv-managed Python versions [env: UV_NO_MANAGED_PYTHON=]
+      --no-python-downloads  Disable automatic downloads of Python. [env: &quot;UV_PYTHON_DOWNLOADS=never&quot;]
+
+Global options:
+  -q, --quiet...                                   Use quiet output
+  -v, --verbose...                                 Use verbose output
+      --color &lt;COLOR_CHOICE&gt;                       Control the use of color in output [possible values: auto, always, never]
+      --native-tls                                 Whether to load TLS certificates from the platform&#39;s native certificate store [env: UV_NATIVE_TLS=]
+      --offline                                    Disable network access [env: UV_OFFLINE=]
+      --allow-insecure-host &lt;ALLOW_INSECURE_HOST&gt;  Allow insecure connections to a host [env: UV_INSECURE_HOST=]
+      --no-progress                                Hide all progress outputs [env: UV_NO_PROGRESS=]
+      --directory &lt;DIRECTORY&gt;                      Change to the given directory prior to running the command [env: UV_WORKING_DIR=]
+      --project &lt;PROJECT&gt;                          Discover a project in the given directory [env: UV_PROJECT=]
+      --config-file &lt;CONFIG_FILE&gt;                  The path to a `uv.toml` file to use for configuration [env: UV_CONFIG_FILE=]
+      --no-config                                  Avoid discovering configuration files (`pyproject.toml`, `uv.toml`) [env: UV_NO_CONFIG=]
+  -h, --help                                       Display the concise help for this command
+  -V, --version                                    Display the uv version
+
+Use `uv help &lt;command&gt;` for more information on a specific command.
+</pre></div>
+</div>
+</section>
+<section id="windows-creating-desktop-shortcuts">
+<h3>Windows: creating desktop shortcuts<a class="headerlink" href="#windows-creating-desktop-shortcuts" title="Link to this heading">¶</a></h3>
+<p>It is quite convenient to simply click to run Qudi. you can do that by manually creating desktop shortcuts.</p>
+<p>Right-click on the desktop and click on <kbd class="kbd compound docutils literal notranslate"><kbd class="kbd docutils literal notranslate">New</kbd> <kbd class="kbd docutils literal notranslate">&gt;</kbd> <kbd class="kbd docutils literal notranslate">Shortcut</kbd></kbd>. In the <code class="docutils literal notranslate"><span class="pre">location</span></code> prompt, you can actually paste a command to be run (instead of the path to a directory). That’s what we want to do.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">windir</span><span class="o">%</span>\<span class="n">System32</span>\<span class="n">WindowsPowerShell</span>\<span class="n">v1</span><span class="mf">.0</span>\<span class="n">powershell</span><span class="o">.</span><span class="n">exe</span> <span class="o">-</span><span class="n">ExecutionPolicy</span> <span class="n">ByPass</span> <span class="o">-</span><span class="n">NoExit</span> <span class="o">-</span><span class="n">Command</span> <span class="s2">&quot;cd $HOME\Documents\qudi-lab-on-a-molecule-modules; uv run --no-dev qudi --debug&quot;</span>
+</pre></div>
+</div>
+<p>This is a command to launch a terminal, navigate to the folder wher Qudi is, and run Qudi. It will work provided that you installed Qudi in you <code class="docutils literal notranslate"><span class="pre">Documents</span></code> folder and that the folder is called <code class="docutils literal notranslate"><span class="pre">qudi-lab-on-a-molecule-modules</span></code>. You may also set a nice icon for the shortcut if you right-click on the created shortcut, then go to <kbd class="kbd docutils literal notranslate">properties</kbd> and click <kbd class="kbd compound docutils literal notranslate"><kbd class="kbd docutils literal notranslate">Change</kbd> <kbd class="kbd docutils literal notranslate">icon...</kbd></kbd>. Then cick on <kbd class="kbd docutils literal notranslate">Browse...</kbd> and navigate to <code class="docutils literal notranslate"><span class="pre">Documents\qudi-lab-on-a-molecule-modules\.venv\Lib\site-packages\qudi\artwork\logo</span></code>.</p>
+<p>To have a shortcut for the Jupyter notebook installation that comes with Qudi, you can follow the same procedure, but instead of having a command that launches Qudi, make it launch the jupyter:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">windir</span><span class="o">%</span>\<span class="n">System32</span>\<span class="n">WindowsPowerShell</span>\<span class="n">v1</span><span class="mf">.0</span>\<span class="n">powershell</span><span class="o">.</span><span class="n">exe</span> <span class="o">-</span><span class="n">ExecutionPolicy</span> <span class="n">ByPass</span> <span class="o">-</span><span class="n">NoExit</span> <span class="o">-</span><span class="n">Command</span> <span class="s2">&quot;cd $HOME\Documents\qudi-lab-on-a-molecule-modules; uv run jupyter notebook&quot;</span>
+</pre></div>
+</div>
+<p>A nice icon for the shortcut is available in <code class="docutils literal notranslate"><span class="pre">Documents\qudi-lab-on-a-molecule-modules\.venv\Lib\site-packages\jupyter_server\static\favicon.ico</span></code>.</p>
+</section>
+</section>
 </section>
 
 

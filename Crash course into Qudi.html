@@ -308,11 +308,11 @@
 <ul class="simple">
 <li><p>We use the <code class="docutils literal notranslate"><span class="pre">uv</span></code> package manager. Please read and follow the <a class="reference external" href="https://docs.astral.sh/uv/getting-started/">getting started</a> guide. <strong>Windows users: see below how to install it. Ask me for help if you are struggling.</strong></p></li>
 <li><p>We will need <code class="docutils literal notranslate"><span class="pre">git</span></code>. This is a version control system (a tool to work collaboratively on code. For example, this is the tool behind <a class="reference external" href="https://github.com">GitHub</a>). Explaining this tool is out of scope, please <a class="reference external" href="https://git-scm.com/install/">install it</a>. If you want to learn more, you might read <a class="reference external" href="https://learnxinyminutes.com/git/">this short guide</a> or look for a more extensive tutorial.</p></li>
-<li><p>A text editor. In theory the simplest notepad is enough, but you may find more advanced applications useful. If you just need somethin lightwight, you can use <a class="reference external" href="https://notepad-plus-plus.org/">Notepad++</a>. Other people like <a class="reference external" href="https://code.visualstudio.com/">VSCode</a>, although I do not use it so I cannot help you much with that.</p></li>
+<li><p>A text editor. In theory the simplest notepad is enough, but you may find more advanced applications useful. If you just need somethin lightweight, you can use <a class="reference external" href="https://notepad-plus-plus.org/">Notepad++</a>. Other people like <a class="reference external" href="https://code.visualstudio.com/">VSCode</a>, although I do not use it so I cannot help you much with that.</p></li>
 </ul>
 <section id="windows-users-installing-uv">
 <h3>Windows users: installing uv<a class="headerlink" href="#windows-users-installing-uv" title="Link to this heading">¶</a></h3>
-<p>For most of the course I want you to use Git Bash. However, to install <code class="docutils literal notranslate"><span class="pre">uv</span></code>, you need the native Windows shell. Type <kbd class="kbd docutils literal notranslate">Windows</kbd> to open the start menu, then type cmd to bring the native Windows shell. Then, you need to copy the following code:</p>
+<p>For most of the course I want you to use Git Bash. However, to install <code class="docutils literal notranslate"><span class="pre">uv</span></code>, you need the native Windows shell. Press the <kbd class="kbd docutils literal notranslate">Windows</kbd> key to open the start menu, then type cmd to bring the native Windows shell. Then, you need to copy the following code:</p>
 <div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="n">powershell</span> <span class="n">-ExecutionPolicy</span> <span class="n">ByPass</span> <span class="n">-c</span> <span class="s2">&quot;irm https://astral.sh/uv/install.ps1 | iex&quot;</span>
 </pre></div>
 </div>
@@ -375,7 +375,7 @@ Use `uv help &lt;command&gt;` for more information on a specific command.
 </section>
 <section id="getting-the-lecture-materials">
 <h2>Getting the lecture materials<a class="headerlink" href="#getting-the-lecture-materials" title="Link to this heading">¶</a></h2>
-<p>This section contains some commands that will get you the source code and setup qudi on you computer. Everything is installed in a Python virtual environment so the impact on your system should be minimal (you can simply delete the folder once the lecture is over if you want to get rid of it).</p>
+<p>This section contains some commands that will get you the source code and setup Qudi on you computer. Everything is installed in a Python virtual environment so the impact on your system should be minimal (you can simply delete the folder once the lecture is over if you want to get rid of it).</p>
 <p>Everything we need, including the interactive version of this notebook, is hosted in our <a class="reference external" href="https://github.com/Lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules">public repository</a>. The first task is to recover it using <code class="docutils literal notranslate"><span class="pre">git</span></code>. There are several ways of using the tool (VSCode users can do it from the editor I think), I will present the simplest: using it directly from the command line. For Mac and Linux users, your operating system already provide a decently functionnal command line interface, please open one. For Windows users, if you installed <code class="docutils literal notranslate"><span class="pre">git</span></code> following the instructions above, you also installed a tool called <code class="docutils literal notranslate"><span class="pre">Git</span> <span class="pre">Bash</span></code> that emulates the command line interface, you can launch it from the startup menu.</p>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
@@ -450,7 +450,11 @@ ls
 </pre></div>
 </div>
 <p>You can check that it corresponds to the files listed on <a class="reference external" href="https://github.com/Lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules">the GitHub</a> page.</p>
-<p>At this point we have downloaded the source code of our modules (if you don’t know what that is don’t worry, we will cover that later), but we still need to install Qudi and all the related dependencies. If you have used Python in the past, you might have encountered many difficulties with managing and installing packages. Because we use the <code class="docutils literal notranslate"><span class="pre">uv</span></code> package manager, that you should have installed following the previous section, all this is made much easier. It will take care of installing everything we need, including the correct Python version, the first time we invoke it. If you want to get scared, you can read the <a class="reference external" href="https://ulm-iqo.github.io/qudi-core/setup/installation.html">installation section</a> of the Qudi manual to see all the complicated steps that <code class="docutils literal notranslate"><span class="pre">uv</span></code> removes.</p>
+<p>At this point we have downloaded the source code of our modules (if you don’t know what that is don’t worry, we will cover that later), but we still need to install Qudi and all the related dependencies. If you have used Python in the past, you might have encountered many difficulties with managing and installing packages. Because we use the <code class="docutils literal notranslate"><span class="pre">uv</span></code> package manager, that you should have installed following the previous section, all this is made much easier. It will take care of installing everything we need, including the correct Python version, the first time we invoke it.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The official focumentation of Qudi has an <a class="reference external" href="https://ulm-iqo.github.io/qudi-core/setup/installation.html">installation section</a>. I advise against following it, especially if you are not an experienced Python programmer. The method using <code class="docutils literal notranslate"><span class="pre">uv</span></code> is equivalent, but much less likely to give you problems, as everything is handled automatically. That being said, this is only a minor issue and you can still go read that page if you are curious to see what <code class="docutils literal notranslate"><span class="pre">uv</span></code> abstracts away for you!</p>
+</div>
 <p>Before we actually run Qudi for the first time, we need one final step that will enable the interaction between jupyter notebooks and Qudi. The following command will do so:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>qudi-install-kernel
 </pre></div>
@@ -491,7 +495,7 @@ ls
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">--config</span></code> option is of peculiar interest to us. As we will see later, with Qudi we use a configuration file to describe the setup and how the various components are configured and connect to one another. This file uses <a class="reference external" href="https://learnxinyminutes.com/yaml/">the YAML (YAML Ain’t Markup Language) syntax</a>, and we will play with it later. For now, you are provided with two configuration files:</p>
 <ul class="simple">
-<li><p>The <code class="docutils literal notranslate"><span class="pre">default.cfg</span></code> file, located in <code class="docutils literal notranslate"><span class="pre">src/qudi/default.cfg</span></code>. This file is kindly provided by the developpers of the Ulm-IQO module, and showcases many possibilities of qudi using dummy hardwares.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">default.cfg</span></code> file, located in <code class="docutils literal notranslate"><span class="pre">src/qudi/default.cfg</span></code>. This file is kindly provided by the developpers of the Ulm-IQO module, and showcases many possibilities of Qudi using dummy hardwares.</p></li>
 <li><p>The <code class="docutils literal notranslate"><span class="pre">crash_course.cfg</span></code> file, located in <code class="docutils literal notranslate"><span class="pre">src/qudi/crash_course.cfg</span></code>. We will use and edit this file to understand together how Qudi works.</p></li>
 </ul>
 <p>By default, if you do not specify a configuration file, Qudi uses the last configuration file used. If you are reading ahead before the lecture, I encourage you to try the default configuration and try to play with all the user interfaces. On the day of the lecture, I want you to use the <code class="docutils literal notranslate"><span class="pre">crash_course.cfg</span></code> file. The configuration file can also be changed from the user interface.</p>
@@ -590,7 +594,12 @@ ls
 <span id="id3"></span><h1>At the beginning of the lecture<a class="headerlink" href="#at-the-beginning-of-the-lecture" title="Link to this heading">¶</a></h1>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
-<p>Please start Qudi and this notebook!</p>
+<p>Because I have a tendency to procrastination, it is likely that I made some last minute adjustements to the notes since you downloaded them. If you followed the “<a class="reference internal" href="#before-the-lecture"><span class="std std-ref">Before the lecture</span></a>” section, please open a terminal and navigate to your Qudi directory. We are going to erase any modifications you may have made to the repository and <code class="docutils literal notranslate"><span class="pre">pull</span></code> the latest version of the notes.</p>
+<ol class="arabic simple">
+<li><p>We store aside any of your modifications. Run the following command: <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">stash</span></code>.</p></li>
+<li><p>We get the latest version of the notes. Run <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">pull</span></code>.</p></li>
+<li><p>We start Qudi and the notebook. In a terminal run <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">run</span> <span class="pre">qudi</span></code>, then in a second terminal navigate to your Qudi directory, and run <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">run</span> <span class="pre">jupyter</span> <span class="pre">notebook</span></code>.</p></li>
+</ol>
 </div>
 </section>
 <section id="a-crash-course-into-qudi">
@@ -831,7 +840,7 @@ If you don’t need any of the instruments, logics, or user interfaces provided,
 <span class="w">    </span><span class="nt">my_logic</span><span class="p">:</span>
 <span class="w">        </span><span class="nt">module.Class</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_example_logic.MyExampleLogic</span>
 <span class="w">        </span><span class="nt">options</span><span class="p">:</span>
-<span class="w">            </span><span class="nt">my_config_option</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;I</span><span class="nv"> </span><span class="s">am</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">string</span><span class="nv"> </span><span class="s">from</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">qudi</span><span class="nv"> </span><span class="s">configuration&#39;</span>
+<span class="w">            </span><span class="nt">my_config_option</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;I</span><span class="nv"> </span><span class="s">am</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">string</span><span class="nv"> </span><span class="s">from</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">Qudi</span><span class="nv"> </span><span class="s">configuration&#39;</span>
 <span class="w">        </span><span class="nt">connect</span><span class="p">:</span>
 <span class="w">            </span><span class="nt">a_connector</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">a_defined_hardware_or_logic</span>
 </pre></div>
@@ -962,7 +971,7 @@ When coding logics, if you need to refer to the connected module (in this exampl
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">global</span><span class="p">:</span>
 <span class="w">    </span><span class="c1"># list of modules to load when starting</span>
 <span class="w">    </span><span class="nt">startup_modules</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[]</span>
-<span class="w">    </span><span class="c1"># Server port for serving the active qudi module namespace locally (localhost).</span>
+<span class="w">    </span><span class="c1"># Server port for serving the active Qudi module namespace locally (localhost).</span>
 <span class="w">    </span><span class="c1"># Used by e.g. the Qudi jupyter kernel.</span>
 <span class="w">    </span><span class="nt">namespace_server_port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">18861</span>
 <span class="w">    </span><span class="c1"># Save data to daily data sub-directories by default</span>
@@ -987,7 +996,7 @@ When coding logics, if you need to refer to the connected module (in this exampl
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">global</span><span class="p">:</span>
 <span class="w">    </span><span class="c1"># list of modules to load when starting</span>
 <span class="w">    </span><span class="nt">startup_modules</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;time_series_gui&#39;</span><span class="p p-Indicator">]</span>
-<span class="w">    </span><span class="c1"># Server port for serving the active qudi module namespace locally (localhost).</span>
+<span class="w">    </span><span class="c1"># Server port for serving the active Qudi module namespace locally (localhost).</span>
 <span class="w">    </span><span class="c1"># Used by e.g. the Qudi jupyter kernel.</span>
 <span class="w">    </span><span class="nt">namespace_server_port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">18861</span>
 <span class="w">    </span><span class="c1"># Save data to daily data sub-directories by default</span>
@@ -1312,7 +1321,7 @@ When coding logics, if you need to refer to the connected module (in this exampl
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;/home/klafyvel/qudi/Data/2025/12/2025-12-17/20210506-1111-11_amplitude_measurement.dat&#39;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;/home/klafyvel/qudi/Data/2025/12/2025-12-18/20210506-1111-11_amplitude_measurement.dat&#39;
 </pre></div>
 </div>
 </div>
@@ -1364,7 +1373,7 @@ When coding logics, if you need to refer to the connected module (in this exampl
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;/home/klafyvel/qudi/Data/2025/12/2025-12-17/20210506-1111-11_amplitude_measurement.png&#39;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;/home/klafyvel/qudi/Data/2025/12/2025-12-18/20210506-1111-11_amplitude_measurement.png&#39;
 </pre></div>
 </div>
 </div>
