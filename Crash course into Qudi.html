@@ -1415,12 +1415,7 @@ When coding logics, if you need to refer to the connected module (in this exampl
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">7</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
-<span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">time_series_reader_logic</span><span class="o">.</span><span class="n">active_channel_names</span>
-
-<span class="ne">NameError</span>: name &#39;time_series_reader_logic&#39; is not defined
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;digital 1&#39;, &#39;analog 1&#39;, &#39;analog 2&#39;, &#39;digital 2&#39;]
 </pre></div>
 </div>
 </div>
@@ -1496,16 +1491,16 @@ When coding logics, if you need to refer to the connected module (in this exampl
         0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
         0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
         0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-        0.        ,  0.        ,  0.        ,  0.        ,  0.06698023,
-        0.01506304,  3.64632618,  2.49793114,  3.48557959,  5.02556142,
-        4.06057504,  4.73545865,  4.65371359,  3.48637932,  2.26034397,
-        7.66790664,  2.94964391,  8.1436822 ,  7.93296847,  7.7837564 ,
-        8.85416867,  8.88805818,  4.34097689,  5.97260568,  6.61344725,
-        5.91208872,  8.86446977,  7.28261722,  7.46139949,  5.41658627,
-        3.25366366,  5.66301532,  5.75595789,  2.86211996,  5.40552875,
-        1.6837842 ,  5.74722921,  5.30131458,  3.78627703, -0.13560487,
-        0.20616062,  1.63436477, -1.51085868,  0.22346584,  1.1943417 ,
-       -2.64445668, -0.4621692 , -4.92496991, -2.29291868, -3.91197362])
+        0.        ,  0.        ,  0.        ,  0.        , -0.39326203,
+        0.56880452, -0.03339895,  0.55400928,  0.89242176,  0.48565332,
+        1.25579948,  1.22744705,  1.47554334,  1.5625426 ,  1.47716033,
+        1.51991982,  1.57789277,  1.84068389,  1.34949531,  1.78309909,
+        1.79983681,  1.97401237,  1.26560821,  1.4909702 ,  1.73993931,
+        1.67467381,  1.49286471,  1.76621132,  1.57633936,  1.36255378,
+        1.10868471,  0.84585051,  1.1012558 ,  0.61139556,  1.2883117 ,
+        0.44943904,  0.89900665,  0.18446763,  0.64284212,  0.51784872,
+       -0.1404892 , -0.08825344, -0.18333869, -0.0413364 , -0.95321013,
+       -0.65761415, -0.36941925, -0.81786148, -1.03319043, -1.3941288 ])
 </pre></div>
 </div>
 </div>
@@ -2185,7 +2180,7 @@ RuntimeError: Failed to activate hardware module &quot;instream_dummy&quot;!
 </section>
 <section id="a-slightly-more-complicated-example-the-moglabs-cem-laser">
 <h4>A slightly more complicated example: the Moglabs CEM laser<a class="headerlink" href="#a-slightly-more-complicated-example-the-moglabs-cem-laser" title="Link to this heading">¶</a></h4>
-<p>We can use the Moglabs Cat-Eye motorised laser to perform excitation spectroscopy.</p>
+<p>We can use the Moglabs Cat-Eye motorised laser to perform excitation spectroscopy. This laser is extermely capricious, but is somewhat usable to do short scans up to a few GHz in range. Its state machine is given below:</p>
 <figure class="align-default" id="id51">
 <a class="reference internal image-reference" href="_images/qudi.hardware.interfuse.moglabs_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.svg"><img alt="_images/qudi.hardware.interfuse.moglabs_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.svg" src="_images/qudi.hardware.interfuse.moglabs_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.svg" style="width: 60%;" />
 </a>
@@ -2193,15 +2188,33 @@ RuntimeError: Failed to activate hardware module &quot;instream_dummy&quot;!
 <p><span class="caption-number">Fig. 38 </span><span class="caption-text">The state machine for the Moglabls CEM laser. On the right, the simplified version with the interruption transitions and the stopped state removed.</span><a class="headerlink" href="#id51" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
+<p>As you can see there are additional states corresponding to idling scans. This is because the laser tends to be not reliable when not performing scans, so it is often better to keep it scanning. Importantly, the idle controls that you would use with other lasers do not work with the Moglabs. Instead, it is better to use the scan controls while performing idle scans. This may change in the future if I get time to work on it.</p>
+<figure class="align-default" id="id52">
+<a class="reference internal image-reference" href="_images/moglabs_control_variables"><img alt="_images/moglabs_control_variables" src="_images/moglabs_control_variables" style="width: 30%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 39 </span><span class="caption-text">The control variables available with the Moglabs.</span><a class="headerlink" href="#id52" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>This laser comprises three elements:</p>
+<ol class="arabic simple">
+<li><p>The cavity itself, that lets you control the position of the grating in steps. Values allowing lasing are in the range ~9000 to ~13000.</p></li>
+<li><p>The laser driver, that controls the position of the internal piezo of the cavity, as well as the current of the diode. You can control the setpoint of the current, and the ramp sent to the piezo for scanning through its offset and span. You can also control the duty cycle of the ramp: a 0.5 duty cycle is a symetric triangular wave, while a 0.0 duty cycle is a ramp with an abrupt change at the end. Finally, the laser driver alsomodulates a bit the current offset with the ramp. This is controlled with the bias setting.</p></li>
+<li><p>The last element is the Fizeau wavemeter. This element has almost been well designed by the manufacturer, as it has a trigger input and is able to store measurements in its internal buffer. Unfortunately, the trigger does notwork with an edge, but instead with a constant level signal. This makes it difficult to trigger it using a standard TTL clock, as it will trigger several times for a single clock cycle depending on its (automatically set) internal exposure time. This forces us to probe directly the wavemeter with the computer at (hopefully, remember that a computer is usually bad at timing) regular intervals and then interpolate the frequencies at the end of a scan step. The fizeau probing rate is given by the <code class="docutils literal notranslate"><span class="pre">fzw</span> <span class="pre">probe</span> <span class="pre">rate</span></code> setting. Too fast, and the computer cannot keep-up, resulting in wrong frequency interpolation. Too slow, and you will miss important informations such as mode jumps.</p></li>
+</ol>
 </section>
 <section id="a-more-complicated-example-the-matisse-laser">
 <h4>A more complicated example: the Matisse laser<a class="headerlink" href="#a-more-complicated-example-the-matisse-laser" title="Link to this heading">¶</a></h4>
-<p>Detail a bit more, explain that the matisse laser is in two part, one on the laser’s computer, not shown here, and one on the main computer.</p>
-<figure class="align-default" id="id52">
+<p>We control our Matisse laser through three hardwares. Two of them run on the computer dedicated to this laser:</p>
+<ol class="arabic simple">
+<li><p>The High Finesse wavemeter, controlled by the <a class="reference external" href="https://lab-on-a-molecule-quantum-nanophotonics.github.io/qudi-lab-on-a-molecule-modules/modules/hardware/wavemeter/high_finesse_wavemeter.html"><code class="docutils literal notranslate"><span class="pre">HighFinesseWavemeter</span></code></a> hardware,</p></li>
+<li><p>The Matisse Proxy, controlled by the <a class="reference external" href="https://lab-on-a-molecule-quantum-nanophotonics.github.io/qudi-lab-on-a-molecule-modules/modules/hardware/excitation_scanners/matisse.html"><code class="docutils literal notranslate"><span class="pre">MatisseProxy</span></code></a> hardware, which</p></li>
+</ol>
+<figure class="align-default" id="id53">
 <a class="reference internal image-reference" href="_images/qudi.hardware.interfuse.remote_matisse_scanner.RemoteMatisseScanner.svg"><img alt="_images/qudi.hardware.interfuse.remote_matisse_scanner.RemoteMatisseScanner.svg" src="_images/qudi.hardware.interfuse.remote_matisse_scanner.RemoteMatisseScanner.svg" style="width: 60%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 39 </span><span class="caption-text">The state machine for the Matisse laser. On the right, the simplified version where the interruption transitions and the stopped state have been removed.</span><a class="headerlink" href="#id52" title="Link to this image">¶</a></p>
+<p><span class="caption-number">Fig. 40 </span><span class="caption-text">The state machine for the Matisse laser. On the right, the simplified version where the interruption transitions and the stopped state have been removed.</span><a class="headerlink" href="#id53" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>

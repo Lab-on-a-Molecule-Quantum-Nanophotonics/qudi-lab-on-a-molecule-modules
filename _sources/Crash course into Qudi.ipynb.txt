@@ -2622,18 +2622,36 @@
   },
   {
    "cell_type": "markdown",
-   "id": "f4107c3e-641d-49b2-9ab2-862eef1c3e1d",
+   "id": "6f9158cb-90e6-4129-9f5f-75ae33117178",
    "metadata": {},
    "source": [
     "#### A slightly more complicated example: the Moglabs CEM laser\n",
     "\n",
-    "We can use the Moglabs Cat-Eye motorised laser to perform excitation spectroscopy.\n",
+    "We can use the Moglabs Cat-Eye motorised laser to perform excitation spectroscopy. This laser is extermely capricious, but is somewhat usable to do short scans up to a few GHz in range. Its state machine is given below:\n",
     "\n",
     "```{figure} crash_course_sources/qudi.hardware.interfuse.moglabs_scanning_excitation.FiniteSamplingScanningExcitationInterfuse.svg\n",
     ":width: 60%\n",
     "\n",
     "The state machine for the Moglabls CEM laser. On the right, the simplified version with the interruption transitions and the stopped state removed.\n",
+    "```\n",
+    "As you can see there are additional states corresponding to idling scans. This is because the laser tends to be not reliable when not performing scans, so it is often better to keep it scanning. Importantly, the idle controls that you would use with other lasers do not work with the Moglabs. Instead, it is better to use the scan controls while performing idle scans. This may change in the future if I get time to work on it.\n",
+    "\n",
+    "```{figure} crash_course_sources/moglabs_control_variables\n",
+    ":width: 30%\n",
+    "\n",
+    "The control variables available with the Moglabs.\n",
     "```"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "f4107c3e-641d-49b2-9ab2-862eef1c3e1d",
+   "metadata": {},
+   "source": [
+    "This laser comprises three elements:\n",
+    "1. The cavity itself, that lets you control the position of the grating in steps. Values allowing lasing are in the range ~9000 to ~13000.\n",
+    "2. The laser driver, that controls the position of the internal piezo of the cavity, as well as the current of the diode. You can control the setpoint of the current, and the ramp sent to the piezo for scanning through its offset and span. You can also control the duty cycle of the ramp: a 0.5 duty cycle is a symetric triangular wave, while a 0.0 duty cycle is a ramp with an abrupt change at the end. Finally, the laser driver alsomodulates a bit the current offset with the ramp. This is controlled with the bias setting.\n",
+    "3. The last element is the Fizeau wavemeter. This element has almost been well designed by the manufacturer, as it has a trigger input and is able to store measurements in its internal buffer. Unfortunately, the trigger does notwork with an edge, but instead with a constant level signal. This makes it difficult to trigger it using a standard TTL clock, as it will trigger several times for a single clock cycle depending on its (automatically set) internal exposure time. This forces us to probe directly the wavemeter with the computer at (hopefully, remember that a computer is usually bad at timing) regular intervals and then interpolate the frequencies at the end of a scan step. The fizeau probing rate is given by the `fzw probe rate` setting. Too fast, and the computer cannot keep-up, resulting in wrong frequency interpolation. Too slow, and you will miss important informations such as mode jumps."
    ]
   },
   {
@@ -2643,7 +2661,9 @@
    "source": [
     "#### A more complicated example: the Matisse laser\n",
     "\n",
-    "Detail a bit more, explain that the matisse laser is in two part, one on the laser's computer, not shown here, and one on the main computer.\n",
+    "We control our Matisse laser through three hardwares. Two of them run on the computer dedicated to this laser:\n",
+    "1. The High Finesse wavemeter, controlled by the [`HighFinesseWavemeter`](https://lab-on-a-molecule-quantum-nanophotonics.github.io/qudi-lab-on-a-molecule-modules/modules/hardware/wavemeter/high_finesse_wavemeter.html) hardware,\n",
+    "2. The Matisse Proxy, controlled by the [`MatisseProxy`](https://lab-on-a-molecule-quantum-nanophotonics.github.io/qudi-lab-on-a-molecule-modules/modules/hardware/excitation_scanners/matisse.html) hardware, which \n",
     "\n",
     "```{figure} crash_course_sources/qudi.hardware.interfuse.remote_matisse_scanner.RemoteMatisseScanner.svg\n",
     ":width: 60%\n",
