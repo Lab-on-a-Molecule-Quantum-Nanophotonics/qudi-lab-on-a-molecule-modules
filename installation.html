@@ -181,6 +181,10 @@
                 
                   <li class="toctree-l2"><a href="#pre-requisites" class="reference internal">Pre-requisites</a></li>
                 
+                  <li class="toctree-l2"><a href="#installing-qudi" class="reference internal">Installing Qudi</a></li>
+                
+                  <li class="toctree-l2"><a href="#running-qudi" class="reference internal">Running Qudi</a></li>
+                
               </ul>
             
           </li>
@@ -334,6 +338,17 @@ Use `uv help &lt;command&gt;` for more information on a specific command.
 </pre></div>
 </div>
 </section>
+</section>
+<section id="installing-qudi">
+<h2>Installing Qudi<a class="headerlink" href="#installing-qudi" title="Link to this heading">¶</a></h2>
+<p>Go to the folder where you want to install Qudi and download our module:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/Lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules
+</pre></div>
+</div>
+<p>Then, install the Qudi kernel for Jupyter. It will also install all the required dependencies.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>qudi-install-kernel
+</pre></div>
+</div>
 <section id="windows-creating-desktop-shortcuts">
 <h3>Windows: creating desktop shortcuts<a class="headerlink" href="#windows-creating-desktop-shortcuts" title="Link to this heading">¶</a></h3>
 <p>It is quite convenient to simply click to run Qudi. you can do that by manually creating desktop shortcuts.</p>
@@ -348,6 +363,14 @@ Use `uv help &lt;command&gt;` for more information on a specific command.
 </div>
 <p>A nice icon for the shortcut is available in <code class="docutils literal notranslate"><span class="pre">Documents\qudi-lab-on-a-molecule-modules\.venv\Lib\site-packages\jupyter_server\static\favicon.ico</span></code>.</p>
 </section>
+</section>
+<section id="running-qudi">
+<h2>Running Qudi<a class="headerlink" href="#running-qudi" title="Link to this heading">¶</a></h2>
+<p>You can simply navigate to the directory where Qudi lives, and run</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>qudi
+</pre></div>
+</div>
+<p>Windows user that installed the  desktop shortcut can simply double-click on it.</p>
 </section>
 </section>
 
