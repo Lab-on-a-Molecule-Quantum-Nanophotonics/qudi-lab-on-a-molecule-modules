@@ -1491,16 +1491,16 @@ When coding logics, if you need to refer to the connected module (in this exampl
         0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
         0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
         0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-        0.        ,  0.        ,  0.        ,  0.        ,  0.26033267,
-        1.3405416 ,  0.71915134,  1.38408903,  2.45089287,  2.32880273,
-        3.95156026,  4.9833553 ,  4.34680526,  5.58636134,  5.02940475,
-        7.24217883,  6.61511243,  6.62731835,  7.83277696,  8.16280452,
-        7.57385998,  6.81841003,  6.95201036,  6.45767879,  6.92831639,
-        6.78695551,  7.41425181,  6.89286226,  6.45945619,  6.02217757,
-        5.07856272,  4.95358769,  5.02384115,  3.47113693,  4.011013  ,
-        1.8574869 ,  3.25450763,  2.436278  ,  0.53991992, -0.01534885,
-        0.3789313 , -2.1263491 , -2.26705003, -2.48566009, -2.38990609,
-       -3.26431796, -5.21322983, -4.52654497, -6.25111343, -4.66573486])
+        0.        ,  0.        ,  0.        ,  0.        ,  0.91391738,
+        1.78003812, -0.71159042,  3.21890389,  2.47398304,  4.68540094,
+        4.20136429,  4.92878503,  6.40051081,  3.33812903,  3.82342173,
+        5.28302614,  5.5367766 ,  7.55775515,  6.97069594,  9.28139541,
+        7.13821799,  6.806591  ,  7.6782009 ,  9.98498369,  8.59400922,
+        7.27037781,  7.62400084,  8.05598313,  8.23754597,  9.13040425,
+        9.13221205,  7.05845927, 10.16470494,  9.22548161,  6.86692185,
+        6.93998746,  6.89367493,  5.98941379,  5.88119503,  4.71127404,
+        6.56310291,  5.805047  ,  6.05428211,  3.43791018,  4.83400832,
+        3.7666657 ,  1.75465893,  1.51886215,  0.94862903,  1.13465156])
 </pre></div>
 </div>
 </div>
@@ -2057,13 +2057,14 @@ RuntimeError: Failed to activate hardware module &quot;instream_dummy&quot;!
 <ol class="arabic simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">time_series_reader_logic.start_reading()</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">time_series_reader_logic.stop_reading()</span></code></p></li>
-<li></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">process_control.get_process_value(&quot;APD&quot;)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">excitation_scanner_logic.get_spectrum()</span></code></p></li>
 </ol>
 </section>
 </div>
 </section>
-<section id="level-1-a-simple-logic-module-that-reads-values-and-print-them-in-the-logs">
-<h2>Level 1: A simple logic module that reads values and print them in the logs<a class="headerlink" href="#level-1-a-simple-logic-module-that-reads-values-and-print-them-in-the-logs" title="Link to this heading">¶</a></h2>
+<section id="level-1-a-logic-module">
+<h2>Level 1: A logic module<a class="headerlink" href="#level-1-a-logic-module" title="Link to this heading">¶</a></h2>
 <p>The idle frequency of <code class="docutils literal notranslate"><span class="pre">excitation_scanner_hardware</span></code> is actually flawed! The frequency we read has an offset with respect to the real frequency. This means that if we find a maximum and send the laser there, we won’t be at the actual maximum. To fix this annoying issue, your task is to write a logic that has a single method to optimize the frequency.</p>
 <div class="exercise admonition" id="level1">
 
