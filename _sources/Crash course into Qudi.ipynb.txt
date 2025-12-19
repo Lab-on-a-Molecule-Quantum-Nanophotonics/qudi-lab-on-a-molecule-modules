@@ -461,11 +461,6 @@
     "(a-crash-course-into-qudi)=\n",
     "# A crash course into Qudi\n",
     "\n",
-    "\n",
-    "```{warning}\n",
-    "This is a work in progress.\n",
-    "```\n",
-    "\n",
     "<center>\n",
     "    Lecture notes by <b>Hugo Levy-Falk</b>, CNR-INO\n",
     "</center>\n",
@@ -488,7 +483,9 @@
     ":width: 60%\n",
     "\n",
     "Get the lecture notes at [https://lab-on-a-molecule-quantum-nanophotonics.github.io/qudi-lab-on-a-molecule-modules/](https://lab-on-a-molecule-quantum-nanophotonics.github.io/qudi-lab-on-a-molecule-modules/Crash%20course%20into%20Qudi.html)\n",
-    "```"
+    "```\n",
+    "\n",
+    "You can also find the [slides on the website](https://lab-on-a-molecule-quantum-nanophotonics.github.io/qudi-lab-on-a-molecule-modules/slides.html), they are a maybe more digest subset of these notes."
    ]
   },
   {
