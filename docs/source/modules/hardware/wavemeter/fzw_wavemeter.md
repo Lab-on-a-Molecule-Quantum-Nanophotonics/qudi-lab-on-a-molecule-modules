@@ -1,6 +1,6 @@
-# Moglabs Fizeau wavemeter
+# High Finesse wavemeter
 
-```{autodoc2-object} qudi.hardware.wavemeter.fzw_wavemeter.MOGLabsFZW
+```{autodoc2-object} qudi.hardware.wavemeter.high_finesse_wavemeter.HighFinesseWavemeter
 render_plugin = "myst"
 ```
 

@@ -72,6 +72,19 @@ Global options:
 Use `uv help <command>` for more information on a specific command.
 ```
 
+## Installing Qudi 
+
+Go to the folder where you want to install Qudi and download our module:
+
+```bash
+git clone https://github.com/Lab-on-a-Molecule-Quantum-Nanophotonics/qudi-lab-on-a-molecule-modules
+```
+
+Then, install the Qudi kernel for Jupyter. It will also install all the required dependencies.
+
+```bash
+uv run qudi-install-kernel
+```
 
 ### Windows: creating desktop shortcuts
 
@@ -93,3 +106,12 @@ To have a shortcut for the Jupyter notebook installation that comes with Qudi, y
 
 A nice icon for the shortcut is available in `Documents\qudi-lab-on-a-molecule-modules\.venv\Lib\site-packages\jupyter_server\static\favicon.ico`.
 
+## Running Qudi
+
+You can simply navigate to the directory where Qudi lives, and run 
+
+```bash
+uv run qudi
+```
+
+Windows user that installed the  desktop shortcut can simply double-click on it.
