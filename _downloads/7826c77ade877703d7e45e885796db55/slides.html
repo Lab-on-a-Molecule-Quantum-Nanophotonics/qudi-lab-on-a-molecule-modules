@@ -1,0 +1,713 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>reveal.js</title>
+
+		<link rel="stylesheet" href="slides/dist/reset.css">
+		<link rel="stylesheet" href="slides/dist/reveal.css">
+		<link rel="stylesheet" href="slides/dist/theme/black.css">
+
+		<!-- Theme used for syntax highlighted code -->
+		<link rel="stylesheet" href="slides/plugin/highlight/monokai.css">
+        <style>
+.container{
+    display: flex;
+}
+.col{
+    flex: 1;
+}
+</style>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+                    <h2>Before the lecture</h2>
+                    <ol style="font-size:smaller;">
+                        <li>We store aside any of your modifications. Run the following command: <code>git stash</code>.</li>
+                            <li>We get the latest version of the notes. Run <code>git pull</code></li>
+                                <li>We start Qudi and the notebook. In a terminal run <code>uv run qudi</code>, then in a second terminal navigate to your Qudi directory, and run <code>uv run jupyter notebook</code>.</li>
+                    </ol>
+                    <img src="crash_course_sources/logo.svg"/>
+                </section>
+				<section>
+                    <div class="container">
+                        <div class="col">
+                            <h1>A crash course into Qudi</h1>
+                            <p>Hugo Levy-Falk</p>
+                        </div>
+                        <div class="col">
+                            <img src="crash_course_sources/lazy_me.jpeg"/>
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <h2>Today</h2>
+                    <ol>
+                        <li>Why automation / a framework / Qudi</li>
+                        <li>Qudi basics</li>
+                        <li>Saving things</li>
+                        <li>Scripting</li>
+                        <li>How to deal with errors</li>
+                        <li>Interactive activity</li>
+                        <li>Our modules</li>
+                    </ol>
+                </section>
+                <section>
+                    <section>
+                        <h2>Basics of Qudi</h2>
+                    </section>
+                    <section>
+                        <h3>Why automation?</h3>
+                        <p>We operate complex instruments and perform repetitive measurements: computers are a good help for that. We want softwares that:
+                        <ul style=font-size:smaller;">
+                            <li>Is able to handle the variability in instrumentation,</li>
+                            <li>Facilitates the systematic handling of experiments,</li>
+                            <li>Provides traceability of data provenance and experimental settings,</li>
+                            <li>Is easy enough to tweak, expand, and re-use.</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h3>Why a framework?</h3>
+                        <p>We want to limit how much we code</p>
+                        <ul style="font-size: smaller;">
+                            <li>This is time consuming,</li>
+                            <li>Someone likely already did that,</li>
+                            <li>We are not software engineers.</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <p>A good software:</p>
+                        <ul>
+                            <li>performs its task correctly,</li>
+                            <li>performs its task efficiently,</li>
+                            <li>is documented so users can learn how to use it and understand what it does,</li>
+                            <li>has public, documented code so new people can work on it,</li>
+                            <li>has sufficiently well structured code that it will facilitate maintenance and addition of new functionalities.</li>
+                        </ul>
+                        <p>A framework allows us to re-use some well tested solutions to these problems.</p>
+                    </section>
+                    <section>
+                        <h3>Qudi</h3>
+                        <p>Qudi has been developped at Ulm-IQO, by people working on NV center in diamond. It is much broader in scope!</p>
+                        <p>Please cite their original paper on Qudi if you use it.</p>
+                    </section>
+                    <section>
+                        <h3>The Hardware, Logic, GUI stack</h3>
+                        <img src="crash_course_sources/diagram.jpeg", width="70%"/>
+                    </section>
+                    <section>
+                        <h3>Logic modules</h3>
+                        <ul>
+                            <li>The brain of you experiment.</li>
+                            <li>Orchestrate hardwares and other logics to acquire data, analyze, and save them.</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h3>Hardware modules</h3>
+                        <ul>
+                            <li>An abstraction layer for Qudi to use the instrument.</li>
+                            <li>The way to interact with them is standardized by an Interface.</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h3>Interfaces</h3>
+                        <ul>
+                            <li>A template to write a hardware module.</li>
+                            <li>Example: the laser scanning logic knows how to use an <code>ExcitationScannerInterface</code>, so the laser hardwares must implement it.</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h3>GUI</h3>
+                        <ul>
+                            <li>What the user sees.</li>
+                            <li>It is usually logic-specific.</li>
+                            <li>The logic knows nothing about it</li>
+                            <li>Separation of concern!</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h3>Where all these live</h3>
+                        <pre><code data-trim data-noescape>
+                        .
+                        ├── AUTHORS.md
+                        ├── Crash course into Qudi.html
+                        ├── docs
+                        │   ... All the documentation files
+                        ├── LICENSE
+                        ├── LICENSE.LESSER
+                        ├── pyproject.toml
+                        ├── README.md
+                        ├── src
+                        │   └── qudi
+                        │       ├── default.cfg
+                        │       ├── gui <- All the GUI modules live there
+                        │       ├── hardware <- All the hardware modules live there
+                        │       ├── interface <- All the interfaces are defined there
+                        │       ├── logic <- All the logics live there
+                        │       ├── scripts <- These are some scripts, I will not cover it today, I think it is better that we use jupyter notebooks instead
+                        │       └── util <- We extend Qudi here, in particular with the TOMLDataStorage that we will cover at the end.
+                        ├── tests
+                        │   ... All unit tests
+                        ├── uv.lock
+                        └── VERSION
+                        </code></pre>
+                    </section>
+                    <section>
+                        <h3>The configuration</h3>
+                        <div class="container">
+                            <div class="col">
+                                <img src="crash_course_sources/writing_configuration.jpeg" width="100%"/>
+                            </div>
+                            <div class="col">
+                                <pre><code data-trim data-noescape>
+                                global:
+                                    # global parameters for Qudi
+                                gui:
+                                    # Configuration of GUI modules
+                                logic:
+                                    # Configuration of Logic modules
+                                hardware:
+                                    # Configuration of Hardware modules
+                                </code></pre>
+                            </div>
+                        </div>
+                    </section>
+                    <section>
+                        <h3>Global section</h3>
+                        <div class="container">
+                            <div class="col">
+                                <pre><code data-trim data-noescape>
+                                global:
+                                    startup_modules: []
+                                    remote_modules_server: null
+                                    namespace_server_port: 18861
+                                    force_remote_calls_by_value: True
+                                    hide_manager_window: False
+                                    stylesheet: 'qdark.qss'
+                                    default_data_dir: null
+                                    daily_data_dirs: True
+                                    extension_paths: []
+                                </code></pre>
+                            </div>
+                            <div class="col">
+                                <ul style="font-size: x-large;">
+                                    <li><code>startup_modules</code>: This lists the modules we want to start automatically when we run Qudi. This avoids having to launch the manually.</li>
+                                    <li><code>remote_modules_server</code>: This is how we make Qudi aware of another instance running on another network. Refer to the documentation for how to use it.</li>
+                                    <li><code>default_data_dir</code>: This is where Qudi will store the data when saving. We systematically overwrite this in our configurations to make it point to the shared drives!</li>
+                            </div>
+                        </div>
+                    </section>
+                    <section>
+                        <h3>Modules section</h3>
+                        <div class="container">
+                            <div class="col">
+                                <pre><code data-trim data-noescape>
+                                logic:
+                                    my_logic:
+                                        module.Class: my_example_logic.MyExampleLogic
+                                        options:
+                                            my_config_option: 'I am a string from the Qudi configuration'
+                                        connect:
+                                            a_connector: a_defined_hardware_or_logic
+                                </code></pre>
+                            </div>
+                            <div class="col">
+                                <ul>
+                                    <li><code>module.Class</code>: Which Python class we want to use.</li>
+                                    <li>Connectors: the <code>connect</code> section tells Qudi which module in the configuration it should link to this module. You know what is expected thanks to the documentation/code.</li>
+                                    <li>Configuration options: the <code>options</code> section gives static configuration values for the module.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+                    <section>
+                        <h3>Interactive time: Let's finish this configuration file</h3>
+                        <div class="container">
+                            <div class="col">
+                                <ul style="font-size: x-large">
+                                    <li>Check the documentation of <code>InStreamDummy</code> in <code>src/qudi/hardware/dummy/data_instream_dummy.py</code></li>
+                                    <li>Check the documentation of <code>TimeSeriesReaderLogic</code> in <code>src/qudi/logic/time_series_reader_logic.py</code></li>
+                                    <li>Check the documentation of <code>TimeSeriesGui</code> in <code>src/qudi/gui/time_series/time_series_gui.py</code></li>
+                                    <li>Complete the configuration file to have these three modules working!</li>
+                                </ul>
+                            </div>
+                            <div class="col">
+                                <pre><code data-trim data-noescape>
+                                    global:
+                                        # list of modules to load when starting
+                                        startup_modules: []
+                                        # Server port for serving the active Qudi module namespace locally (localhost).
+                                        # Used by e.g. the Qudi jupyter kernel.
+                                        namespace_server_port: 18861
+                                        # Save data to daily data sub-directories by default
+                                        daily_data_dirs: True
+                                    gui:
+                                    logic:
+                                    hardware:
+                                </code></pre>
+                            </div>
+                        </div>
+                    </section>
+                    <section>
+                        <h3>Solution: Hardware</h3>
+                        <pre><code data-trim data-noescape>
+                        instream_dummy:
+                            module.Class: 'dummy.data_instream_dummy.InStreamDummy'
+                            options:
+                                channel_names:
+                                    - 'digital 1'
+                                    - 'analog 1'
+                                    - 'analog 2'
+                                    - 'digital 2'
+                                channel_units:
+                                    - 'Hz'
+                                    - 'V'
+                                    - 'V'
+                                    - 'Hz'
+                                channel_signals:  # Can be 'counts' or 'sine'
+                                    - 'counts'
+                                    - 'sine'
+                                    - 'sine'
+                                    - 'counts'
+                                data_type: 'float64'
+                                sample_timing: 'CONSTANT'  # Can be 'CONSTANT', 'TIMESTAMP' or 'RANDOM'
+                        </code></pre>
+                    </section>
+                    <section>
+                        <h3>Solution: Logic</h3>
+                        <pre><code data-trim data-noescape>
+                        time_series_reader_logic:
+                            module.Class: 'time_series_reader_logic.TimeSeriesReaderLogic'
+                            options:
+                                max_frame_rate: 20  # optional (default: 20Hz)
+                                channel_buffer_size: 1048576  # optional (default: 1MSample)
+                                max_raw_data_bytes: 1073741824  # optional (default: 1GB)
+                            connect:
+                                streamer: instream_dummy
+                        </code></pre>
+                    </section>
+                    <section>
+                        <h3>Solution: GUI</h3>
+                        <pre><code data-trim data-noescape>
+                        time_series_gui:
+                            module.Class: 'time_series.time_series_gui.TimeSeriesGui'
+                            options:
+                                use_antialias: True  # optional, set to False if you encounter performance issues
+                            connect:
+                                _time_series_logic_con: time_series_reader_logic
+                        </code></pre>
+                    </section>
+                    <section data-background-color="rgb(255, 255, 255)">
+                        <h3>Qudi's main window</h3>
+                        <img src="crash_course_sources/main_window_annotated.svg"/>
+                    </section>
+                    <section data-background-color="rgb(255, 255, 255)">
+                        <h3>The life of a Qudi module</h3>
+                        <img src="crash_course_sources/module_widget_annotated.svg"/>
+                        <p>In our configuration</p>
+                        <pre><code data-trim data-noescape>
+                        global:
+                            startup_modules: ['time_series_gui']
+                        </code></pre>
+                    </section>
+                    <section data-background-color="rgb(255, 255, 255)">
+                        <h3>State machines</h3>
+                        <img src="crash_course_sources/module_fsm_diagram.svg"/>
+                    </section>
+                    <section>
+                        <h3>Status variables</h3>
+                        <ul>
+                            <li>The memory of Qudi in between runs</li>
+                            <li>They are just text saved on your computer!</li>
+                            <li>They can be sources of errors, you can clear them from the main window.</li>
+                        </ul>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h2>Saving things</h2>
+                        <p>In Qudi, we like organized data folders</p>
+                    </section>
+                    <section>
+                        <pre><code data-trim data-noescape>
+                        .
+                        ├── 2024
+                        │   ├── ...
+                        │   ...
+                        └── 2025
+                            ├── 04
+                            │   ├── 2025-04-15
+                            │   │   ├── matisse_excitation_logic
+                            │   │   ├── powermeter_time_series_logic
+                            │   │   ├── qdplot_logic
+                            │   │   ├── scanning_data_logic
+                            │   │   └── time_series_reader_logic
+                            │   ...
+                            └── 07    
+                                └── 2025-07-22
+                                    ├── camera
+                                    ├── dfb_excitation_logic
+                                    ├── powermeter_time_series_logic
+                                    ├── qdplot_logic
+                                    └── time_series_reader_logic
+                        </code></pre>
+                    </section>
+                    <section>
+                        <p>With meaningful names</p>
+                        <pre><code data-trim data-noescape>
+                        20250930-1115-41_2D-scan_with_xy_axes_from_channel_APD.dat
+                        20250930-1115-41_2D-scan_with_xy_axes_from_channel_APD.png
+                        </code></pre>
+                    </section>
+                    <section>
+                        <p>Datafiles contain metadata</p>
+                        <pre><code data-trim data-noescape>
+                        # [General]
+                        # timestamp = 2025-10-01 11:39:56.535094
+                        # delimiter = "	"
+                        # comments = "# "
+                        # column_dtypes = [
+                        #     "float",
+                        #     "float",
+                        #     "float",
+                        #     "float",
+                        # ]
+                        # column_headers = [
+                        #     "Frequency (Hz)",
+                        #     "pfi3 (c/s)",
+                        #     "Step number ()",
+                        #     "Time (s)",
+                        # ]
+                        # notes = "free spad\nP=480nW\nT=5K\nwith BS"
+                        # ... more metadata, prefixed with a `#`
+                        # ---- END HEADER ----
+                        -2.000000000000000e+10	7.400000000000000e+02	0.000000000000000e+00	5.314013700000942e+00
+                        -1.998998998998999e+10	5.700000000000000e+02	0.000000000000000e+00	5.414013700000941e+00
+                        -1.997997997997998e+10	5.500000000000000e+02	0.000000000000000e+00	5.514013700000942e+00
+                        -1.996996996996997e+10	6.200000000000000e+02	0.000000000000000e+00	5.614013700000942e+00
+                        -1.995995995995996e+10	6.000000000000000e+02	0.000000000000000e+00	5.714013700000942e+00
+                        -1.994994994994995e+10	6.800000000000000e+02	0.000000000000000e+00	5.814013700000942e+00
+                        -1.993993993993994e+10	4.600000000000000e+02	0.000000000000000e+00	5.914013700000941e+00
+                        ... more data
+                        </code></pre>
+                    </section>
+                    <section>
+                        <p>Qudi offers saving utilities to make saving painless. See the notes!</p>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h2>Scripting Qudi using Jupyter notebooks</h2>
+                        <p>The Qudi Jupyter kernel is more than just running Python code. You can also interact with your modules!</p>
+                        <div class="container">
+                            <div class="col">
+                                <p>Creating notebooks</p>
+                                <img src="crash_course_sources/new_notebook.png"/>
+                            </div>
+                            <div class="col">
+                                <p>Running notebooks</p>
+                                <img src="crash_course_sources/running_notebook.png"/>
+                            </div>
+                        </div>
+                    </section>
+                    <section>
+                        <p>You can directly call modules' methods and properties!</p>
+                        <pre><code>time_series_reader_logic.active_channel_names</code> </pre>
+                        <pre><code>['digital 1', 'analog 1', 'analog 2', 'digital 2']</code> </pre>
+                    </section>
+                    <section>
+                        <p>You can even start and stop measurements!</p>
+                        <pre><code data-trim data-noescape>
+                        import time
+
+                        if time_series_reader_logic.module_state() == "locked": # If acquisition is running,
+                            time_series_reader_logic.stop_reading() # stop it.
+
+                        time_series_reader_logic.start_reading() # start acquisition
+                        time.sleep(1) # wait 1s
+                        time_series_reader_logic.stop_reading() # stop acquisition
+                        </code></pre>
+                    </section>
+                    <section>
+                        <h3>A pain in the neck: transfering data to the notebook</h3>
+                        <p>This code will error</p>
+                        <pre><code data-trim data-noescape>
+                        import matplotlib.pyplot as pl
+                        import numpy as np
+                        time, data = time_series_reader_logic.trace_data
+                        data = data['analog 1']
+                        pl.plot(time, data)
+                        </code></pre>
+                    </section>
+                    <section>
+                        <p>You need to explicitely transfer the data</p>
+                        <pre><code data-trim data-noescape>
+                        from qudi.util.network import netobtain
+                        time, data = time_series_reader_logic.trace_data
+                        time = netobtain(time)
+                        data = netobtain(data)
+                        data = data['analog 1']
+                        pl.plot(time, data)
+                        pl.xlabel("Time [s]")
+                        pl.ylabel("Analog value [V]")
+                        </code></pre>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h2>When things go wrong: understanding errors</h2>
+                        <img src="crash_course_sources/fallen_me.jpeg" width="60%"/>
+                    </section>
+                    <section data-background-color="rgb(255, 255, 255)">
+                        <h3>Finding useful errors / finding errors useful</h3>
+                        <p>Qudi provides facilities for modules to log errors</p>
+                        <pre><code data-trim data-noescape>instream_dummy.log.error("Hey, I am an error message!")</code></pre>
+                        <img src="crash_course_sources/error_message_main_window.png"/>
+                        <p>It also appears in the terminal and in the log file.</p>
+                    </section>
+                    <section data-background-color="rgb(255, 255, 255)">
+                        <p>Qudi also tries to catch Python errors.</p>
+                        <img src="crash_course_sources/python_error.png"/>
+                    </section>
+                    <section>
+                        <h3>Let's go through some common errors.</h3>
+                    </section>
+                    <section>
+                        <p>Configuration file errors</p>
+                        <div class="container">
+                            <div class="col">
+                                <img src="crash_course_sources/wrong_configuration.jpeg"/>
+                            </div>
+                            <div class="col">
+                                <ul>
+                                    <li>Wrong interfaces</li>
+                                    <li>Module not existing</li>
+                                    <li>Missing config options</li>
+                                    <li>YAML errors</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+                    <section>
+                        <p>YAML errors</p>
+                        <div class="container">
+                            <div class="col">
+                                <img src="crash_course_sources/yaml.jpeg"/>
+                            </div>
+                            <div class="col">
+                                <ul>
+                                    <li>YAML is hard</li>
+                                    <li>YAML is sensitive to indentation</li>
+                                    <li>Qudi will verify the schema and yield errors if needed</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+                    <section>
+                        <p>Some hope?</p>
+                        <img src="crash_course_sources/config_editor.png"/>
+                    </section>
+                    <section>
+                        <p>Connectivity errors</p>
+                        <div class="container">
+                            <div class="col">
+                                <img src="crash_course_sources/too_many_qudi.jpeg"/>
+                            </div>
+                            <div class="col">
+                                <img src="crash_course_sources/network_failure.jpeg"/>
+                            </div>
+                        </div>
+                    </section>
+                    <section>
+                        <p>Coding errors</p>
+                        <img src="crash_course_sources/a_bug.jpeg"/>
+                    </section>
+                    <section>
+                        <p>You found an error: Trying to fix it yourself</p>
+                        <ul>
+                            <li>Finding a solution from the error message,</li>
+                            <li>Restarting Qudi,</li>
+                            <li>Clearing status variables.</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <p>You found an error: Documenting the error</p>
+                        <ul>
+                            <li>Procedure to produce the error,</li>
+                            <li>Error message(s) <b>Not a phone picture, copy and paste them!</b>,</li>
+                            <li>Screenshots, log files, observations...</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <p>You found an error: Finding help</p>
+                        <ul>
+                            <li>The documentation,</li>
+                            <li>Your colleagues,</li>
+                            <li>The official Qudi forum</li>
+                        </ul>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h2>Interactive activity: let's write a logic module!</h2>
+                    </section>
+                    <section>
+                        <h3>Level 0: Let's <b>not</b> write a logic module</h3>
+                        <p>After loading the provided configuration file, use the notebook to</p>
+                        <ol>
+                            <li>Start the time series acquisition</li>
+                            <li>Stop the time series acquisition</li>
+                            <li>Read the current value of the fluorescence from process_control by reading the process value "APD".</li>
+                            <li>Start a scan using the excitation_scanner_logic</li>
+                        </ol>
+                    </section>
+                    <section>
+                        <p>Solution</p>
+                        <ol style="font-size:smaller;">
+                            <li><code>time_series_reader_logic.start_reading()</code></li>
+                            <li><code>time_series_reader_logic.stop_reading()</code></li>
+                            <li><code>process_control.get_process_value("APD")</code></li>
+                            <li><code>excitation_scanner_logic.get_spectrum()</code></li>
+                        </ol>
+                    </section>
+                    <section>
+                        <h3>Level 1: a logic module</h3>
+                        <p style="font-size:smaller;">Our laser seems to have an offset in frequency, let's write an optimizer! Using the provided template, write the <code>FrequencyOptimizeLogic</code> code. The function should</p>
+                        <ol style="font-size:smaller;">
+                            <li>Scan specified range of frequencies using the <code>_scanner</code> connector</code></li>
+                            <li>Find the maximum of the data, its frequency f0, and the FWHM.</li>
+                            <li>Scan step by step a region [f0-6FWHM, f0+6FWHM] by setting manually the idle frequency of the excitation_scanner_logic. For each of these steps, record the fluorescence by probing the "APD" channel of the process_control module.</li>
+                            <li>Set the <code>_scanner</code> idle frequency to the frequency of the actual maximum.</li>
+                        </ol>
+                    </section>
+                    <section>
+                        <p>Hints</p>
+                        <ul style="font-size:smaller;">
+                            <li>Don’t forget the parentheses when calling the connectors: self._scanner().something and not self._scanner.something</li>
+                            <li>Numpy has many useful functions, such as argmax</li>
+                            <li>Do read the code in src/qudi/logic/scanning_excitation_logic.py and src/qudi/hardware/tutorial/process_control.py to understand how to use them! There are things like acquisition_running and get_spectrum that should catch your eye.</li>
+                            <li>Remember to restart the jupyter kernel each time you restart Qudi.</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <p>Configuration solution</p>
+                        <pre><code data-trim data-noescape>
+                        frequency_optimize_logic:
+                            module.Class: 'frequency_optimize.FrequencyOptimizeLogic'
+                            connect:
+                                scanner_logic: excitation_scanner_logic
+                                process_hardware: process_control
+                        </pre></code>
+                    </section>
+                    <section>
+                        <p>Configuring, Starting a scan and waiting for completion</p>
+                        <pre><code data-trim data-noescape>
+                        self._scanner().set_variable("Start frequency", fstart)
+                        self._scanner().set_variable("Stop frequency", fstop)
+                        self._scanner().set_variable("Step frequency", fstep)
+                        self._scanner().get_spectrum()
+                        # wait for the spectrum to finish
+                        while self._scanner().acquisition_running:
+                            time.sleep(0.5)
+                        </pre></code>
+                    </section>
+                    <section>
+                        <p>Finding the central frequency and fwhm</p>
+                        <pre><code data-trim data-noescape>
+                        spectrum = self._scanner().spectrum
+                        frequency = self._scanner().frequency
+                        bg = np.quantile(spectrum, 0.1)
+                        imaxi = np.argmax(spectrum)
+                        amplitude = spectrum[imaxi] - bg
+                        f0 = frequency[imaxi]
+                        istart = np.nonzero(np.logical_and(spectrum - bg < amplitude/2, frequency < f0))[0][-1]
+                        istop = np.nonzero(np.logical_and(spectrum - bg < amplitude/2, frequency > f0))[0][0]
+                        fstart = frequency[istart]
+                        fstop = frequency[istop]
+                        fwhm = abs(fstop - fstart)
+                        </pre></code>
+                    </section>
+                    <section>
+                        <p>Manual scan and optimization of laser frequency</p>
+                        <pre><code data-trim data-noescape>
+                        # 3. Manually scan the frequencies
+                        scanned_setpoints = np.linspace(f0-6*fwhm, f0+6*fwhm, 100)
+                        fluorescence = np.zeros_like(scanned_setpoints)
+                        for (i,f) in enumerate(scanned_setpoints):
+                            self._scanner().idle = f
+                            time.sleep(0.1)
+                            fluorescence[i] = self._process().get_process_value("APD")
+                            imax = np.argmax(fluorescence)
+                        # 4. Go there
+                        self._scanner().idle = scanned_setpoints[imax]
+                        </code></pre>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h2>The modules we use</h2>
+                    </section>
+                    <section data-background-color="rgb(255, 255, 255)">
+                        <p>Time series GUI</p>
+                        <img src="crash_course_sources/time_series_illustration.svg"/>
+                    </section>
+                    <section data-background-color="rgb(255, 255, 255)">
+                        <p>Scanner GUI</p>
+                        <img src="crash_course_sources/scanner_gui_annotated.svg"/>
+                    </section>
+                    <section>
+                        <p>National Instruments hardwares</p>
+                        <ul>
+                            <li>Many possibilities with them</li>
+                            <li>For historical reasons, some of the best integrated hardwares in Qudi</li>
+                        </ul>
+                    </section>
+                    <section data-background-color="rgb(255, 255, 255)">
+                        <p>Laser scanner GUI</p>
+                        <img src="crash_course_sources/laser_window_annotated.svg"/>
+                    </section>
+                    <section>
+                        <p>Laser scanner logic</p>
+                        <p>We played a lot with it already!</p>
+                    </section>
+                    <section>
+                        <p>Laser scanner hardwares</p>
+                        <ul>
+                            <li>They use internal state machines to control the operations needed to scan frequencies.</li>
+                            <li>They each have their own control variables, read the notes!</li>
+                            <li>The Moglabs laser is complicated to use.</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <p>Pulsers</p>
+                        <p>Many possibilities here, but I am not expert enough yet to describe them well.</p>
+                    </section>
+                </section>
+                <section>
+                    <h2>That's all folks!</h2>
+                </section>
+			</div>
+		</div>
+
+		<script src="slides/dist/reveal.js"></script>
+		<script src="slides/plugin/notes/notes.js"></script>
+		<script src="slides/plugin/markdown/markdown.js"></script>
+		<script src="slides/plugin/highlight/highlight.js"></script>
+		<script>
+			// More info about initialization & config:
+			// - https://revealjs.com/initialization/
+			// - https://revealjs.com/config/
+			Reveal.initialize({
+				hash: true,
+
+				// Learn about plugins: https://revealjs.com/plugins/
+				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ],
+                slideNumber: 'c/t'
+			});
+		</script>
+	</body>
+</html>
