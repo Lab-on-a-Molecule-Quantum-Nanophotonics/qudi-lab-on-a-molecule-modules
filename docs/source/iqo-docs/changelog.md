@@ -14,6 +14,7 @@
 - Fixed counting length for the `t1_sequencing` predefined generate method for a gated counter
 - Fixed `KeysightM8195A` not loading `PulseBlock`s in the pulsed main GUI
 - Fixed ``mw_source_anritsu.py`` hardware file 
+- Fixed typo in ``MicrowaveAnritsu.on_activate`` preventing the module from activating  
 
 ### New Features
 - changed to a better valid `PredefinedGenerator` class discovery method for the pulsed tool chain
