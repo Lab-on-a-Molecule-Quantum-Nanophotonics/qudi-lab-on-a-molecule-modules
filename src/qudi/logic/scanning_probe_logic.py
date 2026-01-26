@@ -144,22 +144,22 @@ class ScanningProbeLogic(LogicBase):
     @property
     def scan_data(self) -> Optional[ScanData]:
         with self._thread_lock:
-            return self._scanner().get_scan_data()
+            return netobtain(self._scanner().get_scan_data())
 
     @property
     def back_scan_data(self) -> Optional[ScanData]:
         with self._thread_lock:
-            return self._scanner().get_back_scan_data()
+            return netobtain(self._scanner().get_back_scan_data())
 
     @property
     def scanner_position(self):
         with self._thread_lock:
-            return self._scanner().get_position()
+            return netobtain(self._scanner().get_position())
 
     @property
     def scanner_target(self):
         with self._thread_lock:
-            return self._scanner().get_target()
+            return netobtain(self._scanner().get_target())
 
     @property
     def scanner_axes(self):
@@ -171,7 +171,7 @@ class ScanningProbeLogic(LogicBase):
 
     @property
     def scanner_constraints(self) -> ScanConstraints:
-        return self._scanner().constraints
+        return netobtain(self._scanner().constraints)
 
     @property
     def back_scan_capability(self) -> BackScanCapability:
@@ -410,16 +410,16 @@ class ScanningProbeLogic(LogicBase):
         with self._thread_lock:
             if self.module_state() != 'idle':
                 self.log.error('Unable to change scanner target position while a scan is running.')
-                new_pos = self._scanner().get_target()
+                new_pos = netobtain(self._scanner().get_target())
                 self.sigScannerTargetChanged.emit(new_pos, self.module_uuid)
                 return new_pos
 
             # self.log.debug(f"Requested Set pos to= {pos_dict}")
             ax_constr = self.scanner_constraints.axes
-            pos_dict = self._scanner()._expand_coordinate(cp.copy(pos_dict))
+            pos_dict = netobtain(self._scanner()._expand_coordinate(cp.copy(pos_dict)))
             # self.log.debug(f"Expand to= {pos_dict}")
 
-            pos_dict = self._scanner().coordinate_transform(pos_dict)
+            pos_dict = netobtain(self._scanner().coordinate_transform(pos_dict))
             if self._save_coord_to_global_metadata:
                 for (k,v) in pos_dict.items():
                     DataStorageBase.add_global_metadata("scanner_" + k, v, overwrite=True)
@@ -427,7 +427,7 @@ class ScanningProbeLogic(LogicBase):
             for ax, pos in pos_dict.items():
                 if ax not in ax_constr:
                     self.log.error('Unknown scanner axis: "{0}"'.format(ax))
-                    new_pos = self._scanner().get_target()
+                    new_pos = netobtain(self._scanner().get_target())
                     self.sigScannerTargetChanged.emit(new_pos, self.module_uuid)
                     return new_pos
 
@@ -439,9 +439,9 @@ class ScanningProbeLogic(LogicBase):
                     )
 
             # move_absolute expects untransformed coordinatess, so invert clipped pos
-            pos_dict = self._scanner().coordinate_transform(pos_dict, inverse=True)
+            pos_dict = netobtain(self._scanner().coordinate_transform(pos_dict, inverse=True))
             # self.log.debug(f"In front of hw.move_abs {pos_dict}")
-            new_pos = self._scanner().move_absolute(pos_dict, blocking=move_blocking)
+            new_pos = netobtain(self._scanner().move_absolute(pos_dict, blocking=move_blocking))
             # self.log.debug(f"Set pos to= {pos_dict} => new pos {new_pos}. Bare {self._scanner()._get_position_bare()}")
             if any(pos != new_pos[ax] for ax, pos in pos_dict.items()):
                 caller_id = None
@@ -456,7 +456,7 @@ class ScanningProbeLogic(LogicBase):
             self.stop_scan()
 
     def toggle_tilt_correction(self, enable=True):
-        target_pos = self._scanner().get_target()
+        target_pos = netobtain(self._scanner().get_target())
         is_enabled = self._scanner().coordinate_transform_enabled
 
         func = self.__transform_func if self._tilt_corr_transform else None
