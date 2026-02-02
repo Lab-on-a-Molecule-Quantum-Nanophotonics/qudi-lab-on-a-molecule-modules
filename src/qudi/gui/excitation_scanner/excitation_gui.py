@@ -309,7 +309,7 @@ class ScanningExcitationGui(GuiBase):
 
     def target_changed(self):
         mini,maxi = self._excitation_logic().idle_value_limits
-        self._target_x = self._mw.data_widget.target_point.pos()[0]
+        self._target_x = self._mw.data_widget.target_point.pos().x()
 
         if self._target_x < mini:
             self._target_x = mini
@@ -321,10 +321,10 @@ class ScanningExcitationGui(GuiBase):
             new_y = 0.0
         else:
             new_y = self._excitation_logic().get_spectrum_at_x(self._target_x)
-        self._mw.data_widget.target_x.setValue(self._target_x)
-        self._mw.data_widget.target_y.setValue(new_y)
+        #self._mw.data_widget.target_x.setValue(self._target_x)
+        #self._mw.data_widget.target_y.setValue(new_y)
 
-        self._mw.data_widget.target_point.setPos(self._target_x)
+        #self._mw.data_widget.target_point.setPos(self._target_x)
         if self._mw.data_widget.laser_follow_cursor.current_state == "Yes":
             self._excitation_logic().idle = self._target_x
             self._mw.data_widget.frequency_scrollbar.blockSignals(True)
