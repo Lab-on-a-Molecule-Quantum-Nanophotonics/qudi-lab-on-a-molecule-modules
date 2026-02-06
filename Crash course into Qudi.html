@@ -1317,7 +1317,7 @@ When coding logics, if you need to refer to the connected module (in this exampl
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;/home/klafyvel/qudi/Data/2025/12/2025-12-19/20210506-1111-11_amplitude_measurement.dat&#39;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;/home/klafyvel/qudi/Data/2026/02/2026-02-06/20210506-1111-11_amplitude_measurement.dat&#39;
 </pre></div>
 </div>
 </div>
@@ -1369,7 +1369,7 @@ When coding logics, if you need to refer to the connected module (in this exampl
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;/home/klafyvel/qudi/Data/2025/12/2025-12-19/20210506-1111-11_amplitude_measurement.png&#39;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;/home/klafyvel/qudi/Data/2026/02/2026-02-06/20210506-1111-11_amplitude_measurement.png&#39;
 </pre></div>
 </div>
 </div>
@@ -1487,16 +1487,16 @@ When coding logics, if you need to refer to the connected module (in this exampl
         0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
         0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
         0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-        0.        ,  0.        ,  0.        ,  0.        ,  0.18072391,
-        0.41181103, -0.09444357,  0.0543197 ,  0.83161318,  0.23677781,
-        1.01729003,  0.40504538,  1.17118029,  0.90554486,  1.27799987,
-        1.29703503,  1.17995753,  0.74016758,  1.83941322,  1.72497016,
-        1.92125307,  1.83207326,  1.43289206,  1.73842985,  1.09300117,
-        1.50838094,  1.01794776,  0.91544236,  0.88755437,  0.8514415 ,
-        1.19119846,  1.77072825,  1.78695825,  1.29797223,  0.86190995,
-        1.03059155,  0.37313701,  0.06068245,  0.17990862,  0.53832665,
-        0.92917549, -0.34158372,  0.50336419, -0.56674317, -0.78146963,
-       -0.60392483,  0.1546898 , -0.79297925, -0.44715019, -1.34481761])
+        0.        ,  0.        ,  0.        ,  0.        ,  1.75619647,
+        0.79013908, -0.18907538,  0.37073501,  3.26064451,  3.46343408,
+        4.81590373,  3.61533034,  7.17216079,  5.74039321,  6.88492108,
+        8.39823849,  4.83950822,  6.24633793,  6.59277166,  7.37398108,
+        4.0622852 ,  6.79761532,  3.92523387,  5.35051133,  3.33554008,
+        3.49592752,  3.99265077,  3.86218948,  2.28941674,  0.87102499,
+        0.68596261,  2.14108433, -1.45848041,  1.17513643, -1.68684867,
+       -0.62911541, -1.31110582, -2.81393748, -3.72314865, -6.5265656 ,
+       -4.78313035, -4.95744028, -4.33426555, -5.1560899 , -7.34443885,
+       -6.35595647, -6.595414  , -5.68913188, -4.07180417, -7.84983539])
 </pre></div>
 </div>
 </div>
@@ -2181,15 +2181,131 @@ RuntimeError: Failed to activate hardware module &quot;instream_dummy&quot;!
 </section>
 <section id="partial-solution-for-step-1">
 <h3>Partial solution for step 1.<a class="headerlink" href="#partial-solution-for-step-1" title="Link to this heading">¶</a></h3>
+<div class="solution dropdown admonition" id="level1-solution-b">
+
+<p class="admonition-title">Solution to<a class="reference internal" href="#level1"> Exercise 3</a></p>
+<section id="solution-content">
+<p>You can start the scan and wait for completion like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">_scanner</span><span class="p">()</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span><span class="s2">&quot;Start frequency&quot;</span><span class="p">,</span> <span class="n">fstart</span><span class="p">)</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">_scanner</span><span class="p">()</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span><span class="s2">&quot;Stop frequency&quot;</span><span class="p">,</span> <span class="n">fstop</span><span class="p">)</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">_scanner</span><span class="p">()</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span><span class="s2">&quot;Step frequency&quot;</span><span class="p">,</span> <span class="n">fstep</span><span class="p">)</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">_scanner</span><span class="p">()</span><span class="o">.</span><span class="n">get_spectrum</span><span class="p">()</span>
+<span class="c1"># wait for the spectrum to finish</span>
+<span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scanner</span><span class="p">()</span><span class="o">.</span><span class="n">acquisition_running</span><span class="p">:</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</div>
 </section>
 <section id="partial-solution-for-step-2">
 <h3>Partial solution for step 2.<a class="headerlink" href="#partial-solution-for-step-2" title="Link to this heading">¶</a></h3>
+<div class="solution dropdown admonition" id="level1-solution-c">
+
+<p class="admonition-title">Solution to<a class="reference internal" href="#level1"> Exercise 3</a></p>
+<section id="solution-content">
+<p>You can find thecentral frequency and FWHM like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spectrum</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scanner</span><span class="p">()</span><span class="o">.</span><span class="n">spectrum</span>
+<span class="n">frequency</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scanner</span><span class="p">()</span><span class="o">.</span><span class="n">frequency</span>
+<span class="n">bg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">spectrum</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+<span class="n">imaxi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">spectrum</span><span class="p">)</span>
+<span class="n">amplitude</span> <span class="o">=</span> <span class="n">spectrum</span><span class="p">[</span><span class="n">imaxi</span><span class="p">]</span> <span class="o">-</span> <span class="n">bg</span>
+<span class="n">f0</span> <span class="o">=</span> <span class="n">frequency</span><span class="p">[</span><span class="n">imaxi</span><span class="p">]</span>
+<span class="n">istart</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">spectrum</span> <span class="o">-</span> <span class="n">bg</span> <span class="o">&lt;</span> <span class="n">amplitude</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">frequency</span> <span class="o">&lt;</span> <span class="n">f0</span><span class="p">))[</span><span class="mi">0</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">istop</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">spectrum</span> <span class="o">-</span> <span class="n">bg</span> <span class="o">&lt;</span> <span class="n">amplitude</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">frequency</span> <span class="o">&gt;</span> <span class="n">f0</span><span class="p">))[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">fstart</span> <span class="o">=</span> <span class="n">frequency</span><span class="p">[</span><span class="n">istart</span><span class="p">]</span>
+<span class="n">fstop</span> <span class="o">=</span> <span class="n">frequency</span><span class="p">[</span><span class="n">istop</span><span class="p">]</span>
+<span class="n">fwhm</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">fstop</span> <span class="o">-</span> <span class="n">fstart</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</div>
 </section>
 <section id="partial-solution-for-step-3-and-4">
 <h3>Partial solution for step 3 and 4.<a class="headerlink" href="#partial-solution-for-step-3-and-4" title="Link to this heading">¶</a></h3>
+<div class="solution dropdown admonition" id="level1-solution-d">
+
+<p class="admonition-title">Solution to<a class="reference internal" href="#level1"> Exercise 3</a></p>
+<section id="solution-content">
+<p>You can start the scan and wait for completion like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 3. Manually scan the frequencies</span>
+<span class="n">scanned_setpoints</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">f0</span><span class="o">-</span><span class="mi">6</span><span class="o">*</span><span class="n">fwhm</span><span class="p">,</span> <span class="n">f0</span><span class="o">+</span><span class="mi">6</span><span class="o">*</span><span class="n">fwhm</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">fluorescence</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">scanned_setpoints</span><span class="p">)</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">f</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">scanned_setpoints</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_scanner</span><span class="p">()</span><span class="o">.</span><span class="n">idle</span> <span class="o">=</span> <span class="n">f</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+    <span class="n">fluorescence</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process</span><span class="p">()</span><span class="o">.</span><span class="n">get_process_value</span><span class="p">(</span><span class="s2">&quot;APD&quot;</span><span class="p">)</span>
+    <span class="n">imax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">fluorescence</span><span class="p">)</span>
+<span class="c1"># 4. Go there</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">_scanner</span><span class="p">()</span><span class="o">.</span><span class="n">idle</span> <span class="o">=</span> <span class="n">scanned_setpoints</span><span class="p">[</span><span class="n">imax</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+</div>
 </section>
 <section id="complete-solution">
 <h3>Complete solution<a class="headerlink" href="#complete-solution" title="Link to this heading">¶</a></h3>
+<div class="solution dropdown admonition" id="level1-solution-e">
+
+<p class="admonition-title">Solution to<a class="reference internal" href="#level1"> Exercise 3</a></p>
+<section id="solution-content">
+<p>You can start the scan and wait for completion like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">qudi.core.connector</span><span class="w"> </span><span class="kn">import</span> <span class="n">Connector</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qudi.core.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogicBase</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qudi.interface.process_control_interface</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProcessValueInterface</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qudi.logic.scanning_excitation_spectroscopy</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScanningExcitationLogic</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">FrequencyOptimizeLogic</span><span class="p">(</span><span class="n">LogicBase</span><span class="p">):</span>
+    <span class="n">_scanner</span> <span class="o">=</span> <span class="n">Connector</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;scanner_logic&#39;</span><span class="p">,</span> <span class="n">interface</span><span class="o">=</span><span class="n">ScanningExcitationLogic</span><span class="p">)</span>
+    <span class="n">_process</span> <span class="o">=</span> <span class="n">Connector</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;process_hardware&#39;</span><span class="p">,</span> <span class="n">interface</span><span class="o">=</span><span class="n">ProcessValueInterface</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_activate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># do you need something here? -&gt; no!</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_deactivate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># do you need something here? -&gt; no!</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">optimize_frequency</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fstart</span><span class="p">,</span> <span class="n">fstop</span><span class="p">,</span> <span class="n">fstep</span><span class="p">):</span>
+        <span class="c1"># 1. Scan the frequencies</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scanner</span><span class="p">()</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span><span class="s2">&quot;Start frequency&quot;</span><span class="p">,</span> <span class="n">fstart</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scanner</span><span class="p">()</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span><span class="s2">&quot;Stop frequency&quot;</span><span class="p">,</span> <span class="n">fstop</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scanner</span><span class="p">()</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span><span class="s2">&quot;Step frequency&quot;</span><span class="p">,</span> <span class="n">fstep</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scanner</span><span class="p">()</span><span class="o">.</span><span class="n">get_spectrum</span><span class="p">()</span>
+        <span class="c1"># wait for the spectrum to finish</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scanner</span><span class="p">()</span><span class="o">.</span><span class="n">acquisition_running</span><span class="p">:</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+        <span class="c1"># 2. get the data and find the maximum</span>
+        <span class="n">spectrum</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scanner</span><span class="p">()</span><span class="o">.</span><span class="n">spectrum</span>
+        <span class="n">frequency</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scanner</span><span class="p">()</span><span class="o">.</span><span class="n">frequency</span>
+        <span class="n">bg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">spectrum</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+        <span class="n">imaxi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">spectrum</span><span class="p">)</span>
+        <span class="n">amplitude</span> <span class="o">=</span> <span class="n">spectrum</span><span class="p">[</span><span class="n">imaxi</span><span class="p">]</span> <span class="o">-</span> <span class="n">bg</span>
+        <span class="n">f0</span> <span class="o">=</span> <span class="n">frequency</span><span class="p">[</span><span class="n">imaxi</span><span class="p">]</span>
+        <span class="n">istart</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">spectrum</span> <span class="o">-</span> <span class="n">bg</span> <span class="o">&lt;</span> <span class="n">amplitude</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">frequency</span> <span class="o">&lt;</span> <span class="n">f0</span><span class="p">))[</span><span class="mi">0</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">istop</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">spectrum</span> <span class="o">-</span> <span class="n">bg</span> <span class="o">&lt;</span> <span class="n">amplitude</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">frequency</span> <span class="o">&gt;</span> <span class="n">f0</span><span class="p">))[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">fstart</span> <span class="o">=</span> <span class="n">frequency</span><span class="p">[</span><span class="n">istart</span><span class="p">]</span>
+        <span class="n">fstop</span> <span class="o">=</span> <span class="n">frequency</span><span class="p">[</span><span class="n">istop</span><span class="p">]</span>
+        <span class="n">fwhm</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">fstop</span> <span class="o">-</span> <span class="n">fstart</span><span class="p">)</span>
+        <span class="c1"># 3. Manually scan the frequencies</span>
+        <span class="n">scanned_setpoints</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">f0</span><span class="o">-</span><span class="mi">6</span><span class="o">*</span><span class="n">fwhm</span><span class="p">,</span> <span class="n">f0</span><span class="o">+</span><span class="mi">6</span><span class="o">*</span><span class="n">fwhm</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="n">fluorescence</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">scanned_setpoints</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">f</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">scanned_setpoints</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_scanner</span><span class="p">()</span><span class="o">.</span><span class="n">idle</span> <span class="o">=</span> <span class="n">f</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+            <span class="n">fluorescence</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process</span><span class="p">()</span><span class="o">.</span><span class="n">get_process_value</span><span class="p">(</span><span class="s2">&quot;APD&quot;</span><span class="p">)</span>
+        <span class="n">imax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">fluorescence</span><span class="p">)</span>
+        <span class="c1"># 4. Go there</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scanner</span><span class="p">()</span><span class="o">.</span><span class="n">idle</span> <span class="o">=</span> <span class="n">scanned_setpoints</span><span class="p">[</span><span class="n">imax</span><span class="p">]</span>
+
+</pre></div>
+</div>
+</section>
+</div>
 </section>
 </section>
 <section id="level-2-what-data-can-i-find-from-my-neighbor-s-computer">
