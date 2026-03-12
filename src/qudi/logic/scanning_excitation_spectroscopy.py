@@ -398,7 +398,7 @@ class ScanningExcitationLogic(LogicBase):
                     QtWidgets.QApplication.instance().beep()
                 if self.frequency is not None:
                     self.fit_region = (min(self.frequency), max(self.frequency))
-                    self.idle = (min(self.frequency) + max(self.frequency)) / 2
+                    # self.idle = (min(self.frequency) + max(self.frequency)) / 2
                     self.sig_state_updated.emit()
         except:
             self.log.exception("")

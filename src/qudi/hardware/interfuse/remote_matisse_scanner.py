@@ -358,6 +358,7 @@ class RemoteMatisseScanner(ExcitationScannerInterface, SampledFiniteStateInterfa
         have been collected, we go back to preparing a step.
         """
         samples_missing = self._number_of_samples_per_frame * (self._repeat_no+1) - self._data_row_index
+        self._idle_value = self._scan_value
         if samples_missing <= 0:
             self.sampled_frequencies, _ = netobtain(self._wavemeter().read_data())
             self.sampled_frequencies = netobtain(self.sampled_frequencies)
@@ -513,6 +514,8 @@ class RemoteMatisseScanner(ExcitationScannerInterface, SampledFiniteStateInterfa
         elif variable == "Idle value":
             self.log.debug(f"Setting idle value to {value}")
             self._idle_value = value
+        elif variable == "Idle frequency":
+            return self.set_control("Idle value", (value- self._conversion_offset)/self._conversion_factor)
         elif variable == "Idle active":
             self._matisse().set_activity_state("scan value", value)
         elif variable == "Stitch scans":
@@ -575,12 +578,12 @@ class RemoteMatisseScanner(ExcitationScannerInterface, SampledFiniteStateInterfa
         "Get number of repetition of each segment of the scan."
         return self._n_repeat
     def get_idle_value(self) -> float:
-        return self._idle_value * self._conversion_factor + self._conversion_offset
+        return self.get_control("Idle frequency")
     def set_idle_value(self, n):
         tension = (n-self._conversion_offset) / self._conversion_factor
-        if not self.constraints.idle_value_in_range(tension):
+        if not self.constraints.variable_in_range("Idle value", tension):
             tension=0.0
-        self._idle_value = tension
+        self.set_control("Idle value", tension)
     @property
     def data_format(self) -> ExcitationScanDataFormat:
         "Return the data format used in this implementation of the interface."
