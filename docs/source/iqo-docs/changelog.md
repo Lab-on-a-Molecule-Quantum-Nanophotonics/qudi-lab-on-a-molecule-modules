@@ -28,6 +28,7 @@
 
 ### Other
 - Diplaying Qudi logs in the test workflow
+- Updated versions for Github actions to fix Node.js 20 deprecation warnings
 - Fixed testing workflow by removing deprecated `python 3.8`
 - Configured Github Action bot as author for the testing branch commits
 - Workflows automatically fetch all possible python versions from the `pyproject.toml` for testing, tests that only use a singular Python version now use the latest possible Python version
