@@ -10,6 +10,7 @@
 ### New Features
 
 ### Other
+- Displaying Qudi logs in the test workflow upon test failure
 
 ## Version 1.0.0
 
