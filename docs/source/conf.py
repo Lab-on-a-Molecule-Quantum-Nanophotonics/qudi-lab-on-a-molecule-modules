@@ -31,6 +31,8 @@ autodoc2_packages = [
     },
 ]
 
+autodoc2_hidden_objects = ["dunder", "private"]
+
 templates_path = ['_templates']
 exclude_patterns = []
 

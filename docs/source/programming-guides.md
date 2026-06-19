@@ -6,6 +6,6 @@ Writing your own modules is not as hard as it seems. Plus, we added some utiliti
 :maxdepth: 2
 :caption: Contents:
 
-lens-modules/state-machines
-lens-modules/excitation-spectroscopy
+guides/state-machines
+guides/excitation-spectroscopy
 ```

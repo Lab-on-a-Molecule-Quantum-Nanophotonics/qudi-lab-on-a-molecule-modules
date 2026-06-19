@@ -44,6 +44,7 @@ class NIXSeriesAnalogOutput(ProcessControlSwitchMixin, ProcessSetpointInterface)
 
     Example config for copy-paste:
 
+    ```yaml
     nicard_63XX_ao:
         module.Class: 'ni_x_series.ni_x_series_analog_output.NIXSeriesAnalogOutput'
         options:
@@ -61,6 +62,7 @@ class NIXSeriesAnalogOutput(ProcessControlSwitchMixin, ProcessSetpointInterface)
                 ao3:
                     limits: [-10.0, 10.0]
                     keep_value: True
+    ```
     """
     _device_name = ConfigOption(name='device_name',
                                 default='Dev1',

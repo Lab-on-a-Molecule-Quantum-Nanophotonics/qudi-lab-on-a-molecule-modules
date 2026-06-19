@@ -50,6 +50,7 @@ class HighFinesseWavemeter(DataInStreamInterface):
 
     Example config for copy-paste:
 
+    ```yaml
     wavemeter:
         module.Class: 'wavemeter.high_finesse_wavemeter.HighFinesseWavemeter'
         connect:
@@ -64,6 +65,7 @@ class HighFinesseWavemeter(DataInStreamInterface):
                     switch_ch: 2
                     unit: 'Hz'
                     exposure: 10
+    ```
     """
 
     # declare signals

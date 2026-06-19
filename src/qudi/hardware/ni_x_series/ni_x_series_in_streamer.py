@@ -89,6 +89,7 @@ class NIXSeriesInStreamer(DataInStreamInterface):
 
     Example config for copy-paste:
 
+    ```yaml
     nicard_6343_instreamer:
         module.Class: 'ni_x_series.ni_x_series_in_streamer.NIXSeriesInStreamer'
         options:
@@ -103,6 +104,7 @@ class NIXSeriesInStreamer(DataInStreamInterface):
             adc_voltage_range: [-10, 10]  # optional
             max_channel_samples_buffer: 10000000  # optional
             read_write_timeout: 10  # optional
+    ```
 
     """
 
