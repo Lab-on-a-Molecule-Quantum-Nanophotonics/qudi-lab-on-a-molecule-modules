@@ -172,6 +172,54 @@ class ScanningExcitationLogic(LogicBase):
             if self._spectrum[self._scanner().data_format.time_column_number] is None:
                 return None
         return np.copy(self._spectrum[self._scanner().data_format.time_column_number])
+        
+    def get_figure(self):
+        figure, ax1 = plt.subplots()
+        med = np.median(self.frequency)
+        rescale_factor_freq, prefix_freq = self._get_si_scaling(np.max(self.frequency)-med)
+        rescale_factor, prefix = self._get_si_scaling(np.max(self.spectrum))
+
+        n_step = np.unique(self.step_number)
+        for i in n_step:
+            roi = self.step_number == i
+            freq = (self.frequency[roi] - med) / rescale_factor_freq
+            count = self.spectrum[roi] / rescale_factor
+            ax1.plot(freq,
+                     count,
+                     linestyle=':',
+                     linewidth=0.5,
+                     )
+
+        fit_displayed = self.fit_method != 'No Fit' and self.fit_results is not None
+        if fit_displayed:
+            frequency = (self.fit_results.high_res_best_fit[0]-med) / rescale_factor_freq
+
+            ax1.plot(frequency,
+                     self.fit_results.high_res_best_fit[1] / rescale_factor,
+                     linestyle=':',
+                     linewidth=0.5,
+                     label="Fit",
+                     )
+            # these are matplotlib.patch.Patch properties
+            props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+            textstr = f"fit method: {self.fit_method}\nfit results:\n"
+            for (name,param) in self.fit_results.params.items():
+                try:
+                    if np.isfinite(param.stderr):
+                        textstr += f"  - {name} = {ufloat(param.value, param.stderr)}\n"
+                    else:
+                        textstr += f"  - {name} = {param.value}\n"
+                except e:
+                    self.log.error(f"Failed to evaluate stderr for the fit parameter {name}")
+            textstr += f"fit region: {self.fit_region}"
+            # place a text box in upper left in axes coords
+            ax1.text(0.05, 0.95, textstr, transform=ax1.transAxes, fontsize=14,
+        verticalalignment='top', bbox=props)
+
+        ax1.set_xlabel(f"Frequency ({prefix_freq}Hz)")
+        ax1.set_ylabel('Intensity ({} count)'.format(prefix))
+        figure.tight_layout()
+        return figure
 
     def save_spectrum_data(self, name_tag='', root_dir=None, parameter=None):
         """ Saves the current spectrum data to a file.
@@ -207,10 +255,6 @@ class ScanningExcitationLogic(LogicBase):
         if self.frequency is None or self.spectrum is None or self.step_number is None:
             self.log.error('No data to save.')
             return
-
-        med = np.median(self.frequency)
-        rescale_factor_freq, prefix_freq = self._get_si_scaling(np.max(self.frequency)-med)
-
         data = []
         header = []
         for (colname, colunit, col) in zip(self._scanner().data_format.data_column_names, self._scanner().data_format.data_column_unit, self._spectrum):
@@ -232,49 +276,7 @@ class ScanningExcitationLogic(LogicBase):
                                        notes=self._notes,
                                        column_dtypes=[float] * len(header))
 
-        # save the figure into a file
-        figure, ax1 = plt.subplots()
-        rescale_factor, prefix = self._get_si_scaling(np.max(data[self.display_channel_column_number]))
-
-        n_step = np.unique(self.step_number)
-        for i in n_step:
-            roi = self.step_number == i
-            freq = (self.frequency[roi] - med) / rescale_factor_freq
-            count = self.spectrum[roi] / rescale_factor
-            ax1.plot(freq,
-                     count,
-                     linestyle=':',
-                     linewidth=0.5,
-                     )
-
-        fit_displayed = self.fit_method != 'No Fit' and self.fit_results is not None
-        if fit_displayed:
-            frequency = (self.fit_results.high_res_best_fit[0]-med) / rescale_factor_freq
-
-            ax1.plot(frequency,
-                     self.fit_results.high_res_best_fit[1] / rescale_factor,
-                     linestyle=':',
-                     linewidth=0.5,
-                     label="Fit",
-                     )
-            # these are matplotlib.patch.Patch properties
-            props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
-            textstr = f"fit method: {self.fit_method}\nfit results:\n"
-            for (name,param) in self.fit_results.params.items():
-                if np.isfinite(param.stderr):
-                    textstr += f"  - {name} = {ufloat(param.value, param.stderr)}\n"
-                else:
-                    textstr += f"  - {name} = {param.value}\n"
-            textstr += f"fit region: {self.fit_region}"
-            # place a text box in upper left in axes coords
-            ax1.text(0.05, 0.95, textstr, transform=ax1.transAxes, fontsize=14,
-        verticalalignment='top', bbox=props)
-
-        ax1.set_xlabel(f"Frequency ({prefix_freq}Hz)")
-        ax1.set_ylabel('Intensity ({} count)'.format(prefix))
-        figure.tight_layout()
-
-        ds.save_thumbnail(figure, file_path=file_path.rsplit('.', 1)[0])
+        ds.save_thumbnail(self.get_figure(), file_path=file_path.rsplit('.', 1)[0])
 
         self.log.debug(f'Spectrum saved to:{file_path}')
         return file_path
