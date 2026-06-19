@@ -112,7 +112,7 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface, Samp
             variables.append(ExcitationScanControlVariable("External setpoint repeat per step", (1, 100), int, ""))
             variables.append(ExcitationScanControlVariable("External setpoint sleep to stabilize", (0, 3000), int, "s"))
         self._constraints = ExcitationScannerConstraints(
-            exposure_limits=(1e-4,1),
+            exposure_limits=(1e-4,1000),
             repeat_limits=(1,10000),
             idle_value_limits=(self._minimum_tension*self._conversion_factor, self._maximum_tension*self._conversion_factor),
             control_variables_list=variables)
@@ -151,19 +151,19 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface, Samp
         n = self._number_of_samples_per_frame
         self.log.debug(f"Preparing scan from {self._scan_mini} to {self._scan_maxi} with {n} points.")
         ncols = 4
-        if self._external_enabled and self._ext_setpoint() is not None:
+        if self._ext_setpoint() is not None:
             ncols += 1
-        if self._external_enabled and self._ext_process() is not None:
+        if self._ext_process() is not None:
             ncols += 1
         with self._data_lock:
             self._scan_data = np.zeros((n*self._n_repeat, ncols))
             self._scan_data[:,self.frequency_column_number] = np.tile(np.linspace(start=self._scan_mini, stop=self._scan_maxi, num=n), self._n_repeat)*self._conversion_factor
             self._scan_data[:,self.step_number_column_number] = np.repeat(range(self._n_repeat), n)
         self._setpoint_no = 0
-        if self._external_enabled and self._ext_setpoint() is not None:
+        if self._ext_setpoint() is not None:
             self._setpoints = np.linspace(start=self._setpoint_first, stop=self._setpoint_last, num = self._n_repeat // self._repeat_per_setpoint)
             self._ext_setpoint().set_activity_state(self._setpoint_channel, True)
-        if self._external_enabled and self._ext_process() is not None:
+        if self._ext_process() is not None:
             self._ext_process().set_activity_state(self._process_channel, True)
         self._repeat_no = 0
         self._data_row_index = 0
@@ -210,7 +210,7 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface, Samp
         if time.perf_counter() - self._waiting_start > self._sleep_duration:
             self.log.debug("Ready.")
             self._ao().set_activity_state(self._output_channel, False)
-            if self._external_enabled and self._ext_process() is not None:
+            if self._ext_process() is not None:
                 self._process_begin = self._ext_process().get_process_value(self._process_channel)
             self._finite_sampling_io().start_buffered_frame()
             self._step_start_time = time.perf_counter()
@@ -226,12 +226,12 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface, Samp
             n = self._number_of_samples_per_frame
             offset = n * self._repeat_no
             ncols = 4
-            if self._external_enabled and self._ext_setpoint() is not None:
+            if self._ext_setpoint() is not None:
                 ncols += 1
                 self._scan_data[offset:(offset+n),4] = self._ext_setpoint().get_setpoint(self._setpoint_channel)
                 if self._repeat_no % self._repeat_per_setpoint == self._repeat_per_setpoint-1:
                     self._setpoint_no = min(len(self._setpoints)-1, self._setpoint_no+1)
-            if self._external_enabled and self._ext_process() is not None:
+            if self._ext_process() is not None:
                 ncols += 1
                 self._process_end = self._ext_process().get_process_value(self._process_channel)
                 self._scan_data[offset:(offset+n),ncols-1] = np.linspace(start=self._process_begin, stop=self._process_end, num=n)
@@ -402,11 +402,11 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface, Samp
         data_column_number = [1]
         data_column_unit=["Hz", units[self._input_channel], "", "s"]
         data_column_names=["Frequency", self._input_channel, "Step number", "Time"] 
-        if self._external_enabled and self._ext_setpoint() is not None:
+        if self._ext_setpoint() is not None:
             data_column_number.append(max(data_column_number)+1)
             data_column_unit.append(self._ext_setpoint().constraints.channel_units[self._setpoint_channel])
             data_column_names.append(self._setpoint_channel)
-        if self._external_enabled and self._ext_process() is not None:
+        if self._ext_process() is not None:
             data_column_number.append(max(data_column_number)+1)
             data_column_unit.append(self._ext_process().constraints.channel_units[self._process_channel])
             data_column_names.append(self._process_channel)
