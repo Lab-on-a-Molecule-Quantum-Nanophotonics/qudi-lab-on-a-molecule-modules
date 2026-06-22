@@ -122,7 +122,7 @@ class TimeSeriesGuiMainWindow(QtWidgets.QMainWindow):
         )
         icon = QtGui.QIcon(os.path.join(icons_dir, 'media-playback-pause'))
         icon.addFile(os.path.join(icons_dir, 'media-playback-start'), state=QtGui.QIcon.On)
-        self.freeze_y_axis_action = QtWidgets.QAction(icon, 'Freeze y axis', self)
+        self.freeze_y_axis_action = QtGui.QAction(icon, 'Freeze y axis', self)
         self.freeze_y_axis_action.setCheckable(True)
         self.freeze_y_axis_action.setToolTip(
             'Freeze y axis range to current value.'

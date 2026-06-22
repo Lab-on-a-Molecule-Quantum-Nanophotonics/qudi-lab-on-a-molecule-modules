@@ -1,6 +1,6 @@
 from typing import Iterable, Union, Tuple, Callable
 import time
-from PySide2 import QtCore
+from PySide6 import QtCore
 from qudi.util.mutex import Mutex
 from fysom import Fysom, FysomError
 

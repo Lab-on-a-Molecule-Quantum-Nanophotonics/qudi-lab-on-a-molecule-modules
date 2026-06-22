@@ -1,5 +1,5 @@
-from PySide2 import QtCore
-from PySide2.QtCore import QThread, QMutex, QWaitCondition
+from PySide6 import QtCore
+from PySide6.QtCore import QThread, QMutex, QWaitCondition
 import time
 from datetime import datetime
 import numpy as np

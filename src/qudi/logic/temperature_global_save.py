@@ -1,4 +1,4 @@
-from PySide2 import QtCore
+from PySide6 import QtCore
 import time
 from datetime import datetime
 from qudi.core.connector import Connector

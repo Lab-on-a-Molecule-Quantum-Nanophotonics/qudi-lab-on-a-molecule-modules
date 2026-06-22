@@ -18,7 +18,7 @@ __all__ = ['SpectrometerGui']
 
 import numpy as np
 from time import perf_counter
-from PySide2 import QtCore
+from PySide6 import QtCore
 
 from qudi.core.module import GuiBase
 from qudi.core.connector import Connector

@@ -4,7 +4,7 @@ import struct
 import time
 from typing import Union, Optional, Tuple, Sequence
 
-from PySide2 import QtCore
+from PySide6 import QtCore
 
 import numpy as np
 

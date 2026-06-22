@@ -2,7 +2,7 @@ import time
 from dataclasses import dataclass
 from typing import Union
 
-from PySide2 import QtCore
+from PySide6 import QtCore
 from fysom import Fysom
 import numpy as np
 

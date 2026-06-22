@@ -1,4 +1,4 @@
-from PySide2.QtCore import QThread, QMutex, QWaitCondition
+from PySide6.QtCore import QThread, QMutex, QWaitCondition
 import numpy as np
 import time
 from qudi.core.connector import Connector

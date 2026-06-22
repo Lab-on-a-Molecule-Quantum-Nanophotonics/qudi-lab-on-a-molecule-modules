@@ -1,5 +1,5 @@
 from qudi.core.scripting.moduletask import ModuleTask
-from PySide2 import QtCore
+from PySide6 import QtCore
 import numpy as np
 from qudi.core.connector import Connector
 

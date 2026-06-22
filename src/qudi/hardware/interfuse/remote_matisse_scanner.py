@@ -9,7 +9,7 @@ from qudi.interface.excitation_scanner_interface import ExcitationScannerInterfa
 from qudi.interface.sampled_finite_state_interface import SampledFiniteStateInterface, transition_to, transition_from, state
 from qudi.util.network import netobtain
 
-from PySide2 import QtCore
+from PySide6 import QtCore
 from fysom import Fysom
 import numpy as np
 from numpy.polynomial import polynomial

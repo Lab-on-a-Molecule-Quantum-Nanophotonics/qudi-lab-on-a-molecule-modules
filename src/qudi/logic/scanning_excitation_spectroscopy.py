@@ -1,5 +1,5 @@
-from PySide2 import QtCore
-from PySide2 import QtWidgets
+from PySide6 import QtCore
+from PySide6 import QtWidgets
 from typing import Iterable, Union, Tuple, Type, Optional
 import numpy as np
 import numpy.typing as npt
