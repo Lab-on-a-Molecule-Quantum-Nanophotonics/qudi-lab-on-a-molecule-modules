@@ -30,7 +30,6 @@ from PySide6 import QtCore
 import numpy as np
 
 from qudi.util.network import netobtain
-
 from qudi.core.module import LogicBase
 from qudi.util.mutex import RecursiveMutex
 from qudi.util.datastorage import DataStorageBase

@@ -218,6 +218,13 @@ class ScannerGui(GuiBase):
             self._optimize_logic().toggle_optimize, QtCore.Qt.ConnectionType.QueuedConnection
         )
         self._mw.action_optimize_position.triggered[bool].connect(self.toggle_optimize, QtCore.Qt.ConnectionType.QueuedConnection)
+        self._optimize_logic().sigOptimizeSequenceDimensionsChanged.connect(
+            self._init_optimizer_dockwidget, QtCore.Qt.ConnectionType.QueuedConnection
+        )
+        self._optimize_logic().sigOptimizeSequenceDimensionsChanged.connect(
+            self.update_optimizer_settings_from_logic, QtCore.Qt.ConnectionType.QueuedConnection
+        )
+        self._mw.action_optimize_position.triggered[bool].connect(self.toggle_optimize, QtCore.Qt.ConnectionType.QueuedConnection)
         self._mw.action_restore_default_view.triggered.connect(self.restore_default_view)
         self._mw.action_save_all_scans.triggered.connect(lambda x: self.save_scan_data(scan_axes=None))
         self.sigSaveScan.connect(self._data_logic().save_scan_by_axis, QtCore.Qt.ConnectionType.QueuedConnection)
@@ -225,56 +232,52 @@ class ScannerGui(GuiBase):
         self._data_logic().sigSaveStateChanged.connect(self._track_save_status)
 
         self._mw.action_utility_zoom.toggled.connect(self.toggle_cursor_zoom)
-        self._mw.action_utility_full_range.triggered.connect(
-            self.set_full_range, QtCore.Qt.ConnectionType.QueuedConnection
-        )
-        self._mw.action_history_forward.triggered.connect(
-            self._data_logic().history_next, QtCore.Qt.ConnectionType.QueuedConnection
-        )
-        self._mw.action_history_back.triggered.connect(
-            self._data_logic().history_previous, QtCore.Qt.ConnectionType.QueuedConnection
-        )
+        self._mw.action_utility_full_range.triggered.connect(self.set_full_range, QtCore.Qt.ConnectionType.QueuedConnection)
+        self._mw.action_history_forward.triggered.connect(self._data_logic().history_next, QtCore.Qt.ConnectionType.QueuedConnection)
+        self._mw.action_history_back.triggered.connect(self._data_logic().history_previous, QtCore.Qt.ConnectionType.QueuedConnection)
 
-        self._scanning_logic().sigScannerTargetChanged.connect(
-            self.scanner_target_updated, QtCore.Qt.ConnectionType.QueuedConnection
+        self._scanning_logic().sigScannerTargetChanged.connect(self.scanner_target_updated, QtCore.Qt.ConnectionType.QueuedConnection)
+        self._scanning_logic().sigScanSettingsChanged.connect(
+            self.update_scanner_settings_from_logic, QtCore.Qt.ConnectionType.QueuedConnection
         )
-        self._scanning_logic().sigScanStateChanged.connect(
-            self.scan_state_updated, QtCore.Qt.ConnectionType.QueuedConnection
-        )
-        self._data_logic().sigHistoryScanDataRestored.connect(
-            self._update_from_history, QtCore.Qt.ConnectionType.QueuedConnection
-        )
-        self._optimize_logic().sigOptimizeStateChanged.connect(
-            self.optimize_state_updated, QtCore.Qt.ConnectionType.QueuedConnection
-        )
-        self._scanning_logic().sigScanStateChanged.connect(self.scan_state_updated, QtCore.Qt.QueuedConnection)
-        self._data_logic().sigHistoryScanDataRestored.connect(self._update_from_history, QtCore.Qt.QueuedConnection)
-        self._optimize_logic().sigOptimizeStateChanged.connect(self.optimize_state_updated, QtCore.Qt.QueuedConnection)
+        self._scanning_logic().sigScanStateChanged.connect(self.scan_state_updated, QtCore.Qt.ConnectionType.QueuedConnection)
+        self._data_logic().sigHistoryScanDataRestored.connect(self._update_from_history, QtCore.Qt.ConnectionType.QueuedConnection)
+        self._optimize_logic().sigOptimizeStateChanged.connect(self.optimize_state_updated, QtCore.Qt.ConnectionType.QueuedConnection)
         self.sigOptimizerSettingsChanged.connect(
             self._optimize_logic().set_optimize_settings, QtCore.Qt.ConnectionType.QueuedConnection)
 
         self.sigShowSaveDialog.connect(
-            lambda x: self._save_dialog.show() if x else self._save_dialog.hide(), QtCore.Qt.DirectConnection
+            lambda x: self._save_dialog.show() if x else self._save_dialog.hide(), QtCore.Qt.ConnectionType.DirectConnection
         )
 
         # tilt correction signals
         tilt_widget = self.tilt_correction_dockwidget
-        tilt_widget.tilt_set_01_pushButton.clicked.connect(lambda: self.tilt_corr_set_support_vector(0),
-                                                                       QtCore.Qt.ConnectionType.QueuedConnection)
-        tilt_widget.tilt_set_02_pushButton.clicked.connect(lambda: self.tilt_corr_set_support_vector(1),
-                                                                       QtCore.Qt.ConnectionType.QueuedConnection)
-        tilt_widget.tilt_set_03_pushButton.clicked.connect(lambda: self.tilt_corr_set_support_vector(2),
-                                                                       QtCore.Qt.ConnectionType.QueuedConnection)
-        tilt_widget.tilt_set_04_pushButton.clicked.connect(lambda: self.tilt_corr_set_support_vector(3),
-                                                                       QtCore.Qt.ConnectionType.QueuedConnection)
-        tilt_widget.auto_origin_switch.toggle_switch.sigStateChanged.connect(self.apply_tilt_corr_support_vectors,
-                                                                       QtCore.Qt.ConnectionType.QueuedConnection)
-        self._mw.action_toggle_tilt_correction.triggered.connect(self.toggle_tilt_correction,
-                                                                QtCore.Qt.ConnectionType.QueuedConnection)
-        [box.valueChanged.connect(self.apply_tilt_corr_support_vectors, QtCore.Qt.ConnectionType.QueuedConnection)
-                                  for box_row in tilt_widget.support_vecs_box for box in box_row]
+        tilt_widget.tilt_set_01_pushButton.clicked.connect(
+            lambda: self.tilt_corr_set_support_vector(0), QtCore.Qt.ConnectionType.QueuedConnection
+        )
+        tilt_widget.tilt_set_02_pushButton.clicked.connect(
+            lambda: self.tilt_corr_set_support_vector(1), QtCore.Qt.ConnectionType.QueuedConnection
+        )
+        tilt_widget.tilt_set_03_pushButton.clicked.connect(
+            lambda: self.tilt_corr_set_support_vector(2), QtCore.Qt.ConnectionType.QueuedConnection
+        )
+        tilt_widget.tilt_set_04_pushButton.clicked.connect(
+            lambda: self.tilt_corr_set_support_vector(3), QtCore.Qt.ConnectionType.QueuedConnection
+        )
+        tilt_widget.auto_origin_switch.toggle_switch.sigStateChanged.connect(
+            self.apply_tilt_corr_support_vectors, QtCore.Qt.ConnectionType.QueuedConnection
+        )
+        self._mw.action_toggle_tilt_correction.triggered.connect(
+            self.toggle_tilt_correction, QtCore.Qt.ConnectionType.QueuedConnection
+        )
+        [
+            box.valueChanged.connect(self.apply_tilt_corr_support_vectors, QtCore.Qt.ConnectionType.QueuedConnection)
+            for box_row in tilt_widget.support_vecs_box
+            for box in box_row
+        ]
         self._scanning_logic().sigTiltCorrSettingsChanged.connect(
-            self.tilt_corr_support_vector_updated, QtCore.Qt.ConnectionType.QueuedConnection)
+            self.tilt_corr_support_vector_updated, QtCore.Qt.ConnectionType.QueuedConnection
+        )
 
         # Initialize dockwidgets to default view
         self.restore_default_view()

@@ -28,6 +28,7 @@ from qudi.util.mutex import RecursiveMutex
 from qudi.core.connector import Connector
 from qudi.core.configoption import ConfigOption
 from qudi.core.module import LogicBase
+from qudi.util.network import netobtain
 from qudi.interface.simple_laser_interface import ControlMode, ShutterState, LaserState, SimpleLaserInterface
 from qudi.util.network import netobtain
 

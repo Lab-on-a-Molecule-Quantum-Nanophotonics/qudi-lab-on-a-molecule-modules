@@ -289,6 +289,6 @@ class QDPlotDockWidget(AdvancedDockWidget):
         super().__init__(*args, **kwargs)
         self.setWindowTitle(f'Plot {plot_number:d}')
         self.setFeatures(self.DockWidgetFeature.DockWidgetFloatable | self.DockWidgetFeature.DockWidgetMovable)
-        widget = QDPlotWidget(fit_container=fit_container)
+        widget = QDPlotWidget(fit_container=fit_container, show_fit=show_fit)
         self.setWidget(widget)
 

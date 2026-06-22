@@ -34,8 +34,6 @@ from qudi.util.yaml import yaml_load
 from qudi.core.qudikernel import QudiKernelClient
 
 
-
-
 CONFIG = os.path.join(os.getcwd(),'tests/test.cfg')
 
 
