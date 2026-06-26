@@ -151,7 +151,7 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface, Samp
         n = self._number_of_samples_per_frame
         self.log.debug(f"Preparing scan from {self._scan_mini} to {self._scan_maxi} with {n} points.")
         ncols = 4
-        if self._ext_setpoint() is not None:
+        if self._ext_setpoint() is not None and self._external_enabled:
             ncols += 1
         if self._ext_process() is not None:
             ncols += 1
@@ -160,7 +160,7 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface, Samp
             self._scan_data[:,self.frequency_column_number] = np.tile(np.linspace(start=self._scan_mini, stop=self._scan_maxi, num=n), self._n_repeat)*self._conversion_factor
             self._scan_data[:,self.step_number_column_number] = np.repeat(range(self._n_repeat), n)
         self._setpoint_no = 0
-        if self._ext_setpoint() is not None:
+        if self._ext_setpoint() is not None and self._external_enabled:
             self._setpoints = np.linspace(start=self._setpoint_first, stop=self._setpoint_last, num = self._n_repeat // self._repeat_per_setpoint)
             self._ext_setpoint().set_activity_state(self._setpoint_channel, True)
         if self._ext_process() is not None:
@@ -226,7 +226,7 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface, Samp
             n = self._number_of_samples_per_frame
             offset = n * self._repeat_no
             ncols = 4
-            if self._ext_setpoint() is not None:
+            if self._ext_setpoint() is not None and self._external_enabled:
                 ncols += 1
                 self._scan_data[offset:(offset+n),4] = self._ext_setpoint().get_setpoint(self._setpoint_channel)
                 if self._repeat_no % self._repeat_per_setpoint == self._repeat_per_setpoint-1:
@@ -402,7 +402,7 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface, Samp
         data_column_number = [1]
         data_column_unit=["Hz", units[self._input_channel], "", "s"]
         data_column_names=["Frequency", self._input_channel, "Step number", "Time"] 
-        if self._ext_setpoint() is not None:
+        if self._ext_setpoint() is not None and self._external_enabled:
             data_column_number.append(max(data_column_number)+1)
             data_column_unit.append(self._ext_setpoint().constraints.channel_units[self._setpoint_channel])
             data_column_names.append(self._setpoint_channel)

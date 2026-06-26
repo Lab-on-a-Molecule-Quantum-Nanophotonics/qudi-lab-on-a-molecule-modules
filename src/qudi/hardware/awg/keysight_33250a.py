@@ -3,15 +3,23 @@ try:
 except ImportError:
     import visa
 
+
 from qudi.core.configoption import ConfigOption
 from qudi.core.statusvariable import StatusVar
 from qudi.interface.process_control_interface import ProcessSetpointInterface, ProcessControlConstraints
 
 class Keysight33250A(ProcessSetpointInterface):
-    _visa_address = ConfigOption(name='awg_visa_address',
-                                 default='TCPIP0::localhost::hislip0::INSTR',
+    _visa_address = ConfigOption(name='visa_address',
+                                 default='ASLR6::INSTR',
                                  missing='warn')
+    _baud_rate = ConfigOption(name='baud_rate',
+                                 default=57600
+                             )
+    _data_bits = ConfigOption(name='data_bits',
+                                 default=8
+                             )
     _awg_timeout = ConfigOption(name='awg_timeout', default=20, missing='warn')
+    _rmparam = ConfigOption(name='rm_param', default="@py")
     _last_value = StatusVar(name="last_value", default=0.0)
     _active = StatusVar(name="active", default=True)
     def __init__(self, *args, **kwargs):
@@ -23,9 +31,11 @@ class Keysight33250A(ProcessSetpointInterface):
         self._debug_check_all_commands = False       # # For development purpose, might slow down
         self.awg = None
     def on_activate(self):
-        self._rm = visa.ResourceManager()
+        self._rm = visa.ResourceManager(self._rmparam)
+        available = self._rm.list_resources()
+        self.log.debug(f"Available resources: {available}")
         try:
-            self.awg = self._rm.open_resource(self._visa_address)
+            self.awg = self._rm.open_resource(self._visa_address, baud_rate=self._baud_rate, data_bits=self._data_bits)
             # set timeout by default to 30 sec
             self.awg.timeout = self._awg_timeout * 1000
         except:
@@ -46,7 +56,7 @@ class Keysight33250A(ProcessSetpointInterface):
                           'successfully.'.format(self._MODEL, self._BRAND,
                                                  self._SERIALNUMBER,
                                                  self._FIRMWARE_VERSION))
-            self.write("DISP:TEXT 'Hello Qudi'")
+            self.write("DISP:TEXT 'Hello, Qudi'")
             self.set_setpoint("output", self._last_value)
             self.set_activity_state("output", self._active)
 
@@ -60,14 +70,14 @@ class Keysight33250A(ProcessSetpointInterface):
     def set_setpoint(self, channel, value):
         self.write(f"APPL:DC DEF, DEF, {value}")
         self._last_value = value
-    def get_setpoint(self):
-        val = float(self.query("VOLT:OFF?"))
+    def get_setpoint(self, channel):
+        val = float(self.query("VOLT:OFFS?"))
         self._last_value = val
         return val
     @property
     def constraints(self):
-        mini = float(self.query("VOLT:OFF? MIN"))
-        maxi = float(self.query("VOLT:OFF? MAX"))
+        mini = float(self.query("VOLT:OFFS? MIN"))
+        maxi = float(self.query("VOLT:OFFS? MAX"))
         constraints = ProcessControlConstraints(
             setpoint_channels=("output",),
             units={"output":"V"},
