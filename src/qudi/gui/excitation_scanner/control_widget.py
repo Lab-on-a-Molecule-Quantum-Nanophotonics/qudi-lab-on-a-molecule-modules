@@ -88,8 +88,8 @@ class ScanningExcitationControlWidget(QtWidgets.QWidget):
         common_controls_layout.addRow("Scanner status", self.status_label)
         main_layout.addLayout(common_controls_layout, 3, 0, 1, 2)
 
-        self._variables_layout = QtWidgets.QFormLayout()
-        main_layout.addLayout(self._variables_layout, 0, 2, 4, 1)
+        self._variables_toolbox = QtWidgets.QToolBox()
+        main_layout.addWidget(self._variables_toolbox, 0, 2, 4, 1)
         self._variables_widgets = {}
 
         #spacer = QtWidgets.QSpacerItem(1, 1, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
@@ -104,29 +104,37 @@ class ScanningExcitationControlWidget(QtWidgets.QWidget):
                                            QtWidgets.QSizePolicy.Minimum)
         main_layout.addWidget(notes_group_box, 0, 3, 4, 1)
 
-    def create_variable_widgets(self, variables_dict):
+    def create_variable_widgets(self, variables_dict, groups):
         for widget in self._variables_widgets.values():
-            self._variables_layout.removeRow(0)
             getattr(widget, _signal_mapping[type(widget)]).disconnect()
+        number_of_items = self._variables_toolbox.count()
+        for _ in range(number_of_items):
+            self._variables_toolbox.removeItem(0)
         self._variables_widgets = {}
-        for variable in variables_dict.values():
-            name = variable.name
-            limits = variable.limits
-            t = variable.type
-            unit = variable.unit
-            value = variable.value
-            widget = _widget_mapping[t]()
-            if t==bool:
-                widget.setChecked(value)
-            else:
-                widget.setValue(value)
-            getattr(widget, _signal_mapping[type(widget)]).connect(lambda v,name=name:self.sig_variable_set.emit(name, v))
-            if t != bool:
-                widget.setSuffix(unit)
-                widget.setMinimum(limits[0])
-                widget.setMaximum(limits[1])
-            self._variables_layout.addRow(name, widget)
-            self._variables_widgets[name] = widget
+        for group_title,group in groups.items():
+            container = QtWidgets.QWidget()
+            layout = QtWidgets.QFormLayout()
+            for variable_name in group:
+                variable = variables_dict[variable_name]
+                name = variable.name
+                limits = variable.limits
+                t = variable.type
+                unit = variable.unit
+                value = variable.value
+                widget = _widget_mapping[t]()
+                if t==bool:
+                    widget.setChecked(value)
+                else:
+                    widget.setValue(value)
+                getattr(widget, _signal_mapping[type(widget)]).connect(lambda v,name=name:self.sig_variable_set.emit(name, v))
+                if t != bool:
+                    widget.setSuffix(unit)
+                    widget.setMinimum(limits[0])
+                    widget.setMaximum(limits[1])
+                layout.addRow(name, widget)
+                self._variables_widgets[name] = widget
+            container.setLayout(layout)
+            self._variables_toolbox.addItem(container, group_title)
 
     def update_variable_widgets(self, variables_dict):
         for variable in variables_dict.values():

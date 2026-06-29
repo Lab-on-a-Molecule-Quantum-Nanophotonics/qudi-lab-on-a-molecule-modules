@@ -304,8 +304,9 @@ class ScanningExcitationGui(GuiBase):
         self._mw.control_widget.repetitions_spinbox.blockSignals(False)
         self._mw.control_widget.progress_bar.setRange(0, round(100 * exposure_time * repetitions))
         variables = self._excitation_logic().variables
+        groups = self._excitation_logic().suggested_control_groups
         self.log.debug(f"Creating variables {variables}")
-        self._mw.control_widget.create_variable_widgets(variables)
+        self._mw.control_widget.create_variable_widgets(variables, groups)
 
     def target_changed(self):
         mini,maxi = self._excitation_logic().idle_value_limits

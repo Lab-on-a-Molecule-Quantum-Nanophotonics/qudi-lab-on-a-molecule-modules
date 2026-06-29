@@ -1,6 +1,7 @@
 from PySide6 import QtCore
 from PySide6 import QtWidgets
 from typing import Iterable, Union, Tuple, Type, Optional
+from collections import OrderedDict
 import numpy as np
 import numpy.typing as npt
 import matplotlib.pyplot as plt
@@ -357,6 +358,12 @@ class ScanningExcitationLogic(LogicBase):
     def variables(self)->dict:
         """Get the current fictionary of control variables."""
         return self._scanner().control_dict
+    @property 
+    def suggested_control_groups(self) -> OrderedDict[str, Iterable[str]]:
+        """
+        Get suggested groups of control variables for the UI. 
+        """
+        return self._scanner().suggested_control_groups
     def set_variable(self, name:str, value):
         """Set the `value` of control variable `name`."""
         self._scanner().set_control(name, value)
