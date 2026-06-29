@@ -59,6 +59,14 @@ class Keysight33250A(ProcessSetpointInterface):
             self.write("DISP:TEXT 'Hello, Qudi'")
             self.set_setpoint("output", self._last_value)
             self.set_activity_state("output", self._active)
+        mini = float(self.query("VOLT:OFFS? MIN"))
+        maxi = float(self.query("VOLT:OFFS? MAX"))
+        self._constraints = ProcessControlConstraints(
+            setpoint_channels=("output",),
+            units={"output":"V"},
+            limits={"output":(mini, maxi)},
+            dtypes={"output":float}
+        )
 
         
     def on_deactivate(self):
@@ -71,20 +79,12 @@ class Keysight33250A(ProcessSetpointInterface):
         self.write(f"APPL:DC DEF, DEF, {value}")
         self._last_value = value
     def get_setpoint(self, channel):
-        val = float(self.query("VOLT:OFFS?"))
-        self._last_value = val
-        return val
+        # val = float(self.query("VOLT:OFFS?"))
+        # self._last_value = val
+        return self._last_value
     @property
     def constraints(self):
-        mini = float(self.query("VOLT:OFFS? MIN"))
-        maxi = float(self.query("VOLT:OFFS? MAX"))
-        constraints = ProcessControlConstraints(
-            setpoint_channels=("output",),
-            units={"output":"V"},
-            limits={"output":(mini, maxi)},
-            dtypes={"output":float}
-        )
-        return constraints
+        return self._constraints
     def set_activity_state(self, channel, active):
         if active:
             self.write("OUTP ON")
@@ -93,9 +93,9 @@ class Keysight33250A(ProcessSetpointInterface):
         self._active = active
 
     def get_activity_state(self, channel):
-        res = self.query("OUTP?") == 1
-        self._active = res
-        return res
+        # res = self.query("OUTP?") == 1
+        # self._active = res
+        return self._active
 
     def check_dev_error(self):
         has_error_occured = False
@@ -117,6 +117,7 @@ class Keysight33250A(ProcessSetpointInterface):
 
         @return string: the answer of the device to the 'question' in a string
         """
+        self.log.debug(f"Querying {question}")
         ret = self.awg.query(question).strip().strip('"')
         if self._debug_check_all_commands and not force_no_check:
             if 0 != self.check_dev_error():
@@ -131,6 +132,7 @@ class Keysight33250A(ProcessSetpointInterface):
 
             @return int: error code (0:OK, -1:error)
         """
+        self.log.debug(f"Writing {command}")
         bytes_written = self.awg.write(command)
 
         if self._debug_check_all_commands:
