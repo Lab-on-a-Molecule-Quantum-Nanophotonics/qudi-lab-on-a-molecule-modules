@@ -79,8 +79,6 @@ class Keysight33250A(ProcessSetpointInterface):
         self.write(f"APPL:DC DEF, DEF, {value}")
         self._last_value = value
     def get_setpoint(self, channel):
-        # val = float(self.query("VOLT:OFFS?"))
-        # self._last_value = val
         return self._last_value
     @property
     def constraints(self):
@@ -93,8 +91,6 @@ class Keysight33250A(ProcessSetpointInterface):
         self._active = active
 
     def get_activity_state(self, channel):
-        # res = self.query("OUTP?") == 1
-        # self._active = res
         return self._active
 
     def check_dev_error(self):
