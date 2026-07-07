@@ -314,6 +314,7 @@ class FiniteSamplingScanningExcitationInterfuse(
         we initialize the instruments, and move the scanner to its first position.
         """
         if self._repeat_no >= self._n_repeat:
+            self._idle_value = self._saved_idle_value
             self.watchdog_event("end")
             self.log.info("Scan done.")
         else:
@@ -334,6 +335,7 @@ class FiniteSamplingScanningExcitationInterfuse(
                     self._setpoint_channel, self._setpoints[self._setpoint_no]
                 )
                 self._sleep_duration = self._sleep_time_external_stabilization
+            self._saved_idle_value = self._idle_value
             self.log.debug("Step prepared, starting wait.")
             self._waiting_start = time.perf_counter()
             self.watchdog_event("next")
@@ -405,6 +407,7 @@ class FiniteSamplingScanningExcitationInterfuse(
             with self._data_lock:
                 self._scan_data[i : i + len(new_data), 1] = new_data
                 self._data_row_index += len(new_data)
+            self._idle_value = self._scan_data[self._data_row_index, self.frequency_column_number] / self._conversion_factor
 
     @state
     @transition_from(("stop", "*"))
