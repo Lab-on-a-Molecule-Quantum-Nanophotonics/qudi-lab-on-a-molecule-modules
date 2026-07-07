@@ -426,7 +426,10 @@ class FiniteSamplingScanningExcitationInterfuse(
 
     @property
     def state_display(self) -> str:
-        return self.watchdog_state.replace("_", " ")
+        if self.scan_running:
+            return self.watchdog_state.replace("_", " ") + f" (Step {self._repeat_no+1}/{self._n_repeat})"
+        else:
+            return self.watchdog_state.replace("_", " ")
 
     def start_scan(self) -> None:
         "Start scanning in a non_blocking way."
