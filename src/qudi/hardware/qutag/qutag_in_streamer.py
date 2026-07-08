@@ -161,6 +161,7 @@ class QuTagInStreamer(DataInStreamInterface, SampledFiniteStateInterface):
     @state
     @initial
     @transition_to(("start", "prepare_sampling"))
+    @transition_to(("stop", "idle"))
     def idle(self):
         """idling mode: do not read the current count rates."""
         pass
@@ -197,21 +198,23 @@ class QuTagInStreamer(DataInStreamInterface, SampledFiniteStateInterface):
             self.__read_buffer.ctypes.data_as(ctypes.POINTER(ctypes.c_int32)), ctypes.byref(updates)
         )
         self.perror("TDC_getCoincCounters", rc)
+        if updates.value <= 0:
+            return
         with self._data_lock:
             available_space = (
-                self.__buffer_start + self.__buffer_size * self._NUMBER_OF_COINCIDENCE_CHANNELS - self.__buffer_stop
+                self.__buffer_start + self.__buffer_size - self.__buffer_stop
             )
             number_of_values = updates.value * self._NUMBER_OF_COINCIDENCE_CHANNELS
             if available_space <= number_of_values:
-                self.log.error("Buffer overflow. Please increase buffer size.")
+                self.log.error(f"Buffer overflow. Please increase buffer size. Available space is {available_space}, number of values read is {number_of_values}.")
                 self.stop_stream()
                 return
             if number_of_values > self._NUMBER_OF_COINCIDENCE_CHANNELS:  # fill the missed samples with NaN
                 number_of_nan = (updates.value - 1) * self._NUMBER_OF_COINCIDENCE_CHANNELS
-                space_at_the_end = self.__buffer_size * self._NUMBER_OF_COINCIDENCE_CHANNELS - self.__buffer_stop
+                space_at_the_end = self.__buffer_size - self.__buffer_stop
                 if space_at_the_end >= number_of_nan:
                     self.__buffer[self.__buffer_stop : self.__buffer_stop + number_of_nan] = np.nan
-                    self.__buffer_stop = self.__buffer_stop + number_of_nan
+                    self.__buffer_stop = (self.__buffer_stop + number_of_nan) % self.__buffer_size
                 else:
                     self.__buffer[self.__buffer_stop :] = np.nan
                     to_be_stored_at_the_start = number_of_nan - space_at_the_end
@@ -219,12 +222,12 @@ class QuTagInStreamer(DataInStreamInterface, SampledFiniteStateInterface):
                     self.__buffer_stop = to_be_stored_at_the_start
                 number_of_values -= number_of_nan
             if number_of_values > 0:
-                space_at_the_end = self.__buffer_size * self._NUMBER_OF_COINCIDENCE_CHANNELS - self.__buffer_stop
+                space_at_the_end = self.__buffer_size - self.__buffer_stop
                 if space_at_the_end >= self._NUMBER_OF_COINCIDENCE_CHANNELS:
                     self.__buffer[self.__buffer_stop : self.__buffer_stop + self._NUMBER_OF_COINCIDENCE_CHANNELS] = (
                         self.__read_buffer
                     )
-                    self.__buffer_stop += self._NUMBER_OF_COINCIDENCE_CHANNELS
+                    self.__buffer_stop = (self.__buffer_stop + self._NUMBER_OF_COINCIDENCE_CHANNELS) % self.__buffer_size
                 else:
                     self.__buffer[self.__buffer_stop :] = self.__read_buffer[:space_at_the_end]
                     to_be_stored_at_the_start = self._NUMBER_OF_COINCIDENCE_CHANNELS - space_at_the_end
@@ -268,7 +271,7 @@ class QuTagInStreamer(DataInStreamInterface, SampledFiniteStateInterface):
         The total buffer size in bytes can be estimated by:
             <buffer_size> * <channel_count> * numpy.nbytes[<data_type>]
         """
-        return self.__buffer_size
+        return self.__buffer_size // self._NUMBER_OF_COINCIDENCE_CHANNELS
 
     @property
     def streaming_mode(self) -> StreamingMode:
@@ -307,14 +310,14 @@ class QuTagInStreamer(DataInStreamInterface, SampledFiniteStateInterface):
 
         self.__active_channels = tuple(active_channels)
         self.__streaming_mode = streaming_mode
-        self.__buffer_size = channel_buffer_size
+        self.__buffer_size = channel_buffer_size * self._NUMBER_OF_COINCIDENCE_CHANNELS
         self.__sample_rate = sample_rate
         with self._data_lock:
             self.__buffer_start = 0
             self.__buffer_stop = 0
             self.__read_buffer = np.zeros(int(self._NUMBER_OF_COINCIDENCE_CHANNELS), dtype=np.int32)
             self.__buffer = np.empty(
-                self.__buffer_size * self._NUMBER_OF_COINCIDENCE_CHANNELS, dtype=self._constraints.data_type
+                self.__buffer_size,  dtype=self._constraints.data_type
             )
 
     def start_stream(self) -> None:
