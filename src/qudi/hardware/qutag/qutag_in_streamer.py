@@ -44,7 +44,7 @@ class QuTagInStreamer(DataInStreamInterface, SampledFiniteStateInterface):
         self.__buffer_size = -1
         self.__buffer = np.array([])
         self.__read_buffer = np.zeros(int(self._NUMBER_OF_COINCIDENCE_CHANNELS), dtype=np.int32)
-        self.__stored_watchdog_delay = self._watchdog_delay
+        self.__stored_watchdog_delay = self.watchdog_delay
         self.__buffer_start = 0
         self.__buffer_stop = 0
         self.__streaming_mode = None
@@ -160,8 +160,8 @@ class QuTagInStreamer(DataInStreamInterface, SampledFiniteStateInterface):
         self.perror("TDC_setExposureTime", rc)
         if rc != 0:
             self.stop_stream()
-        self.__stored_watchdog_delay = self._watchdog_delay
-        self._watchdog_delay = 0.8 / self.sample_rate
+        self.__stored_watchdog_delay = self.watchdog_delay
+        self.watchdog_delay = 0.8 / self.sample_rate
         updates = ctypes.c_int32()
         rc = self.tdclib.TDC_getCoincCounters(
             self.__read_buffer.ctypes.data_as(ctypes.POINTER(ctypes.c_int32)), ctypes.byref(updates)
@@ -216,7 +216,7 @@ class QuTagInStreamer(DataInStreamInterface, SampledFiniteStateInterface):
     @transition_to(("stop", "idle"))
     def stop_sampling(self):
         """Transition back to idle mode."""
-        self._watchdog_delay = self.__stored_watchdog_delay
+        self.watchdog_delay = self.__stored_watchdog_delay
         self.watchdog_event("stop")
 
     @property

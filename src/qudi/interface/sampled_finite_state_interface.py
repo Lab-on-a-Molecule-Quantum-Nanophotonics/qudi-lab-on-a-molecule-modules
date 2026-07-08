@@ -152,6 +152,7 @@ class SampledFiniteStateInterface(Base):
         self._watchdog_timer = QtCore.QTimer(parent=self)
         self._watchdog_lock = Mutex()
         self._watchdog_running = False
+        self.__watchdog_delay = -1.0
         callbacks_structure = {}
         for event in self.__fysom_events:
             specific_callback = getattr(self, "sig_on_event_" + event).emit
@@ -175,13 +176,13 @@ class SampledFiniteStateInterface(Base):
             self.log.error("There is an error in your Fysom state machine! stopping the watchdog now.")
             self._watchdog_running = False
             self.log.exception("")
-        except:
-            self.log.exception("")
+        except Exception as e:
+            self.log.exception(f"{e}")
         finally:
             if self._watchdog_running:
                 time_end = time.perf_counter()
                 time_overhead = time_end-time_start
-                new_time = max(0, self._watchdog_delay - time_overhead)
+                new_time = int(round(max(0, self.watchdog_delay - time_overhead)))
                 self._watchdog_timer.start(new_time*1000)
 
     @property
@@ -190,6 +191,14 @@ class SampledFiniteStateInterface(Base):
         with self._watchdog_lock:
             return self._watchdog_state.current
 
+    @property
+    def watchdog_delay(self) -> float:
+        return self.__watchdog_delay
+
+    @watchdog_delay.setter
+    def watchdog_delay(self, v:float) -> None:
+        self.__watchdog_delay = v
+
     def watchdog_event(self, event) -> None:
         "Trigger a watchdog event that must have beed declared beforehand."
         with self._watchdog_lock:
@@ -197,6 +206,7 @@ class SampledFiniteStateInterface(Base):
 
     def enable_watchdog(self) -> None:
         "Enable the watchdog mechanism."
+        self.watchdog_delay = float(self._watchdog_delay)
         self._watchdog_timer.setSingleShot(True)
         self._watchdog_timer.timeout.connect(self.__watchdog, QtCore.Qt.QueuedConnection)
         self.sig_start_watchdog.connect(self.__start_watchdog, QtCore.Qt.QueuedConnection)
@@ -212,7 +222,7 @@ class SampledFiniteStateInterface(Base):
 
     def __start_watchdog(self) -> None:
         self._watchdog_running = True
-        self._watchdog_timer.start(self._watchdog_delay * 1000)
+        self._watchdog_timer.start(int(round(self.watchdog_delay * 1000)))
 
     def __stop_watchdog(self) -> None:
         self._watchdog_running = False
