@@ -269,7 +269,7 @@ class ScanningExcitationLogic(LogicBase):
         if self.fit_method != 'No Fit' and self.fit_results is not None:
             fit_setup = {}
             fit_setup['method'] = self.fit_method
-            fit_setup['results'] = self.fit_results.params
+            fit_setup['results'] = {k:{"value":v.value, "stderr":v.stderr, "min":v.min, "max":v.max} for k,v in dict(self.fit_results.params).items()}
             fit_setup['region'] = self.fit_region
             parameters['fit'] = fit_setup
 
@@ -284,14 +284,13 @@ class ScanningExcitationLogic(LogicBase):
         for (colname, colunit, col) in zip(self._scanner().data_format.data_column_names, self._scanner().data_format.data_column_unit, self._spectrum):
             if col is None:
                 self.log.error('No spectrum to save.')
-                return
+                return ""
             data.append(col)
             header.append(f"{colname} ({colunit})")
         file_label = 'spectrum' + name_tag
         # save the date to file
         ds = TOMLHeaderDataStorage(root_dir=self.module_default_data_dir if root_dir is None else root_dir,
                              include_global_metadata=True)
-
         file_path, _, _ = ds.save_data(np.array(data).T,
                                        column_headers=header,
                                        metadata=parameters,
