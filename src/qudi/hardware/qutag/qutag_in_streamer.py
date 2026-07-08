@@ -18,10 +18,26 @@ from qudi.interface.sampled_finite_state_interface import (
     SampledFiniteStateInterface,
     state,
     transition_to,
+    initial
 )
 
 
 class QuTagInStreamer(DataInStreamInterface, SampledFiniteStateInterface):
+    """
+    Use a QuTAG device as a digital streamer. 
+    Tested with QuTAG-MC.
+
+    Example configuration for copy-paste:
+    ```yaml
+    qutag_instreamer:
+        module.Class: qutag.qutag_in_streamer.QuTagInStreamer
+        options:
+            device_id: -1 # Take any device available
+            tdcbase_path: "C:/Users/Lab66_spectrometer/Desktop/QUTAG-MC-WIN64QT5-v1.0.15/QUTAG-MC-WIN64QT5-v1.0.15/userlib/lib64/tdcbase.dll" # path to the DLL
+            max_channel_samples_buffer: 2048 # default
+            coincidence_window: 2000 # default
+    ```
+    """
     _device_id = ConfigOption("device_id", default=-1, missing="info")
     _tdcbase_path = ConfigOption("tdcbase_path", default="tdcbase.dll", missing="warn")
     _max_channel_samples_buffer = ConfigOption(
@@ -106,6 +122,8 @@ class QuTagInStreamer(DataInStreamInterface, SampledFiniteStateInterface):
         self.tdclib.TDC_getCoincCounters.restype = ctypes.c_int32
         rc = self.tdclib.TDC_init(self._device_id)
         self.perror("TDC_init", rc)
+        if rc != 0:
+            raise ValueError("Could not connect to Qutag device.")
         self._number_of_channels = self.tdclib.TDC_getChannelCount()
         self._constraints = DataInStreamConstraints(
             channel_units={ch: "counts/s" for ch in self.__coincidence_channels_names},
@@ -141,6 +159,7 @@ class QuTagInStreamer(DataInStreamInterface, SampledFiniteStateInterface):
 
     # SampledFiniteStateInterface
     @state
+    @initial
     @transition_to(("start", "prepare_sampling"))
     def idle(self):
         """idling mode: do not read the current count rates."""
@@ -170,7 +189,7 @@ class QuTagInStreamer(DataInStreamInterface, SampledFiniteStateInterface):
         self.watchdog_event("start")
 
     @state
-    @transition_to(("stop", "stop_sampling"))
+    @transition_to(("stop", "idle"))
     def sampling(self):
         """Read the current count rates and store it in the current buffer."""
         updates = ctypes.c_int32()
@@ -212,13 +231,6 @@ class QuTagInStreamer(DataInStreamInterface, SampledFiniteStateInterface):
                     self.__buffer[:to_be_stored_at_the_start] = self.__read_buffer[:to_be_stored_at_the_start]
                     self.__buffer_stop = to_be_stored_at_the_start
 
-    @state
-    @transition_to(("stop", "idle"))
-    def stop_sampling(self):
-        """Transition back to idle mode."""
-        self.watchdog_delay = self.__stored_watchdog_delay
-        self.watchdog_event("stop")
-
     @property
     def constraints(self) -> DataInStreamConstraints:
         """Read-only property returning the constraints on the settings for this data streamer."""
@@ -240,6 +252,15 @@ class QuTagInStreamer(DataInStreamInterface, SampledFiniteStateInterface):
                 number_to_the_end = self.__buffer_size - self.__buffer_start
                 number_from_start = self.__buffer_stop
                 return (number_to_the_end + number_from_start) // self._NUMBER_OF_COINCIDENCE_CHANNELS
+
+    @property
+    def sample_rate(self) -> float:
+        """ Read-only property returning the currently set sample rate in Hz.
+        For SampleTiming.CONSTANT this is the sample rate of the hardware, for any other timing mode
+        this property represents only a hint to the actual hardware timebase and can not be
+        considered accurate.
+        """
+        return self.__sample_rate
 
     @property
     def channel_buffer_size(self) -> int:
@@ -311,6 +332,7 @@ class QuTagInStreamer(DataInStreamInterface, SampledFiniteStateInterface):
     def stop_stream(self) -> None:
         """Stop the data acquisition/streaming"""
         try:
+            self.watchdog_delay = self.__stored_watchdog_delay
             self.watchdog_event("stop")
         finally:
             if self.module_state() == 'locked':
@@ -351,7 +373,7 @@ class QuTagInStreamer(DataInStreamInterface, SampledFiniteStateInterface):
             while samples_per_channel > 0 and self.module_state() == 'locked':
                 number_of_waits_remaining = 3
                 while number_of_waits_remaining > 0 and self.available_samples <= 0:
-                    time.sleep(self._watchdog_delay)
+                    time.sleep(self.watchdog_delay)
                     number_of_waits_remaining -= 1
                 if number_of_waits_remaining <= 0:
                     self.log.error("Timeout while reading data. Stopping streamer.")
@@ -391,7 +413,7 @@ class QuTagInStreamer(DataInStreamInterface, SampledFiniteStateInterface):
                                 :, selected_channels
                             ]
                             .reshape((data_buffer_extent,))
-                        )
+                        ) * self.sample_rate
                         data_buffer_index += data_buffer_extent
                     if valid_samples_from_the_start > 0:
                         data_buffer_extent = valid_samples_from_the_start * channel_count
@@ -401,13 +423,14 @@ class QuTagInStreamer(DataInStreamInterface, SampledFiniteStateInterface):
                                 :, selected_channels
                             ]
                             .reshape((data_buffer_extent,))
-                        )
+                        ) * self.sample_rate
                         data_buffer_index += data_buffer_extent
                     consumed_samples = valid_samples_from_the_start + valid_samples_to_the_end
                     self.__buffer_start = (
                         self.__buffer_start + consumed_samples * self._NUMBER_OF_COINCIDENCE_CHANNELS
                     ) % self.__buffer_size
                 samples_per_channel = samples_per_channel - consumed_samples
+
         except Exception as e:
             self.log.exception(f'Getting samples from streamer failed, got exception {e}. Stopping streamer.')
             self.stop_stream()
