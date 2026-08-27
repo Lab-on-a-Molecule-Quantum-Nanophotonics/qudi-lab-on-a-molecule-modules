@@ -194,7 +194,7 @@ class CameraLogic(LogicBase):
         return fig
 
     @QtCore.Slot()
-    def save_frame(self):
+    def save_frame(self) -> None | str:
         """ A snapshot of the current data trace window will be saved """
         if self._last_frame is None:
             self.log.warning("Trying to save a frame, but there is no frame!")
@@ -217,6 +217,7 @@ class CameraLogic(LogicBase):
                                                column_headers='Image (columns is X, rows is Y)')
             fig = self.draw_2d_image(self._last_frame)
             ds.save_thumbnail(mpl_figure=fig, file_path=filepath)
+            return filepath
         except:
             self.log.exception('Something went wrong while saving trace snapshot:')
             raise
