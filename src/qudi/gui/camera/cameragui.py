@@ -125,7 +125,7 @@ class CameraGui(GuiBase):
         self._mw.action_start_video.triggered[bool].connect(self._start_video_clicked)
         self._mw.action_capture_frame.triggered.connect(self._capture_frame_clicked)
         self._mw.action_show_settings.triggered.connect(lambda: self._settings_dialog.exec_())
-        self._mw.action_save_frame.triggered.connect(self._save_frame)
+        self._mw.action_save_frame.triggered.connect(self._camera_logic().save_frame)
         # connect update signals from logic
         logic.sigFrameChanged.connect(self._update_frame)
         logic.sigAcquisitionFinished.connect(self._acquisition_finished)
@@ -194,23 +194,3 @@ class CameraGui(GuiBase):
         """
         """
         self._mw.image_widget.set_image(frame_data)
-
-    def _save_frame(self):
-        logic = self._camera_logic()
-        ds = TextDataStorage(root_dir=self.module_default_data_dir)
-        timestamp = datetime.datetime.now()
-        tag = logic.create_tag(timestamp)
-
-        parameters = {}
-        parameters['gain'] = logic.get_gain()
-        parameters['exposure'] = logic.get_exposure()
-
-        data = logic.last_frame
-        if data is not None:
-            file_path, _, _ = ds.save_data(data, metadata=parameters, nametag=tag,
-                                       timestamp=timestamp, column_headers='Image (columns is X, rows is Y)')
-            figure = logic.draw_2d_image(data, cbar_range=None)
-            ds.save_thumbnail(figure, file_path=file_path.rsplit('.', 1)[0])
-        else:
-            self.log.error('No Data acquired. Nothing to save.')
-        return

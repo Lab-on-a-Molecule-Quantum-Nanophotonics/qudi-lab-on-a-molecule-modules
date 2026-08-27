@@ -33,7 +33,7 @@ class CameraDummy(CameraInterface):
     Example config for copy-paste:
 
     camera_dummy:
-        module.Class: 'camera.camera_dummy.CameraDummy'
+        module.Class: 'dummy.camera_dummy.CameraDummy'
         options:
             support_live: True
             camera_name: 'Dummy camera'

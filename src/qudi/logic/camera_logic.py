@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 """
 A module for controlling a camera.
@@ -21,16 +20,17 @@ If not, see <https://www.gnu.org/licenses/>.
 """
 
 import datetime
-import numpy as np
+
 import matplotlib.pyplot as plt
-import matplotlib as mpl
+import numpy as np
 from PySide6 import QtCore
-from qudi.core.connector import Connector
 from qudi.core.configoption import ConfigOption
-from qudi.util.mutex import RecursiveMutex
+from qudi.core.connector import Connector
 from qudi.core.module import LogicBase
+from qudi.util.mutex import RecursiveMutex
 
 from qudi.interface.camera_interface import CameraInterface
+from qudi.util.datastorage import NpyDataStorage
 
 
 class CameraLogic(LogicBase):
@@ -190,5 +190,34 @@ class CameraLogic(LogicBase):
         if cbar_range is None:
             cbar_range = (np.nanmin(data), np.nanmax(data))
         cbar = plt.colorbar(cfimage, shrink=0.8)
-        cbar.ax.tick_params(which=u'both', length=0)
+        cbar.ax.tick_params(which='both', length=0)
         return fig
+
+    @QtCore.Slot()
+    def save_frame(self):
+        """ A snapshot of the current data trace window will be saved """
+        if self._last_frame is None:
+            self.log.warning("Trying to save a frame, but there is no frame!")
+            return
+        try:
+            timestamp = datetime.datetime.now()
+            metadata = {
+                'Timestamp': timestamp.strftime('%d.%m.%Y, %H:%M:%S.%f'),
+                'Gain' : self.get_gain(),
+                'Exposure' : self.get_exposure(),
+                'Camera name': self._camera().get_name()
+            }
+            nametag = 'camera_frame'
+            ds = NpyDataStorage(root_dir=self.module_default_data_dir,
+                             include_global_metadata=True)
+            filepath, _, _ = ds.save_data(self._last_frame,
+                                               timestamp=timestamp,
+                                               metadata=metadata,
+                                               nametag=nametag,
+                                               column_headers='Image (columns is X, rows is Y)')
+            fig = self.draw_2d_image(self._last_frame)
+            ds.save_thumbnail(mpl_figure=fig, file_path=filepath)
+        except:
+            self.log.exception('Something went wrong while saving trace snapshot:')
+            raise
+    
