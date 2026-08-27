@@ -127,11 +127,11 @@ class MatisseCommander(ProcessControlInterface, SwitchInterface, SampledFiniteSt
         self._constraints_process = ProcessControlConstraints(
             setpoint_channels=["piezo ref cell", "piezo slow", "scan rising speed", 
                                "scan falling speed", "scan lower limit", "scan upper limit", 
-                               "conversion factor", "scan mode", "scan value", "go to target"],
+                               "conversion factor", "scan mode", "scan value", "go to target", "thin etalon position"],
             process_channels=["diode power dc"],
-            units={"scan rising speed":"1/s", "scan falling speed":"1/s", "conversion factor":"MHz", "go to target": "Hz"},
-            limits={"scan lower limit":(0.0,0.7), "scan upper limit":(0.0,0.7), "scan mode":(0,7), "scan value":(0.0,0.7), "go to target": (minimum_possible_frequency, np.inf)},
-            dtypes={"scan mode":int}
+            units={"scan rising speed":"1/s", "scan falling speed":"1/s", "conversion factor":"MHz", "go to target": "Hz",  "thin etalon position":""},
+            limits={"scan lower limit":(0.0,0.7), "scan upper limit":(0.0,0.7), "scan mode":(0,7), "scan value":(0.0,0.7), "go to target": (minimum_possible_frequency, np.inf), "thin etalon position":(20_000, 60_000)},
+            dtypes={"scan mode":int, "thin etalon position":int}
         )
         self._idle_activated = False
         self._bifi_reset_countdown = 0
@@ -221,6 +221,10 @@ class MatisseCommander(ProcessControlInterface, SwitchInterface, SampledFiniteSt
             self.conversionfactor = value
         elif channel == "go to target":
             self._go_to_target = value
+        elif channel == "thin etalon position":
+            if self._device.set("MOTORTHINETALON:POSITION", value) is False:
+                raise RuntimeError(
+                    'Setting thin etalon did not complete successfully.')
         else:
             raise ValueError(f'Invalid process channel specifier "{channel}".')
     def get_setpoint(self, channel):
@@ -247,6 +251,8 @@ class MatisseCommander(ProcessControlInterface, SwitchInterface, SampledFiniteSt
             return self.conversionfactor
         elif channel == "go to target":
             return self._go_to_target
+        elif channel == "thin etalon position":
+            return self._device.get("MOTORTHINETALON:POSITION")
         else:
             raise ValueError(f'Invalid process channel specifier "{channel}".')
     def get_activity_state(self, channel):
@@ -259,6 +265,7 @@ class MatisseCommander(ProcessControlInterface, SwitchInterface, SampledFiniteSt
             "scan upper limit",
             "scan mode",
             "scan value",
+            "thin etalon position",
         ])
         if self.watchdog_state != "idle" and channel in require_communication:
             return False
