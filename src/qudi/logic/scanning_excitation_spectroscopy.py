@@ -1,22 +1,23 @@
-from PySide6 import QtCore
-from PySide6 import QtWidgets
-from typing import Iterable, Union, Tuple, Type, Optional
+import traceback
+from collections.abc import Iterable
+from dataclasses import asdict
+from datetime import datetime
+
+import matplotlib.pyplot as plt
 import numpy as np
 import numpy.typing as npt
-import matplotlib.pyplot as plt
-from datetime import datetime
-import traceback
-from uncertainties import ufloat
-from dataclasses import asdict
-
-from qudi.core.module import LogicBase
-from qudi.core.connector import Connector
+from PySide6 import QtCore, QtWidgets
 from qudi.core.configoption import ConfigOption
+from qudi.core.connector import Connector
+from qudi.core.module import LogicBase
 from qudi.core.statusvariable import StatusVar
-from qudi.util.tomldatastorage import TOMLHeaderDataStorage
+from qudi.util.datafitting import FitConfigurationsModel, FitContainer
 from qudi.util.datastorage import DataStorageBase
-from qudi.util.datafitting import FitContainer, FitConfigurationsModel
 from qudi.util.mutex import Mutex
+from uncertainties import ufloat
+
+from qudi.util.tomldatastorage import TOMLHeaderDataStorage
+
 
 class ScanningExcitationLogic(LogicBase):
     """
@@ -240,11 +241,11 @@ class ScanningExcitationLogic(LogicBase):
         verticalalignment='top', bbox=props)
 
         ax1.set_xlabel(f"Frequency ({prefix_freq}Hz)")
-        ax1.set_ylabel('Intensity ({} count)'.format(prefix))
+        ax1.set_ylabel(f'Intensity ({prefix} count)')
         figure.tight_layout()
         return figure
 
-    def save_spectrum_data(self, name_tag:str='', root_dir:Optional[str]=None, parameter:Optional[dict]=None) -> str:
+    def save_spectrum_data(self, name_tag:str='', root_dir:str | None=None, parameter:dict | None=None) -> str:
         """ Saves the current spectrum data to a file.
         @param string name_tag: postfix name tag for saved filename.
         @param string root_dir: overwrite the file position in necessary
@@ -305,7 +306,7 @@ class ScanningExcitationLogic(LogicBase):
         return file_path
 
     @staticmethod
-    def _get_si_scaling(number:float) -> Tuple[float, str]:
+    def _get_si_scaling(number:float) -> tuple[float, str]:
 
         prefix = ['', 'k', 'M', 'G', 'T', 'P']
         prefix_index = 0
