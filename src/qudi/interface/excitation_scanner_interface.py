@@ -1,5 +1,4 @@
 from abc import abstractmethod
-from collections import OrderedDict
 from typing import Iterable, Union, Tuple, Type
 import numpy.typing as npt
 from collections import OrderedDict
@@ -133,6 +132,13 @@ class ExcitationScannerInterface(Base):
                                         value=self.get_control(k))
              ) for (k,cv) in self.constraints.control_variables.items()
         ])
+    @property
+    def suggested_control_groups(self) -> OrderedDict[str, Iterable[str]]:
+        """
+        Get suggested groups of control variables for the UI. 
+        By default return a single group with all control variables.
+        """
+        return OrderedDict([ ("Controls", self.constraints.control_variables.keys()) ])
 
     @abstractmethod
     def get_current_data(self) -> npt.NDArray[np.float64]:

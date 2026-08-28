@@ -128,10 +128,17 @@ class ScanningProbeLogic(LogicBase):
         self.__scan_poll_timer.timeout.connect(self.__scan_poll_loop, QtCore.Qt.ConnectionType.QueuedConnection)
 
         self._scan_axes = OrderedDict(sorted(self._scanner().constraints.axes.items()))
+        self.save_global_metadata()
+
+    def save_global_metadata(self):
         if self._save_coord_to_global_metadata:
             pos_dict = self._scanner().get_position()
-            for (k,v) in pos_dict.items():
-                DataStorageBase.add_global_metadata("scanner_" + k, v, overwrite=True)
+            keys = list(pos_dict.keys())
+            keys.sort()
+            save_dict = {}
+            for k in keys:
+                save_dict[k] = pos_dict[k]
+            DataStorageBase.add_global_metadata("scanner_position", save_dict, overwrite=True)
 
     def on_deactivate(self):
         """Reverse steps of activation"""
@@ -419,9 +426,7 @@ class ScanningProbeLogic(LogicBase):
             # self.log.debug(f"Expand to= {pos_dict}")
 
             pos_dict = netobtain(self._scanner().coordinate_transform(pos_dict))
-            if self._save_coord_to_global_metadata:
-                for (k,v) in pos_dict.items():
-                    DataStorageBase.add_global_metadata("scanner_" + k, v, overwrite=True)
+            self.save_global_metadata()
 
             for ax, pos in pos_dict.items():
                 if ax not in ax_constr:
