@@ -50,7 +50,8 @@ class WorkerSignals(QObject):
     success = Signal(int)  # thread_id
     errored = Signal(tuple)
     finished = Signal(int)  # thread_id
-    def __init__(self, worker):
+    def __init__(self, worker, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.worker = worker
 
     @Slot()
@@ -66,10 +67,11 @@ class Worker(QRunnable):
     * `kwargs`: keyword arguments to feed the function.
     """
 
-    def __init__(self, initialization: Callable, loop: Callable, *args, thread_id=0, **kwargs):
+    def __init__(self, initialization: Callable, loop: Callable, finish: Callable=lambda:None, *args, thread_id=0, **kwargs):
         super().__init__()
         self.initialization_callback = initialization
         self.loop_callback = loop
+        self.finish_callback = finish
         self.thread_id = thread_id
         self.signals = WorkerSignals(self)
         self.variables = {}
@@ -81,9 +83,12 @@ class Worker(QRunnable):
     def run(self):
         try:
             self.variables = self.initialization_callback(*self.args, **self.kwargs)
-            while not self._interrupt:
-                ctx = {**self.kwargs, **self.variables}
-                self.variables = self.loop_callback(*self.args, **ctx)
+            loop_running = True
+            while loop_running:
+                keep_running,self.variables = self.loop_callback(**self.variables)
+                loop_running = not self._interrupt and keep_running
+            if not self._interrupt:
+                self.finish_callback(**self.variables)
         except Exception:  # noqa: BLE001
             traceback.print_exc()
             exctype, value = sys.exc_info()[:2]
@@ -126,6 +131,7 @@ class UserActionableMoleculeDetectionSettings:
     lorentzian_safety_margin: float | None = None
     probability_false_positive: float | None = None
     frame_per_slice: float | None = None
+    number_of_frames_sampled_for_gamma_fitting: int | None = None
 
 
 @dataclass
@@ -148,6 +154,7 @@ class MoleculeDetectionSettings:
     assumed_amplitude: float
     kernel_spatial_length: float
     kernel_frequency_length: float
+    number_of_frames_sampled_for_gamma_fitting: int 
 
 def positivity_constraint_constructor(val):
     if val <= 0:
@@ -167,6 +174,7 @@ class MoleculeDetectionLogic(LogicBase):
     _number_of_workers = ConfigOption(name="number_of_workers", default=4)
 
     _quantile_gamma_fit = StatusVar(name="quantile_gamma_fit", default=0.99)
+    _number_of_frames_sampled_for_gamma_fitting = StatusVar(default=10)
     _quantile_max_estimate = StatusVar(name="quantile_max_estimate", default=0.9999)
     _lorentzian_safety_margin = StatusVar(name="lorentzian_safety_margin", default=3)
 
@@ -193,6 +201,7 @@ class MoleculeDetectionLogic(LogicBase):
     _start_builder = Signal()
     _localize = Signal()
     _trigger_interrupt = Signal()
+    _gamma_estimate_histogram_updated = Signal(tuple[np.ndarray, np.ndarray])
 
     @_theta.constructor
     def theta_constructor(self, yaml_data):
@@ -210,8 +219,8 @@ class MoleculeDetectionLogic(LogicBase):
         self._computing_lock = Mutex()
         self._threadpool = QThreadPool(self)
         self._workers = []
-        self._slicer = Worker(self.slicer)
-        self._builder = Worker(self.builder)
+        self._slicer = None
+        self._builder = None
         self._total_number_of_slices = 0
         self._number_of_frames = 0
         self._interrupt = False
@@ -222,6 +231,8 @@ class MoleculeDetectionLogic(LogicBase):
         self._builder_started = False
         self._workers_started = False
         self._timer = QTimer(parent=self)
+        self._noise_fitting_histogram = (np.array([]), np.array([]))
+        self._fitted_histogram = (np.array([]), np.array([]))
 
     def on_activate(self) -> None:
         self._start_watchdog_timer.connect(self.__start_watchdog_timer, QtCore.Qt.QueuedConnection)
@@ -235,7 +246,7 @@ class MoleculeDetectionLogic(LogicBase):
         self._start_workers.disconnect()
         self._start_builder.disconnect()
         self._localize.disconnect()
-        self._interrupt = True
+        self.interrupt()
 
     def ln_transform(self, r_lmn: np.ndarray) -> np.ndarray:
         """
@@ -321,6 +332,7 @@ class MoleculeDetectionLogic(LogicBase):
             assumed_amplitude=float(self._assumed_amplitude),
             kernel_spatial_length=float(self._kernel_spatial_length),
             kernel_frequency_length=float(self._kernel_frequency_length),
+            number_of_frames_sampled_for_gamma_fitting=int(self._number_of_frames_sampled_for_gamma_fitting),
         )
 
     @settings.setter
@@ -337,24 +349,67 @@ class MoleculeDetectionLogic(LogicBase):
             self._probability_false_positive = settings.probability_false_positive  # ty: ignore[invalid-assignment]
         if settings.frame_per_slice is not None:
             self._frames_per_slice = settings.frame_per_slice  # ty: ignore[invalid-assignment]
+        if settings.number_of_frames_sampled_for_gamma_fitting is not None:
+            self._number_of_frames_sampled_for_gamma_fitting = settings.number_of_frames_sampled_for_gamma_fitting  # ty: ignore[invalid-assignment]
+
+    @Slot()
+    def estimate_from_noise(self):
+        filepath = str(self._input_file)
+        tiff = TiffFile(filepath)
+        number_of_frames = len(tiff.pages)
+        number_of_samples = min(self._number_of_frames_sampled_for_gamma_fitting, number_of_frames)
+        sampled_frames = np.random.choice(range(number_of_frames), number_of_samples)
+        data = np.ravel(imread(
+            filepath,
+            key=sampled_frames,
+        )[0])
+        self._noise_fitting_histogram = np.histogram(data, density=True)
+        self._gamma_estimate_histogram_updated.emit(self._noise_fitting_histogram)
+        data_gamma_fit = data[ data < np.quantile(data, float(self._quantile_gamma_fit)) ]
+        alpha, _loc, theta = gamma.fit(data, floc=0.0)
+        self._theta = theta
+        background = alpha * theta
+        threshold_max = np.quantile(data, float(self._quantile_max_estimate))
+        self._assumed_amplitude = (
+            np.max(mat_full_image[mat_full_image < threshold_max]) - background
+        )
+        self.settings_update.emit(self.settings)
+        # todo: emit a fitted curve
+
+
 
     def prepare_run(self):
         self._background_kernel = self.background_kernel()
         self._workers = [
-            Worker(self.worker, i, thread_id=i) for i in range(int(self._number_of_workers))
+            Worker(
+                initialization=self.worker_init,
+                loop=self.worker, 
+                finish = self.worker_finish,
+                worker_id=i, thread_id=i) for i in range(int(self._number_of_workers))
         ]
-        self._slicer = Worker(self.slicer)
-        self._builder = Worker(self.builder)
+        self._slicer = Worker(
+                initialization=self.slicer_init,
+                loop = self.slicer,
+                finish = self.slicer_finish
+        )
+        self._builder = Worker(
+                initialization=self.builder_init,
+                loop=self.builder,
+                finish=self.builder_finish,
+        )
         for worker in self._workers:
             worker.signals.errored.connect(self.worker_thread_error, QtCore.Qt.QueuedConnection)
             worker.signals.success.connect(self.worker_thread_success, QtCore.Qt.QueuedConnection)
             worker.signals.finished.connect(self.worker_thread_finished, QtCore.Qt.QueuedConnection)
+            self._trigger_interrupt.connect(worker.signals.interrupt, QtCore.Qt.QueuedConnection)
         self._slicer.signals.errored.connect(self.slicer_thread_error, QtCore.Qt.QueuedConnection)
         self._slicer.signals.success.connect(self.slicer_thread_success, QtCore.Qt.QueuedConnection)
         self._slicer.signals.finished.connect(self.slicer_thread_finished, QtCore.Qt.QueuedConnection)
+        self._trigger_interrupt.connect(self._slicer.signals.interrupt)
         self._builder.signals.errored.connect(self.builder_thread_error, QtCore.Qt.QueuedConnection)
         self._builder.signals.success.connect(self.builder_thread_success, QtCore.Qt.QueuedConnection)
         self._builder.signals.finished.connect(self.builder_thread_finished, QtCore.Qt.QueuedConnection)
+        self._trigger_interrupt.connect(self._builder.signals.interrupt)
         self._slicer_finished = False
         self._builder_finished = False
         self._worker_finished = [False for _ in self._workers]
@@ -390,12 +445,15 @@ class MoleculeDetectionLogic(LogicBase):
             worker.signals.errored.disconnect(self.worker_thread_error)
             worker.signals.success.disconnect(self.worker_thread_success)
             worker.signals.finished.disconnect(self.worker_thread_finished)
+            self._trigger_interrupt.disconnect(worker.signals.interrupt)
         self._slicer.signals.errored.disconnect(self.slicer_thread_error)
         self._slicer.signals.success.disconnect(self.slicer_thread_success)
         self._slicer.signals.finished.disconnect(self.slicer_thread_finished)
+        self._trigger_interrupt.disconnect(self._slicer.signals.interrupt)
         self._builder.signals.errored.disconnect(self.builder_thread_error)
         self._builder.signals.success.disconnect(self.builder_thread_success)
         self._builder.signals.finished.disconnect(self.builder_thread_finished)
+        self._trigger_interrupt.disconnect(self._builder.signals.interrupt)
 
     def background_kernel(self) -> np.ndarray:
         """
@@ -503,33 +561,39 @@ class MoleculeDetectionLogic(LogicBase):
             key=range(slice_number * number_of_frames_per_slice, stop_frame),
         )
         return segment
+    def slicer_init(self):
+        self.log.debug(f"[slicer] Starting to slice file {self._input_file}.")
+        return {"slice_number": 0}
 
-    def slicer(self):
+    def slicer(self, slice_number):
         """
         Slice the video and push the sliced parts in a queue to be processed by
         the workers
         """
-        self.log.debug(f"[slicer] Starting to slice file {self._input_file}.")
-        for slice_number in range(self._total_number_of_slices):
-            if self._interrupt:
-                break
-            retry = True
-            while retry:
-                segment = self.slice(slice_number)
-                self.log.debug(f"[slicer] sending slice {slice_number}.")
-                try:
-                    self._slicer_to_worker_queue.put(
-                        WorkerMessage(segment, slice_number),
-                        timeout=1,
-                    )
-                except Full:
-                    if not self._workers_started or all(self._worker_finished):
-                        self.log.error("[slicer] All workers seem to be dead, giving up.")
-                        retry = False
-                else:
+        if self._interrupt:
+            return False
+        retry = True
+        while retry:
+            segment = self.slice(slice_number)
+            self.log.debug(f"[slicer] sending slice {slice_number}.")
+            try:
+                self._slicer_to_worker_queue.put(
+                    WorkerMessage(segment, slice_number),
+                    timeout=1,
+                )
+            except Full:
+                if not self._workers_started or all(self._worker_finished):
+                    self.log.error("[slicer] All workers seem to be dead, giving up.")
                     retry = False
-                    self._start_workers.emit()
-                retry = retry and not self._interrupt
+            else:
+                retry = False
+                self._start_workers.emit()
+            retry = retry and not self._interrupt
+        slice_number += 1
+        keep_going = slice_number < self._total_number_of_slices
+        return keep_going and not self._interrupt, {"slice_number":slice_number}
+
+    def slicer_finish(self, slice_number):
         if not self._interrupt:
             self.log.debug(f"[slicer] Finished to slice file {self._input_file}.")
 
@@ -543,68 +607,74 @@ class MoleculeDetectionLogic(LogicBase):
         background = self.adaptative_background(data)
         above_threshold_coordinates = self.thresholding(r_lmn, background)
         coordinates = self.local_maxima(r_lmn, above_threshold_coordinates)
-        self.log.debug("Done!")
         return coordinates
+
+    def worker_init(self, worker_id):
+        self.log.debug(f"[worker {worker_id}] Started.")
+        return {"worker_id":worker_id}
 
     def worker(self, worker_id):
         """
         Process the slices received from the slicer and output molecule coordinates
         to a queue to be assembled back by the builder.
         """
-        self.log.debug(f"[worker {worker_id}] Started.")
         running = True
-        while running:
-            try:
-                message = self._slicer_to_worker_queue.get(timeout=1)
-            except Empty:
-                self.log.debug(f"[worker {worker_id}] Timed out!")
-                running = self._slicer_started and not self._slicer_finished
-            else:
-                slice_number = message.slice_number
-                coordinates = self.detection_procedure(message.data)
-                self.log.debug(f"[worker {worker_id}] Starting to process slice {slice_number}/{self._total_number_of_slices}.")
-                self._worker_to_builder_queue.put(
-                    BuilderMessage(coordinates, slice_number)
-                )
-                self._start_builder.emit()
-            running = running and not self._interrupt
+        try:
+            message = self._slicer_to_worker_queue.get(timeout=1)
+        except Empty:
+            self.log.debug(f"[worker {worker_id}] Timed out!")
+            running = self._slicer_started and not self._slicer_finished
+        else:
+            slice_number = message.slice_number
+            self.log.debug(f"[worker {worker_id}] Starting to process slice {slice_number}/{self._total_number_of_slices}.")
+            coordinates = self.detection_procedure(message.data)
+            self._worker_to_builder_queue.put(
+                BuilderMessage(coordinates, slice_number)
+            )
+            self._start_builder.emit()
+        return running, {"worker_id": worker_id}
+
+    def worker_finish(self, worker_id):
         self.log.debug(f"[worker {worker_id}] Finished.")
 
-    def builder(self):
+    def builder_init(self):
+        self.log.debug("[builder] Starting builder.")
+        return {
+                "number_of_slices_processed" : 0,
+                "L" : [],
+                "M" : [],
+                "N" : [],
+                }
+
+    def builder(self, number_of_slices_processed, L, M, N):
         """
         Assemble the coordinates generated by the workers to produce the finale result.
         """
-        number_of_slices_processed = 0
         running = True
-        L = []
-        M = []
-        N = []
-        self.log.debug("[builder] Starting builder.")
-        while running:
-            try:
-                message = self._worker_to_builder_queue.get(timeout=1)
-            except Empty:
-                running = self._workers_started and not all(self._worker_finished)
-            else:
-                slice_number = message.slice_number
-                slice_L, slice_M, slice_N = message.coordinates
-                slice_L += slice_number * self._frames_per_slice
-                L.append(slice_L)
-                M.append(slice_M)
-                N.append(slice_N)
-                number_of_slices_processed += 1
-                self.progress_update.emit(
-                    (number_of_slices_processed + 1) / self._total_number_of_slices
-                )
-            finally:
-                running = running and not self._interrupt
+        try:
+            message = self._worker_to_builder_queue.get(timeout=1)
+        except Empty:
+            running = self._workers_started and not all(self._worker_finished)
+        else:
+            slice_number = message.slice_number
+            slice_L, slice_M, slice_N = message.coordinates
+            slice_L += slice_number * self._frames_per_slice
+            L.append(slice_L)
+            M.append(slice_M)
+            N.append(slice_N)
+            number_of_slices_processed += 1
+            self.progress_update.emit(
+                (number_of_slices_processed + 1) / self._total_number_of_slices
+            )
+        finally:
+            running = running and not self._interrupt
+        return running, {"number_of_slices_processed":number_of_slices_processed, "L":L, "M":M, "N":N}
 
+    def builder_finish(self, number_of_slices_processed, L, M, N):
         self.log.debug(
             f"[builder] Processed {number_of_slices_processed}/{self._total_number_of_slices} slices."
         )
-        if self._interrupt:
-            return
-        elif len(L) == 0 or len(M) == 0 or len(N) == 0:
+        if len(L) == 0 or len(M) == 0 or len(N) == 0:
             self.log.warning("[builder] No molecule was detected.")
             return
         L = np.concat(L)
@@ -684,6 +754,7 @@ class MoleculeDetectionLogic(LogicBase):
         finished = finished and (not self._workers_started or all(self._worker_finished))
         if finished:
             self.cleanup_run()
+            self.log.debug("[supervisor] Molecule detection procedure finished.")
             self.finished.emit()
         else:
             self._timer.start(1000)
@@ -693,16 +764,22 @@ class MoleculeDetectionLogic(LogicBase):
     def __start_workers(self):
         if self._workers_started:
             return
-        for worker in self._workers:
-            self._threadpool.start(worker)
-        self._workers_started = True
+        if len(self._workers) == 0:
+            self.log.warning("No worker was initialized, could not start the processing task.")
+        else:
+            for worker in self._workers:
+                self._threadpool.start(worker)
+            self._workers_started = True
 
     @Slot()
     def __start_builder(self):
         if self._builder_started:
             return
-        self._threadpool.start(self._builder)
-        self._builder_started = True
+        if self._builder is None:
+            self.log.warning("Builder was not initialized properly and could not be started.")
+        else:
+            self._threadpool.start(self._builder)
+            self._builder_started = True
 
     @Slot()
     def localize(self):
@@ -717,8 +794,11 @@ class MoleculeDetectionLogic(LogicBase):
             return
         self.prepare_run()
         self._threadpool = QThreadPool(self)
-        self._threadpool.start(self._slicer)
-        self._slicer_started = True
+        if self._slicer is None:
+            self.log.warning("Slicer was not initialized properly and could not be started.")
+        else:
+            self._threadpool.start(self._slicer)
+            self._slicer_started = True
 
     @Slot()
     def interrupt(self):
