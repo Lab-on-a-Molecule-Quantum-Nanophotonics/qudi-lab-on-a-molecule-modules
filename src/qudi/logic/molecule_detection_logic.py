@@ -8,7 +8,7 @@ from queue import Empty, Full
 
 import numpy as np
 from PySide6 import QtCore
-from PySide6.QtCore import QRunnable, QThreadPool, QTimer, Signal, Slot, QObject
+from PySide6.QtCore import QObject, QRunnable, QThreadPool, QTimer, Signal, Slot
 from qudi.core.configoption import ConfigOption
 from qudi.core.module import LogicBase
 from qudi.core.statusvariable import StatusVar
@@ -195,13 +195,14 @@ class MoleculeDetectionLogic(LogicBase):
     failure = Signal()
     finished = Signal()
     new_result = Signal(MoleculePositionsResult)
-    settings_update = Signal(MoleculeDetectionSettings)
+    settings_updated = Signal(MoleculeDetectionSettings)
     _start_watchdog_timer = Signal()
     _start_workers = Signal()
     _start_builder = Signal()
     _localize = Signal()
     _trigger_interrupt = Signal()
-    _gamma_estimate_histogram_updated = Signal(tuple[np.ndarray, np.ndarray])
+    _gamma_estimate_histogram_updated = Signal(np.ndarray, np.ndarray)
+    _gamma_law_fit_updated = Signal(np.ndarray, np.ndarray)
 
     @_theta.constructor
     def theta_constructor(self, yaml_data):
@@ -233,6 +234,7 @@ class MoleculeDetectionLogic(LogicBase):
         self._timer = QTimer(parent=self)
         self._noise_fitting_histogram = (np.array([]), np.array([]))
         self._fitted_histogram = (np.array([]), np.array([]))
+        self._fitted_gamma_law = (np.array([]), np.array([]))
 
     def on_activate(self) -> None:
         self._start_watchdog_timer.connect(self.__start_watchdog_timer, QtCore.Qt.QueuedConnection)
@@ -301,21 +303,6 @@ class MoleculeDetectionLogic(LogicBase):
             self._probability_false_positive
         ) + w1 * digamma(alpha)
 
-    def estimate_amplitude(self, mat_full_image: np.ndarray):
-        """
-        Estimate some parameters of the algorithm given some input data.
-        """
-        raveled_mat = np.ravel(mat_full_image[0])
-        raveled_mat_bg = raveled_mat[
-            raveled_mat < np.quantile(mat_full_image, float(self._quantile_gamma_fit))
-        ]
-        alpha, _loc, theta = gamma.fit(raveled_mat_bg, floc=0.0)
-        background = alpha * theta
-        threshold_max = np.quantile(mat_full_image, float(self._quantile_max_estimate))
-        self._assumed_amplitude = (
-            np.max(mat_full_image[mat_full_image < threshold_max]) - background
-        )
-
     @property
     def settings(self) -> MoleculeDetectionSettings:
         return MoleculeDetectionSettings(
@@ -351,6 +338,7 @@ class MoleculeDetectionLogic(LogicBase):
             self._frames_per_slice = settings.frame_per_slice  # ty: ignore[invalid-assignment]
         if settings.number_of_frames_sampled_for_gamma_fitting is not None:
             self._number_of_frames_sampled_for_gamma_fitting = settings.number_of_frames_sampled_for_gamma_fitting  # ty: ignore[invalid-assignment]
+        self.settings_updated.emit(self.settings)
 
     @Slot()
     def estimate_from_noise(self):
@@ -364,19 +352,20 @@ class MoleculeDetectionLogic(LogicBase):
             key=sampled_frames,
         )[0])
         self._noise_fitting_histogram = np.histogram(data, density=True)
-        self._gamma_estimate_histogram_updated.emit(self._noise_fitting_histogram)
+        self._gamma_estimate_histogram_updated.emit(self._noise_fitting_histogram[0], self._noise_fitting_histogram[1])
         data_gamma_fit = data[ data < np.quantile(data, float(self._quantile_gamma_fit)) ]
-        alpha, _loc, theta = gamma.fit(data, floc=0.0)
+        alpha, loc, theta = gamma.fit(data_gamma_fit, floc=0.0)
         self._theta = theta
         background = alpha * theta
         threshold_max = np.quantile(data, float(self._quantile_max_estimate))
         self._assumed_amplitude = (
-            np.max(mat_full_image[mat_full_image < threshold_max]) - background
+            np.max(data[data < threshold_max]) - background
         )
-        self.settings_update.emit(self.settings)
-        # todo: emit a fitted curve
-
-
+        self.settings_updated.emit(self.settings)
+        x = self._noise_fitting_histogram[0]
+        y = gamma.pdf(x, alpha, loc=loc, scale=theta)
+        self._fitted_gamma_law = (x, y)
+        self._gamma_law_fit_updated.emit(x, y)
 
     def prepare_run(self):
         self._background_kernel = self.background_kernel()
@@ -637,6 +626,27 @@ class MoleculeDetectionLogic(LogicBase):
     def worker_finish(self, worker_id):
         self.log.debug(f"[worker {worker_id}] Finished.")
 
+    def assemble_workers_positions(self, L, M, N):
+        L = np.concat(L)
+        M = np.concat(M)
+        N = np.concat(N)
+        coordinates = np.array([L, M, N])
+        self._last_result = MoleculePositionsResult(
+            quantile_gamma_fit=float(self._quantile_gamma_fit),
+            quantile_max_estimate=float(self._quantile_max_estimate),
+            lorentzian_safety_margin=float(self._lorentzian_safety_margin),
+            file_name=str(self._input_file),
+            frequency_fwhm=float(self._frequency_fwhm),
+            probability_false_positive=float(self._probability_false_positive),
+            psf_extension=float(self._position_stdev),
+            assumed_intensity_amplitude=float(self._assumed_amplitude),
+            theta=float(self._theta),
+            kernel_spatial_length=int(self._kernel_spatial_length),
+            kernel_frequency_length=int(self._kernel_frequency_length),
+            coordinates_array=coordinates,
+        )
+        self.new_result.emit(self._last_result)
+
     def builder_init(self):
         self.log.debug("[builder] Starting builder.")
         return {
@@ -663,6 +673,7 @@ class MoleculeDetectionLogic(LogicBase):
             M.append(slice_M)
             N.append(slice_N)
             number_of_slices_processed += 1
+            self.assemble_workers_positions(L, M, N)
             self.progress_update.emit(
                 (number_of_slices_processed + 1) / self._total_number_of_slices
             )
@@ -677,25 +688,7 @@ class MoleculeDetectionLogic(LogicBase):
         if len(L) == 0 or len(M) == 0 or len(N) == 0:
             self.log.warning("[builder] No molecule was detected.")
             return
-        L = np.concat(L)
-        M = np.concat(M)
-        N = np.concat(N)
-        coordinates = np.array([L, M, N])
-        self._last_result = MoleculePositionsResult(
-            quantile_gamma_fit=float(self._quantile_gamma_fit),
-            quantile_max_estimate=float(self._quantile_max_estimate),
-            lorentzian_safety_margin=float(self._lorentzian_safety_margin),
-            file_name=str(self._input_file),
-            frequency_fwhm=float(self._frequency_fwhm),
-            probability_false_positive=float(self._probability_false_positive),
-            psf_extension=float(self._position_stdev),
-            assumed_intensity_amplitude=float(self._assumed_amplitude),
-            theta=float(self._theta),
-            kernel_spatial_length=int(self._kernel_spatial_length),
-            kernel_frequency_length=int(self._kernel_frequency_length),
-            coordinates_array=coordinates,
-        )
-        self.new_result.emit(self._last_result)
+        self.assemble_workers_positions(L, M, N)
 
     @Slot()
     def worker_thread_error(self, error: tuple):
