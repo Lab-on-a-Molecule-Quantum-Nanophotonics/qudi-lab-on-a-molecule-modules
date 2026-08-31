@@ -1,14 +1,15 @@
+import datetime
 import queue
 import sys
 import traceback
 from collections.abc import Callable
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from enum import Enum
 from queue import Empty, Full
 
-import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import numpy as np
 from PySide6 import QtCore
 from PySide6.QtCore import QObject, QRunnable, QThreadPool, QTimer, Signal, Slot
 from qudi.core.configoption import ConfigOption
@@ -22,6 +23,7 @@ from scipy.stats import gamma, norm
 from tifffile import TiffFile, imread
 
 from qudi.util.fit_models.gaussian import Gaussian2D
+from qudi.util.tomldatastorage import TOMLHeaderDataStorage
 
 
 def digamma(z):
@@ -203,8 +205,6 @@ class MoleculeDetectionLogic(LogicBase):
     _kernel_frequency_length = StatusVar(default=3)
     _input_file = StatusVar(default=None)
     _frames_per_slice = StatusVar(default=100)
-    _last_result = StatusVar(default=None, representer=asdict)
-    _last_superlocalization = StatusVar(default=None)
 
     progress_update = Signal(float)  # Localization progress between 0 and 1
     failure = Signal()
@@ -250,10 +250,11 @@ class MoleculeDetectionLogic(LogicBase):
         self._workers_started = False
         self._timer = QTimer(parent=self)
         self._noise_fitting_histogram = (np.array([]), np.array([]))
-        self._fitted_histogram = (np.array([]), np.array([]))
         self._fitted_gamma_law = (np.array([]), np.array([]))
         self._flattened_image = np.array([])
         self._metadata = None
+        self._last_result = None
+        self._last_superlocalization = None
 
     def on_activate(self) -> None:
         self._start_watchdog_timer.connect(self.__start_watchdog_timer, QtCore.Qt.QueuedConnection)
@@ -402,6 +403,9 @@ class MoleculeDetectionLogic(LogicBase):
         self.gamma_law_fit_updated.emit(x, y)
 
     def prepare_run(self):
+        if self._input_file is None:
+            self.log.error("Cannot prepare run, no file selected.")
+            return
         self._background_kernel = self.background_kernel()
         self._workers = [
             Worker(
@@ -873,7 +877,7 @@ class MoleculeDetectionLogic(LogicBase):
         keys = range(offset_l, min(l + frequency_size+1, self._number_of_frames))
         filepath = str(self._input_file)
         data = imread(filepath, key=keys)
-        w,h = data.shape
+        _d,w,h = data.shape
         offset_m = max(0, m - spatial_size)
         M = np.arange(offset_m, min(w, m + spatial_size + 1))
         offset_n = max(0, n - spatial_size)
@@ -933,7 +937,7 @@ class MoleculeDetectionLogic(LogicBase):
         if not (0 <= i < self._last_result.coordinates_array.shape[1]):
             raise ValueError(f"There is no molecule number {i}")
         l,m,n = self._last_result.coordinates_array[:, i]
-        superlocalized = self.superlocalize_by_position(self, l, m, n)
+        superlocalized = self.superlocalize_by_position(l, m, n)
         if superlocalized is None:
             return None
         if superlocalized.fit_result_spectrally is None:
@@ -991,12 +995,111 @@ class MoleculeDetectionLogic(LogicBase):
     def draw_frequency_superlocalization(self):
         pass
 
-    def save_parameter_estimation(self):
-        pass
+    def save_parameter_estimation(self, name_tag=""):
+        timestamp = datetime.datetime.now()
+        parameters = {
+                "file": self._input_file,
+                    "parameter estimation" : {
+                    "quantile_gamma_fit": self._quantile_gamma_fit,
+                    "number_of_frames_sampled": self._number_of_frames_sampled_for_gamma_fitting,
+                    "quantile_max_estimate": self._quantile_max_estimate,
+                },
+                "estimated parameters":{
+                    "amplitude": self._assumed_amplitude,
+                    "theta": self._theta,
+                }
+                }
+        x = self._noise_fitting_histogram[0]
+        histo = np.concatenate((self._noise_fitting_histogram[1], [np.nan]))
+        fitted = self._fitted_gamma_law[1]
+        data = np.array([x,histo,fitted]).T
+        header = ["Pixel value", "Data", "Fitted Gamma"]
+        file_label = "fitted_background" + name_tag
+        ds = TOMLHeaderDataStorage(root_dir=self.module_default_data_dir,
+                             include_global_metadata=True)
+        file_path, _, _ = ds.save_data(np.array(data).T,
+                                       column_headers=header,
+                                       metadata=parameters,
+                                       nametag=file_label,
+                                       timestamp=timestamp,
+                                       notes="",
+                                       column_dtypes=[float] * len(header))
 
-    def save_result(self):
-        pass
+        # ds.save_thumbnail(self.get_figure(), file_path=file_path.rsplit('.', 1)[0])
 
-    def save_superlocalization(self):
-        pass
+        self.log.debug(f'Background fitting saved to:{file_path}')
+        return file_path
+        
+
+    def save_result(self, name_tag=""):
+        if self._last_result is None:
+            self.log.warning("No localization result to save!")
+            return
+        timestamp = datetime.datetime.now()
+        parameters = {
+                "file": self._last_result.file_name,
+                "file metadata": self._last_result.file_metadata,
+                "algorithm parameters" : asdict(self._last_result.algorithm_settings),
+        }
+        header = ["Frame number", "X (Pixel)", "Y (Pixel)"]
+        file_label = "molecules_positions" + name_tag
+        ds = TOMLHeaderDataStorage(root_dir=self.module_default_data_dir,
+                             include_global_metadata=True)
+        file_path, _, _ = ds.save_data(np.array(self._last_result.coordinates_array).T,
+                                       column_headers=header,
+                                       metadata=parameters,
+                                       nametag=file_label,
+                                       timestamp=timestamp,
+                                       notes="",
+                                       column_dtypes=[float] * len(header))
+
+        # ds.save_thumbnail(self.get_figure(), file_path=file_path.rsplit('.', 1)[0])
+
+        self.log.debug(f'Molecule coordinates saved to:{file_path}')
+        return file_path
+
+    def save_superlocalization(self, dataset:SingleMoleculeLocalizationDataset|None=None, name_tag:str=""):
+        if dataset is None and self._last_superlocalization is None:
+            self.log.warning("No superlocalization data to save!")
+            return
+        elif dataset is None:
+            dataset = self._last_superlocalization
+        if dataset is None:
+            self.log.warning("No superlocalization data to save!")
+            return
+        timestamp = datetime.datetime.now()
+        parameters = {
+                "file": dataset.input_file,
+                "Initial position estimate" : {
+                    "l":dataset.position_rough_estimate_l,
+                    "m":dataset.position_rough_estimate_m,
+                    "n":dataset.position_rough_estimate_n,
+                    },
+                "Spatial Fit": dataset.fit_result_spatially,
+                "Spectral Fit": dataset.fit_result_spectrally
+        }
+        header_spatial = ""
+        header_spectral = ["Frame", "Count"]
+        file_label = "molecules_superlocalization" + name_tag
+        ds = TOMLHeaderDataStorage(root_dir=self.module_default_data_dir,
+                             include_global_metadata=True)
+        file_path_spatial, _, _ = ds.save_data(dataset.flattened_image.T,
+                                       column_headers=header_spatial,
+                                       metadata=parameters,
+                                       nametag=file_label + "_flat_image",
+                                       timestamp=timestamp,
+                                       notes="",
+                                       column_dtypes=[float] * dataset.flattened_image.shape[0])
+        file_path_spectral, _, _ = ds.save_data(dataset.frequency_spectrum.T,
+                                       column_headers=header_spectral,
+                                       metadata=parameters,
+                                       nametag=file_label + "_spectrum",
+                                       timestamp=timestamp,
+                                       notes="",
+                                       column_dtypes=[float, float])
+
+        # ds.save_thumbnail(self.get_figure(), file_path=file_path.rsplit('.', 1)[0])
+
+        self.log.debug(f'Molecule superlocalization coordinates saved to:{file_path_spatial,file_path_spectral}')
+        return file_path_spatial, file_path_spectral
 
