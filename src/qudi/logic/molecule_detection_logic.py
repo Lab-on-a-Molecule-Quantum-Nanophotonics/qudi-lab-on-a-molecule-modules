@@ -2,7 +2,7 @@ import queue
 import sys
 import traceback
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from enum import Enum
 from queue import Empty, Full
 
@@ -99,25 +99,7 @@ class Worker(QRunnable):
             self.signals.finished.emit(self.thread_id)
 
 
-@dataclass
-class MoleculePositionsResult:
-    """
-    A dataclass to hold the result of the molecule detection algorithm.
-    """
-
-    file_name: str
-    quantile_gamma_fit: float
-    quantile_max_estimate: float
-    lorentzian_safety_margin: float
-    frequency_fwhm: float
-    probability_false_positive: float
-    psf_extension: float
-    assumed_intensity_amplitude: float
-    theta: float
-    kernel_spatial_length: int
-    kernel_frequency_length: int
-    coordinates_array: np.ndarray
-
+ANDOR_METADATA_KEYS = ("Temperature", "ExposureTime", "KineticCycleTime", "Accumulations", "PhotonCounting", "EmDacLevel", "Frames", "VerticalShiftSpeed", "PreAmpSetting", "CameraSerial", "BaselineClamp", "Model", "ChipSizeX", "ChipSizeY", "SoftwareVersion")
 
 @dataclass
 class UserActionableMoleculeDetectionSettings:
@@ -156,6 +138,17 @@ class MoleculeDetectionSettings:
     kernel_frequency_length: float
     number_of_frames_sampled_for_gamma_fitting: int 
 
+@dataclass
+class MoleculePositionsResult:
+    """
+    A dataclass to hold the result of the molecule detection algorithm.
+    """
+
+    file_name: str
+    file_metadata: dict[str, float]
+    algorithm_settings: MoleculeDetectionSettings
+    coordinates_array: np.ndarray
+
 def positivity_constraint_constructor(val):
     if val <= 0:
         return 1.0
@@ -189,20 +182,21 @@ class MoleculeDetectionLogic(LogicBase):
     _kernel_frequency_length = StatusVar(default=3)
     _input_file = StatusVar(default=None)
     _frames_per_slice = StatusVar(default=100)
-    _last_result = StatusVar(default=None)
+    _last_result = StatusVar(default=None, representer=asdict)
 
     progress_update = Signal(float)  # Localization progress between 0 and 1
     failure = Signal()
     finished = Signal()
     new_result = Signal(MoleculePositionsResult)
     settings_updated = Signal(MoleculeDetectionSettings)
+    position_updated = Signal(int)
     _start_watchdog_timer = Signal()
     _start_workers = Signal()
     _start_builder = Signal()
     _localize = Signal()
     _trigger_interrupt = Signal()
-    _gamma_estimate_histogram_updated = Signal(np.ndarray, np.ndarray)
-    _gamma_law_fit_updated = Signal(np.ndarray, np.ndarray)
+    gamma_estimate_histogram_updated = Signal(np.ndarray, np.ndarray)
+    gamma_law_fit_updated = Signal(np.ndarray, np.ndarray)
 
     @_theta.constructor
     def theta_constructor(self, yaml_data):
@@ -235,6 +229,8 @@ class MoleculeDetectionLogic(LogicBase):
         self._noise_fitting_histogram = (np.array([]), np.array([]))
         self._fitted_histogram = (np.array([]), np.array([]))
         self._fitted_gamma_law = (np.array([]), np.array([]))
+        self._flattened_image = np.array([])
+        self._metadata = None
 
     def on_activate(self) -> None:
         self._start_watchdog_timer.connect(self.__start_watchdog_timer, QtCore.Qt.QueuedConnection)
@@ -325,6 +321,18 @@ class MoleculeDetectionLogic(LogicBase):
     @settings.setter
     def settings(self, settings: UserActionableMoleculeDetectionSettings):
         if settings.input_file is not None:
+            if self._input_file != settings.input_file:
+                self._flattened_image = np.array([])
+                self._flattened_image = self.flattened_image
+                filepath = str(settings.input_file)
+                tiff = TiffFile(filepath)
+                number_of_frames = len(tiff.pages)
+                number_of_frames_per_slice = int(self._frames_per_slice)
+                number_of_slices = number_of_frames // number_of_frames_per_slice
+                self._total_number_of_slices = number_of_slices
+                self._number_of_frames = number_of_frames
+                self._metadata = None
+                self._metadata = self.andor_metadata
             self._input_file = settings.input_file  # ty: ignore[invalid-assignment]
         if settings.quantile_gamma_fit is not None:
             self._quantile_gamma_fit = settings.quantile_gamma_fit  # ty: ignore[invalid-assignment]
@@ -342,6 +350,9 @@ class MoleculeDetectionLogic(LogicBase):
 
     @Slot()
     def estimate_from_noise(self):
+        if self._input_file is None:
+            self.log.warning("No input file defined, could not perform noise estimation procedure.")
+            return
         filepath = str(self._input_file)
         tiff = TiffFile(filepath)
         number_of_frames = len(tiff.pages)
@@ -352,7 +363,7 @@ class MoleculeDetectionLogic(LogicBase):
             key=sampled_frames,
         )[0])
         self._noise_fitting_histogram = np.histogram(data, density=True)
-        self._gamma_estimate_histogram_updated.emit(self._noise_fitting_histogram[0], self._noise_fitting_histogram[1])
+        self.gamma_estimate_histogram_updated.emit(self._noise_fitting_histogram[0], self._noise_fitting_histogram[1])
         data_gamma_fit = data[ data < np.quantile(data, float(self._quantile_gamma_fit)) ]
         alpha, loc, theta = gamma.fit(data_gamma_fit, floc=0.0)
         self._theta = theta
@@ -365,7 +376,7 @@ class MoleculeDetectionLogic(LogicBase):
         x = self._noise_fitting_histogram[0]
         y = gamma.pdf(x, alpha, loc=loc, scale=theta)
         self._fitted_gamma_law = (x, y)
-        self._gamma_law_fit_updated.emit(x, y)
+        self.gamma_law_fit_updated.emit(x, y)
 
     def prepare_run(self):
         self._background_kernel = self.background_kernel()
@@ -632,17 +643,9 @@ class MoleculeDetectionLogic(LogicBase):
         N = np.concat(N)
         coordinates = np.array([L, M, N])
         self._last_result = MoleculePositionsResult(
-            quantile_gamma_fit=float(self._quantile_gamma_fit),
-            quantile_max_estimate=float(self._quantile_max_estimate),
-            lorentzian_safety_margin=float(self._lorentzian_safety_margin),
             file_name=str(self._input_file),
-            frequency_fwhm=float(self._frequency_fwhm),
-            probability_false_positive=float(self._probability_false_positive),
-            psf_extension=float(self._position_stdev),
-            assumed_intensity_amplitude=float(self._assumed_amplitude),
-            theta=float(self._theta),
-            kernel_spatial_length=int(self._kernel_spatial_length),
-            kernel_frequency_length=int(self._kernel_frequency_length),
+            file_metadata=self._metadata,  # ty: ignore[invalid-argument-type]
+            algorithm_settings=self.settings,
             coordinates_array=coordinates,
         )
         self.new_result.emit(self._last_result)
@@ -801,3 +804,32 @@ class MoleculeDetectionLogic(LogicBase):
     def __interrupt(self):
         self._interrupt = True
 
+    @property
+    def last_result(self) -> MoleculePositionsResult | None:
+        return self._last_result  # ty: ignore[invalid-return-type]
+
+    @property
+    def flattened_image(self) -> np.ndarray:
+        """Return a 2D image of the movie my taking the max over the whole time
+        series of each pixel.
+        """
+        if self._flattened_image.size == 0 and self._input_file is not None:
+            filepath = str(self._input_file)
+            full_image = imread(filepath)
+            self._flattened_image = np.max(full_image, axis=0)
+        return self._flattened_image
+
+    @property
+    def andor_metadata(self) -> dict[str, float]:
+        """Return the Andor metadata from the input file."""
+        if self._metadata is None:
+            if self._input_file is not None:
+                filepath = str(self._input_file)
+                file = TiffFile(filepath)
+                self._metadata = file.andor_metadata
+            if self._metadata is None:
+                self._metadata = {}
+            for k in ANDOR_METADATA_KEYS:
+                if k not in self._metadata:
+                    self._metadata[k] = np.nan
+        return self._metadata
