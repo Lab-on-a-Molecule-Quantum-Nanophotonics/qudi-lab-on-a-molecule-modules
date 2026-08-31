@@ -7,16 +7,21 @@ from enum import Enum
 from queue import Empty, Full
 
 import numpy as np
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 from PySide6 import QtCore
 from PySide6.QtCore import QObject, QRunnable, QThreadPool, QTimer, Signal, Slot
 from qudi.core.configoption import ConfigOption
 from qudi.core.module import LogicBase
 from qudi.core.statusvariable import StatusVar
+from qudi.util.fit_models.lorentzian import Lorentzian
 from qudi.util.mutex import Mutex
 from scipy.signal import convolve
 from scipy.special import polygamma
 from scipy.stats import gamma, norm
 from tifffile import TiffFile, imread
+
+from qudi.util.fit_models.gaussian import Gaussian2D
 
 
 def digamma(z):
@@ -149,6 +154,22 @@ class MoleculePositionsResult:
     algorithm_settings: MoleculeDetectionSettings
     coordinates_array: np.ndarray
 
+
+@dataclass
+class SingleMoleculeLocalizationDataset:
+    """
+    Data related to the localization of a single molecule.
+    """
+    input_file: str
+    position_rough_estimate_l: int
+    position_rough_estimate_m: int
+    position_rough_estimate_n: int
+    flattened_image: np.ndarray
+    frequency_spectrum: np.ndarray
+    fit_result_spatially: dict | None
+    fit_result_spectrally: dict | None
+    
+
 def positivity_constraint_constructor(val):
     if val <= 0:
         return 1.0
@@ -183,6 +204,7 @@ class MoleculeDetectionLogic(LogicBase):
     _input_file = StatusVar(default=None)
     _frames_per_slice = StatusVar(default=100)
     _last_result = StatusVar(default=None, representer=asdict)
+    _last_superlocalization = StatusVar(default=None)
 
     progress_update = Signal(float)  # Localization progress between 0 and 1
     failure = Signal()
@@ -190,6 +212,7 @@ class MoleculeDetectionLogic(LogicBase):
     new_result = Signal(MoleculePositionsResult)
     settings_updated = Signal(MoleculeDetectionSettings)
     position_updated = Signal(int)
+    new_superlocalization = Signal(SingleMoleculeLocalizationDataset)
     _start_watchdog_timer = Signal()
     _start_workers = Signal()
     _start_builder = Signal()
@@ -833,3 +856,147 @@ class MoleculeDetectionLogic(LogicBase):
                 if k not in self._metadata:
                     self._metadata[k] = np.nan
         return self._metadata
+
+    def subset_for_pixel(self, l:int, m:int, n:int, frequency_size:int | None=None, spatial_size:int | None=None) -> tuple[np.ndarray, tuple[int, int, int]]:
+        """
+        Return the subset of the raw data around the localized pizel at
+        `(l, m, n)`. And the offset that can be used to recover the global
+        coordinates of the pixels within the subset.
+        """
+        if self._input_file is None:
+            return np.array([])
+        if frequency_size is None:
+            frequency_size = int(self._kernel_frequency_length*self._lorentzian_safety_margin)
+        if spatial_size is None:
+            spatial_size = int(self._kernel_spatial_length)
+        offset_l = max(0, l - frequency_size)
+        keys = range(offset_l, min(l + frequency_size+1, self._number_of_frames))
+        filepath = str(self._input_file)
+        data = imread(filepath, key=keys)
+        w,h = data.shape
+        offset_m = max(0, m - spatial_size)
+        M = np.arange(offset_m, min(w, m + spatial_size + 1))
+        offset_n = max(0, n - spatial_size)
+        N = np.arange(offset_n, min(h, n + spatial_size + 1))
+        return data[:, M, N], (offset_l, offset_m, offset_n)
+
+    def integrate_spatially(self, subset:np.ndarray) -> np.ndarray:
+        """
+        Return a 1D array from the 3D subset where the spatial cordinates
+        have all been integrated.
+        """
+        return np.sum(subset, axis=(1,2))
+
+    def integrate_spectrally(self, data:np.ndarray) -> np.ndarray:
+        """Return a 2D array from the 3D dataset where the frequency axis has been integrated."""
+        return np.sum(data, axis=0)
+
+    def fit_frequency_dimension(self, integrated_spatially: np.ndarray) -> dict | None:
+        model = Lorentzian()
+        L = range(integrated_spatially.size)
+        try:
+            params = model.estimate_peak(integrated_spatially, L)
+            fit_result = model.fit(integrated_spatially, params, x=L)
+        except:
+            self.log.exception("Failed to fit on the frequency axis.")
+            return
+        else:
+            return fit_result.params.valuesdict()
+
+    def fit_spatial_dimension(self, integrated_spectrally: np.ndarray) -> dict | None:
+        model = Gaussian2D()
+        w,h = integrated_spectrally.shape
+        M = np.arange(w)
+        N = np.arange(h)
+        MN = np.meshgrid(M, N, indexing='ij')
+        try:
+            params = model.estimate_peak(integrated_spectrally, MN)
+            fit_result = model.fit(integrated_spectrally, params, x=MN)
+        except:
+            self.log.exception("Failed to fit in the spatial dimension.")
+            return
+        else:
+            return fit_result.params.valuesdict()
+
+    @Slot()
+    def superlocalize_all(self):
+        number_of_pre_localized = self._last_result.coordinates_array.shape[1]
+        for i in range(number_of_pre_localized):
+            self.superlocalize_by_id(i)
+
+    @Slot(int)
+    def superlocalize_by_id(self, i:int) -> SingleMoleculeLocalizationDataset | None:
+        """Perform a fitting procedure on the pre-localized molecule at index `i`."""
+        if self._last_result is None:
+            self.log.warning(f"Could not perform superlocalization on molecule {i}, no pre-localization data are available.")
+            return None
+        if not (0 <= i < self._last_result.coordinates_array.shape[1]):
+            raise ValueError(f"There is no molecule number {i}")
+        l,m,n = self._last_result.coordinates_array[:, i]
+        superlocalized = self.superlocalize_by_position(self, l, m, n)
+        if superlocalized is None:
+            return None
+        if superlocalized.fit_result_spectrally is None:
+            l = superlocalized.position_rough_estimate_l
+        else:
+            l = superlocalized.fit_result_spectrally["center"]
+        if superlocalized.fit_result_spatially is None:
+            m = superlocalized.position_rough_estimate_m
+            n = superlocalized.position_rough_estimate_n
+        else:
+            m = superlocalized.fit_result_spatially["center_x"]
+            n = superlocalized.fit_result_spatially["center_y"]
+        self._last_result.coordinates_array[:, i] = (l,m,n)
+        self.position_updated.emit(i)
+        return superlocalized
+
+    @Slot(int, int)
+    def superlocalize_by_position(self, l, m, n) -> SingleMoleculeLocalizationDataset | None:
+        """Perform a fitting procedure assuming a molecule is close to the pixel position `(l,m,n)`."""
+        self.log.debug(f"Fitting position around pixel position {(l,m,n)}.")
+        data, offsets = self.subset_for_pixel(l, m, n)
+        integrated_spatially = self.integrate_spatially(data)
+        integrated_spectrally = self.integrate_spectrally(data)
+        fit_result_spectral = self.fit_frequency_dimension(integrated_spatially)
+        fit_result_spatial = self.fit_spatial_dimension(integrated_spectrally)
+        offset_l, offset_m, offset_n = offsets
+        if fit_result_spatial is not None:
+            fit_result_spatial["center_x"] = fit_result_spatial["center_x"] + offset_m
+            fit_result_spatial["center_y"] = fit_result_spatial["center_y"] + offset_n
+        if fit_result_spectral is not None:
+            fit_result_spectral["center"] = fit_result_spectral["center"] + offset_l
+        superlocalized = SingleMoleculeLocalizationDataset(
+                input_file=str(self._input_file),
+                position_rough_estimate_l=l,
+                position_rough_estimate_m=m,
+                position_rough_estimate_n=n,
+                flattened_image=integrated_spectrally,
+                frequency_spectrum=integrated_spatially,
+                fit_result_spatially=fit_result_spatial,
+                fit_result_spectrally=fit_result_spectral,
+        )
+        self._last_superlocalization = superlocalized
+        self.new_superlocalization.emit(superlocalized)
+        return superlocalized
+
+    def draw_parameter_estimation_figure(self):
+        pass
+
+    def draw_flattened_image_figure(self):
+        pass
+
+    def draw_spatial_superlocalization(self):
+        pass
+
+    def draw_frequency_superlocalization(self):
+        pass
+
+    def save_parameter_estimation(self):
+        pass
+
+    def save_result(self):
+        pass
+
+    def save_superlocalization(self):
+        pass
+
