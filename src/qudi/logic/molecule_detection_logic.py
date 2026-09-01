@@ -7,7 +7,6 @@ from dataclasses import asdict, dataclass
 from enum import Enum
 from queue import Empty, Full
 
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 from PySide6 import QtCore
@@ -16,7 +15,6 @@ from qudi.core.configoption import ConfigOption
 from qudi.core.module import LogicBase
 from qudi.core.statusvariable import StatusVar
 from qudi.util.fit_models.lorentzian import Lorentzian
-from qudi.util.mutex import Mutex
 from qudi.util.units import ScaledFloat
 from scipy.signal import convolve
 from scipy.special import polygamma
@@ -237,7 +235,6 @@ class MoleculeDetectionLogic(LogicBase):
         self._slicer_to_worker_queue = queue.Queue()
         self._worker_to_builder_queue = queue.Queue()
         self._background_kernel = np.array([])
-        self._computing_lock = Mutex()
         self._threadpool = QThreadPool(self)
         self._workers = []
         self._slicer = None
@@ -274,6 +271,8 @@ class MoleculeDetectionLogic(LogicBase):
         self._start_builder.disconnect()
         self._localize.disconnect()
         self.interrupt()
+        if self.module_state() == 'locked':
+            self.module_state.unlock()
 
     def ln_transform(self, r_lmn: np.ndarray) -> np.ndarray:
         """
@@ -491,7 +490,6 @@ class MoleculeDetectionLogic(LogicBase):
     @Slot()
     def cleanup_run(self):
         self._interrupt = False
-        self._computing_lock.release()
         self._slicer_finished = False
         self._builder_finished = False
         self._worker_finished = []
@@ -638,9 +636,9 @@ class MoleculeDetectionLogic(LogicBase):
         if self._interrupt:
             return False
         retry = True
+        self.log.debug(f"[slicer] sending slice {slice_number}.")
         while retry:
             segment = self.slice(slice_number)
-            self.log.debug(f"[slicer] sending slice {slice_number}.")
             try:
                 self._slicer_to_worker_queue.put(
                     WorkerMessage(segment, slice_number),
@@ -773,6 +771,7 @@ class MoleculeDetectionLogic(LogicBase):
     def worker_thread_finished(self, thread_id):
         self._worker_finished[thread_id] = True
         self.log.debug(f"[supervisor] Worker thread {thread_id} finished.")
+        self.check_termination()
 
     @Slot()
     def slicer_thread_error(self, error: tuple):
@@ -788,6 +787,7 @@ class MoleculeDetectionLogic(LogicBase):
     def slicer_thread_finished(self, _thread_id):
         self._slicer_finished = True
         self.log.debug("[supervisor] Slicer thread finished.")
+        self.check_termination()
 
     @Slot()
     def builder_thread_error(self, error: tuple):
@@ -803,6 +803,7 @@ class MoleculeDetectionLogic(LogicBase):
     def builder_thread_finished(self, _thread_id):
         self._builder_finished = True
         self.log.debug("[supervisor] Builder thread finished.")
+        self.check_termination()
 
     @Slot()
     def abort(self):
@@ -811,6 +812,8 @@ class MoleculeDetectionLogic(LogicBase):
 
     @Slot()
     def check_termination(self):
+        if self.module_state() != "locked":
+            return
         finished = not self._builder_started or self._builder_finished
         finished = finished and (not self._slicer_started or self._slicer_finished)
         finished = finished and (not self._workers_started or all(self._worker_finished))
@@ -849,11 +852,12 @@ class MoleculeDetectionLogic(LogicBase):
 
     @Slot()
     def __localize(self):
-        if not self._computing_lock.acquire(timeout=5):
+        if self.module_state() != 'idle':
             self.log.error(
                 "Failed to acquire computing lock. Another task might be running, or the logic crashed."
             )
             return
+        self.module_state.lock()
         self.prepare_run()
         self._threadpool = QThreadPool(self)
         if self._slicer is None:
