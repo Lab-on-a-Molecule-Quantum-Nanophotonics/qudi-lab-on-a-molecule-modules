@@ -350,8 +350,6 @@ class MoleculeDetectionLogic(LogicBase):
     def settings(self, settings: UserActionableMoleculeDetectionSettings):
         if settings.input_file is not None:
             if self._input_file != settings.input_file:
-                self._flattened_image = np.array([])
-                self._flattened_image = self.flattened_image
                 filepath = str(settings.input_file)
                 tiff = TiffFile(filepath)
                 number_of_frames = len(tiff.pages)
@@ -360,8 +358,8 @@ class MoleculeDetectionLogic(LogicBase):
                 number_of_slices = number_of_frames // number_of_frames_per_slice
                 self._total_number_of_slices = number_of_slices
                 self._number_of_frames = number_of_frames
-                self._metadata = None
-                self._metadata = self.andor_metadata
+                self.load_flattened_image(settings.input_file)
+                self.load_andor_metadata(settings.input_file)
             self._input_file = settings.input_file  # ty: ignore[invalid-assignment]
         if settings.quantile_gamma_fit is not None:
             self._quantile_gamma_fit = settings.quantile_gamma_fit  # ty: ignore[invalid-assignment]
@@ -878,6 +876,10 @@ class MoleculeDetectionLogic(LogicBase):
     def last_result(self) -> MoleculePositionsResult | None:
         return self._last_result  # ty: ignore[invalid-return-type]
 
+    def load_flattened_image(self, filepath):
+        full_image = imread(filepath)
+        self._flattened_image = np.max(full_image, axis=0)
+
     @property
     def flattened_image(self) -> np.ndarray:
         """Return a 2D image of the movie my taking the max over the whole time
@@ -885,23 +887,24 @@ class MoleculeDetectionLogic(LogicBase):
         """
         if self._flattened_image.size == 0 and self._input_file is not None:
             filepath = str(self._input_file)
-            full_image = imread(filepath)
-            self._flattened_image = np.max(full_image, axis=0)
+            self.load_flattened_image(filepath)
         return self._flattened_image
+
+    def load_andor_metadata(self, filepath: str | None):
+        if filepath is not None:
+            file = TiffFile(filepath)
+            self._metadata = file.andor_metadata
+        if self._metadata is None:
+            self._metadata = {}
+        for k in ANDOR_METADATA_KEYS:
+            if k not in self._metadata:
+                self._metadata[k] = np.nan
 
     @property
     def andor_metadata(self) -> dict[str, float]:
         """Return the Andor metadata from the input file."""
         if self._metadata is None:
-            if self._input_file is not None:
-                filepath = str(self._input_file)
-                file = TiffFile(filepath)
-                self._metadata = file.andor_metadata
-            if self._metadata is None:
-                self._metadata = {}
-            for k in ANDOR_METADATA_KEYS:
-                if k not in self._metadata:
-                    self._metadata[k] = np.nan
+            self.load_andor_metadata(self._input_file)
         return self._metadata
 
     def subset_for_pixel(self, l:int, m:int, n:int, frequency_size:int | None=None, spatial_size:int | None=None) -> tuple[np.ndarray, tuple[int, int, int]]:
