@@ -930,9 +930,10 @@ class MoleculeDetectionLogic(LogicBase):
         """
         return np.sum(subset, axis=(1,2)) / (subset.shape[1]*subset.shape[2])
 
-    def integrate_spectrally(self, data:np.ndarray) -> np.ndarray:
+    def integrate_spectrally(self, l:int, data:np.ndarray) -> np.ndarray:
         """Return a 2D array from the 3D dataset where the frequency axis has been integrated."""
-        return np.sum(data, axis=0) / data.shape[0]
+        # return np.sum(data, axis=0) / data.shape[0]
+        return data[l, :, :]
 
     def fit_frequency_dimension(self, integrated_spatially: np.ndarray) -> dict | None:
         model = Lorentzian()
@@ -1000,15 +1001,23 @@ class MoleculeDetectionLogic(LogicBase):
         self.log.debug(f"Fitting position around pixel position {(l,m,n)}.")
         data, offsets = self.subset_for_pixel(l, m, n)
         integrated_spatially = self.integrate_spatially(data)
-        integrated_spectrally = self.integrate_spectrally(data)
         fit_result_spectral = self.fit_frequency_dimension(integrated_spatially)
+        new_l, new_m, new_n = l,m,n
+        offset_l, _offset_m, _offset_n = offsets
+        if fit_result_spectral is not None:
+            fit_result_spectral["center"] = fit_result_spectral["center"] + offset_l
+            new_l = int(fit_result_spectral["center"])
+        data, offsets = self.subset_for_pixel(new_l, new_m, new_n)
+        integrated_spectrally = self.integrate_spectrally(new_l-offset_l, data)
         fit_result_spatial = self.fit_spatial_dimension(integrated_spectrally)
-        offset_l, offset_m, offset_n = offsets
+        _offset_l, offset_m, offset_n = offsets
         if fit_result_spatial is not None:
             fit_result_spatial["center_x"] = fit_result_spatial["center_x"] + offset_m
             fit_result_spatial["center_y"] = fit_result_spatial["center_y"] + offset_n
-        if fit_result_spectral is not None:
-            fit_result_spectral["center"] = fit_result_spectral["center"] + offset_l
+            new_m, new_n = int(fit_result_spatial["center_x"]), int(fit_result_spatial["center_y"])
+        data, offsets = self.subset_for_pixel(new_l, new_m, new_n)
+        integrated_spectrally = self.integrate_spectrally(new_l-offset_l, data)
+        _offset_l, offset_m, offset_n = offsets
         superlocalized = SingleMoleculeLocalizationDataset(
                 input_file=str(self._input_file),
                 position_rough_estimate_l=l,
@@ -1108,6 +1117,14 @@ class MoleculeDetectionLogic(LogicBase):
         cbar = plt.colorbar(image, shrink=0.8)  # , fraction=0.046, pad=0.08, shrink=0.75)
         cbar.set_label(f"Intensity [{si_prefix_cb}count]")
         cbar.ax.tick_params(which=u'both', length=0)
+        if self._last_superlocalization.fit_result_spatially is not None:
+            texts = []
+            for (k,v) in self._last_superlocalization.fit_result_spatially.items():
+                texts.append(f"{k}={v}")
+            textstr = "\n".join(texts)
+            props = {"boxstyle": 'round', "facecolor": 'wheat', "alpha": 0.5}
+            ax.text(0.05, 0.95, textstr, transform=ax.transAxes, fontsize=14,
+                    verticalalignment='top', bbox=props)
         return fig
 
     def draw_frequency_superlocalization(self):
@@ -1117,6 +1134,20 @@ class MoleculeDetectionLogic(LogicBase):
         frame,count = self._last_superlocalization.frequency_spectrum
         fig, ax = plt.subplots()
         line, = ax.plot(frame, count, label="Data", color="black")
+        if self._last_superlocalization.fit_result_spectrally is not None:
+            offset = self._last_superlocalization.fit_result_spectrally["offset"]
+            center = self._last_superlocalization.fit_result_spectrally["center"]
+            sigma = self._last_superlocalization.fit_result_spectrally["sigma"]
+            amplitude = self._last_superlocalization.fit_result_spectrally["amplitude"]
+            x = np.linspace(start=np.min(frame), stop=np.max(frame), num=100)
+            ax.plot(x, Lorentzian._model_function(x, offset, center, sigma, amplitude), label="Fit")
+            textstr = "\n".join([f"offset={offset} counts",
+                                 f"center={center} frames",
+                                 f"HWHM={sigma} frames",
+                                 f"amplitude={amplitude} counts"])
+            props = {"boxstyle": 'round', "facecolor": 'wheat', "alpha": 0.5}
+            ax.text(0.05, 0.95, textstr, transform=ax.transAxes, fontsize=14,
+                    verticalalignment='top', bbox=props)
         ax.set_xlabel("Frame")
         ax.set_ylabel("Count")
         ax.legend(handles=[line], loc="best")
