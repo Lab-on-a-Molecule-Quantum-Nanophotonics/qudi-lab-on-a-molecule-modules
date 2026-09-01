@@ -372,6 +372,25 @@ class MoleculeDetectionLogic(LogicBase):
             self._number_of_frames_sampled_for_gamma_fitting = settings.number_of_frames_sampled_for_gamma_fitting  # ty: ignore[invalid-assignment]
         self.settings_updated.emit(self.settings)
 
+    @Slot(str)
+    def open_file(self, filepath):
+        self.settings = UserActionableMoleculeDetectionSettings(input_file=filepath)
+
+    @Slot(str)
+    def open_file_and_analyze(self, filepath):
+        self.settings = UserActionableMoleculeDetectionSettings(input_file=filepath)
+        self.estimate_from_noise()
+        self.prepare_run()
+        self.localize()
+
+    @Slot()
+    def analyze(self):
+        if self._input_file is None:
+            self.log.error("No file to analyze!")
+            return
+        else:
+            self.open_file_and_analyze(self._input_file)
+
     @Slot()
     def estimate_from_noise(self):
         if self._input_file is None:
