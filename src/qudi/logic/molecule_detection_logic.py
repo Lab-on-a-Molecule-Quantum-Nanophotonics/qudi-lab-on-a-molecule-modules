@@ -17,6 +17,7 @@ from qudi.core.module import LogicBase
 from qudi.core.statusvariable import StatusVar
 from qudi.util.fit_models.lorentzian import Lorentzian
 from qudi.util.mutex import Mutex
+from qudi.util.units import ScaledFloat
 from scipy.signal import convolve
 from scipy.special import polygamma
 from scipy.stats import gamma, norm
@@ -167,6 +168,8 @@ class SingleMoleculeLocalizationDataset:
     position_rough_estimate_m: int
     position_rough_estimate_n: int
     flattened_image: np.ndarray
+    flattened_image_m: np.ndarray
+    flattened_image_n: np.ndarray
     frequency_spectrum: np.ndarray
     fit_result_spatially: dict | None
     fit_result_spectrally: dict | None
@@ -405,7 +408,7 @@ class MoleculeDetectionLogic(LogicBase):
             filepath,
             key=sampled_frames,
         )[0])
-        self._noise_fitting_histogram = np.histogram(data, density=True)
+        self._noise_fitting_histogram = np.histogram(data, bins="auto", density=True)
         self.gamma_estimate_histogram_updated.emit(self._noise_fitting_histogram[0], self._noise_fitting_histogram[1])
         data_gamma_fit = data[ data < np.quantile(data, float(self._quantile_gamma_fit)) ]
         alpha, loc, theta = gamma.fit(data_gamma_fit, floc=0.0)
@@ -416,7 +419,8 @@ class MoleculeDetectionLogic(LogicBase):
             np.max(data[data < threshold_max]) - background
         )
         self.settings_updated.emit(self.settings)
-        x = self._noise_fitting_histogram[0]
+        histogram_edges = self._noise_fitting_histogram[1]
+        x = np.linspace(start=np.min(histogram_edges), stop=np.max(histogram_edges), num=1_000)
         y = gamma.pdf(x, alpha, loc=loc, scale=theta)
         self._fitted_gamma_law = (x, y)
         self.gamma_law_fit_updated.emit(x, y)
@@ -908,11 +912,11 @@ class MoleculeDetectionLogic(LogicBase):
         Return a 1D array from the 3D subset where the spatial cordinates
         have all been integrated.
         """
-        return np.sum(subset, axis=(1,2))
+        return np.sum(subset, axis=(1,2)) / (subset.shape[1]*subset.shape[2])
 
     def integrate_spectrally(self, data:np.ndarray) -> np.ndarray:
         """Return a 2D array from the 3D dataset where the frequency axis has been integrated."""
-        return np.sum(data, axis=0)
+        return np.sum(data, axis=0) / data.shape[0]
 
     def fit_frequency_dimension(self, integrated_spatially: np.ndarray) -> dict | None:
         model = Lorentzian()
@@ -995,7 +999,9 @@ class MoleculeDetectionLogic(LogicBase):
                 position_rough_estimate_m=m,
                 position_rough_estimate_n=n,
                 flattened_image=integrated_spectrally,
-                frequency_spectrum=integrated_spatially,
+                flattened_image_m=np.arange(int(offset_m), stop=int(offset_m+integrated_spectrally.shape[0])),
+                flattened_image_n=np.arange(int(offset_n), stop=int(offset_n+integrated_spectrally.shape[1])),
+                frequency_spectrum=np.array([np.arange(int(offset_l), stop=int(offset_l+integrated_spatially.shape[0])), integrated_spatially]),
                 fit_result_spatially=fit_result_spatial,
                 fit_result_spectrally=fit_result_spectral,
         )
@@ -1004,16 +1010,101 @@ class MoleculeDetectionLogic(LogicBase):
         return superlocalized
 
     def draw_parameter_estimation_figure(self):
-        pass
+        histogram_bins, histogram_edges  = self._noise_fitting_histogram
+        fitted_x, fitted_y = self._fitted_gamma_law 
+
+        fig, ax = plt.subplots()
+        bar = ax.bar(histogram_edges[:-1], histogram_bins, width=np.diff(histogram_edges), align="edge", label="data")
+        line, = ax.plot(fitted_x, fitted_y, label=f"Fit, θ={self._theta}", color="black")
+        ax.set_xlabel("Count")
+        ax.set_ylabel("Density")
+        ax.legend(handles=[bar, line], loc="best")
+        return fig
 
     def draw_flattened_image_figure(self):
-        pass
+        data = self.flattened_image
+        cbar_range = (np.nanmin(data), np.nanmax(data))
+        si_prefix_cb = ScaledFloat(cbar_range[1]-cbar_range[0]).scale if cbar_range[1] != cbar_range[0] \
+            else ScaledFloat(cbar_range[1])
+        si_factor_cb = ScaledFloat(cbar_range[1]-cbar_range[0]).scale_val
+        fig, ax = plt.subplots()
+        image = ax.imshow(data.transpose()/si_factor_cb,
+                            cmap='inferno',  # FIXME: reference the right place in qudi
+                            origin='lower',
+                            vmin=cbar_range[0]/si_factor_cb,
+                            vmax=cbar_range[1]/si_factor_cb,
+                            interpolation='none',
+                            extent=(0, data.shape[0],
+                                    0, data.shape[1])
+                          )
+        ax.set_aspect(1)
+        ax.set_xlabel("X [Pixels]")
+        ax.set_ylabel("Y [Pixels]")
+        ax.spines['bottom'].set_position(('outward', 10))
+        ax.spines['left'].set_position(('outward', 10))
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.get_xaxis().tick_bottom()
+        ax.get_yaxis().tick_left()
+        cbar = plt.colorbar(image, shrink=0.8)  # , fraction=0.046, pad=0.08, shrink=0.75)
+        cbar.set_label(f"Intensity [{si_prefix_cb}count]")
+        cbar.ax.tick_params(which=u'both', length=0)
+        if self.last_result is not None:
+            coordinates = self.last_result.coordinates_array
+            xs = coordinates[1, :]
+            ys = coordinates[2, :]
+            ax.plot(xs, ys, color="red", marker="o")
+            labels = [str(i) for i in range(coordinates.shape[1])]
+            for (x,y,label) in zip(xs,ys,labels):
+                ax.annotate(label, (x,y))
+        return fig
 
     def draw_spatial_superlocalization(self):
-        pass
+        if self._last_superlocalization is None:
+            self.log.error("No superlocalization data to plot.")
+            return
+        data = self._last_superlocalization.flattened_image
+        m = self._last_superlocalization.flattened_image_m
+        n = self._last_superlocalization.flattened_image_n
+        cbar_range = (np.nanmin(data), np.nanmax(data))
+        si_prefix_cb = ScaledFloat(cbar_range[1]-cbar_range[0]).scale if cbar_range[1] != cbar_range[0] \
+            else ScaledFloat(cbar_range[1])
+        si_factor_cb = ScaledFloat(cbar_range[1]-cbar_range[0]).scale_val
+        fig, ax = plt.subplots()
+        image = ax.imshow(data.transpose()/si_factor_cb,
+                            cmap='inferno',  # FIXME: reference the right place in qudi
+                            origin='lower',
+                            vmin=cbar_range[0]/si_factor_cb,
+                            vmax=cbar_range[1]/si_factor_cb,
+                            interpolation='none',
+                            extent=(np.min(m), np.max(m),
+                                    np.min(n), np.max(n))
+                          )
+        ax.set_aspect(1)
+        ax.set_xlabel("X [Pixels]")
+        ax.set_ylabel("Y [Pixels]")
+        ax.spines['bottom'].set_position(('outward', 10))
+        ax.spines['left'].set_position(('outward', 10))
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.get_xaxis().tick_bottom()
+        ax.get_yaxis().tick_left()
+        cbar = plt.colorbar(image, shrink=0.8)  # , fraction=0.046, pad=0.08, shrink=0.75)
+        cbar.set_label(f"Intensity [{si_prefix_cb}count]")
+        cbar.ax.tick_params(which=u'both', length=0)
+        return fig
 
     def draw_frequency_superlocalization(self):
-        pass
+        if self._last_superlocalization is None:
+            self.log.error("No superlocalization data to plot.")
+            return
+        frame,count = self._last_superlocalization.frequency_spectrum
+        fig, ax = plt.subplots()
+        line, = ax.plot(frame, count, label="Data", color="black")
+        ax.set_xlabel("Frame")
+        ax.set_ylabel("Count")
+        ax.legend(handles=[line], loc="best")
+        return fig
 
     def save_parameter_estimation(self, name_tag=""):
         timestamp = datetime.datetime.now()
@@ -1045,7 +1136,7 @@ class MoleculeDetectionLogic(LogicBase):
                                        notes="",
                                        column_dtypes=[float] * len(header))
 
-        # ds.save_thumbnail(self.get_figure(), file_path=file_path.rsplit('.', 1)[0])
+        ds.save_thumbnail(self.draw_parameter_estimation_figure(), file_path=file_path.rsplit('.', 1)[0])
 
         self.log.debug(f'Background fitting saved to:{file_path}')
         return file_path
@@ -1073,7 +1164,7 @@ class MoleculeDetectionLogic(LogicBase):
                                        notes="",
                                        column_dtypes=[float] * len(header))
 
-        # ds.save_thumbnail(self.get_figure(), file_path=file_path.rsplit('.', 1)[0])
+        ds.save_thumbnail(self.draw_flattened_image_figure(), file_path=file_path.rsplit('.', 1)[0])
 
         self.log.debug(f'Molecule coordinates saved to:{file_path}')
         return file_path
@@ -1118,7 +1209,8 @@ class MoleculeDetectionLogic(LogicBase):
                                        notes="",
                                        column_dtypes=[float, float])
 
-        # ds.save_thumbnail(self.get_figure(), file_path=file_path.rsplit('.', 1)[0])
+        ds.save_thumbnail(self.draw_frequency_superlocalization(), file_path=file_path_spectral.rsplit('.', 1)[0])
+        ds.save_thumbnail(self.draw_spatial_superlocalization(), file_path=file_path_spatial.rsplit('.', 1)[0])
 
         self.log.debug(f'Molecule superlocalization coordinates saved to:{file_path_spatial,file_path_spectral}')
         return file_path_spatial, file_path_spectral
