@@ -258,6 +258,8 @@ class MoleculeDetectionLogic(LogicBase):
         self._metadata = None
         self._last_result = None
         self._last_superlocalization = None
+        self._input_file_width = 0
+        self._input_file_height = 0
 
     def on_activate(self) -> None:
         self._start_watchdog_timer.connect(self.__start_watchdog_timer, QtCore.Qt.QueuedConnection)
@@ -354,6 +356,7 @@ class MoleculeDetectionLogic(LogicBase):
                 filepath = str(settings.input_file)
                 tiff = TiffFile(filepath)
                 number_of_frames = len(tiff.pages)
+                self._input_file_width, self._input_file_height, = tiff.pages.first.shape
                 number_of_frames_per_slice = int(self._frames_per_slice)
                 number_of_slices = number_of_frames // number_of_frames_per_slice
                 self._total_number_of_slices = number_of_slices
@@ -474,6 +477,7 @@ class MoleculeDetectionLogic(LogicBase):
         number_of_frames = len(tiff.pages)
         number_of_frames_per_slice = int(self._frames_per_slice)
         number_of_slices = number_of_frames // number_of_frames_per_slice
+        self._input_file_width, self._input_file_height, = tiff.pages.first.shape
         self._total_number_of_slices = number_of_slices
         self._number_of_frames = number_of_frames
         self._worker_to_builder_queue = queue.Queue()
@@ -600,6 +604,17 @@ class MoleculeDetectionLogic(LogicBase):
         roi_local_maxima = is_local_maximum == LocalMaximumDecision.Keep
         return (L[roi_local_maxima], M[roi_local_maxima], N[roi_local_maxima])
 
+    def offset_result(
+            self, r_lmn: np.ndarray, coordinates: tuple[np.ndarray, np.ndarray, np.ndarray]) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+        """Offset the computed coordinates to account for the change in dimension due
+        to the convolution steps.
+        """
+        data_shape = r_lmn.shape
+        offset_l = (self._total_number_of_slices - data_shape[0]) // 2
+        offset_m = (self._input_file_width - data_shape[1]) // 2
+        offset_n = (self._input_file_height - data_shape[2]) // 2
+        return (coordinates[0]+offset_l, coordinates[1]+offset_m, coordinates[2]+offset_n)
+
     def slice(self, slice_number: int) -> np.ndarray:
         filepath = str(self._input_file)
         number_of_frames_per_slice = int(self._frames_per_slice)
@@ -657,6 +672,7 @@ class MoleculeDetectionLogic(LogicBase):
         background = self.adaptative_background(data)
         above_threshold_coordinates = self.thresholding(r_lmn, background)
         coordinates = self.local_maxima(r_lmn, above_threshold_coordinates)
+        coordinates = self.offset_result(r_lmn, coordinates)
         return coordinates
 
     def worker_init(self, worker_id):
