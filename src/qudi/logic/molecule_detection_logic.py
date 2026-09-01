@@ -882,7 +882,7 @@ class MoleculeDetectionLogic(LogicBase):
         M = np.arange(offset_m, min(w, m + spatial_size + 1))
         offset_n = max(0, n - spatial_size)
         N = np.arange(offset_n, min(h, n + spatial_size + 1))
-        return data[:, M, N], (offset_l, offset_m, offset_n)
+        return data[np.ix_(range(data.shape[0]), M, N)], (offset_l, offset_m, offset_n)
 
     def integrate_spatially(self, subset:np.ndarray) -> np.ndarray:
         """
@@ -897,7 +897,7 @@ class MoleculeDetectionLogic(LogicBase):
 
     def fit_frequency_dimension(self, integrated_spatially: np.ndarray) -> dict | None:
         model = Lorentzian()
-        L = range(integrated_spatially.size)
+        L = np.arange(integrated_spatially.size)
         try:
             params = model.estimate_peak(integrated_spatially, L)
             fit_result = model.fit(integrated_spatially, params, x=L)
@@ -913,9 +913,10 @@ class MoleculeDetectionLogic(LogicBase):
         M = np.arange(w)
         N = np.arange(h)
         MN = np.meshgrid(M, N, indexing='ij')
+        raveled = np.ravel(integrated_spectrally)
         try:
-            params = model.estimate_peak(integrated_spectrally, MN)
-            fit_result = model.fit(integrated_spectrally, params, x=MN)
+            params = model.estimate_peak(raveled, MN)
+            fit_result = model.fit(raveled, params, x=MN)
         except:
             self.log.exception("Failed to fit in the spatial dimension.")
             return
