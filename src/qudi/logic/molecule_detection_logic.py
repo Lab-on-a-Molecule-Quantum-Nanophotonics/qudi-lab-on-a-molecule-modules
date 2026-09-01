@@ -504,20 +504,23 @@ class MoleculeDetectionLogic(LogicBase):
         self._builder.signals.success.disconnect(self.builder_thread_success)
         self._builder.signals.finished.disconnect(self.builder_thread_finished)
         self._trigger_interrupt.disconnect(self._builder.signals.interrupt)
+        self.module_state.unlock()
 
     def background_kernel(self) -> np.ndarray:
         """
         Produce a "holed" kernel, i.e. a 3D matrix where the central block is zero,
         that can be used to estimate locally the background.
         """
-        size_lateral = 2 * int(self._kernel_spatial_length) + 1
-        size_frequency = 2 * int(self._kernel_frequency_length) + 1
+        kf_length = int(self._kernel_frequency_length)
+        ks_length = int(self._kernel_spatial_length)
+        size_lateral = 2 * ks_length + 1
+        size_frequency = 2 * kf_length + 1
         kernel = np.ones((size_frequency, size_lateral, size_lateral))
-        kernel[
-            (size_frequency // 2 + 1) : (size_frequency + size_frequency // 2 + 1),
-            (size_lateral // 2 + 1) : (size_lateral + size_lateral // 2 + 1),
-            (size_lateral // 2 + 1) : (size_lateral + size_lateral // 2 + 1),
-        ] = 0
+        kernel[np.ix_(
+                    range((kf_length // 2 + 1), (kf_length + kf_length // 2 + 1)),
+                    range((ks_length // 2 + 1), (ks_length + ks_length // 2 + 1)),
+                    range((ks_length // 2 + 1), (ks_length + ks_length // 2 + 1)),
+        )] = 0
         return kernel / np.sum(kernel)
 
     def adaptative_background(self, r_lmn: np.ndarray) -> np.ndarray:
