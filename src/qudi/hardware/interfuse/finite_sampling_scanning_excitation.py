@@ -90,6 +90,7 @@ class FiniteSamplingScanningExcitationInterfuse(
     _sleep_time_external_stabilization = StatusVar(
         name="sleep_time_external_stabilization", default=60
     )
+    _idle_enabled = StatusVar(default=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -163,6 +164,7 @@ class FiniteSamplingScanningExcitationInterfuse(
                 "Idle frequency", (-10e12, 10e12), float, "Hz"
             ),
             ExcitationScanControlVariable("External enabled", (False, True), bool, ""),
+            ExcitationScanControlVariable("Idling enabled", (False, True), bool, ""),
         ]
         if self._ext_setpoint() is not None:
             limits = self._ext_setpoint().constraints.channel_limits[
@@ -246,10 +248,11 @@ class FiniteSamplingScanningExcitationInterfuse(
     @transition_to(("start", "prepare_scan"))
     def idle(self):
         "Idling between scans, setting the analog output value if requested."
-        if not self._ao().get_activity_state(self._output_channel):
-            self._ao().set_activity_state(self._output_channel, True)
-        if self._ao().get_setpoint(self._output_channel) != self._idle_value:
-            self._ao().set_setpoint(self._output_channel, self._idle_value)
+        if self._idle_enabled:
+            if not self._ao().get_activity_state(self._output_channel):
+                self._ao().set_activity_state(self._output_channel, True)
+            if self._ao().get_setpoint(self._output_channel) != self._idle_value:
+                self._ao().set_setpoint(self._output_channel, self._idle_value)
 
     @state
     @transition_to(("next", "prepare_step"))
@@ -407,7 +410,7 @@ class FiniteSamplingScanningExcitationInterfuse(
             with self._data_lock:
                 self._scan_data[i : i + len(new_data), 1] = new_data
                 self._data_row_index += len(new_data)
-            self._idle_value = self._scan_data[self._data_row_index, self.frequency_column_number] / self._conversion_factor
+            self._idle_value = self._scan_data[self._data_row_index-1, self.frequency_column_number] / self._conversion_factor
 
     @state
     @transition_from(("stop", "*"))
@@ -512,6 +515,8 @@ class FiniteSamplingScanningExcitationInterfuse(
             self._external_enabled = value
         elif variable == "External setpoint sleep to stabilize":
             self._sleep_time_external_stabilization = value
+        elif variable == "Idling enabled":
+            self._idle_enabled = value
 
     def get_control(self, variable: str):
         "Get a control variable value."
@@ -549,6 +554,8 @@ class FiniteSamplingScanningExcitationInterfuse(
             return self._external_enabled
         elif variable == "External setpoint sleep to stabilize":
             return self._sleep_time_external_stabilization
+        elif variable == "Idling enabled":
+            return self._idle_enabled
         else:
             raise ValueError(f"Unknown variable {variable}")
 
@@ -621,13 +628,20 @@ class FiniteSamplingScanningExcitationInterfuse(
         """
         result = [
             (
+                "Idling",
+                [
+                    "Idling enabled",
+                    "Idle frequency",
+                    "Idle tension",
+                ]
+            ),
+            (
                 "Tension controls",
                 [
                     "Conversion factor",
                     "Minimum tension",
                     "Maximum tension",
                     "Tension step",
-                    "Idle tension",
                 ],
             ),
             (
@@ -636,7 +650,6 @@ class FiniteSamplingScanningExcitationInterfuse(
                     "Minimum frequency",
                     "Maximum frequency",
                     "Frequency step",
-                    "Idle frequency",
                 ],
             ),
             ("Time controls", ["Sleep before scan"]),
