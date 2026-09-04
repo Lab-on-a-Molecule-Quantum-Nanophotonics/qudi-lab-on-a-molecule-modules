@@ -116,6 +116,7 @@ class UserActionableMoleculeDetectionSettings:
     probability_false_positive: float | None = None
     frame_per_slice: float | None = None
     number_of_frames_sampled_for_gamma_fitting: int | None = None
+    border_excluded_pixels: int | None = None
 
 
 @dataclass
@@ -139,6 +140,7 @@ class MoleculeDetectionSettings:
     kernel_spatial_length: float
     kernel_frequency_length: float
     number_of_frames_sampled_for_gamma_fitting: int 
+    border_excluded_pixels: int 
 
 @dataclass
 class MoleculePositionsResult:
@@ -202,6 +204,7 @@ class MoleculeDetectionLogic(LogicBase):
     _kernel_frequency_length = StatusVar(default=3)
     _input_file = StatusVar(default=None)
     _frames_per_slice = StatusVar(default=100)
+    _excluded_pixels_border = StatusVar(default=1)
 
     progress_update = Signal(float)  # Localization progress between 0 and 1
     failure = Signal()
@@ -369,6 +372,8 @@ class MoleculeDetectionLogic(LogicBase):
             self._frames_per_slice = settings.frame_per_slice  # ty: ignore[invalid-assignment]
         if settings.number_of_frames_sampled_for_gamma_fitting is not None:
             self._number_of_frames_sampled_for_gamma_fitting = settings.number_of_frames_sampled_for_gamma_fitting  # ty: ignore[invalid-assignment]
+        if settings.border_excluded_pixels is not None:
+            self._excluded_pixels_border = settings.border_excluded_pixels  # ty: ignore[invalid-assignment]
         self.settings_updated.emit(self.settings)
 
     @Slot(str)
@@ -545,7 +550,10 @@ class MoleculeDetectionLogic(LogicBase):
         )  # recover the alpha parameter of the gamma distribution of the background
         threshold = self.tau(alpha)
         thresholded = r_lmn >= threshold
-        coordinates = np.nonzero(thresholded)
+        L = np.arange(thresholded.shape[0])
+        M = np.arange(int(self._excluded_pixels_border), stop=thresholded.shape[1]-self._excluded_pixels_border)
+        N = np.arange(int(self._excluded_pixels_border), stop=thresholded.shape[2]-self._excluded_pixels_border)
+        coordinates = np.nonzero(thresholded[np.ix_(L,M,N)])
         return coordinates
 
     def local_maxima(
