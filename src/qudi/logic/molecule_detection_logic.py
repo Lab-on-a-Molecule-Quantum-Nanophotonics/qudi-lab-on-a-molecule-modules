@@ -1,3 +1,4 @@
+from tracemalloc import start
 import datetime
 import queue
 import sys
@@ -118,6 +119,12 @@ class UserActionableMoleculeDetectionSettings:
     number_of_frames_sampled_for_gamma_fitting: int | None = None
     number_of_frames_sampled_for_psf_estimation: int | None = None
     border_excluded_pixels: int | None = None
+    digamma_interpolation_mini: float | None = None
+    digamma_interpolation_maxi: float | None = None
+    digamma_interpolation_num: int | None = None
+    trigamma_interpolation_mini: float | None = None
+    trigamma_interpolation_maxi: float | None = None
+    trigamma_interpolation_num: int | None = None
 
 
 @dataclass
@@ -143,6 +150,13 @@ class MoleculeDetectionSettings:
     number_of_frames_sampled_for_gamma_fitting: int 
     number_of_frames_sampled_for_psf_estimation: int
     border_excluded_pixels: int 
+    digamma_interpolation_mini: float
+    digamma_interpolation_maxi: float
+    digamma_interpolation_num: int
+    trigamma_interpolation_mini: float
+    trigamma_interpolation_maxi: float
+    trigamma_interpolation_num: int
+
 
 @dataclass
 class MoleculePositionsResult:
@@ -208,6 +222,12 @@ class MoleculeDetectionLogic(LogicBase):
     _input_file = StatusVar(default=None)
     _frames_per_slice = StatusVar(default=100)
     _excluded_pixels_border = StatusVar(default=1)
+    _digamma_interpolation_mini = StatusVar(default=2)
+    _digamma_interpolation_maxi = StatusVar(default=40_000)
+    _digamma_interpolation_num = StatusVar(default=100)
+    _trigamma_interpolation_mini = StatusVar(default=2)
+    _trigamma_interpolation_maxi = StatusVar(default=40_000)
+    _trigamma_interpolation_num = StatusVar(default=100)
 
     progress_update = Signal(float)  # Localization progress between 0 and 1
     failure = Signal()
@@ -259,6 +279,8 @@ class MoleculeDetectionLogic(LogicBase):
         self._last_superlocalization = None
         self._input_file_width = 0
         self._input_file_height = 0
+        self._trigamma_interpolation = (np.array([]), np.array([]))
+        self._digamma_interpolation = (np.array([]), np.array([]))
 
     def on_activate(self) -> None:
         self._start_watchdog_timer.connect(self.__start_watchdog_timer, QtCore.Qt.QueuedConnection)
@@ -325,9 +347,11 @@ class MoleculeDetectionLogic(LogicBase):
         W2 = W1**2
         w1 = W1.sum()
         w2 = W2.sum()
-        return np.sqrt(w2 * trigamma(alpha)) * inv_gauss(
+        digamma_interpolation = np.interp(alpha, self._digamma_interpolation[0], self._digamma_interpolation[1])
+        trigamma_interpolation = np.interp(alpha, self._trigamma_interpolation[0], self._trigamma_interpolation[1])
+        return np.sqrt(w2 * trigamma_interpolation) * inv_gauss(
             self._probability_false_positive
-        ) + w1 * digamma(alpha)
+        ) + w1 * digamma_interpolation
 
     @property
     def settings(self) -> MoleculeDetectionSettings:
@@ -348,6 +372,12 @@ class MoleculeDetectionLogic(LogicBase):
             number_of_frames_sampled_for_gamma_fitting=int(self._number_of_frames_sampled_for_gamma_fitting),
             number_of_frames_sampled_for_psf_estimation=int(self._number_of_frames_sampled_for_psf_estimation),
             border_excluded_pixels=int(self._excluded_pixels_border),
+            digamma_interpolation_mini= float(self._digamma_interpolation_mini),
+            digamma_interpolation_maxi= float(self._digamma_interpolation_maxi),
+            digamma_interpolation_num= int(self._digamma_interpolation_num),
+            trigamma_interpolation_mini= float(self._trigamma_interpolation_mini),
+            trigamma_interpolation_maxi= float(self._trigamma_interpolation_maxi),
+            trigamma_interpolation_num= int(self._trigamma_interpolation_num),
         )
 
     @settings.setter
@@ -380,6 +410,27 @@ class MoleculeDetectionLogic(LogicBase):
             self._number_of_frames_sampled_for_psf_estimation = settings.number_of_frames_sampled_for_psf_estimation  # ty: ignore[invalid-assignment]
         if settings.border_excluded_pixels is not None:
             self._excluded_pixels_border = settings.border_excluded_pixels  # ty: ignore[invalid-assignment]
+        need_to_recalculate_interpolation=False
+        if settings.digamma_interpolation_mini is not None:
+            need_to_recalculate_interpolation = True
+            self._digamma_interpolation_mini = settings.digamma_interpolation_mini # ty: ignore[invalid-assignment]
+        if settings.digamma_interpolation_maxi is not None:
+            need_to_recalculate_interpolation = True
+            self._digamma_interpolation_maxi = settings.digamma_interpolation_maxi # ty: ignore[invalid-assignment]
+        if settings.digamma_interpolation_num is not None:
+            need_to_recalculate_interpolation = True
+            self._digamma_interpolation_num = settings.digamma_interpolation_num # ty: ignore[invalid-assignment]
+        if settings.trigamma_interpolation_mini is not None:
+            need_to_recalculate_interpolation = True
+            self._trigamma_interpolation_mini = settings.trigamma_interpolation_mini # ty: ignore[invalid-assignment]
+        if settings.trigamma_interpolation_maxi is not None:
+            need_to_recalculate_interpolation = True
+            self._trigamma_interpolation_maxi = settings.trigamma_interpolation_maxi # ty: ignore[invalid-assignment]
+        if settings.trigamma_interpolation_num is not None:
+            need_to_recalculate_interpolation = True
+            self._trigamma_interpolation_num = settings.trigamma_interpolation_num # ty: ignore[invalid-assignment]
+        if need_to_recalculate_interpolation:
+            self.compute_interpolations()
         self.settings_updated.emit(self.settings)
 
     @Slot(str)
@@ -401,6 +452,13 @@ class MoleculeDetectionLogic(LogicBase):
             return
         else:
             self.open_file_and_analyze(self._input_file)
+
+    @Slot()
+    def compute_interpolations(self):
+        digamma_range = np.geomspace(start=float(self._digamma_interpolation_mini), stop=float(self._digamma_interpolation_maxi), num=int(self._digamma_interpolation_num))
+        trigamma_range = np.geomspace(start=float(self._trigamma_interpolation_mini), stop=float(self._trigamma_interpolation_maxi), num=int(self._trigamma_interpolation_num))
+        self._digamma_interpolation = (digamma_range, digamma(digamma_range))
+        self._trigamma_interpolation = (trigamma_range, trigamma(trigamma_range))
 
     @Slot()
     def estimate_psf(self):
@@ -473,6 +531,7 @@ class MoleculeDetectionLogic(LogicBase):
         if self._input_file is None:
             self.log.error("Cannot prepare run, no file selected.")
             return
+        self.compute_interpolations()
         self._background_kernel = self.background_kernel()
         self._workers = [
             Worker(
