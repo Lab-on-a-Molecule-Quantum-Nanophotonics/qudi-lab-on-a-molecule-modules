@@ -346,22 +346,23 @@ class MoleculeDetectionLogic(LogicBase):
             kernel_spatial_length=float(self._kernel_spatial_length),
             kernel_frequency_length=float(self._kernel_frequency_length),
             number_of_frames_sampled_for_gamma_fitting=int(self._number_of_frames_sampled_for_gamma_fitting),
+            number_of_frames_sampled_for_psf_estimation=int(self._number_of_frames_sampled_for_psf_estimation),
+            border_excluded_pixels=int(self._excluded_pixels_border),
         )
 
     @settings.setter
     def settings(self, settings: UserActionableMoleculeDetectionSettings):
         if settings.input_file is not None:
-            if self._input_file != settings.input_file:
-                filepath = str(settings.input_file)
-                tiff = TiffFile(filepath)
-                number_of_frames = len(tiff.pages)
-                self._input_file_width, self._input_file_height, = tiff.pages.first.shape
-                number_of_frames_per_slice = int(self._frames_per_slice)
-                number_of_slices = number_of_frames // number_of_frames_per_slice
-                self._total_number_of_slices = number_of_slices
-                self._number_of_frames = number_of_frames
-                self.load_flattened_image(settings.input_file)
-                self.load_andor_metadata(settings.input_file)
+            filepath = str(settings.input_file)
+            tiff = TiffFile(filepath)
+            number_of_frames = len(tiff.pages)
+            self._input_file_width, self._input_file_height, = tiff.pages.first.shape
+            number_of_frames_per_slice = int(self._frames_per_slice)
+            number_of_slices = number_of_frames // number_of_frames_per_slice
+            self._total_number_of_slices = number_of_slices
+            self._number_of_frames = number_of_frames
+            self.load_flattened_image(settings.input_file)
+            self.load_andor_metadata(settings.input_file)
             self._input_file = settings.input_file  # ty: ignore[invalid-assignment]
         if settings.quantile_gamma_fit is not None:
             self._quantile_gamma_fit = settings.quantile_gamma_fit  # ty: ignore[invalid-assignment]
