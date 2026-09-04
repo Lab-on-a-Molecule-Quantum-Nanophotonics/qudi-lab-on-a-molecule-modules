@@ -627,10 +627,11 @@ class MoleculeDetectionLogic(LogicBase):
             # Compute the distance to all the other coordinates and select the
             # coordinates in the neighborhood
             spatial_distances = np.sqrt((m - M) ** 2 + (n - N) ** 2)
-            roi_distances = (0 < spatial_distances) & (spatial_distances < 3 * float(self._position_stdev))
+            roi_distances = (spatial_distances < 3 * float(self._position_stdev))
             frequency_distances = np.abs(l - L)
-            roi_frequencies = (0 < frequency_distances) & (frequency_distances < 3 * float(self._frequency_fwhm))
+            roi_frequencies = (frequency_distances < 3 * float(self._lorentzian_safety_margin*self._frequency_fwhm))
             roi = roi_distances & roi_frequencies
+            roi[i] = False
             neighbors_L = L[roi]
             neighbors_M = M[roi]
             neighbors_N = N[roi]
@@ -656,7 +657,7 @@ class MoleculeDetectionLogic(LogicBase):
         to the convolution steps.
         """
         data_shape = r_lmn.shape
-        offset_l = (self._total_number_of_slices - data_shape[0]) // 2
+        offset_l = (self._frames_per_slice - data_shape[0]) // 2
         offset_m = (self._input_file_width - data_shape[1]) // 2
         offset_n = (self._input_file_height - data_shape[2]) // 2
         return (coordinates[0]+offset_l, coordinates[1]+offset_m, coordinates[2]+offset_n)
