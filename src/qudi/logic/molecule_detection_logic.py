@@ -116,6 +116,7 @@ class UserActionableMoleculeDetectionSettings:
     probability_false_positive: float | None = None
     frame_per_slice: float | None = None
     number_of_frames_sampled_for_gamma_fitting: int | None = None
+    number_of_frames_sampled_for_psf_estimation: int | None = None
     border_excluded_pixels: int | None = None
 
 
@@ -140,6 +141,7 @@ class MoleculeDetectionSettings:
     kernel_spatial_length: float
     kernel_frequency_length: float
     number_of_frames_sampled_for_gamma_fitting: int 
+    number_of_frames_sampled_for_psf_estimation: int
     border_excluded_pixels: int 
 
 @dataclass
@@ -190,6 +192,7 @@ class MoleculeDetectionLogic(LogicBase):
 
     _quantile_gamma_fit = StatusVar(name="quantile_gamma_fit", default=0.99)
     _number_of_frames_sampled_for_gamma_fitting = StatusVar(default=10)
+    _number_of_frames_sampled_for_psf_estimation = StatusVar(default=50)
     _quantile_max_estimate = StatusVar(name="quantile_max_estimate", default=0.9999)
     _lorentzian_safety_margin = StatusVar(name="lorentzian_safety_margin", default=3)
 
@@ -372,6 +375,8 @@ class MoleculeDetectionLogic(LogicBase):
             self._frames_per_slice = settings.frame_per_slice  # ty: ignore[invalid-assignment]
         if settings.number_of_frames_sampled_for_gamma_fitting is not None:
             self._number_of_frames_sampled_for_gamma_fitting = settings.number_of_frames_sampled_for_gamma_fitting  # ty: ignore[invalid-assignment]
+        if settings.number_of_frames_sampled_for_psf_estimation is not None:
+            self._number_of_frames_sampled_for_psf_estimation = settings.number_of_frames_sampled_for_psf_estimation  # ty: ignore[invalid-assignment]
         if settings.border_excluded_pixels is not None:
             self._excluded_pixels_border = settings.border_excluded_pixels  # ty: ignore[invalid-assignment]
         self.settings_updated.emit(self.settings)
@@ -383,6 +388,7 @@ class MoleculeDetectionLogic(LogicBase):
     @Slot(str)
     def open_file_and_analyze(self, filepath):
         self.settings = UserActionableMoleculeDetectionSettings(input_file=filepath)
+        self.estimate_psf()
         self.estimate_from_noise()
         self.prepare_run()
         self.localize()
@@ -396,9 +402,45 @@ class MoleculeDetectionLogic(LogicBase):
             self.open_file_and_analyze(self._input_file)
 
     @Slot()
+    def estimate_psf(self):
+        if self._input_file is None:
+            self.log.error("No input file defined, could not perform noise estimation procedure.")
+            return
+        filepath = str(self._input_file)
+        tiff = TiffFile(filepath)
+        number_of_frames = len(tiff.pages)
+        number_of_samples = min(self._number_of_frames_sampled_for_psf_estimation, number_of_frames)
+        sampled_frames = np.random.choice(range(number_of_frames), number_of_samples)
+        data = imread(
+            filepath,
+            key=sampled_frames,
+        )
+        l,m,n = np.unravel_index(np.argmax(data), data.shape)
+        l = sampled_frames[l]
+        extent = int(self._frequency_fwhm*self._lorentzian_safety_margin)
+        sampled_frames = np.arange(max(0, l - extent), stop=min(number_of_frames, l+extent))
+        extent = max(10, int(self._position_stdev*3))
+        M = np.arange(max(0, m-extent), stop=min(self._input_file_width, m+extent))
+        N = np.arange(max(0, n-extent), stop=min(self._input_file_height, n+extent))
+        data = imread(
+            filepath,
+            key=sampled_frames,
+        )[np.ix_(range(len(sampled_frames)), M, N)] 
+        integrated_spatially = self.integrate_spatially(data)
+        fitted_frequency = self.fit_frequency_dimension(integrated_spatially)
+        l = int(fitted_frequency["center"])
+        print(l)
+        integrated_spectrally = self.integrate_spectrally(l, data)
+        fitted_spatial = self.fit_spatial_dimension(integrated_spectrally)
+        self._frequency_fwhm = int(np.ceil(fitted_frequency['sigma']))
+        self._kernel_frequency_length = self._lorentzian_safety_margin*self._frequency_fwhm
+        self._position_stdev = int(np.ceil(max(fitted_spatial['sigma_x'], fitted_spatial['sigma_x'])))
+        self._kernel_spatial_length = 3*self._position_stdev
+
+    @Slot()
     def estimate_from_noise(self):
         if self._input_file is None:
-            self.log.warning("No input file defined, could not perform noise estimation procedure.")
+            self.log.error("No input file defined, could not perform noise estimation procedure.")
             return
         filepath = str(self._input_file)
         tiff = TiffFile(filepath)
@@ -408,7 +450,7 @@ class MoleculeDetectionLogic(LogicBase):
         data = np.ravel(imread(
             filepath,
             key=sampled_frames,
-        )[0])
+        ))
         self._noise_fitting_histogram = np.histogram(data, bins="auto", density=True)
         self.gamma_estimate_histogram_updated.emit(self._noise_fitting_histogram[0], self._noise_fitting_histogram[1])
         data_gamma_fit = data[ data < np.quantile(data, float(self._quantile_gamma_fit)) ]
