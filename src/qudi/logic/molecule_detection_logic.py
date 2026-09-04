@@ -17,16 +17,12 @@ from qudi.core.statusvariable import StatusVar
 from qudi.util.fit_models.lorentzian import Lorentzian
 from qudi.util.units import ScaledFloat
 from scipy.signal import convolve
-from scipy.special import polygamma
+from scipy.special import digamma, polygamma
 from scipy.stats import gamma, norm
 from tifffile import TiffFile, imread
 
 from qudi.util.fit_models.gaussian import Gaussian2D
 from qudi.util.tomldatastorage import TOMLHeaderDataStorage
-
-
-def digamma(z):
-    return polygamma(0, z)
 
 
 def trigamma(z):
