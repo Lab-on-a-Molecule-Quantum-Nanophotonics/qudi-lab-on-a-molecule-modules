@@ -191,6 +191,7 @@ class MoleculePositionsResult:
     file_metadata: dict[str, float]
     algorithm_settings: MoleculeDetectionSettings
     coordinates_array: np.ndarray
+    lorentzian_fit_array: np.ndarray | None = None
 
 
 @dataclass
