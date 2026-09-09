@@ -87,3 +87,21 @@ class MoleculeLocalizationGui(GuiBase):
         self.settings.numberOfFramesSampledForGammaFittingSpinBox.setValue(settings.number_of_frames_sampled_for_gamma_fitting)
         self.settings.quantileGammaFitDoubleSpinBox.setValue(settings.quantile_gamma_fit)
         self.settings.quantileMaxEstimateDoubleSpinBox.setValue(settings.quantile_max_estimate)
+        self.settings.thetaDoubleSpinBox.setValue(settings.theta)
+        self.settings.assumedAmplitudeDoubleSpinBox.setValue(settings.assumed_amplitude)
+        self.settings.digammaInterpolationMinimumDoubleSpinBox.setValue(settings.digamma_interpolation_mini)
+        self.settings.digammaInterpolationMaximumDoubleSpinBox.setValue(settings.digamma_interpolation_maxi)
+        self.settings.digammaInterpolationNumberSpinBox.setValue(settings.digamma_interpolation_num)
+        self.settings.trigammaInterpolationMinimumDoubleSpinBox.setValue(settings.trigamma_interpolation_mini)
+        self.settings.trigammaInterpolationMaximumDoubleSpinBox.setValue(settings.trigamma_interpolation_maxi)
+        self.settings.trigammaInterpolationNumberSpinBox.setValue(settings.trigamma_interpolation_num)
+        self.settings.numberOfFramesSampledForPSFEstimatonSpinBox.setValue(settings.number_of_frames_sampled_for_psf_estimation)
+        self.settings.lorentzianSafetyMarginDoubleSpinBox
+        self.settings.frequencyFWHMDoubleSpinBox
+        self.settings.positionStdevDoubleSpinBox
+        self.settings.kernelFrequencyLengthDoubleSpinBox
+        self.settings.kernelSpatialLengthDoubleSpinBox
+        self.settings.framesPerSliceSpinBox
+        self.settings.numberOfWorkersSpinBox
+        self.settings.probabilityOfFalsePositiveDoubleSpinBox
+        self.settings.borderExcludedPixelsSpinBox
