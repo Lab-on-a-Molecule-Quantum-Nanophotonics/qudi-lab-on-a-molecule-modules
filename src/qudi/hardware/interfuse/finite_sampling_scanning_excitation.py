@@ -112,6 +112,7 @@ class FiniteSamplingScanningExcitationInterfuse(
         self._process_end = 0.0
         self._setpoints = []
         self._sleep_duration = 0.0
+        self._saved_idle_value = 0.0
 
     # Internal utilities
     @property
