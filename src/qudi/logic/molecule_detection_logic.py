@@ -8,11 +8,13 @@ from enum import Enum
 from queue import Empty, Full
 
 import matplotlib.pyplot as plt
+from qudi.util.fit_models.helpers import correct_offset_histogram
 import numpy as np
 from PySide6 import QtCore
 from PySide6.QtCore import QObject, QRunnable, QThreadPool, QTimer, Signal, Slot
-from qudi.core.configoption import ConfigOption
 from qudi.core.module import LogicBase
+from qudi.core.connector import Connector
+from qudi.core.configoption import ConfigOption
 from qudi.core.statusvariable import StatusVar
 from qudi.util.fit_models.lorentzian import Lorentzian
 from qudi.util.units import ScaledFloat
@@ -23,6 +25,7 @@ from tifffile import TiffFile, imread
 
 from qudi.util.fit_models.gaussian import Gaussian2D
 from qudi.util.tomldatastorage import TOMLHeaderDataStorage
+from qudi.logic.scanning_probe_logic import ScanningProbeLogic
 
 
 def trigamma(z):
@@ -134,11 +137,17 @@ class UserActionableMoleculeDetectionSettings:
     """
 
     input_file: str | None = None
+    pixel_physical_dimension: float | None = None
+    pixels_offset: tuple[float, float] | None = None
+    sample_position: tuple[float, float] | None = None
+    frequency_step: float | None = None
+    frequency_offset: float | None = None
     quantile_gamma_fit: float | None = None
     quantile_max_estimate: float | None = None
     lorentzian_safety_margin: float | None = None
     probability_false_positive: float | None = None
     frame_per_slice: float | None = None
+    number_of_workers: int | None = None
     number_of_frames_sampled_for_gamma_fitting: int | None = None
     number_of_frames_sampled_for_psf_estimation: int | None = None
     border_excluded_pixels: int | None = None
@@ -158,6 +167,11 @@ class MoleculeDetectionSettings:
     """
 
     input_file: str
+    pixel_physical_dimension: float
+    pixels_offset: tuple[float, float]
+    sample_position: tuple[float, float]
+    frequency_step: float
+    frequency_offset: float
     quantile_gamma_fit: float
     quantile_max_estimate: float
     lorentzian_safety_margin: float
@@ -191,7 +205,7 @@ class MoleculePositionsResult:
     file_metadata: dict[str, float]
     algorithm_settings: MoleculeDetectionSettings
     coordinates_array: np.ndarray
-    lorentzian_fit_array: np.ndarray | None = None
+    lorentzian_fit_array: dict[str, np.ndarray] | None = None
 
 
 @dataclass
@@ -201,15 +215,16 @@ class SingleMoleculeLocalizationDataset:
     """
 
     input_file: str
-    position_rough_estimate_l: int
-    position_rough_estimate_m: int
-    position_rough_estimate_n: int
+    position_rough_estimate_l: float
+    position_rough_estimate_m: float
+    position_rough_estimate_n: float
     flattened_image: np.ndarray
     flattened_image_m: np.ndarray
     flattened_image_n: np.ndarray
     frequency_spectrum: np.ndarray
-    fit_result_spatially: dict | None
-    fit_result_spectrally: dict | None
+    movie: np.ndarray | None = None
+    fit_result_spatially: dict | None = None
+    fit_result_spectrally: dict | None = None
 
 
 def positivity_constraint_constructor(val):
@@ -227,8 +242,17 @@ class MoleculeDetectionLogic(LogicBase):
             number_of_workers: 4 # default
     ```
     """
+    scanning_probe = Connector(interface=ScanningProbeLogic, optional=True)
+    _scanning_probe_x_axis = ConfigOption(name='scanning_probe_x_axis', default='x')
+    _scanning_probe_y_axis = ConfigOption(name='scanning_probe_y_axis', default='y')
 
-    _number_of_workers = ConfigOption(name="number_of_workers", default=4)
+    _pixel_physical_dimension = StatusVar(default=1.0)
+    _pixels_offset = StatusVar(default=(0.0, 0.0))
+    _sample_position = StatusVar(default=(0.0, 0.0))
+    _frequency_step = StatusVar(default=1.0)
+    _frequency_offset = StatusVar(default=0.0)
+
+    _number_of_workers = StatusVar(name="number_of_workers", default=4)
 
     _quantile_gamma_fit = StatusVar(name="quantile_gamma_fit", default=0.99)
     _number_of_frames_sampled_for_gamma_fitting = StatusVar(default=10)
@@ -253,13 +277,16 @@ class MoleculeDetectionLogic(LogicBase):
     _trigamma_interpolation_maxi = StatusVar(default=40_000)
     _trigamma_interpolation_num = StatusVar(default=100)
 
-    progress_update = Signal(float)  # Localization progress between 0 and 1
+    progress_update = Signal(int)  # Localization progress between 0 and 100
     failure = Signal()
     finished = Signal()
     new_result = Signal(MoleculePositionsResult)
     settings_updated = Signal(MoleculeDetectionSettings)
+    metadata_updated = Signal(dict)
+    flattened_image_updated = Signal(np.ndarray)
     position_updated = Signal(int)
     new_superlocalization = Signal(SingleMoleculeLocalizationDataset)
+    new_movie = Signal(np.ndarray)
     _start_watchdog_timer = Signal()
     _start_workers = Signal()
     _start_builder = Signal()
@@ -267,6 +294,7 @@ class MoleculeDetectionLogic(LogicBase):
     _trigger_interrupt = Signal()
     gamma_estimate_histogram_updated = Signal(np.ndarray, np.ndarray)
     gamma_law_fit_updated = Signal(np.ndarray, np.ndarray)
+    psf_updated = Signal(SingleMoleculeLocalizationDataset)
 
     @_theta.constructor
     def theta_constructor(self, yaml_data):
@@ -300,6 +328,7 @@ class MoleculeDetectionLogic(LogicBase):
         self._flattened_image = np.array([])
         self._metadata = None
         self._last_result = None
+        self._last_psf = None
         self._last_superlocalization = None
         self._input_file_width = 0
         self._input_file_height = 0
@@ -312,6 +341,11 @@ class MoleculeDetectionLogic(LogicBase):
         self._start_builder.connect(self.__start_builder, QtCore.Qt.QueuedConnection)
         self._trigger_interrupt.connect(self.__interrupt, QtCore.Qt.QueuedConnection)
         self._localize.connect(self.__localize, QtCore.Qt.QueuedConnection)
+        if self._input_file is not None:
+            try:
+                self.load_file_info()
+            except Exception as e:
+                self.log.exception(e)
 
     def on_deactivate(self) -> None:
         self._start_watchdog_timer.disconnect()
@@ -321,6 +355,38 @@ class MoleculeDetectionLogic(LogicBase):
         self.interrupt()
         if self.module_state() == 'locked':
             self.module_state.unlock()
+
+    def convert_frames_to_frequency(self, frames):
+        return self.scale_frames_to_frequency(frames) + self._frequency_offset
+
+    def scale_frames_to_frequency(self, frames):
+        return frames * self._frequency_step
+
+    def convert_frequency_to_frames(self, frequency):
+        return int(np.clip((frequency - self._frequency_offset) / self._frequency_step, a_min=0, a_max=self._number_of_frames))
+
+    def convert_pixels_to_positions(self, pixels):
+        scaled_array = self.scale_pixels_to_positions(np.asarray(pixels))
+        offset = np.asarray(self._pixels_offset) + np.asarray(self._sample_position)
+        if len(scaled_array.shape) < 2:
+            return scaled_array + offset
+        else:
+            return  scaled_array + np.tile(offset.reshape((2,1)), scaled_array.shape[1])
+
+    def scale_pixels_to_positions(self, pixels):
+        return self._pixel_physical_dimension * pixels
+
+    def convert_position_to_pixels(self, position):
+        position = np.asarray(position)
+        offset = np.asarray(self._pixels_offset) + np.asarray(self._sample_position)
+        if len(position.shape) < 2:
+            return (position - offset) / self._pixel_physical_dimension
+        else:
+            return (position - np.tile(offset.reshape((2,1)), position.shape[1])) / self._pixel_physical_dimension
+
+    @property
+    def read_position_available(self):
+        return self.scanning_probe() is not None
 
     def ln_transform(self, r_lmn: np.ndarray) -> np.ndarray:
         """
@@ -378,6 +444,11 @@ class MoleculeDetectionLogic(LogicBase):
     def settings(self) -> MoleculeDetectionSettings:
         return MoleculeDetectionSettings(
             input_file=str(self._input_file),
+            pixel_physical_dimension= float(self._pixel_physical_dimension),
+            pixels_offset= tuple(self._pixels_offset),
+            sample_position= tuple(self._sample_position),
+            frequency_step= float(self._frequency_step),
+            frequency_offset= float(self._frequency_offset),
             quantile_gamma_fit=float(self._quantile_gamma_fit),
             quantile_max_estimate=float(self._quantile_max_estimate),
             lorentzian_safety_margin=float(self._lorentzian_safety_margin),
@@ -401,20 +472,38 @@ class MoleculeDetectionLogic(LogicBase):
             trigamma_interpolation_num=int(self._trigamma_interpolation_num),
         )
 
+    def load_file_info(self, input_file:str|None=None):
+        if input_file is None:
+            input_file = self._input_file
+        if input_file is None:
+            raise ValueError("No input file specified")
+        filepath = str(input_file)
+        tiff = TiffFile(filepath)
+        number_of_frames = len(tiff.pages)
+        self._input_file_width, self._input_file_height = tiff.pages.first.shape
+        number_of_frames_per_slice = int(self._frames_per_slice)
+        number_of_slices = number_of_frames // number_of_frames_per_slice
+        self._total_number_of_slices = number_of_slices
+        self._number_of_frames = number_of_frames
+        self.load_flattened_image(input_file)
+        self.load_andor_metadata(input_file)
+        self.new_movie.emit(tiff.asarray())
+
     @settings.setter
     def settings(self, settings: UserActionableMoleculeDetectionSettings):
         if settings.input_file is not None:
-            filepath = str(settings.input_file)
-            tiff = TiffFile(filepath)
-            number_of_frames = len(tiff.pages)
-            self._input_file_width, self._input_file_height = tiff.pages.first.shape
-            number_of_frames_per_slice = int(self._frames_per_slice)
-            number_of_slices = number_of_frames // number_of_frames_per_slice
-            self._total_number_of_slices = number_of_slices
-            self._number_of_frames = number_of_frames
-            self.load_flattened_image(settings.input_file)
-            self.load_andor_metadata(settings.input_file)
+            self.load_file_info(settings.input_file)
             self._input_file = settings.input_file  # ty: ignore[invalid-assignment]
+        if settings.pixel_physical_dimension is not None:
+            self._pixel_physical_dimension = settings.pixel_physical_dimension  # ty:ignore[invalid-assignment]
+        if settings.pixels_offset is not None:
+            self._pixels_offset = settings.pixels_offset  # ty:ignore[invalid-assignment]
+        if settings.sample_position is not None:
+            self._sample_position = settings.sample_position  # ty:ignore[invalid-assignment]
+        if settings.frequency_step is not None:
+            self._frequency_step = settings.frequency_step  # ty:ignore[invalid-assignment]
+        if settings.frequency_offset is not None:
+            self._frequency_offset = settings.frequency_offset  # ty:ignore[invalid-assignment]
         if settings.quantile_gamma_fit is not None:
             self._quantile_gamma_fit = settings.quantile_gamma_fit  # ty: ignore[invalid-assignment]
         if settings.quantile_max_estimate is not None:
@@ -425,6 +514,8 @@ class MoleculeDetectionLogic(LogicBase):
             self._probability_false_positive = settings.probability_false_positive  # ty: ignore[invalid-assignment]
         if settings.frame_per_slice is not None:
             self._frames_per_slice = settings.frame_per_slice  # ty: ignore[invalid-assignment]
+        if settings.number_of_workers is not None:
+            self._number_of_workers = settings.number_of_workers
         if settings.number_of_frames_sampled_for_gamma_fitting is not None:
             self._number_of_frames_sampled_for_gamma_fitting = settings.number_of_frames_sampled_for_gamma_fitting  # ty: ignore[invalid-assignment]
         if settings.number_of_frames_sampled_for_psf_estimation is not None:
@@ -454,17 +545,36 @@ class MoleculeDetectionLogic(LogicBase):
             self.compute_interpolations()
         self.settings_updated.emit(self.settings)
 
+    @Slot()
+    def read_sample_position(self):
+        scanning_probe = self.scanning_probe()
+        if scanning_probe is None:
+            self.log.warning("No scanning probe connected. Could not read the current position.")
+            return
+        position = scanning_probe.scanner_target
+        self.settings = UserActionableMoleculeDetectionSettings(
+                sample_position=(position[self._scanning_probe_x_axis], position[self._scanning_probe_y_axis])
+                )
+
     @Slot(str)
     def open_file(self, filepath):
         self.settings = UserActionableMoleculeDetectionSettings(input_file=filepath)
+
+    @Slot()
+    def reload_file(self):
+        self.open_file(self._input_file)
+
+    @Slot()
+    def launch_algorithm(self):
+        self.prepare_run()
+        self.localize()
 
     @Slot(str)
     def open_file_and_analyze(self, filepath):
         self.settings = UserActionableMoleculeDetectionSettings(input_file=filepath)
         self.estimate_psf()
         self.estimate_from_noise()
-        self.prepare_run()
-        self.localize()
+        self.launch_algorithm()
 
     @Slot()
     def analyze(self):
@@ -494,6 +604,11 @@ class MoleculeDetectionLogic(LogicBase):
         if self._input_file is None:
             self.log.error("No input file defined, could not perform noise estimation procedure.")
             return
+        if self._input_file_height == 0 or self._input_file_width == 0:
+            self.load_file_info()
+        if self._input_file_height == 0 or self._input_file_width == 0:
+            self.log.error("Input file appears to be zero dimensionnal!")
+            return
         filepath = str(self._input_file)
         tiff = TiffFile(filepath)
         number_of_frames = len(tiff.pages)
@@ -501,6 +616,7 @@ class MoleculeDetectionLogic(LogicBase):
         sampled_frames = np.random.choice(range(number_of_frames), number_of_samples)
         data = imread(filepath, key=sampled_frames)
         l, m, n = np.unravel_index(np.argmax(data), data.shape)
+        rough_l = l
         l = sampled_frames[l]
         extent = int(self._frequency_fwhm * self._lorentzian_safety_margin)
         sampled_frames = np.arange(max(0, l - extent), stop=min(number_of_frames, l + extent))
@@ -510,14 +626,38 @@ class MoleculeDetectionLogic(LogicBase):
         data = imread(filepath, key=sampled_frames)[np.ix_(range(len(sampled_frames)), M, N)]
         integrated_spatially = self.integrate_spatially(data)
         fitted_frequency = self.fit_frequency_dimension(integrated_spatially)
-        l = int(fitted_frequency["center"])
-        print(l)
+        if fitted_frequency is not None:
+            l = int(fitted_frequency["center"])
         integrated_spectrally = self.integrate_spectrally(l, data)
         fitted_spatial = self.fit_spatial_dimension(integrated_spectrally)
-        self._frequency_fwhm = int(np.ceil(fitted_frequency['sigma']))
+        self._frequency_fwhm = int(np.ceil(2*fitted_frequency['sigma']))
         self._kernel_frequency_length = self._lorentzian_safety_margin * self._frequency_fwhm
         self._position_stdev = int(np.ceil(max(fitted_spatial['sigma_x'], fitted_spatial['sigma_x'])))
         self._kernel_spatial_length = 3 * self._position_stdev
+        self.settings_updated.emit(self.settings)
+        fitted_frequency['center'] += sampled_frames.min()
+        # convertion to physical units
+        M,N = self.convert_pixels_to_positions(np.array((M,N)))
+        m,n = self.convert_pixels_to_positions((m,n))
+        if fitted_frequency is not None:
+            fitted_frequency['center'] = self.convert_frames_to_frequency(fitted_frequency['center'])
+            fitted_frequency['sigma'] = self.scale_frames_to_frequency(fitted_frequency['sigma'])
+        if fitted_spatial is not None:
+            fitted_spatial['center_x'],fitted_spatial['center_y'] = self.convert_pixels_to_positions((fitted_spatial['center_x'],fitted_spatial['center_y']))
+            fitted_spatial['sigma_x'],fitted_spatial['sigma_y'] = self.convert_pixels_to_positions((fitted_spatial['sigma_x'],fitted_spatial['sigma_y']))
+        self._last_psf = SingleMoleculeLocalizationDataset(
+                input_file=str(self._input_file),
+                position_rough_estimate_l=self.convert_frames_to_frequency(rough_l),
+                position_rough_estimate_m=int(m),
+                position_rough_estimate_n=int(n),
+                flattened_image=integrated_spectrally,
+                flattened_image_m=M,
+                flattened_image_n=N,
+                frequency_spectrum=np.array([self.convert_frames_to_frequency(sampled_frames), integrated_spatially]),
+                fit_result_spatially=fitted_spatial,
+                fit_result_spectrally=fitted_frequency
+                )
+        self.psf_updated.emit(self._last_psf)
 
     @Slot()
     def estimate_from_noise(self):
@@ -812,7 +952,10 @@ class MoleculeDetectionLogic(LogicBase):
         L = np.concat(L)
         M = np.concat(M)
         N = np.concat(N)
-        coordinates = np.array([L, M, N])
+        L = self.convert_frames_to_frequency(L)
+        ordering = np.argsort(L)
+        M,N = self.convert_pixels_to_positions(np.array((M,N)))
+        coordinates = np.array([L[ordering], M[ordering], N[ordering]])
         self._last_result = MoleculePositionsResult(
             file_name=str(self._input_file),
             file_metadata=self._metadata,  # ty: ignore[invalid-argument-type]
@@ -843,7 +986,7 @@ class MoleculeDetectionLogic(LogicBase):
             N.append(slice_N)
             number_of_slices_processed += 1
             self.assemble_workers_positions(L, M, N)
-            self.progress_update.emit((number_of_slices_processed + 1) / self._total_number_of_slices)
+            self.progress_update.emit(int((number_of_slices_processed + 1) / self._total_number_of_slices * 100))
         finally:
             running = running and not self._interrupt
         return running, {"number_of_slices_processed": number_of_slices_processed, "L": L, "M": M, "N": N}
@@ -977,6 +1120,7 @@ class MoleculeDetectionLogic(LogicBase):
     def load_flattened_image(self, filepath):
         full_image = imread(filepath)
         self._flattened_image = np.max(full_image, axis=0)
+        self.flattened_image_updated.emit(self._flattened_image)
 
     @property
     def flattened_image(self) -> np.ndarray:
@@ -989,14 +1133,16 @@ class MoleculeDetectionLogic(LogicBase):
         return self._flattened_image
 
     def load_andor_metadata(self, filepath: str | None):
+        new_metadata = {}
         if filepath is not None:
             file = TiffFile(filepath)
-            self._metadata = file.andor_metadata
-        if self._metadata is None:
-            self._metadata = {}
+            if file.andor_metadata is not None:
+                new_metadata = file.andor_metadata
+        self._metadata = {k:new_metadata[k] for k in new_metadata if k in ANDOR_METADATA_KEYS}
         for k in ANDOR_METADATA_KEYS:
             if k not in self._metadata:
                 self._metadata[k] = np.nan
+        self.metadata_updated.emit(self._metadata)
 
     @property
     def andor_metadata(self) -> dict[str, float]:
@@ -1046,8 +1192,23 @@ class MoleculeDetectionLogic(LogicBase):
         model = Lorentzian()
         L = np.arange(integrated_spatially.size)
         try:
-            params = model.estimate_peak(integrated_spatially, L)
+            params = model.make_params()
+            data_offset_corrected, offset = correct_offset_histogram(integrated_spatially, bin_width=2)
+            center = np.argmax(data_offset_corrected)
+            amplitude = abs(max(data_offset_corrected))
+            # according to the derived formula, calculate sigma. The crucial part is here that the
+            # offset was estimated correctly, then the area under the curve is calculated correctly:
+            numerical_integral = np.trapezoid(data_offset_corrected, L)
+            sigma = abs(numerical_integral / (np.pi * amplitude))
+            params['amplitude'].set(value=amplitude, min=0, max=2 * amplitude)
+            params['sigma'].set(value=sigma, min=1, max=len(L))
+            params['center'].set(value=center, min=-len(L), max=2*len(L))
+            params['offset'].set(
+                value=offset, min=0, max=2*offset
+            )
+            self.log.debug(f"Estimated peak {params.valuesdict()}")
             fit_result = model.fit(integrated_spatially, params, x=L)
+            self.log.debug(f"Fitted peak {fit_result.params.valuesdict()}")
         except:
             self.log.exception("Failed to fit on the frequency axis.")
             return
@@ -1075,6 +1236,7 @@ class MoleculeDetectionLogic(LogicBase):
         number_of_pre_localized = self._last_result.coordinates_array.shape[1]
         for i in range(number_of_pre_localized):
             self.superlocalize_by_id(i)
+            self.progress_update.emit(int((i + 1) / number_of_pre_localized * 100))
 
     @Slot(int)
     def superlocalize_by_id(self, i: int) -> SingleMoleculeLocalizationDataset | None:
@@ -1087,6 +1249,10 @@ class MoleculeDetectionLogic(LogicBase):
         if not (0 <= i < self._last_result.coordinates_array.shape[1]):
             raise ValueError(f"There is no molecule number {i}")
         l, m, n = self._last_result.coordinates_array[:, i]
+        l = int(self.convert_frequency_to_frames(l))
+        m,n = self.convert_position_to_pixels((m,n))
+        m = int(m)
+        n = int(n)
         superlocalized = self.superlocalize_by_position(l, m, n)
         if superlocalized is None:
             return None
@@ -1094,6 +1260,13 @@ class MoleculeDetectionLogic(LogicBase):
             l = superlocalized.position_rough_estimate_l
         else:
             l = superlocalized.fit_result_spectrally["center"]
+            if self._last_result.lorentzian_fit_array is None:
+                self._last_result.lorentzian_fit_array = {
+                        "sigma": np.full((self._last_result.coordinates_array.shape[1],), np.nan),
+                        "amplitude": np.full((self._last_result.coordinates_array.shape[1],), np.nan),
+                        }
+            self._last_result.lorentzian_fit_array["sigma"][i] = superlocalized.fit_result_spectrally["sigma"]
+            self._last_result.lorentzian_fit_array["amplitude"][i] = superlocalized.fit_result_spectrally["amplitude"]
         if superlocalized.fit_result_spatially is None:
             m = superlocalized.position_rough_estimate_m
             n = superlocalized.position_rough_estimate_n
@@ -1101,10 +1274,38 @@ class MoleculeDetectionLogic(LogicBase):
             m = superlocalized.fit_result_spatially["center_x"]
             n = superlocalized.fit_result_spatially["center_y"]
         self._last_result.coordinates_array[:, i] = (l, m, n)
+        self.new_result.emit(self._last_result)
         self.position_updated.emit(i)
         return superlocalized
 
-    @Slot(int, int)
+    def get_data_by_molecule_id(self, i:int) -> SingleMoleculeLocalizationDataset:
+        if self._last_result is None:
+            raise ValueError("No result available.")
+        l, m, n = self._last_result.coordinates_array[:, i]
+        l = int(self.convert_frequency_to_frames(l))
+        m,n = self.convert_position_to_pixels((m,n))
+        m = int(m)
+        n = int(n)
+        data, offsets = self.subset_for_pixel(l, m, n)
+        integrated_spatially = self.integrate_spatially(data)
+        integrated_spectrally = self.integrate_spectrally(l - offsets[0], data)
+        # convertion to physical units
+        m,n = self.convert_pixels_to_positions((m,n))
+        flattened_image_m,flattened_image_n = self.convert_pixels_to_positions(np.array([np.arange(0, integrated_spectrally.shape[0])+offsets[1], np.arange(0, integrated_spectrally.shape[1])+offsets[2]]))
+
+        return SingleMoleculeLocalizationDataset(
+                input_file=str(self._input_file),
+                position_rough_estimate_l=self.convert_frames_to_frequency(l),
+                position_rough_estimate_m=m,
+                position_rough_estimate_n=n,
+                flattened_image=integrated_spectrally,
+                flattened_image_m=flattened_image_m,
+                flattened_image_n=flattened_image_n,
+                frequency_spectrum=self.convert_frames_to_frequency(np.array([np.arange(0, integrated_spatially.shape[0])+offsets[0], integrated_spatially])),
+                movie=data
+                )
+
+    @Slot(int, int, int)
     def superlocalize_by_position(self, l, m, n) -> SingleMoleculeLocalizationDataset | None:
         """Perform a fitting procedure assuming a molecule is close to the pixel position `(l,m,n)`."""
         self.log.debug(f"Fitting position around pixel position {(l, m, n)}.")
@@ -1115,28 +1316,41 @@ class MoleculeDetectionLogic(LogicBase):
         offset_l, _offset_m, _offset_n = offsets
         if fit_result_spectral is not None:
             fit_result_spectral["center"] = fit_result_spectral["center"] + offset_l
-            new_l = int(fit_result_spectral["center"])
+            new_l = np.clip(int(fit_result_spectral["center"]), a_min=0, a_max=self._number_of_frames)
         data, offsets = self.subset_for_pixel(new_l, new_m, new_n)
-        integrated_spectrally = self.integrate_spectrally(new_l - offset_l, data)
+        integrated_spectrally = self.integrate_spectrally(new_l - offsets[0], data)
         fit_result_spatial = self.fit_spatial_dimension(integrated_spectrally)
         _offset_l, offset_m, offset_n = offsets
         if fit_result_spatial is not None:
             fit_result_spatial["center_x"] = fit_result_spatial["center_x"] + offset_m
             fit_result_spatial["center_y"] = fit_result_spatial["center_y"] + offset_n
             new_m, new_n = int(fit_result_spatial["center_x"]), int(fit_result_spatial["center_y"])
+            new_m = np.clip(new_m, a_min=0, a_max=self._input_file_width)
+            new_n = np.clip(new_n, a_min=0, a_max=self._input_file_height)
         data, offsets = self.subset_for_pixel(new_l, new_m, new_n)
-        integrated_spectrally = self.integrate_spectrally(new_l - offset_l, data)
+        integrated_spectrally = self.integrate_spectrally(new_l - offsets[0], data)
         _offset_l, offset_m, offset_n = offsets
+        # convertion to physical units
+        m,n = self.convert_pixels_to_positions((m,n))
+        flattened_image_m,flattened_image_n = self.convert_pixels_to_positions(np.array([np.arange(int(offset_m), stop=int(offset_m + integrated_spectrally.shape[0])), np.arange(int(offset_n), stop=int(offset_n + integrated_spectrally.shape[1]))]))
+        if fit_result_spectral is not None:
+            fit_result_spectral['center'] = self.convert_frames_to_frequency(fit_result_spectral['center'])
+            fit_result_spectral['sigma'] = self.scale_frames_to_frequency(fit_result_spectral['sigma'])
+        if fit_result_spatial is not None:
+            fit_result_spatial['center_x'],fit_result_spatial['center_y'] = self.convert_pixels_to_positions((fit_result_spatial['center_x'],fit_result_spatial['center_y']))
+            fit_result_spatial['sigma_x'],fit_result_spatial['sigma_y'] = self.convert_pixels_to_positions((fit_result_spatial['sigma_x'],fit_result_spatial['sigma_y']))
         superlocalized = SingleMoleculeLocalizationDataset(
             input_file=str(self._input_file),
-            position_rough_estimate_l=l,
+            position_rough_estimate_l=self.convert_frames_to_frequency(l),
             position_rough_estimate_m=m,
             position_rough_estimate_n=n,
             flattened_image=integrated_spectrally,
-            flattened_image_m=np.arange(int(offset_m), stop=int(offset_m + integrated_spectrally.shape[0])),
-            flattened_image_n=np.arange(int(offset_n), stop=int(offset_n + integrated_spectrally.shape[1])),
+            flattened_image_m=flattened_image_m,
+            flattened_image_n=flattened_image_n,
             frequency_spectrum=np.array(
-                [np.arange(int(offset_l), stop=int(offset_l + integrated_spatially.shape[0])), integrated_spatially]
+                [
+                    self.convert_frames_to_frequency(np.arange(int(offset_l), stop=int(offset_l + integrated_spatially.shape[0]))), integrated_spatially
+                ]
             ),
             fit_result_spatially=fit_result_spatial,
             fit_result_spectrally=fit_result_spectral,
@@ -1144,6 +1358,24 @@ class MoleculeDetectionLogic(LogicBase):
         self._last_superlocalization = superlocalized
         self.new_superlocalization.emit(superlocalized)
         return superlocalized
+
+    @Slot(int)
+    def delete_molecule_by_id(self, id:int):
+        if self._last_result is None:
+            self.log.warning("No dataset to delete from.")
+            return
+        self.log.debug(f"Deleting molecule {id}")
+        if not (0 <= id <= self._last_result.coordinates_array.shape[1]):
+            raise IndexError()
+        new_coordinates = np.delete(self._last_result.coordinates_array, id, axis=1)
+        self.log.debug(f"old shape {self._last_result.coordinates_array.shape} new shape {new_coordinates.shape}")
+        if self._last_result.lorentzian_fit_array is not None:
+            mask = np.ones(self._last_result.coordinates_array.shape[1], bool)
+            mask[id] = False
+            new_fits = {k:v[mask] for (k,v) in self._last_result.lorentzian_fit_array.items()}
+            self._last_result.lorentzian_fit_array = new_fits
+        self._last_result.coordinates_array = new_coordinates
+        self.new_result.emit(self._last_result)
 
     def draw_parameter_estimation_figure(self):
         histogram_bins, histogram_edges = self._noise_fitting_histogram
