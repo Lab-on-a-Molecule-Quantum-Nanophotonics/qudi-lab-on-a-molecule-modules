@@ -1553,6 +1553,7 @@ class MoleculeDetectionLogic(LogicBase):
         ax.legend(handles=[line], loc="best")
         return fig
 
+    @Slot()
     def save_parameter_estimation(self, name_tag=""):
         timestamp = datetime.datetime.now()
         parameters = {
@@ -1586,6 +1587,7 @@ class MoleculeDetectionLogic(LogicBase):
         self.log.debug(f'Background fitting saved to:{file_path}')
         return file_path
 
+    @Slot()
     def save_result(self, name_tag=""):
         if self._last_result is None:
             self.log.warning("No localization result to save!")
@@ -1614,6 +1616,7 @@ class MoleculeDetectionLogic(LogicBase):
         self.log.debug(f'Molecule coordinates saved to:{file_path}')
         return file_path
 
+    @Slot()
     def save_superlocalization(self, dataset: SingleMoleculeLocalizationDataset | None = None, name_tag: str = ""):
         if dataset is None and self._last_superlocalization is None:
             self.log.warning("No superlocalization data to save!")

@@ -412,7 +412,7 @@
     <string>Save superlocalization</string>
    </property>
    <property name="toolTip">
-    <string>Save the currently displayed superlocalization dataset</string>
+    <string>Save the last superlocalization dataset</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>

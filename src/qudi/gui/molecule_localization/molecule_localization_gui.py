@@ -116,6 +116,9 @@ class MoleculeLocalizationGui(GuiBase):
         self._mw.actionRun_molecule_detection_algorithm.triggered.connect(self.launch_algorithm)
         self._mw.actionSuperlocalize_current_molecule.triggered.connect(self.on_superlocalize_current_molecule)
         self._mw.actionSuperlocalize_all_molecules.triggered.connect(self._localization_logic().superlocalize_all)
+        self._mw.actionSave_parameter_estimation.triggered.connect(self.on_save_parameter_estimation)
+        self._mw.actionSave_molecule_positions.triggered.connect(self.on_save_molecule_positions)
+        self._mw.actionSave_superlocalization.triggered.connect(self.on_save_superlocalization)
         self._mw.tabWidget.currentChanged.connect(self.on_tab_change)
         self._mw.showAllMoleculesCheckBox.clicked.connect(self.on_plot_all_molecules_clicked)
         self._mw.resultsTableWidget.currentCellChanged.connect(self.on_table_result_cell_changed)
@@ -149,7 +152,10 @@ class MoleculeLocalizationGui(GuiBase):
         self._mw.actionEstimate_Point_Spread_Function.triggered.disconnect(self.launch_psf_estimation)
         self._mw.actionRun_molecule_detection_algorithm.triggered.disconnect(self.launch_algorithm)
         self._mw.actionSuperlocalize_current_molecule.triggered.disconnect(self.on_superlocalize_current_molecule)
-        self._mw.actionSuperlocalize_all_molecules.triggered.connect(self._localization_logic().superlocalize_all)
+        self._mw.actionSuperlocalize_all_molecules.triggered.disconnect(self._localization_logic().superlocalize_all)
+        self._mw.actionSave_parameter_estimation.triggered.disconnect(self.on_save_parameter_estimation)
+        self._mw.actionSave_molecule_positions.triggered.disconnect(self.on_save_molecule_positions)
+        self._mw.actionSave_superlocalization.triggered.disconnect(self.on_save_superlocalization)
         self._mw.showAllMoleculesCheckBox.clicked.disconnect(self.on_plot_all_molecules_clicked)
         self._mw.resultsTableWidget.currentCellChanged.disconnect(self.on_table_result_cell_changed)
         self._mw.settings.readSamplePositionPushButton.clicked.disconnect(self._localization_logic().read_sample_position)
@@ -563,4 +569,15 @@ class MoleculeLocalizationGui(GuiBase):
         else:
             self._localization_logic().delete_molecules_by_id(ids)
 
+    @Slot()
+    def on_save_parameter_estimation(self):
+        self._localization_logic().save_parameter_estimation()
+
+    @Slot()
+    def on_save_molecule_positions(self):
+        self._localization_logic().save_result()
+
+    @Slot()
+    def on_save_superlocalization(self):
+        self._localization_logic().save_superlocalization()
 
