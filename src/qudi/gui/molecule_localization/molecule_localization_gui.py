@@ -1,21 +1,30 @@
-from PySide6.QtWidgets import QFileDialog, QMessageBox
-from PySide6.QtCore import Slot, Qt, Signal
 import os
 import sys
 
 import numpy as np
-from qudi.core.connector import Connector
-import qudi.util.uic as uic
-from PySide6 import QtWidgets
 import pyqtgraph
-from qudi.core.module import GuiBase
-from qudi.logic.molecule_detection_logic import MoleculeDetectionLogic, MoleculeDetectionSettings, UserActionableMoleculeDetectionSettings, SingleMoleculeLocalizationDataset, MoleculePositionsResult
-from qudi.util.colordefs import QudiPalette
 from lmfit import Parameter
+from PySide6 import QtWidgets
+from PySide6.QtCore import Qt, Signal, Slot
+from PySide6.QtWidgets import QFileDialog, QMessageBox
+from qudi.core.connector import Connector
+from qudi.core.module import GuiBase
+from qudi.util.colordefs import QudiPalette
 from qudi.util.fit_models.lorentzian import Lorentzian
 
+from qudi.logic.molecule_detection_logic import (
+    DatasetUpdate,
+    DatasetUpdateKind,
+    MoleculeDetectionLogic,
+    MoleculeDetectionSettings,
+    SingleMoleculeLocalizationDataset,
+    UserActionableMoleculeDetectionSettings,
+)
+from qudi.util import uic
+
+
 class MainWindow(QtWidgets.QMainWindow):
-    sigDeleteMolecule = Signal(int)
+    sigDeleteMolecules = Signal(list)
     def __init__(self, *args, **kwargs):
         this_dir = os.path.dirname(__file__)
         ui_file = os.path.join(this_dir, 'main_window.ui')
@@ -55,9 +64,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def keyPressEvent(self, event):
         # https://doc.qt.io/qtforpython/PySide6/QtCore/Qt.html?highlight=key_escape#PySide6.QtCore.PySide6.QtCore.Qt.Key
-        if event.key() == Qt.Key.Key_Delete:
-            if self.resultsTableWidget.hasFocus():
-                self.sigDeleteMolecule.emit(self.resultsTableWidget.currentRow())
+        if event.key() == Qt.Key.Key_Delete and self.resultsTableWidget.hasFocus():
+            to_be_deleted = [i.row() for i in self.resultsTableWidget.selectedIndexes()]
+            self.sigDeleteMolecules.emit(to_be_deleted)
 
 
 HELP_TEXTS = {
@@ -108,11 +117,11 @@ class MoleculeLocalizationGui(GuiBase):
         self._mw.actionSuperlocalize_current_molecule.triggered.connect(self.on_superlocalize_current_molecule)
         self._mw.actionSuperlocalize_all_molecules.triggered.connect(self._localization_logic().superlocalize_all)
         self._mw.tabWidget.currentChanged.connect(self.on_tab_change)
-        self._mw.showAllMoleculesCheckBox.clicked.connect(self.plot_molecules_positions)
+        self._mw.showAllMoleculesCheckBox.clicked.connect(self.on_plot_all_molecules_clicked)
         self._mw.resultsTableWidget.currentCellChanged.connect(self.on_table_result_cell_changed)
         self._mw.settings.readSamplePositionPushButton.clicked.connect(self._localization_logic().read_sample_position)
         self._mw.settings.updateCalibrationPushButton.clicked.connect(self.update_calibration)
-        self._mw.sigDeleteMolecule.connect(self._localization_logic().delete_molecule_by_id)
+        self._mw.sigDeleteMolecules.connect(self.on_delete_molecules_by_id)
         self._localization_logic().metadata_updated.connect(self._mw.metadata.setData)
         self._localization_logic().flattened_image_updated.connect(self._mw.flattened_image.setImage)
         self._localization_logic().settings_updated.connect(self.update_settings)
@@ -120,7 +129,8 @@ class MoleculeLocalizationGui(GuiBase):
         self._localization_logic().gamma_law_fit_updated.connect(self.set_gamma_fit)
         self._localization_logic().psf_updated.connect(self.on_new_psf_available)
         self._localization_logic().progress_update.connect(self._mw.progress_bar.setValue)
-        self._localization_logic().new_result.connect(self.on_new_result_available)
+        self._localization_logic().results_updated.connect(self.on_results_updated)
+        self._localization_logic().results_updated.connect(self.plot_molecules_positions)
         self._localization_logic().finished.connect(self.on_localization_finished)
         self._localization_logic().new_movie.connect(self._mw.movie.setImage)
     def disconnect_gui(self):
@@ -140,11 +150,11 @@ class MoleculeLocalizationGui(GuiBase):
         self._mw.actionRun_molecule_detection_algorithm.triggered.disconnect(self.launch_algorithm)
         self._mw.actionSuperlocalize_current_molecule.triggered.disconnect(self.on_superlocalize_current_molecule)
         self._mw.actionSuperlocalize_all_molecules.triggered.connect(self._localization_logic().superlocalize_all)
-        self._mw.showAllMoleculesCheckBox.clicked.disconnect(self.plot_molecules_positions)
+        self._mw.showAllMoleculesCheckBox.clicked.disconnect(self.on_plot_all_molecules_clicked)
         self._mw.resultsTableWidget.currentCellChanged.disconnect(self.on_table_result_cell_changed)
         self._mw.settings.readSamplePositionPushButton.clicked.disconnect(self._localization_logic().read_sample_position)
         self._mw.settings.updateCalibrationPushButton.clicked.disconnect(self.update_settings)
-        self._mw.sigDeleteMolecule.disconnect(self._localization_logic().delete_molecule_by_id)
+        self._mw.sigDeleteMolecules.disconnect(self.on_delete_molecules_by_id)
         self._localization_logic().metadata_updated.disconnect(self._mw.metadata.setData)
 
         self._localization_logic().flattened_image_updated.disconnect(self._mw.flattened_image.setImage)
@@ -153,7 +163,8 @@ class MoleculeLocalizationGui(GuiBase):
         self._localization_logic().gamma_law_fit_updated.disconnect(self.set_gamma_fit)
         self._localization_logic().psf_updated.disconnect(self.on_new_psf_available)
         self._localization_logic().progress_update.disconnect(self._mw.progress_bar.setValue)
-        self._localization_logic().new_result.disconnect(self.on_new_result_available)
+        self._localization_logic().results_updated.disconnect(self.on_results_updated)
+        self._localization_logic().results_updated.connect(self.plot_molecules_positions)
         self._localization_logic().finished.disconnect(self.on_localization_finished)
         self._localization_logic().new_movie.disconnect(self._mw.movie.setImage)
     @Slot()
@@ -391,47 +402,101 @@ class MoleculeLocalizationGui(GuiBase):
         self.switch_to_psf()
         self._mw.statusBar().showMessage("PSF updated")
 
-    @Slot(MoleculePositionsResult)
-    def on_new_result_available(self, data:MoleculePositionsResult):
-        data_dict = {
-                    'mol. id': np.arange(0, stop=data.coordinates_array.shape[1]),
-                    'Frequency (Hz)': data.coordinates_array[0,:],
-                    'x (m)': data.coordinates_array[1, :],
-                    'y (m)': data.coordinates_array[2, :],
-                    }
-        if data.lorentzian_fit_array is not None:
-            data_dict['HWHM (Hz)'] = data.lorentzian_fit_array['sigma']
-            data_dict['amplitude (counts)'] = data.lorentzian_fit_array['amplitude']
-        sent_data = [{k:data_dict[k][i] for k in data_dict} for i in range(data.coordinates_array.shape[1])]
-        self._mw.resultsTableWidget.setData(sent_data)
-        offset = np.asarray(data.algorithm_settings.pixels_offset)+np.asarray(data.algorithm_settings.sample_position)
-        
-        self._mw.resultsImageView.setImage(self._localization_logic().flattened_image, scale=(data.algorithm_settings.pixel_physical_dimension, data.algorithm_settings.pixel_physical_dimension), pos=offset)
-        self.plot_molecules_positions()
-        self.switch_to_results()
+    @Slot(DatasetUpdate)
+    def on_results_updated(self, update:DatasetUpdate):
+        if update.kind == DatasetUpdateKind.AddedMultipleRows:
+            data = update.dataset
+            data_dict = {
+                        'Frequency (Hz)': data.coordinates_array[0,:],
+                        'x (m)': data.coordinates_array[1, :],
+                        'y (m)': data.coordinates_array[2, :],
+                        }
+            if data.lorentzian_fit_array is not None:
+                data_dict['HWHM (Hz)'] = data.lorentzian_fit_array['sigma']
+                data_dict['amplitude (counts)'] = data.lorentzian_fit_array['amplitude']
+            sent_data = [{k:data_dict[k][i] for k in data_dict} for i in range(data.coordinates_array.shape[1])]
+            self._mw.resultsTableWidget.setData(sent_data)
+            offset = np.asarray(data.algorithm_settings.pixels_offset)+np.asarray(data.algorithm_settings.sample_position)
+            
+            self._mw.resultsImageView.setImage(self._localization_logic().flattened_image, scale=(data.algorithm_settings.pixel_physical_dimension, data.algorithm_settings.pixel_physical_dimension), pos=offset)
+            self.switch_to_results()
+        elif update.kind == DatasetUpdateKind.DeletedASingleRow:
+            i = update.index
+            current_row = self._mw.resultsTableWidget.currentRow()
+            if current_row == i and current_row < self._mw.resultsTableWidget.rowCount()-1:
+                self._mw.resultsTableWidget.setCurrentCell(current_row+1, self._mw.resultsTableWidget.currentColumn())
+            elif current_row == i and current_row >= self._mw.resultsTableWidget.rowCount()-1:
+                self._mw.resultsTableWidget.setCurrentCell(current_row-1, self._mw.resultsTableWidget.currentColumn())
+            self.on_table_result_cell_changed(current_row)
+            self._mw.resultsTableWidget.removeRow(i)
+            self._mw.statusBar().showMessage(f"Deleted molecule {i}")
+        elif update.kind == DatasetUpdateKind.DeletedManyRows:
+            indices = update.index
+            if indices is None:
+                return
+            if type(indices) is int:
+                indices = [indices]
+            self._mw.resultsTableWidget.currentCellChanged.disconnect(self.on_table_result_cell_changed)
+            indices = sorted(indices, reverse=True)
+            for i in indices:  # ty: ignore[not-iterable]
+                self._mw.resultsTableWidget.setRangeSelected(QtWidgets.QTableWidgetSelectionRange(i,0,i,self._mw.resultsTableWidget.columnCount()), False)
+                self._mw.resultsTableWidget.removeRow(i)
+            self._mw.resultsTableWidget.currentCellChanged.connect(self.on_table_result_cell_changed)
+            self._mw.statusBar().showMessage(f"Deleted molecules {indices}")
+        elif update.kind == DatasetUpdateKind.SuperlocalizedASingleRow:
+            i = update.index
+            row = list(update.dataset.coordinates_array[:,i])
+            if self._mw.resultsTableWidget.columnCount() < 5:
+                self._mw.resultsTableWidget.setColumnCount(5)
+                self._mw.resultsTableWidget.setHorizontalHeaderLabels([
+                    'Frequency (Hz)', 'x (m)', 'y (m)',
+                    'HWHM (Hz)', 'amplitude (counts)'
+                    ])
+            if update.dataset.lorentzian_fit_array is not None:
+                row.append(update.dataset.lorentzian_fit_array['sigma'][i])
+                row.append(update.dataset.lorentzian_fit_array['amplitude'][i])
+            self._mw.resultsTableWidget.setRow(i, row)
+            self._mw.statusBar().showMessage(f"Superlocalized molecule {i}")
+
     @Slot()
-    def plot_molecules_positions(self):
-        last_result = self._localization_logic().last_result
+    def on_plot_all_molecules_clicked(self):
+        self.plot_molecules_positions()
+
+    @Slot(DatasetUpdate)
+    def plot_molecules_positions(self, update:DatasetUpdate|None=None):
+        if update is not None and type(update) != bool:
+            last_result = update.dataset
+            append_data = update.kind is DatasetUpdateKind.AddedMultipleRows
+        else:
+            last_result = self._localization_logic().last_result
+            append_data = False
         if last_result is None:
             self._mw.results_scatter_item.clear()
             return
         if self._mw.showAllMoleculesCheckBox.isChecked():
             dataset = last_result.coordinates_array[1:, :]
-            self._mw.results_scatter_item.setData(pos=dataset.transpose())
+            if append_data:
+                self._mw.results_scatter_item.addPoints(pos=dataset.transpose())
+            else:
+                self._mw.results_scatter_item.setData(pos=dataset.transpose())
         else:
-            currently_selected = self._mw.resultsTableWidget.currentRow()
+            currently_selected = np.clip(self._mw.resultsTableWidget.currentRow(),a_min=-1, a_max=last_result.coordinates_array.shape[1]-1) 
             if currently_selected < 0:
                 self._mw.results_scatter_item.clear()
             else:
                 self._mw.results_scatter_item.setData(x=[last_result.coordinates_array[1, currently_selected]], y=[last_result.coordinates_array[2, currently_selected]])
-    @Slot(int, int)
-    def on_table_result_cell_changed(self, x, _y, _prevx, _prevy):
+    @Slot(int, int, int, int)
+    def on_table_result_cell_changed(self, x:int, _y=int|None, _prevx=int|None, _prevy=int|None):
         if x < 0:
             return
         if not self._mw.showAllMoleculesCheckBox.isChecked():
             self.plot_molecules_positions()
         try:
-            data = self._localization_logic().get_data_by_molecule_id(x)
+            last_result = self._localization_logic().last_result
+            if last_result is None:
+                return
+            currently_selected = np.clip(x,a_min=0, a_max=last_result.coordinates_array.shape[1]-1) 
+            data = self._localization_logic().get_data_by_molecule_id(currently_selected)
         except ValueError:
             self.log.warning("failed to display single molecule data.")
         else:
@@ -453,7 +518,7 @@ class MoleculeLocalizationGui(GuiBase):
             xs = np.linspace(start=data.frequency_spectrum[0].min(), stop=data.frequency_spectrum[0].max(), num=100)
             ys = model.eval(params=param_dict, x=xs)
             index_of_frame = np.argmin(np.abs(data.frequency_spectrum[0] - data.fit_result_spectrally["center"]))
-            if "Fit" not in self._mw.psf_frequency.plot_names:
+            if "Fit" not in self._mw.singeMoleculeInteractiveCurvesWidget.plot_names:
                 self._mw.singeMoleculeInteractiveCurvesWidget.plot("Fit", x=xs, y=ys, pen=QudiPalette.c2)
             else:
                 self._mw.singeMoleculeInteractiveCurvesWidget.set_data("Fit", x=xs, y=ys)
@@ -490,4 +555,12 @@ class MoleculeLocalizationGui(GuiBase):
         superlocalized = self._localization_logic().superlocalize_by_id(id)
         if superlocalized is not None:
             self.display_single_molecule_data(superlocalized)
+
+    @Slot(list)
+    def on_delete_molecules_by_id(self, ids:list[int]):
+        if len(ids) == 1:
+            self._localization_logic().delete_molecule_by_id(ids[0])
+        else:
+            self._localization_logic().delete_molecules_by_id(ids)
+
 

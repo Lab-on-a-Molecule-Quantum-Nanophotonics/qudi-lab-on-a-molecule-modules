@@ -357,7 +357,7 @@ if __name__ == "__main__":
     """
     nb_seg_part = 64
     nb_workers = 8
-    file = 'C:/Users/Maelig/Documents/Research/molecule_detection/research/tiff_files/long_cool_scan.tif'
+    file = "H:/Other computers/Spectro2021/Lab66_spectrometer_2021/Data/2025/05/2025-05-23/long_cool_scan_wf_5uW_res_3p8K_2by2_10xGain.tif"
     queue_in = Queue()
     queue_out = Queue()
     queue_result = Queue()
@@ -393,7 +393,7 @@ if __name__ == "__main__":
     ### diplaying of the result
 
     
-    mat = np.load('C:/Users/Maelig/Documents/Research/molecule_detection/research/filtered_test_mat.npy')
+    # mat = np.load('C:/Users/Maelig/Documents/Research/molecule_detection/research/filtered_test_mat.npy')
     local_max_coordinates = threshold_coordinates.coordinates_array
     permutation2 = np.argsort(local_max_coordinates[0])[::]
     local_max_coordinates_sorted = local_max_coordinates[0][permutation2],local_max_coordinates[1][permutation2],local_max_coordinates[2][permutation2]
@@ -404,7 +404,7 @@ if __name__ == "__main__":
     c=0
     for i in range(start,end):
         fig, ax = plt.subplots(figsize=(12, 12))
-        ax.matshow(mat[i])
+        # ax.matshow(mat[i])
         while i == local_max_coordinates_sorted[0][c]:
             plt.scatter(local_max_coordinates_sorted[2][c],local_max_coordinates_sorted[1][c], s=1000, facecolors='none', edgecolors='r', lw=1)
             c=c+1

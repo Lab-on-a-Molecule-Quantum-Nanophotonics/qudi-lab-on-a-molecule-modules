@@ -1,3 +1,4 @@
+from typing import Iterable
 import datetime
 import queue
 import sys
@@ -8,14 +9,14 @@ from enum import Enum
 from queue import Empty, Full
 
 import matplotlib.pyplot as plt
-from qudi.util.fit_models.helpers import correct_offset_histogram
 import numpy as np
 from PySide6 import QtCore
 from PySide6.QtCore import QObject, QRunnable, QThreadPool, QTimer, Signal, Slot
-from qudi.core.module import LogicBase
-from qudi.core.connector import Connector
 from qudi.core.configoption import ConfigOption
+from qudi.core.connector import Connector
+from qudi.core.module import LogicBase
 from qudi.core.statusvariable import StatusVar
+from qudi.util.fit_models.helpers import correct_offset_histogram
 from qudi.util.fit_models.lorentzian import Lorentzian
 from qudi.util.units import ScaledFloat
 from scipy.signal import convolve
@@ -23,9 +24,9 @@ from scipy.special import digamma, polygamma
 from scipy.stats import gamma, norm
 from tifffile import TiffFile, imread
 
+from qudi.logic.scanning_probe_logic import ScanningProbeLogic
 from qudi.util.fit_models.gaussian import Gaussian2D
 from qudi.util.tomldatastorage import TOMLHeaderDataStorage
-from qudi.logic.scanning_probe_logic import ScanningProbeLogic
 
 
 def trigamma(z):
@@ -51,6 +52,7 @@ class WorkerMessage:
 @dataclass
 class BuilderMessage:
     coordinates: tuple[np.ndarray, np.ndarray, np.ndarray] | None = None
+    values: np.ndarray | None = None
     slice_number: int = 0
 
 
@@ -205,6 +207,7 @@ class MoleculePositionsResult:
     file_metadata: dict[str, float]
     algorithm_settings: MoleculeDetectionSettings
     coordinates_array: np.ndarray
+    certainty: np.ndarray
     lorentzian_fit_array: dict[str, np.ndarray] | None = None
 
 
@@ -225,6 +228,18 @@ class SingleMoleculeLocalizationDataset:
     movie: np.ndarray | None = None
     fit_result_spatially: dict | None = None
     fit_result_spectrally: dict | None = None
+
+class DatasetUpdateKind(Enum):
+    DeletedASingleRow = 1
+    AddedMultipleRows = 2
+    SuperlocalizedASingleRow = 3
+    DeletedManyRows = 4
+
+@dataclass
+class DatasetUpdate:
+    kind: DatasetUpdateKind
+    dataset: MoleculePositionsResult
+    index: Iterable | int | None = None
 
 
 def positivity_constraint_constructor(val):
@@ -280,16 +295,16 @@ class MoleculeDetectionLogic(LogicBase):
     progress_update = Signal(int)  # Localization progress between 0 and 100
     failure = Signal()
     finished = Signal()
-    new_result = Signal(MoleculePositionsResult)
+    results_updated = Signal(DatasetUpdate)
     settings_updated = Signal(MoleculeDetectionSettings)
     metadata_updated = Signal(dict)
     flattened_image_updated = Signal(np.ndarray)
-    position_updated = Signal(int)
     new_superlocalization = Signal(SingleMoleculeLocalizationDataset)
     new_movie = Signal(np.ndarray)
     _start_watchdog_timer = Signal()
     _start_workers = Signal()
     _start_builder = Signal()
+    _delete_molecules_by_id = Signal(list)
     _localize = Signal()
     _trigger_interrupt = Signal()
     gamma_estimate_histogram_updated = Signal(np.ndarray, np.ndarray)
@@ -341,6 +356,7 @@ class MoleculeDetectionLogic(LogicBase):
         self._start_builder.connect(self.__start_builder, QtCore.Qt.QueuedConnection)
         self._trigger_interrupt.connect(self.__interrupt, QtCore.Qt.QueuedConnection)
         self._localize.connect(self.__localize, QtCore.Qt.QueuedConnection)
+        self._delete_molecules_by_id.connect(self.__delete_molecules_by_id, QtCore.Qt.QueuedConnection)
         if self._input_file is not None:
             try:
                 self.load_file_info()
@@ -352,6 +368,7 @@ class MoleculeDetectionLogic(LogicBase):
         self._start_workers.disconnect()
         self._start_builder.disconnect()
         self._localize.disconnect()
+        self._delete_molecules_by_id.disconnect()
         self.interrupt()
         if self.module_state() == 'locked':
             self.module_state.unlock()
@@ -907,7 +924,7 @@ class MoleculeDetectionLogic(LogicBase):
         if not self._interrupt:
             self.log.debug(f"[slicer] Finished to slice file {self._input_file}.")
 
-    def detection_procedure(self, data: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def detection_procedure(self, data: np.ndarray) -> tuple[tuple[np.ndarray, np.ndarray, np.ndarray], np.ndarray]:
         """
         Run the molecule detection algorithm on the given data.
         """
@@ -917,8 +934,9 @@ class MoleculeDetectionLogic(LogicBase):
         background = self.adaptative_background(data)
         above_threshold_coordinates = self.thresholding(r_lmn, background)
         coordinates = self.local_maxima(r_lmn, above_threshold_coordinates)
+        certainties = r_lmn[coordinates] - self.ln_transform(background[coordinates])
         coordinates = self.offset_result(r_lmn, coordinates)
-        return coordinates
+        return coordinates, certainties
 
     def worker_init(self, worker_id):
         self.log.debug(f"[worker {worker_id}] Started.")
@@ -940,20 +958,21 @@ class MoleculeDetectionLogic(LogicBase):
             self.log.debug(
                 f"[worker {worker_id}] Starting to process slice {slice_number}/{self._total_number_of_slices}."
             )
-            coordinates = self.detection_procedure(message.data)
-            self._worker_to_builder_queue.put(BuilderMessage(coordinates, slice_number))
+            coordinates, certainties = self.detection_procedure(message.data)
+            self._worker_to_builder_queue.put(BuilderMessage(coordinates, certainties, slice_number))
             self._start_builder.emit()
         return running, {"worker_id": worker_id}
 
     def worker_finish(self, worker_id):
         self.log.debug(f"[worker {worker_id}] Finished.")
 
-    def assemble_workers_positions(self, L, M, N):
+    def assemble_workers_positions(self, L, M, N, certainties):
         L = np.concat(L)
         M = np.concat(M)
         N = np.concat(N)
+        certainties = np.concat(certainties)
         L = self.convert_frames_to_frequency(L)
-        ordering = np.argsort(L)
+        ordering = np.argsort(certainties, descending=True)
         M,N = self.convert_pixels_to_positions(np.array((M,N)))
         coordinates = np.array([L[ordering], M[ordering], N[ordering]])
         self._last_result = MoleculePositionsResult(
@@ -961,14 +980,18 @@ class MoleculeDetectionLogic(LogicBase):
             file_metadata=self._metadata,  # ty: ignore[invalid-argument-type]
             algorithm_settings=self.settings,
             coordinates_array=coordinates,
+            certainty=certainties
         )
-        self.new_result.emit(self._last_result)
+        self.results_updated.emit(DatasetUpdate(
+            kind=DatasetUpdateKind.AddedMultipleRows,
+            dataset=self._last_result
+        ))
 
     def builder_init(self):
         self.log.debug("[builder] Starting builder.")
-        return {"number_of_slices_processed": 0, "L": [], "M": [], "N": []}
+        return {"number_of_slices_processed": 0, "L": [], "M": [], "N": [], "certainties": []}
 
-    def builder(self, number_of_slices_processed, L, M, N):
+    def builder(self, number_of_slices_processed, L, M, N, certainties):
         """
         Assemble the coordinates generated by the workers to produce the finale result.
         """
@@ -984,19 +1007,20 @@ class MoleculeDetectionLogic(LogicBase):
             L.append(slice_L)
             M.append(slice_M)
             N.append(slice_N)
+            certainties.append(message.values)
             number_of_slices_processed += 1
-            self.assemble_workers_positions(L, M, N)
+            self.assemble_workers_positions(L, M, N, certainties)
             self.progress_update.emit(int((number_of_slices_processed + 1) / self._total_number_of_slices * 100))
         finally:
             running = running and not self._interrupt
-        return running, {"number_of_slices_processed": number_of_slices_processed, "L": L, "M": M, "N": N}
+        return running, {"number_of_slices_processed": number_of_slices_processed, "L": L, "M": M, "N": N, "certainties":certainties}
 
-    def builder_finish(self, number_of_slices_processed, L, M, N):
+    def builder_finish(self, number_of_slices_processed, L, M, N, certainties):
         self.log.debug(f"[builder] Processed {number_of_slices_processed}/{self._total_number_of_slices} slices.")
         if len(L) == 0 or len(M) == 0 or len(N) == 0:
             self.log.warning("[builder] No molecule was detected.")
             return
-        self.assemble_workers_positions(L, M, N)
+        self.assemble_workers_positions(L, M, N, certainties)
 
     @Slot()
     def worker_thread_error(self, error: tuple):
@@ -1274,8 +1298,11 @@ class MoleculeDetectionLogic(LogicBase):
             m = superlocalized.fit_result_spatially["center_x"]
             n = superlocalized.fit_result_spatially["center_y"]
         self._last_result.coordinates_array[:, i] = (l, m, n)
-        self.new_result.emit(self._last_result)
-        self.position_updated.emit(i)
+        self.results_updated.emit(DatasetUpdate(
+            kind=DatasetUpdateKind.SuperlocalizedASingleRow,
+            dataset=self._last_result,
+            index=i
+        ))
         return superlocalized
 
     def get_data_by_molecule_id(self, i:int) -> SingleMoleculeLocalizationDataset:
@@ -1359,8 +1386,25 @@ class MoleculeDetectionLogic(LogicBase):
         self.new_superlocalization.emit(superlocalized)
         return superlocalized
 
+    @Slot(list)
+    def delete_molecules_by_id(self, ids:list[int]):
+        self._delete_molecules_by_id.emit(ids)
+
+    @Slot(list)
+    def __delete_molecules_by_id(self, ids:list[int]):
+        reversed_ids_list = sorted(ids, reverse=True)
+        for i in reversed_ids_list:
+            self.delete_molecule_by_id(i, emit=False)
+        if self._last_result is not None:
+            self.results_updated.emit(DatasetUpdate(
+                kind=DatasetUpdateKind.DeletedManyRows,
+                dataset=self._last_result,
+                index=ids
+            ))
+        
+
     @Slot(int)
-    def delete_molecule_by_id(self, id:int):
+    def delete_molecule_by_id(self, id:int, emit:bool=True):
         if self._last_result is None:
             self.log.warning("No dataset to delete from.")
             return
@@ -1375,7 +1419,12 @@ class MoleculeDetectionLogic(LogicBase):
             new_fits = {k:v[mask] for (k,v) in self._last_result.lorentzian_fit_array.items()}
             self._last_result.lorentzian_fit_array = new_fits
         self._last_result.coordinates_array = new_coordinates
-        self.new_result.emit(self._last_result)
+        if emit:
+            self.results_updated.emit(DatasetUpdate(
+                kind=DatasetUpdateKind.DeletedASingleRow,
+                dataset=self._last_result,
+                index=id
+            ))
 
     def draw_parameter_estimation_figure(self):
         histogram_bins, histogram_edges = self._noise_fitting_histogram
