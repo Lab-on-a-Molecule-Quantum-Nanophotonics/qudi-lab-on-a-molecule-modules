@@ -1280,9 +1280,11 @@ class MoleculeDetectionLogic(LogicBase):
                 self._last_result.lorentzian_fit_array = {
                         "sigma": np.full((self._last_result.coordinates_array.shape[1],), np.nan),
                         "amplitude": np.full((self._last_result.coordinates_array.shape[1],), np.nan),
+                        "offset": np.full((self._last_result.coordinates_array.shape[1],), np.nan),
                         }
             self._last_result.lorentzian_fit_array["sigma"][i] = superlocalized.fit_result_spectrally["sigma"]
             self._last_result.lorentzian_fit_array["amplitude"][i] = superlocalized.fit_result_spectrally["amplitude"]
+            self._last_result.lorentzian_fit_array["offset"][i] = superlocalized.fit_result_spectrally["offset"]
         if superlocalized.fit_result_spatially is None:
             m = superlocalized.position_rough_estimate_m
             n = superlocalized.position_rough_estimate_n
@@ -1311,6 +1313,14 @@ class MoleculeDetectionLogic(LogicBase):
         # convertion to physical units
         m,n = self.convert_pixels_to_positions((m,n))
         flattened_image_m,flattened_image_n = self.convert_pixels_to_positions(np.array([np.arange(0, integrated_spectrally.shape[0])+offsets[1], np.arange(0, integrated_spectrally.shape[1])+offsets[2]]))
+        if self._last_result.lorentzian_fit_array is not None:
+            sigma = self._last_result.lorentzian_fit_array['sigma'][i]
+            amplitude = self._last_result.lorentzian_fit_array['amplitude'][i]
+            center = self._last_result.coordinates_array[0,i]
+            offset = self._last_result.lorentzian_fit_array['offset'][i]
+            fit_result_spectrally = { 'sigma':sigma, 'amplitude':amplitude, 'center':center, 'offset':offset }
+        else:
+            fit_result_spectrally = None
         return SingleMoleculeLocalizationDataset(
                 input_file=str(self._input_file),
                 position_rough_estimate_l=self.convert_frames_to_frequency(l),
@@ -1320,7 +1330,8 @@ class MoleculeDetectionLogic(LogicBase):
                 flattened_image_m=flattened_image_m,
                 flattened_image_n=flattened_image_n,
                 frequency_spectrum=np.array([self.convert_frames_to_frequency(np.arange(0, integrated_spatially.shape[0])+offsets[0]), integrated_spatially]),
-                movie=data
+                movie=data,
+                fit_result_spectrally=fit_result_spectrally
                 )
 
     @Slot(int, int, int)
@@ -1372,6 +1383,7 @@ class MoleculeDetectionLogic(LogicBase):
             ),
             fit_result_spatially=fit_result_spatial,
             fit_result_spectrally=fit_result_spectral,
+            movie=data
         )
         self._last_superlocalization = superlocalized
         self.new_superlocalization.emit(superlocalized)

@@ -532,16 +532,17 @@ class MoleculeLocalizationGui(GuiBase):
             else:
                 self._mw.singeMoleculeInteractiveCurvesWidget.set_data("Fit", x=xs, y=ys)
         else:
+            if "Fit" in self._mw.singeMoleculeInteractiveCurvesWidget.plot_names:
+                self._mw.singeMoleculeInteractiveCurvesWidget.set_data("Fit", x=[], y=[])
             index_of_frame = np.argmax(data.frequency_spectrum[1])
-        extent_m = data.flattened_image_m[-1] - data.flattened_image_m[0]
-        extent_n = data.flattened_image_n[-1] - data.flattened_image_n[0]
+        settings = self._localization_logic().settings
         if data.movie is not None :
-            self._mw.singleMoleculeImageView.setImage(data.movie, pos=(data.flattened_image_m[0], data.flattened_image_n[0]),xvals=data.frequency_spectrum[0], scale=(extent_m, extent_n))
+            self._mw.singleMoleculeImageView.setImage(data.movie, pos=(data.flattened_image_m[0], data.flattened_image_n[0]),xvals=data.frequency_spectrum[0], scale=(settings.pixel_physical_dimension, settings.pixel_physical_dimension))
             n = self._mw.singleMoleculeImageView.nframes()
             self._mw.singleMoleculeImageView.jumpFrames(-n)
             self._mw.singleMoleculeImageView.jumpFrames(index_of_frame)
         else:
-            self._mw.singleMoleculeImageView.setImage(data.flattened_image, pos=(data.flattened_image_m[0], data.flattened_image_n[0]), scale=(extent_m, extent_n))
+            self._mw.singleMoleculeImageView.setImage(data.flattened_image, pos=(data.flattened_image_m[0], data.flattened_image_n[0]), scale=(settings.pixel_physical_dimension, settings.pixel_physical_dimension))
         if data.fit_result_spatially is not None:
             self._mw.single_molecule_target_item.setPos((data.fit_result_spatially['center_x'], data.fit_result_spatially['center_y']))
 
