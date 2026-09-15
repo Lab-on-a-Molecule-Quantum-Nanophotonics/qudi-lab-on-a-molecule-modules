@@ -1,3 +1,4 @@
+from PySide6.scripts.metaobjectdump import file
 import os
 import sys
 
@@ -8,6 +9,7 @@ from PySide6 import QtWidgets
 from PySide6.QtCore import Qt, Signal, Slot
 from PySide6.QtWidgets import QFileDialog, QMessageBox
 from qudi.core.connector import Connector
+from qudi.core.statusvariable import StatusVar
 from qudi.core.module import GuiBase
 from qudi.util.colordefs import QudiPalette
 from qudi.util.fit_models.lorentzian import Lorentzian
@@ -25,6 +27,7 @@ from qudi.util import uic
 
 class MainWindow(QtWidgets.QMainWindow):
     sigDeleteMolecules = Signal(list)
+    _last_directory = StatusVar(default="~")
     def __init__(self, *args, **kwargs):
         this_dir = os.path.dirname(__file__)
         ui_file = os.path.join(this_dir, 'main_window.ui')
@@ -178,13 +181,14 @@ class MoleculeLocalizationGui(GuiBase):
         filename,_selected_filter = QFileDialog.getOpenFileName(
                 parent=self._mw,
                 caption="Open File",
-                dir=os.path.expanduser("~"),
+                dir=os.path.expanduser(self._last_directory),
                 filter = "TIFF files (*.tif *.tiff)"
                 )
         if not os.path.isfile(filename):
             self.log.warning("Selected file does not appear to exist")
             return
         else:
+            self._last_directory = os.path.dirname(filename)
             self._localization_logic().open_file(filename)
     @Slot(MoleculeDetectionSettings)
     def update_settings(self, settings:MoleculeDetectionSettings):
