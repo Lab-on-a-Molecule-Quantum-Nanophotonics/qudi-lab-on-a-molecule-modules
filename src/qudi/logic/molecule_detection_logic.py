@@ -22,7 +22,7 @@ from qudi.util.units import ScaledFloat
 from scipy.signal import convolve
 from scipy.special import digamma, polygamma
 from scipy.stats import gamma, norm
-from tifffile import TiffFile, imread
+from tifffile import TiffFile
 
 from qudi.logic.scanning_probe_logic import ScanningProbeLogic
 from qudi.util.fit_models.gaussian import Gaussian2D
@@ -321,34 +321,35 @@ class MoleculeDetectionLogic(LogicBase):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._slicer_to_worker_queue = queue.Queue()
-        self._worker_to_builder_queue = queue.Queue()
-        self._background_kernel = np.array([])
+        self._slicer_to_worker_queue: queue.Queue = queue.Queue()
+        self._worker_to_builder_queue: queue.Queue = queue.Queue()
+        self._background_kernel: np.ndarray = np.array([])
         self._threadpool = QThreadPool(self)
-        self._workers = []
-        self._slicer = None
-        self._builder = None
-        self._total_number_of_slices = 0
-        self._number_of_frames = 0
-        self._interrupt = False
-        self._slicer_finished = False
-        self._builder_finished = False
-        self._worker_finished = []
-        self._slicer_started = False
-        self._builder_started = False
-        self._workers_started = False
-        self._timer = QTimer(parent=self)
-        self._noise_fitting_histogram = (np.array([]), np.array([]))
-        self._fitted_gamma_law = (np.array([]), np.array([]))
-        self._flattened_image = np.array([])
-        self._metadata = None
-        self._last_result = None
-        self._last_psf = None
-        self._last_superlocalization = None
-        self._input_file_width = 0
-        self._input_file_height = 0
-        self._trigamma_interpolation = (np.array([]), np.array([]))
-        self._digamma_interpolation = (np.array([]), np.array([]))
+        self._workers: list[Worker] = []
+        self._slicer: Worker | None = None
+        self._builder:Worker | None = None
+        self._total_number_of_slices: int = 0
+        self._number_of_frames: int = 0
+        self._interrupt: bool = False
+        self._slicer_finished: bool = False
+        self._builder_finished: bool = False
+        self._worker_finished: list[bool] = []
+        self._slicer_started: bool = False
+        self._builder_started: bool = False
+        self._workers_started: bool = False
+        self._timer: QTimer = QTimer(parent=self)
+        self._noise_fitting_histogram: tuple[np.ndarray, np.ndarray] = (np.array([]), np.array([]))
+        self._fitted_gamma_law: tuple[np.ndarray, np.ndarray] = (np.array([]), np.array([]))
+        self._flattened_image: np.ndarray = np.array([])
+        self._tiff: TiffFile | None = None
+        self._metadata: dict | None = None
+        self._last_result: MoleculePositionsResult | None = None
+        self._last_psf: SingleMoleculeLocalizationDataset | None = None
+        self._last_superlocalization: SingleMoleculeLocalizationDataset | None = None
+        self._input_file_width: int = 0
+        self._input_file_height: int = 0
+        self._trigamma_interpolation: tuple[np.ndarray, np.ndarray] = (np.array([]), np.array([]))
+        self._digamma_interpolation: tuple[np.ndarray, np.ndarray] = (np.array([]), np.array([]))
 
     def on_activate(self) -> None:
         self._start_watchdog_timer.connect(self.__start_watchdog_timer, QtCore.Qt.QueuedConnection)
@@ -495,16 +496,16 @@ class MoleculeDetectionLogic(LogicBase):
         if input_file is None:
             raise ValueError("No input file specified")
         filepath = str(input_file)
-        tiff = TiffFile(filepath)
-        number_of_frames = len(tiff.pages)
-        self._input_file_width, self._input_file_height = tiff.pages.first.shape
+        self._tiff = TiffFile(filepath)
+        number_of_frames = len(self._tiff.pages)
+        self._input_file_width, self._input_file_height = self._tiff.pages.first.shape
         number_of_frames_per_slice = int(self._frames_per_slice)
         number_of_slices = number_of_frames // number_of_frames_per_slice
         self._total_number_of_slices = number_of_slices
         self._number_of_frames = number_of_frames
-        self.load_flattened_image(input_file)
-        self.load_andor_metadata(input_file)
-        self.new_movie.emit(tiff.asarray())
+        self.load_flattened_image()
+        self.load_andor_metadata()
+        self.new_movie.emit(self._tiff.asarray(out='memmap'))
 
     @settings.setter
     def settings(self, settings: UserActionableMoleculeDetectionSettings):
@@ -621,17 +622,17 @@ class MoleculeDetectionLogic(LogicBase):
         if self._input_file is None:
             self.log.error("No input file defined, could not perform noise estimation procedure.")
             return
-        if self._input_file_height == 0 or self._input_file_width == 0:
+        if self._input_file_height == 0 or self._input_file_width == 0 or self._tiff is None:
             self.load_file_info()
+        if self._tiff is None:
+            raise ValueError("Could not load file.")
         if self._input_file_height == 0 or self._input_file_width == 0:
             self.log.error("Input file appears to be zero dimensionnal!")
             return
-        filepath = str(self._input_file)
-        tiff = TiffFile(filepath)
-        number_of_frames = len(tiff.pages)
+        number_of_frames = len(self._tiff.pages)
         number_of_samples = min(self._number_of_frames_sampled_for_psf_estimation, number_of_frames)
         sampled_frames = np.random.choice(range(number_of_frames), number_of_samples)
-        data = imread(filepath, key=sampled_frames)
+        data = self._tiff.asarray(key=sampled_frames)
         l, m, n = np.unravel_index(np.argmax(data), data.shape)
         rough_l = l
         l = sampled_frames[l]
@@ -640,7 +641,7 @@ class MoleculeDetectionLogic(LogicBase):
         extent = max(10, int(self._position_stdev * 3))
         M = np.arange(max(0, m - extent), stop=min(self._input_file_width, m + extent))
         N = np.arange(max(0, n - extent), stop=min(self._input_file_height, n + extent))
-        data = imread(filepath, key=sampled_frames)[np.ix_(range(len(sampled_frames)), M, N)]
+        data = self._tiff.asarray(key=sampled_frames)[np.ix_(range(len(sampled_frames)), M, N)]
         integrated_spatially = self.integrate_spatially(data)
         fitted_frequency = self.fit_frequency_dimension(integrated_spatially)
         if fitted_frequency is not None:
@@ -678,15 +679,13 @@ class MoleculeDetectionLogic(LogicBase):
 
     @Slot()
     def estimate_from_noise(self):
-        if self._input_file is None:
+        if self._input_file is None or self._tiff is None:
             self.log.error("No input file defined, could not perform noise estimation procedure.")
             return
-        filepath = str(self._input_file)
-        tiff = TiffFile(filepath)
-        number_of_frames = len(tiff.pages)
+        number_of_frames = len(self._tiff.pages)
         number_of_samples = min(self._number_of_frames_sampled_for_gamma_fitting, number_of_frames)
         sampled_frames = np.random.choice(range(number_of_frames), number_of_samples)
-        data = np.ravel(imread(filepath, key=sampled_frames))
+        data = np.ravel(self._tiff.asarray(key=sampled_frames))
         self._noise_fitting_histogram = np.histogram(data, bins="auto", density=True)
         self.gamma_estimate_histogram_updated.emit(self._noise_fitting_histogram[0], self._noise_fitting_histogram[1])
         data_gamma_fit = data[data < np.quantile(data, float(self._quantile_gamma_fit))]
@@ -738,14 +737,7 @@ class MoleculeDetectionLogic(LogicBase):
         self._total_number_of_slices = 0
         self._slicer_to_worker_queue = queue.Queue(maxsize=int(self._number_of_workers))
 
-        filepath = str(self._input_file)
-        tiff = TiffFile(filepath)
-        number_of_frames = len(tiff.pages)
-        number_of_frames_per_slice = int(self._frames_per_slice)
-        number_of_slices = number_of_frames // number_of_frames_per_slice
-        self._input_file_width, self._input_file_height = tiff.pages.first.shape
-        self._total_number_of_slices = number_of_slices
-        self._number_of_frames = number_of_frames
+        self.load_file_info()
         self._worker_to_builder_queue = queue.Queue()
 
     @Slot()
@@ -885,10 +877,11 @@ class MoleculeDetectionLogic(LogicBase):
         return (coordinates[0] + offset_l, coordinates[1] + offset_m, coordinates[2] + offset_n)
 
     def slice(self, slice_number: int) -> np.ndarray:
-        filepath = str(self._input_file)
+        if self._tiff is None:
+            raise ValueError("No file has been loaded.")
         number_of_frames_per_slice = int(self._frames_per_slice)
         stop_frame = min(self._number_of_frames, (slice_number + 1) * number_of_frames_per_slice)
-        segment = imread(filepath, key=range(slice_number * number_of_frames_per_slice, stop_frame))
+        segment = self._tiff.asarray(key=range(slice_number * number_of_frames_per_slice, stop_frame))
         return segment
 
     def slicer_init(self):
@@ -1139,10 +1132,12 @@ class MoleculeDetectionLogic(LogicBase):
 
     @property
     def last_result(self) -> MoleculePositionsResult | None:
-        return self._last_result  # ty: ignore[invalid-return-type]
+        return self._last_result 
 
-    def load_flattened_image(self, filepath):
-        full_image = imread(filepath)
+    def load_flattened_image(self):
+        if self._tiff is None:
+            raise ValueError("No file has been loaded.")
+        full_image = self._tiff.asarray(out='memmap')
         self._flattened_image = np.max(full_image, axis=0)
         self.flattened_image_updated.emit(self._flattened_image)
 
@@ -1151,17 +1146,15 @@ class MoleculeDetectionLogic(LogicBase):
         """Return a 2D image of the movie my taking the max over the whole time
         series of each pixel.
         """
-        if self._flattened_image.size == 0 and self._input_file is not None:
-            filepath = str(self._input_file)
-            self.load_flattened_image(filepath)
+        if self._flattened_image.size == 0:
+            self.load_flattened_image()
         return self._flattened_image
 
-    def load_andor_metadata(self, filepath: str | None):
+    def load_andor_metadata(self):
         new_metadata = {}
-        if filepath is not None:
-            file = TiffFile(filepath)
-            if file.andor_metadata is not None:
-                new_metadata = file.andor_metadata
+        if self._tiff is not None:
+            if self._tiff.andor_metadata is not None:
+                new_metadata = self._tiff.andor_metadata
         self._metadata = {k:new_metadata[k] for k in new_metadata if k in ANDOR_METADATA_KEYS}
         for k in ANDOR_METADATA_KEYS:
             if k not in self._metadata:
@@ -1172,8 +1165,8 @@ class MoleculeDetectionLogic(LogicBase):
     def andor_metadata(self) -> dict[str, float]:
         """Return the Andor metadata from the input file."""
         if self._metadata is None:
-            self.load_andor_metadata(self._input_file)
-        return self._metadata
+            self.load_andor_metadata()
+        return self._metadata  # ty:ignore[invalid-return-type]
 
     def subset_for_pixel(
         self, l: int, m: int, n: int, frequency_size: int | None = None, spatial_size: int | None = None
@@ -1183,16 +1176,15 @@ class MoleculeDetectionLogic(LogicBase):
         `(l, m, n)`. And the offset that can be used to recover the global
         coordinates of the pixels within the subset.
         """
-        if self._input_file is None:
-            return np.array([])
+        if self._input_file is None or self._tiff is None:
+            raise ValueError("No file has been loaded.")
         if frequency_size is None:
             frequency_size = int(self._kernel_frequency_length * self._lorentzian_safety_margin)
         if spatial_size is None:
             spatial_size = int(self._kernel_spatial_length)
         offset_l = max(0, l - frequency_size)
         keys = range(offset_l, min(l + frequency_size + 1, self._number_of_frames))
-        filepath = str(self._input_file)
-        data = imread(filepath, key=keys)
+        data = self._tiff.asarray( key=keys)
         _d, w, h = data.shape
         offset_m = max(0, m - spatial_size)
         M = np.arange(offset_m, min(w, m + spatial_size + 1))
@@ -1319,7 +1311,6 @@ class MoleculeDetectionLogic(LogicBase):
         # convertion to physical units
         m,n = self.convert_pixels_to_positions((m,n))
         flattened_image_m,flattened_image_n = self.convert_pixels_to_positions(np.array([np.arange(0, integrated_spectrally.shape[0])+offsets[1], np.arange(0, integrated_spectrally.shape[1])+offsets[2]]))
-
         return SingleMoleculeLocalizationDataset(
                 input_file=str(self._input_file),
                 position_rough_estimate_l=self.convert_frames_to_frequency(l),
@@ -1412,7 +1403,6 @@ class MoleculeDetectionLogic(LogicBase):
         if not (0 <= id <= self._last_result.coordinates_array.shape[1]):
             raise IndexError()
         new_coordinates = np.delete(self._last_result.coordinates_array, id, axis=1)
-        self.log.debug(f"old shape {self._last_result.coordinates_array.shape} new shape {new_coordinates.shape}")
         if self._last_result.lorentzian_fit_array is not None:
             mask = np.ones(self._last_result.coordinates_array.shape[1], bool)
             mask[id] = False

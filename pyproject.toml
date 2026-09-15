@@ -54,7 +54,7 @@ classifiers = [
 
     "Topic :: Scientific/Engineering",
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 # Dependencies with omitted version numbers get a fixed version from qudi-core
 dependencies = [
     'qudi-core>=1.7.0',
@@ -64,7 +64,7 @@ dependencies = [
     'lxml>=6.1.0',
     'matplotlib',
     'nidaqmx>=1.5.0',
-    'numpy',
+    'numpy>=2.5',
     'pyqtgraph',
     'PySide6',
     "pyvisa>=1.16.2",
