@@ -1328,7 +1328,7 @@ class MoleculeDetectionLogic(LogicBase):
                 flattened_image=integrated_spectrally,
                 flattened_image_m=flattened_image_m,
                 flattened_image_n=flattened_image_n,
-                frequency_spectrum=self.convert_frames_to_frequency(np.array([np.arange(0, integrated_spatially.shape[0])+offsets[0], integrated_spatially])),
+                frequency_spectrum=np.array([self.convert_frames_to_frequency(np.arange(0, integrated_spatially.shape[0])+offsets[0]), integrated_spatially]),
                 movie=data
                 )
 
