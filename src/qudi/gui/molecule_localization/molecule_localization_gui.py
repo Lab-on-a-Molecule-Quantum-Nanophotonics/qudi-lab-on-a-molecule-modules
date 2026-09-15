@@ -1,4 +1,3 @@
-from PySide6.scripts.metaobjectdump import file
 import os
 import sys
 
@@ -162,7 +161,7 @@ class MoleculeLocalizationGui(GuiBase):
         self._mw.showAllMoleculesCheckBox.clicked.disconnect(self.on_plot_all_molecules_clicked)
         self._mw.resultsTableWidget.currentCellChanged.disconnect(self.on_table_result_cell_changed)
         self._mw.settings.readSamplePositionPushButton.clicked.disconnect(self._localization_logic().read_sample_position)
-        self._mw.settings.updateCalibrationPushButton.clicked.disconnect(self.update_settings)
+        self._mw.settings.updateCalibrationPushButton.clicked.disconnect(self.update_calibration)
         self._mw.sigDeleteMolecules.disconnect(self.on_delete_molecules_by_id)
         self._localization_logic().metadata_updated.disconnect(self._mw.metadata.setData)
 
