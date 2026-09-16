@@ -1,9 +1,8 @@
-from typing import Iterable
 import datetime
 import queue
 import sys
 import traceback
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from dataclasses import asdict, dataclass
 from enum import Enum
 from queue import Empty, Full
@@ -482,13 +481,14 @@ class MoleculeDetectionLogic(LogicBase):
             number_of_frames_sampled_for_gamma_fitting=int(self._number_of_frames_sampled_for_gamma_fitting),
             number_of_frames_sampled_for_psf_estimation=int(self._number_of_frames_sampled_for_psf_estimation),
             border_excluded_pixels=int(self._excluded_pixels_border),
-            digamma_interpolation_mini=float(self._digamma_interpolation_mini),
-            digamma_interpolation_maxi=float(self._digamma_interpolation_maxi),
-            digamma_interpolation_num=int(self._digamma_interpolation_num),
-            trigamma_interpolation_mini=float(self._trigamma_interpolation_mini),
-            trigamma_interpolation_maxi=float(self._trigamma_interpolation_maxi),
-            trigamma_interpolation_num=int(self._trigamma_interpolation_num),
         )
+
+    @property
+    def movie(self):
+        if self._tiff is not None:
+            return self._tiff.asarray(out='memmap') 
+        else:
+            return np.array([])
 
     def load_file_info(self, input_file:str|None=None):
         if input_file is None:
@@ -497,15 +497,20 @@ class MoleculeDetectionLogic(LogicBase):
             raise ValueError("No input file specified")
         filepath = str(input_file)
         self._tiff = TiffFile(filepath)
+        self.extract_file_dimensions()
+        self.load_flattened_image()
+        self.load_andor_metadata()
+        self.new_movie.emit(self.movie)
+
+    def extract_file_dimensions(self):
+        if self._tiff is None:
+            raise ValueError("file not loaded")
         number_of_frames = len(self._tiff.pages)
         self._input_file_width, self._input_file_height = self._tiff.pages.first.shape
         number_of_frames_per_slice = int(self._frames_per_slice)
         number_of_slices = number_of_frames // number_of_frames_per_slice
         self._total_number_of_slices = number_of_slices
         self._number_of_frames = number_of_frames
-        self.load_flattened_image()
-        self.load_andor_metadata()
-        self.new_movie.emit(self._tiff.asarray(out='memmap'))
 
     @settings.setter
     def settings(self, settings: UserActionableMoleculeDetectionSettings):
@@ -646,14 +651,18 @@ class MoleculeDetectionLogic(LogicBase):
         fitted_frequency = self.fit_frequency_dimension(integrated_spatially)
         if fitted_frequency is not None:
             l = int(fitted_frequency["center"])
+        l = np.clip(l, a_min=0, a_max=data.shape[0])
         integrated_spectrally = self.integrate_spectrally(l, data)
         fitted_spatial = self.fit_spatial_dimension(integrated_spectrally)
-        self._frequency_fwhm = int(np.ceil(2*fitted_frequency['sigma']))
-        self._kernel_frequency_length = self._lorentzian_safety_margin * self._frequency_fwhm
-        self._position_stdev = int(np.ceil(max(fitted_spatial['sigma_x'], fitted_spatial['sigma_x'])))
-        self._kernel_spatial_length = 3 * self._position_stdev
+        if fitted_frequency is not None:
+            self._frequency_fwhm = int(np.ceil(2*fitted_frequency['sigma']))
+            self._kernel_frequency_length = self._lorentzian_safety_margin * self._frequency_fwhm
+        if fitted_spatial is not None:
+            self._position_stdev = int(np.ceil(max(fitted_spatial['sigma_x'], fitted_spatial['sigma_x'])))
+            self._kernel_spatial_length = 3 * self._position_stdev
         self.settings_updated.emit(self.settings)
-        fitted_frequency['center'] += sampled_frames.min()
+        if fitted_frequency is not None:
+            fitted_frequency['center'] += sampled_frames.min()
         # convertion to physical units
         M,N = self.convert_pixels_to_positions(np.array((M,N)))
         m,n = self.convert_pixels_to_positions((m,n))
@@ -737,7 +746,7 @@ class MoleculeDetectionLogic(LogicBase):
         self._total_number_of_slices = 0
         self._slicer_to_worker_queue = queue.Queue(maxsize=int(self._number_of_workers))
 
-        self.load_file_info()
+        self.extract_file_dimensions()
         self._worker_to_builder_queue = queue.Queue()
 
     @Slot()
@@ -894,7 +903,7 @@ class MoleculeDetectionLogic(LogicBase):
         the workers
         """
         if self._interrupt:
-            return False
+            return False, {}
         retry = True
         self.log.debug(f"[slicer] sending slice {slice_number}.")
         while retry:
@@ -940,12 +949,12 @@ class MoleculeDetectionLogic(LogicBase):
         Process the slices received from the slicer and output molecule coordinates
         to a queue to be assembled back by the builder.
         """
-        running = True
+        running = not self._interrupt
         try:
             message = self._slicer_to_worker_queue.get(timeout=1)
         except Empty:
             self.log.debug(f"[worker {worker_id}] Timed out!")
-            running = self._slicer_started and not self._slicer_finished
+            running = running and self._slicer_started and not self._slicer_finished
         else:
             slice_number = message.slice_number
             self.log.debug(
@@ -992,7 +1001,7 @@ class MoleculeDetectionLogic(LogicBase):
         try:
             message = self._worker_to_builder_queue.get(timeout=1)
         except Empty:
-            running = self._workers_started and not all(self._worker_finished)
+            running = running and self._workers_started and not all(self._worker_finished)
         else:
             slice_number = message.slice_number
             slice_L, slice_M, slice_N = message.coordinates
