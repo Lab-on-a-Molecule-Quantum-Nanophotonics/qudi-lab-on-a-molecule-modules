@@ -33,7 +33,6 @@ class MainWindow(QtWidgets.QMainWindow):
         super().__init__(*args, **kwargs)
         uic.loadUi(ui_file, self)
         self.settings.helpNoiseStatisticsToolButton.setDefaultAction(self.actionHelp_Noise_Statistics)
-        self.settings.helpPolygammaInterpolationToolButton.setDefaultAction(self.actionHelp_Polygamma_Interpolation)
         self.settings.helpPSFToolButton.setDefaultAction(self.actionHelp_PSF)
         self.settings.helpMultithreadingtoolButton.setDefaultAction(self.actionHelp_Multithreading)
         self.settings.helpAlgorithmToolButton.setDefaultAction(self.actionHelp_Algorithm)
@@ -67,11 +66,37 @@ class MainWindow(QtWidgets.QMainWindow):
         single_molecule_image_view.addItem(self.single_molecule_target_item)
         self.singeMoleculeInteractiveCurvesWidget.set_units(x="Hz", y="counts")
         self.settings.probabilityOfFalsePositiveDoubleSpinBox.setMinimum(sys.float_info.epsilon)
+        self.inhomogeneousInteractiveCurvesWidget.set_units(x="Hz", y="bins")
+        self.inhomogeneousInteractiveCurvesWidget.set_labels(x="Peak Frequency")
+        self.linewidthStatisticsInteractiveCurvesWidget.set_units(x="Hz", y="bins")
+        self.linewidthStatisticsInteractiveCurvesWidget.set_labels(x="HWHM")
+        self.inhomogeneous_broadening_vertical_line = pyqtgraph.InfiniteLine(pen=QudiPalette.green, label="selected molecule")
+        self.inhomogeneousInteractiveCurvesWidget._plot_widget.addItem(self.inhomogeneous_broadening_vertical_line)
+        self.linewidth_vertical_line = pyqtgraph.InfiniteLine(pen=QudiPalette.green, label="selected molecule")
+        self.linewidthStatisticsInteractiveCurvesWidget._plot_widget.addItem(self.linewidth_vertical_line)
+
+    @property
+    def table_widgets(self):
+        return [
+                self.resultsTableWidget,
+                self.inhomogeneousTableWidget,
+                self.linewidthStatisticsTableWidget
+                ]
+
+    @property
+    def currently_focused_table(self):
+        for table in self.table_widgets:
+            if table.hasFocus():
+                return table
+        return None
 
     def keyPressEvent(self, event):
         # https://doc.qt.io/qtforpython/PySide6/QtCore/Qt.html?highlight=key_escape#PySide6.QtCore.PySide6.QtCore.Qt.Key
-        if event.key() == Qt.Key.Key_Delete and self.resultsTableWidget.hasFocus():
-            to_be_deleted = [i.row() for i in self.resultsTableWidget.selectedIndexes()]
+        if event.key() == Qt.Key.Key_Delete:
+            widget = self.currently_focused_table
+            if widget is None:
+                return
+            to_be_deleted = [i.row() for i in widget.selectedIndexes()]
             self.sigDeleteMolecules.emit(to_be_deleted)
 
 
@@ -96,8 +121,8 @@ class MoleculeLocalizationGui(GuiBase):
         self._mw = MainWindow()
         self.update_settings(self._localization_logic().settings)
         self._mw.metadata.setData(self._localization_logic().andor_metadata)
-        self._mw.flattened_image.setImage(self._localization_logic().flattened_image)
-        self._mw.movie.setImage(self._localization_logic().movie)
+        # self._mw.flattened_image.setImage(self._localization_logic().flattened_image)
+        # self._mw.movie.setImage(self._localization_logic().movie)
         self._mw.settings.readSamplePositionPushButton.setEnabled(self._localization_logic().read_position_available)
         self.connect_gui()
         self.show()
@@ -118,7 +143,6 @@ class MoleculeLocalizationGui(GuiBase):
             return
         self._mw.actionSelect_tiff.triggered.connect(self.select_file)
         self._mw.actionHelp_Noise_Statistics.triggered.connect(self.show_statistics_help_dialog)
-        self._mw.actionHelp_Polygamma_Interpolation.triggered.connect(self.show_polygamma_help_dialog)
         self._mw.actionHelp_PSF.triggered.connect(self.show_psf_help_dialog)
         self._mw.actionHelp_Multithreading.triggered.connect(self.show_multithreading_help_dialog)
         self._mw.actionHelp_Algorithm.triggered.connect(self.show_algorithm_help_dialog)
@@ -138,6 +162,8 @@ class MoleculeLocalizationGui(GuiBase):
         self._mw.settings.readSamplePositionPushButton.clicked.connect(self._localization_logic().read_sample_position)
         self._mw.settings.updateCalibrationPushButton.clicked.connect(self.update_calibration)
         self._mw.sigDeleteMolecules.connect(self.on_delete_molecules_by_id)
+        self._mw.inhomogeneousTableWidget.currentCellChanged.connect(self.on_table_inhomogeneous_broadening_cell_changed)
+        self._mw.linewidthStatisticsTableWidget.currentCellChanged.connect(self.on_table_linewidth_statistics_cell_changed)
         self._localization_logic().metadata_updated.connect(self._mw.metadata.setData)
         self._localization_logic().flattened_image_updated.connect(self._mw.flattened_image.setImage)
         self._localization_logic().settings_updated.connect(self.update_settings)
@@ -149,13 +175,16 @@ class MoleculeLocalizationGui(GuiBase):
         self._localization_logic().results_updated.connect(self.plot_molecules_positions)
         self._localization_logic().finished.connect(self.on_localization_finished)
         self._localization_logic().new_movie.connect(self._mw.movie.setImage)
+        self._localization_logic().new_inhomogeneous_broadening_histogram.connect(self.on_new_inhomogeneous_broadening_histogram)
+        self._localization_logic().new_linewidth_histogram.connect(self.on_new_linewidth_histogram)
+        self._localization_logic().new_inhomogeneous_statistics.connect(self.on_new_inhomogeneous_broadening_statistics)
+        self._localization_logic().new_linewidth_statistics.connect(self.on_new_linewidth_statistics)
 
     def disconnect_gui(self):
         if self._mw is None:
             return
         self._mw.actionSelect_tiff.triggered.disconnect(self.select_file)
         self._mw.actionHelp_Noise_Statistics.triggered.disconnect(self.show_statistics_help_dialog)
-        self._mw.actionHelp_Polygamma_Interpolation.triggered.disconnect(self.show_polygamma_help_dialog)
         self._mw.actionHelp_PSF.triggered.disconnect(self.show_psf_help_dialog)
         self._mw.actionHelp_Multithreading.triggered.disconnect(self.show_multithreading_help_dialog)
         self._mw.actionHelp_Algorithm.triggered.disconnect(self.show_algorithm_help_dialog)
@@ -177,6 +206,8 @@ class MoleculeLocalizationGui(GuiBase):
         )
         self._mw.settings.updateCalibrationPushButton.clicked.disconnect(self.update_calibration)
         self._mw.sigDeleteMolecules.disconnect(self.on_delete_molecules_by_id)
+        self._mw.inhomogeneousTableWidget.currentCellChanged.connect(self.on_table_inhomogeneous_broadening_cell_changed)
+        self._mw.linewidthStatisticsTableWidget.currentCellChanged.connect(self.on_table_linewidth_statistics_cell_changed)
         self._localization_logic().metadata_updated.disconnect(self._mw.metadata.setData)
 
         self._localization_logic().flattened_image_updated.disconnect(self._mw.flattened_image.setImage)
@@ -189,6 +220,10 @@ class MoleculeLocalizationGui(GuiBase):
         self._localization_logic().results_updated.connect(self.plot_molecules_positions)
         self._localization_logic().finished.disconnect(self.on_localization_finished)
         self._localization_logic().new_movie.disconnect(self._mw.movie.setImage)
+        self._localization_logic().new_inhomogeneous_broadening_histogram.disconnect(self.on_new_inhomogeneous_broadening_histogram)
+        self._localization_logic().new_linewidth_histogram.disconnect(self.on_new_linewidth_histogram)
+        self._localization_logic().new_inhomogeneous_statistics.disconnect(self.on_new_inhomogeneous_broadening_statistics)
+        self._localization_logic().new_linewidth_statistics.disconnect(self.on_new_linewidth_statistics)
 
     @Slot()
     def select_file(self):
@@ -478,7 +513,8 @@ class MoleculeLocalizationGui(GuiBase):
                 data_dict['HWHM (Hz)'] = data.lorentzian_fit_array['sigma']
                 data_dict['amplitude (counts)'] = data.lorentzian_fit_array['amplitude']
             sent_data = [{k: data_dict[k][i] for k in data_dict} for i in range(data.coordinates_array.shape[1])]
-            self._mw.resultsTableWidget.setData(sent_data)
+            for table in self._mw.table_widgets:
+                table.setData(sent_data)
             offset = np.asarray(data.algorithm_settings.pixels_offset) + np.asarray(
                 data.algorithm_settings.sample_position
             )
@@ -494,13 +530,13 @@ class MoleculeLocalizationGui(GuiBase):
             self.switch_to_results()
         elif update.kind == DatasetUpdateKind.DeletedASingleRow:
             i = update.index
-            current_row = self._mw.resultsTableWidget.currentRow()
-            if current_row == i and current_row < self._mw.resultsTableWidget.rowCount() - 1:
-                self._mw.resultsTableWidget.setCurrentCell(current_row + 1, self._mw.resultsTableWidget.currentColumn())
-            elif current_row == i and current_row >= self._mw.resultsTableWidget.rowCount() - 1:
-                self._mw.resultsTableWidget.setCurrentCell(current_row - 1, self._mw.resultsTableWidget.currentColumn())
-            self.on_table_result_cell_changed(current_row)
-            self._mw.resultsTableWidget.removeRow(i)
+            for table in self._mw.table_widgets:
+                current_row = table.currentRow()
+                if current_row == i and current_row < table.rowCount() - 1:
+                    table.setCurrentCell(current_row + 1, table.currentColumn())
+                elif current_row == i and current_row >= table.rowCount() - 1:
+                    table.setCurrentCell(current_row - 1, table.currentColumn())
+                table.removeRow(i)
             self._mw.statusBar().showMessage(f"Deleted molecule {i}")
         elif update.kind == DatasetUpdateKind.DeletedManyRows:
             indices = update.index
@@ -508,27 +544,29 @@ class MoleculeLocalizationGui(GuiBase):
                 return
             if type(indices) is int:
                 indices = [indices]
-            self._mw.resultsTableWidget.currentCellChanged.disconnect(self.on_table_result_cell_changed)
-            indices = sorted(indices, reverse=True)
-            for i in indices:  # ty: ignore[not-iterable]
-                self._mw.resultsTableWidget.setRangeSelected(
-                    QtWidgets.QTableWidgetSelectionRange(i, 0, i, self._mw.resultsTableWidget.columnCount()), False
-                )
-                self._mw.resultsTableWidget.removeRow(i)
-            self._mw.resultsTableWidget.currentCellChanged.connect(self.on_table_result_cell_changed)
+            for table in self._mw.table_widgets:
+                old_state = table.currentCellChanged.blockSignals(True)
+                indices = sorted(indices, reverse=True)
+                for i in indices:  # ty: ignore[not-iterable]
+                    table.setRangeSelected(
+                        QtWidgets.QTableWidgetSelectionRange(i, 0, i, table.columnCount()), False
+                    )
+                    table.removeRow(i)
+                table.currentCellChanged.blockSignals(old_state)
             self._mw.statusBar().showMessage(f"Deleted molecules {indices}")
         elif update.kind == DatasetUpdateKind.SuperlocalizedASingleRow:
             i = update.index
             row = list(update.dataset.coordinates_array[:, i])
-            if self._mw.resultsTableWidget.columnCount() < 5:
-                self._mw.resultsTableWidget.setColumnCount(5)
-                self._mw.resultsTableWidget.setHorizontalHeaderLabels(
-                    ['Frequency (Hz)', 'x (m)', 'y (m)', 'HWHM (Hz)', 'amplitude (counts)']
-                )
-            if update.dataset.lorentzian_fit_array is not None:
-                row.append(update.dataset.lorentzian_fit_array['sigma'][i])
-                row.append(update.dataset.lorentzian_fit_array['amplitude'][i])
-            self._mw.resultsTableWidget.setRow(i, row)
+            for table in self._mw.table_widgets:
+                if table.columnCount() < 5:
+                    table.setColumnCount(5)
+                    table.setHorizontalHeaderLabels(
+                        ['Frequency (Hz)', 'x (m)', 'y (m)', 'HWHM (Hz)', 'amplitude (counts)']
+                    )
+                if update.dataset.lorentzian_fit_array is not None:
+                    row.append(update.dataset.lorentzian_fit_array['sigma'][i])
+                    row.append(update.dataset.lorentzian_fit_array['amplitude'][i])
+                table.setRow(i, row)
             self._mw.statusBar().showMessage(f"Superlocalized molecule {i}")
 
     @Slot()
@@ -580,6 +618,30 @@ class MoleculeLocalizationGui(GuiBase):
             self.log.warning("failed to display single molecule data.")
         else:
             self.display_single_molecule_data(data)
+
+    @Slot(int, int, int, int)
+    def on_table_inhomogeneous_broadening_cell_changed(self, x: int, _y=int | None, _prevx=int | None, _prevy=int | None):
+        if x < 0:
+            return
+        last_result = self._localization_logic().last_result
+        if last_result is None:
+            return
+        currently_selected = np.clip(x, a_min=0, a_max=last_result.coordinates_array.shape[1] - 1)
+        frequency = last_result.coordinates_array[0, currently_selected]
+        self._mw.inhomogeneous_broadening_vertical_line.setValue(frequency)
+
+    @Slot(int, int, int, int)
+    def on_table_linewidth_statistics_cell_changed(self, x: int, _y=int | None, _prevx=int | None, _prevy=int | None):
+        if x < 0:
+            return
+        last_result = self._localization_logic().last_result
+        if last_result is None:
+            return
+        currently_selected = np.clip(x, a_min=0, a_max=last_result.coordinates_array.shape[1] - 1)
+        if last_result.lorentzian_fit_array is None:
+            return
+        linewidth = last_result.lorentzian_fit_array["sigma"]
+        self._mw.linewidth_vertical_line.setValue(linewidth)
 
     @Slot()
     def on_localization_finished(self):
@@ -651,7 +713,10 @@ class MoleculeLocalizationGui(GuiBase):
 
     @Slot()
     def on_superlocalize_current_molecule(self):
-        id = self._mw.resultsTableWidget.currentRow()
+        table = self._mw.currently_focused_table
+        if table is None:
+            return
+        id = table.currentRow()
         if id < 0:
             return
         superlocalized = self._localization_logic().superlocalize_by_id(id)
@@ -676,3 +741,28 @@ class MoleculeLocalizationGui(GuiBase):
     @Slot()
     def on_save_superlocalization(self):
         self._localization_logic().save_superlocalization()
+
+    @Slot(np.ndarray, np.ndarray)
+    def on_new_inhomogeneous_broadening_histogram(self, hist:np.ndarray, edges: np.ndarray):
+        if "Histogram" not in self._mw.inhomogeneousInteractiveCurvesWidget.plot_names:
+            self._mw.inhomogeneousInteractiveCurvesWidget.plot("Histogram", x=edges[:-1], y=hist, pen=QudiPalette.c1)
+        else:
+            self._mw.inhomogeneousInteractiveCurvesWidget.set_data("Histogram", x=edges[:-1], y=hist)
+
+    @Slot(np.ndarray, np.ndarray)
+    def on_new_linewidth_histogram(self, hist:np.ndarray, edges: np.ndarray):
+        if "Histogram" not in self._mw.linewidthStatisticsInteractiveCurvesWidget.plot_names:
+            self._mw.linewidthStatisticsInteractiveCurvesWidget.plot("Histogram", x=edges[:-1], y=hist, pen=QudiPalette.c1)
+        else:
+            self._mw.linewidthStatisticsInteractiveCurvesWidget.set_data("Histogram", x=edges[:-1], y=hist)
+
+    @Slot(float, float)
+    def on_new_inhomogeneous_broadening_statistics(self, mean, std):
+        self._mw.frequencyMeanDoubleSpinBox.setValue(mean)
+        self._mw.frequencyStdDoubleSpinBox.setValue(std)
+
+    @Slot(float, float)
+    def on_new_linewidth_statistics(self, mean, std):
+        self._mw.lineWidthMeanDoubleSpinBox.setValue(mean)
+        self._mw.lineWidthStdDoubleSpinBox.setValue(std)
+

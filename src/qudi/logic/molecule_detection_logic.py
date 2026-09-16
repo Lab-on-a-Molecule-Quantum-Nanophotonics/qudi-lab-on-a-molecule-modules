@@ -278,6 +278,10 @@ class MoleculeDetectionLogic(LogicBase):
     flattened_image_updated = Signal(np.ndarray)
     new_superlocalization = Signal(SingleMoleculeLocalizationDataset)
     new_movie = Signal(np.ndarray)
+    new_inhomogeneous_broadening_histogram = Signal(np.ndarray, np.ndarray)
+    new_inhomogeneous_statistics = Signal(float, float)
+    new_linewidth_histogram = Signal(np.ndarray, np.ndarray)
+    new_linewidth_statistics = Signal(float, float)
     _start_watchdog_timer = Signal()
     _start_workers = Signal()
     _start_builder = Signal()
@@ -333,11 +337,6 @@ class MoleculeDetectionLogic(LogicBase):
         self._trigger_interrupt.connect(self.__interrupt, QtCore.Qt.QueuedConnection)
         self._localize.connect(self.__localize, QtCore.Qt.QueuedConnection)
         self._delete_molecules_by_id.connect(self.__delete_molecules_by_id, QtCore.Qt.QueuedConnection)
-        if self._input_file is not None:
-            try:
-                self.load_file_info()
-            except Exception as e:
-                self.log.exception(e)
 
     def on_deactivate(self) -> None:
         self._start_watchdog_timer.disconnect()
@@ -348,6 +347,9 @@ class MoleculeDetectionLogic(LogicBase):
         self.interrupt()
         if self.module_state() == 'locked':
             self.module_state.unlock()
+        self._last_result = None
+        if self._tiff is not None:
+            self._tiff.close()
 
     def convert_frames_to_frequency(self, frames):
         return self.scale_frames_to_frequency(frames) + self._frequency_offset
@@ -1018,6 +1020,8 @@ class MoleculeDetectionLogic(LogicBase):
                 app = QtWidgets.QApplication.instance()
                 if app is not None:
                     app.beep()
+            self.new_inhomogeneous_broadening_histogram.emit(*self.inhomogeneous_broadening_histogram)
+            self.new_inhomogeneous_statistics.emit(*self.inhomogeneous_statistics)
             self.finished.emit()
         else:
             self._timer.start(1000)
@@ -1076,7 +1080,8 @@ class MoleculeDetectionLogic(LogicBase):
 
     def load_flattened_image(self):
         if self._tiff is None:
-            raise ValueError("No file has been loaded.")
+            self.log.warning("No file has been loaded.")
+            return
         full_image = self._tiff.asarray(out='memmap')
         self._flattened_image = np.max(full_image, axis=0)
         self.flattened_image_updated.emit(self._flattened_image)
@@ -1193,6 +1198,10 @@ class MoleculeDetectionLogic(LogicBase):
         for i in range(number_of_pre_localized):
             self.superlocalize_by_id(i)
             self.progress_update.emit(int((i + 1) / number_of_pre_localized * 100))
+        self.new_inhomogeneous_broadening_histogram.emit(*self.inhomogeneous_broadening_histogram)
+        self.new_inhomogeneous_statistics.emit(*self.inhomogeneous_statistics)
+        self.new_linewidth_histogram.emit(*self.linewidth_histogram)
+        self.new_linewidth_statistics.emit(*self.linewidth_statistics)
         if self._beep:
             app = QtWidgets.QApplication.instance()
             if app is not None:
@@ -1348,6 +1357,10 @@ class MoleculeDetectionLogic(LogicBase):
                 dataset=self._last_result,
                 index=ids
             ))
+            self.new_linewidth_histogram.emit(*self.linewidth_histogram)
+            self.new_inhomogeneous_broadening_histogram.emit(*self.inhomogeneous_broadening_histogram)
+            self.new_linewidth_histogram.emit(*self.linewidth_histogram)
+            self.new_linewidth_statistics.emit(*self.linewidth_statistics)
         
 
     @Slot(int)
@@ -1371,6 +1384,10 @@ class MoleculeDetectionLogic(LogicBase):
                 dataset=self._last_result,
                 index=id
             ))
+            self.new_linewidth_histogram.emit(*self.linewidth_histogram)
+            self.new_inhomogeneous_broadening_histogram.emit(*self.inhomogeneous_broadening_histogram)
+            self.new_linewidth_histogram.emit(*self.linewidth_histogram)
+            self.new_linewidth_statistics.emit(*self.linewidth_statistics)
 
     def draw_parameter_estimation_figure(self):
         histogram_bins, histogram_edges = self._noise_fitting_histogram
@@ -1611,3 +1628,31 @@ class MoleculeDetectionLogic(LogicBase):
 
         self.log.debug(f'Molecule superlocalization coordinates saved to:{file_path_spatial, file_path_spectral}')
         return file_path_spatial, file_path_spectral
+
+    @property
+    def inhomogeneous_broadening_histogram(self) -> tuple[np.ndarray, np.ndarray]:
+        if self._last_result is None:
+            return (np.array([]), np.array([]))
+        else:
+            return np.histogram(self._last_result.coordinates_array[0,:], bins="auto")
+
+    @property
+    def linewidth_histogram(self) -> tuple[np.ndarray, np.ndarray]:
+        if self._last_result is None or self._last_result.lorentzian_fit_array is None:
+            return (np.array([]), np.array([]))
+        else:
+            return np.histogram(self._last_result.lorentzian_fit_array["sigma"], bins="auto")
+
+    @property
+    def inhomogeneous_statistics(self) -> tuple[float, float]:
+        if self._last_result is None:
+            return (np.nan, np.nan)
+        else:
+            return (self._last_result.coordinates_array[0, :].mean(), self._last_result.coordinates_array[0, :].std())
+
+    @property
+    def linewidth_statistics(self) -> tuple[float, float]:
+        if self._last_result is None or self._last_result.lorentzian_fit_array is None:
+            return (np.nan, np.nan)
+        else:
+            return (self._last_result.lorentzian_fit_array["sigma"].mean(), self._last_result.lorentzian_fit_array["sigma"].std())

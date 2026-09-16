@@ -253,8 +253,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>268</width>
-        <height>266</height>
+        <width>341</width>
+        <height>295</height>
        </rect>
       </property>
       <attribute name="label">
@@ -376,6 +376,9 @@
            <property name="readOnly">
             <bool>true</bool>
            </property>
+           <property name="buttonSymbols">
+            <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
+           </property>
            <property name="maximum">
             <double>100000.000000000000000</double>
            </property>
@@ -385,6 +388,9 @@
           <widget class="QDoubleSpinBox" name="assumedAmplitudeDoubleSpinBox">
            <property name="readOnly">
             <bool>true</bool>
+           </property>
+           <property name="buttonSymbols">
+            <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
            </property>
            <property name="maximum">
             <double>100000.000000000000000</double>
@@ -419,7 +425,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>0</y>
+        <y>-22</y>
         <width>366</width>
         <height>300</height>
        </rect>
@@ -485,6 +491,9 @@
            <property name="readOnly">
             <bool>true</bool>
            </property>
+           <property name="buttonSymbols">
+            <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
+           </property>
            <property name="suffix">
             <string> frames</string>
            </property>
@@ -507,6 +516,9 @@
            </property>
            <property name="readOnly">
             <bool>true</bool>
+           </property>
+           <property name="buttonSymbols">
+            <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
            </property>
            <property name="suffix">
             <string> px</string>
@@ -544,6 +556,9 @@
            <property name="readOnly">
             <bool>true</bool>
            </property>
+           <property name="buttonSymbols">
+            <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
+           </property>
            <property name="maximum">
             <double>1000.000000000000000</double>
            </property>
@@ -556,6 +571,9 @@
            </property>
            <property name="readOnly">
             <bool>true</bool>
+           </property>
+           <property name="buttonSymbols">
+            <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
            </property>
           </widget>
          </item>
@@ -575,6 +593,9 @@
          </item>
          <item row="4" column="1">
           <widget class="ScienDSpinBox" name="frequencyFWHMHzDoubleSpinBox">
+           <property name="buttonSymbols">
+            <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
+           </property>
            <property name="suffix">
             <string>Hz</string>
            </property>
@@ -585,6 +606,9 @@
          </item>
          <item row="6" column="1">
           <widget class="ScienDSpinBox" name="positionStdevMDoubleSpinBox">
+           <property name="buttonSymbols">
+            <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
+           </property>
            <property name="suffix">
             <string>m</string>
            </property>
@@ -612,8 +636,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>185</width>
-        <height>104</height>
+        <width>341</width>
+        <height>295</height>
        </rect>
       </property>
       <attribute name="label">
@@ -695,7 +719,7 @@
         <x>0</x>
         <y>0</y>
         <width>341</width>
-        <height>265</height>
+        <height>295</height>
        </rect>
       </property>
       <attribute name="label">
@@ -786,8 +810,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>102</height>
+        <width>341</width>
+        <height>295</height>
        </rect>
       </property>
       <attribute name="label">
