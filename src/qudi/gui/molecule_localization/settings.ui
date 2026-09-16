@@ -62,9 +62,17 @@
       </sizepolicy>
      </property>
      <property name="currentIndex">
-      <number>5</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="scalingPage">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>324</width>
+        <height>376</height>
+       </rect>
+      </property>
       <attribute name="label">
        <string>Calibration</string>
       </attribute>
@@ -245,8 +253,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>327</width>
-        <height>288</height>
+        <width>268</width>
+        <height>266</height>
        </rect>
       </property>
       <attribute name="label">
@@ -407,186 +415,13 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="polygammaPage">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>-71</y>
-        <width>327</width>
-        <height>328</height>
-       </rect>
-      </property>
-      <attribute name="label">
-       <string>Polygamma interpolation</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <item>
-        <widget class="QToolButton" name="helpPolygammaInterpolationToolButton">
-         <property name="text">
-          <string>...</string>
-         </property>
-         <property name="toolButtonStyle">
-          <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="groupBox">
-         <property name="title">
-          <string>Digamma</string>
-         </property>
-         <layout class="QFormLayout" name="formLayout_2">
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_6">
-            <property name="text">
-             <string>Interpolation minimum</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QDoubleSpinBox" name="digammaInterpolationMinimumDoubleSpinBox">
-            <property name="minimum">
-             <double>2.000000000000000</double>
-            </property>
-            <property name="maximum">
-             <double>40000.000000000000000</double>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_7">
-            <property name="text">
-             <string>Interpolation maximum</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QDoubleSpinBox" name="digammaInterpolationMaximumDoubleSpinBox">
-            <property name="minimum">
-             <double>2.000000000000000</double>
-            </property>
-            <property name="maximum">
-             <double>100000.000000000000000</double>
-            </property>
-            <property name="value">
-             <double>40000.000000000000000</double>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_8">
-            <property name="text">
-             <string>Number of interpolation points</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QSpinBox" name="digammaInterpolationNumberSpinBox">
-            <property name="minimum">
-             <number>2</number>
-            </property>
-            <property name="maximum">
-             <number>10000</number>
-            </property>
-            <property name="value">
-             <number>100</number>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="groupBox_2">
-         <property name="title">
-          <string>Trigamma</string>
-         </property>
-         <layout class="QFormLayout" name="formLayout_3">
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_10">
-            <property name="text">
-             <string>Interpolation minimum</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QDoubleSpinBox" name="trigammaInterpolationMinimumDoubleSpinBox">
-            <property name="minimum">
-             <double>2.000000000000000</double>
-            </property>
-            <property name="maximum">
-             <double>100000.000000000000000</double>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_11">
-            <property name="text">
-             <string>Interpolation maximum</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QDoubleSpinBox" name="trigammaInterpolationMaximumDoubleSpinBox">
-            <property name="minimum">
-             <double>2.000000000000000</double>
-            </property>
-            <property name="maximum">
-             <double>100000.000000000000000</double>
-            </property>
-            <property name="stepType">
-             <enum>QAbstractSpinBox::StepType::DefaultStepType</enum>
-            </property>
-            <property name="value">
-             <double>40000.000000000000000</double>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_12">
-            <property name="text">
-             <string>Number of interpolation points</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QSpinBox" name="trigammaInterpolationNumberSpinBox">
-            <property name="minimum">
-             <number>2</number>
-            </property>
-            <property name="maximum">
-             <number>10000</number>
-            </property>
-            <property name="value">
-             <number>100</number>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer_4">
-         <property name="orientation">
-          <enum>Qt::Orientation::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </widget>
      <widget class="QWidget" name="PSFPage">
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-29</y>
-        <width>404</width>
-        <height>336</height>
+        <y>0</y>
+        <width>366</width>
+        <height>300</height>
        </rect>
       </property>
       <attribute name="label">
@@ -777,8 +612,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>341</width>
-        <height>257</height>
+        <width>185</width>
+        <height>104</height>
        </rect>
       </property>
       <attribute name="label">
@@ -860,7 +695,7 @@
         <x>0</x>
         <y>0</y>
         <width>341</width>
-        <height>257</height>
+        <height>265</height>
        </rect>
       </property>
       <attribute name="label">
@@ -951,8 +786,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>341</width>
-        <height>257</height>
+        <width>98</width>
+        <height>102</height>
        </rect>
       </property>
       <attribute name="label">

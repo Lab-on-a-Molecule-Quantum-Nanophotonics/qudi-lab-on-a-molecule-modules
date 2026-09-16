@@ -192,7 +192,6 @@
      <string>Help</string>
     </property>
     <addaction name="actionHelp_Noise_Statistics"/>
-    <addaction name="actionHelp_Polygamma_Interpolation"/>
     <addaction name="actionHelp_PSF"/>
     <addaction name="actionHelp_Multithreading"/>
     <addaction name="actionHelp_Algorithm"/>
@@ -427,20 +426,6 @@
    </property>
    <property name="toolTip">
     <string>Show help window for noise statistics</string>
-   </property>
-   <property name="menuRole">
-    <enum>QAction::MenuRole::NoRole</enum>
-   </property>
-  </action>
-  <action name="actionHelp_Polygamma_Interpolation">
-   <property name="icon">
-    <iconset theme="help-about"/>
-   </property>
-   <property name="text">
-    <string>Polygamma interpolation</string>
-   </property>
-   <property name="toolTip">
-    <string>Show help window for polygamma interpolation</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>
