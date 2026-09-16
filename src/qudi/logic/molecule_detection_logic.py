@@ -9,7 +9,7 @@ from queue import Empty, Full
 
 import matplotlib.pyplot as plt
 import numpy as np
-from PySide6 import QtCore
+from PySide6 import QtCore, QtWidgets
 from PySide6.QtCore import QObject, QRunnable, QThreadPool, QTimer, Signal, Slot
 from qudi.core.configoption import ConfigOption
 from qudi.core.connector import Connector
@@ -235,9 +235,11 @@ class MoleculeDetectionLogic(LogicBase):
     molecule_detection_logic:
         module.Class: 'molecule_detection_logic.MoleculeDetectionLogic'
         options:
-            number_of_workers: 4 # default
+            beep_on_finish: True # default
     ```
     """
+    _beep = ConfigOption(name="beep_on_finish", default=True)
+
     scanning_probe = Connector(interface=ScanningProbeLogic, optional=True)
     _scanning_probe_x_axis = ConfigOption(name='scanning_probe_x_axis', default='x')
     _scanning_probe_y_axis = ConfigOption(name='scanning_probe_y_axis', default='y')
@@ -1012,6 +1014,10 @@ class MoleculeDetectionLogic(LogicBase):
         if finished:
             self.cleanup_run()
             self.log.debug("[supervisor] Molecule detection procedure finished.")
+            if self._beep:
+                app = QtWidgets.QApplication.instance()
+                if app is not None:
+                    app.beep()
             self.finished.emit()
         else:
             self._timer.start(1000)
@@ -1187,6 +1193,10 @@ class MoleculeDetectionLogic(LogicBase):
         for i in range(number_of_pre_localized):
             self.superlocalize_by_id(i)
             self.progress_update.emit(int((i + 1) / number_of_pre_localized * 100))
+        if self._beep:
+            app = QtWidgets.QApplication.instance()
+            if app is not None:
+                app.beep()
 
     @Slot(int)
     def superlocalize_by_id(self, i: int) -> SingleMoleculeLocalizationDataset | None:
