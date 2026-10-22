@@ -133,8 +133,11 @@ class StartStopDummy(StartStopInterface):
     def _g2(self, tau):
         p = self.gamma_1 + self.gamma_2
         omega = np.sqrt(self.S*self.gamma_1*self.gamma_2)
-        q = np.sqrt((self.gamma_1 - self.gamma_2)**2 - 4*omega**2)
-        return 1 - (p+q)/(2*q)*np.exp(-1/2 * (p-q) * tau) + (p-q)/(2*q)*np.exp(-1/2 * (p+q)*tau)
+        q_square = (self.gamma_1 - self.gamma_2)**2 - 4*omega**2
+        q = np.sqrt(np.abs(q_square))
+        if q_square < 0:
+            q = 1j * q
+        return np.real(1 - (p+q)/(2*q)*np.exp(-1/2 * (p-q) * np.abs(tau)) + (p-q)/(2*q)*np.exp(-1/2 * (p+q)*np.abs(tau)))
 
     def __get_or_generate_data(self):
         if self._state is not StartStopHardwareState.RUNNING:

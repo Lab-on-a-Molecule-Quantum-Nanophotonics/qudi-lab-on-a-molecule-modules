@@ -322,7 +322,7 @@ class StartStopGui(GuiBase):
         for name, histogram in data.items():
             if name not in self._mw.data_curves:
                 self._mw.add_curve(name)
-            times = np.linspace(start=0, stop=histogram.bin_width_ns*histogram.histogram.shape[0], num=histogram.histogram.shape[0])
+            times = np.linspace(start=0, stop=histogram.bin_width_ns*histogram.histogram.shape[0]*1e-9, num=histogram.histogram.shape[0])
             times = times - times[histogram.zero]
             self._mw.data_curves[name].setData(x=times, y=histogram.histogram)
         to_be_removed = []
