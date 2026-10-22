@@ -1,12 +1,14 @@
 import ctypes
+import itertools
 import platform
 import time
-from typing import List, Optional, Sequence, Tuple, Union
+from collections.abc import Sequence
 
 import numpy as np
 from qudi.core.configoption import ConfigOption
 from qudi.util.constraints import ScalarConstraint
 from qudi.util.mutex import Mutex
+from qudi.util.overload import OverloadedAttribute
 
 from qudi.interface.data_instream_interface import (
     DataInStreamConstraints,
@@ -14,23 +16,38 @@ from qudi.interface.data_instream_interface import (
     SampleTiming,
     StreamingMode,
 )
-from qudi.interface.sampled_finite_state_interface import (
-    SampledFiniteStateInterface,
-    state,
-    transition_to,
-    initial
+from qudi.interface.sampled_finite_state_interface import SampledFiniteStateInterface, initial, state, transition_to
+from qudi.interface.start_stop_interface import (
+    StartStopHardwareState,
+    StartStopHistogram,
+    StartStopHistogramConfiguration,
+    StartStopInterface,
 )
 
+AVAILABLE_HISTOGRAMS = tuple([f"{i}/{j}" for (i,j) in itertools.product(range(3), range(3))])
+def histogram_pair_from_name(name:str) -> tuple[int, int]:
+    splitted = name.split("/")
+    if len(splitted) != 2:
+        raise ValueError(f"Could not extract inputs from histogram name '{name}'")
+    start_name = splitted[0]
+    stop_name = splitted[1]
+    start = int(start_name)
+    stop = int(stop_name)
+    if not (0 < start < 33):
+        raise ValueError(f"Start channel {start} is not in range 1...32.")
+    if not (0 < stop < 33):
+        raise ValueError(f"Stop channel {stop} is not in range 1...32.")
+    return (start, stop)
 
-class QuTagInStreamer(DataInStreamInterface, SampledFiniteStateInterface):
+class QuTagMC(DataInStreamInterface, SampledFiniteStateInterface, StartStopInterface):
     """
     Use a QuTAG device as a digital streamer. 
     Tested with QuTAG-MC.
 
     Example configuration for copy-paste:
     ```yaml
-    qutag_instreamer:
-        module.Class: qutag.qutag_in_streamer.QuTagInStreamer
+    qutag_mc:
+        module.Class: qutag.qutag_mc.QuTagMC
         options:
             device_id: -1 # Take any device available
             tdcbase_path: "C:/Users/Lab66_spectrometer/Desktop/QUTAG-MC-WIN64QT5-v1.0.15/QUTAG-MC-WIN64QT5-v1.0.15/userlib/lib64/tdcbase.dll" # path to the DLL
@@ -98,6 +115,16 @@ class QuTagInStreamer(DataInStreamInterface, SampledFiniteStateInterface):
             ]
         )
         self.__inverted_coincidence_channels_names = {ch: i for i, ch in enumerate(self.__coincidence_channels_names)}
+        self._enabled_histograms = {histogram:False for histogram in AVAILABLE_HISTOGRAMS}
+        self._histogram_configurations = {
+                histogram: StartStopHistogramConfiguration(1.0, 50.0, 30.0)
+                for histogram in AVAILABLE_HISTOGRAMS
+                }
+        self._start_stop_status = StartStopHardwareState.UNCONFIGURED
+        self._histogram_data: dict[str, StartStopHistogram | None] = {
+                histogram: None
+                for histogram in AVAILABLE_HISTOGRAMS
+                }
 
     def on_activate(self):
         if platform.system() == "Windows":
@@ -120,6 +147,29 @@ class QuTagInStreamer(DataInStreamInterface, SampledFiniteStateInterface):
         self.tdclib.TDC_setExposureTime.restype = ctypes.c_int32
         self.tdclib.TDC_getCoincCounters.argtypes = [ctypes.POINTER(ctypes.c_int32), ctypes.POINTER(ctypes.c_int32)]
         self.tdclib.TDC_getCoincCounters.restype = ctypes.c_int32
+        self.tdclib.TDC_addHistogram.argtypes = [ctypes.c_int32, ctypes.c_int32, ctypes.c_int32]
+        self.tdclib.TDC_addHistogram.restype = ctypes.c_int32
+        self.tdclib.TDC_enableStartStop.argtypes = [ctypes.c_int32]
+        self.tdclib.TDC_enableStartStop.restype = ctypes.c_int32
+        self.tdclib.TDC_getHistogram.argtypes = [
+                ctypes.c_int32, ctypes.c_int32, ctypes.c_int32, 
+                ctypes.POINTER(ctypes.c_int32),
+                ctypes.POINTER(ctypes.c_int32),
+                ctypes.POINTER(ctypes.c_int32),
+                ctypes.POINTER(ctypes.c_int32),
+                ctypes.POINTER(ctypes.c_int32),
+                ctypes.POINTER(ctypes.c_int32),
+                ctypes.POINTER(ctypes.c_int64),
+                ]
+        self.tdclib.TDC_getHistogram.restype = ctypes.c_int32
+        self.tdclib.TDC_getHistogramParams.argtypes = [ctypes.POINTER(ctypes.c_int32),ctypes.POINTER(ctypes.c_int32)]
+        self.tdclib.TDC_getHistogramParams.restype = ctypes.c_int32
+        self.tdclib.TDC_setHistogramParams.argtypes = [ctypes.c_int32,ctypes.c_int32]
+        self.tdclib.TDC_setHistogramParams.restype = ctypes.c_int32
+        self.tdclib.TDC_getTimebase.argtypes = [ctypes.POINTER(ctypes.c_double)]
+        self.tdclib.TDC_getTimebase.restype = ctypes.c_int32
+        self.tdclib.TDC_freezeBuffers.argtypes = [ctypes.c_int32]
+        self.tdclib.TDC_freezeBuffers.restype = ctypes.c_int32
         rc = self.tdclib.TDC_init(self._device_id)
         self.perror("TDC_init", rc)
         if rc != 0:
@@ -145,6 +195,7 @@ class QuTagInStreamer(DataInStreamInterface, SampledFiniteStateInterface):
         )
         self.enable_watchdog()
         self.start_watchdog()
+        self._start_stop_status = StartStopHardwareState.UNCONFIGURED
 
     def perror(self, environ, returnCode):
         if returnCode != 0:
@@ -164,7 +215,6 @@ class QuTagInStreamer(DataInStreamInterface, SampledFiniteStateInterface):
     @transition_to(("stop", "idle"))
     def idle(self):
         """idling mode: do not read the current count rates."""
-        pass
 
     @state
     @transition_to(("start", "sampling"))
@@ -279,14 +329,17 @@ class QuTagInStreamer(DataInStreamInterface, SampledFiniteStateInterface):
         return StreamingMode(self.__streaming_mode)
 
     @property
-    def active_channels(self) -> List[str]:
+    def active_channels(self) -> list[str]:
         """Read-only property returning the currently configured active channel names"""
         return list(self.__active_channels)
 
+    configure = OverloadedAttribute()
+
+    @configure.overload("DataInStreamInterface")
     def configure(
         self,
         active_channels: Sequence[str],
-        streaming_mode: Union[StreamingMode, int],
+        streaming_mode: StreamingMode | int,
         channel_buffer_size: int,
         sample_rate: float,
     ) -> None:
@@ -329,7 +382,8 @@ class QuTagInStreamer(DataInStreamInterface, SampledFiniteStateInterface):
             try:
                 self.watchdog_event("start")
             except:
-                self.module_state.unlock()
+                if self._start_stop_status not in (StartStopHardwareState.RUNNING, StartStopHardwareState.PAUSED): 
+                    self.module_state.unlock()
                 raise
 
     def stop_stream(self) -> None:
@@ -338,11 +392,11 @@ class QuTagInStreamer(DataInStreamInterface, SampledFiniteStateInterface):
             self.watchdog_delay = self.__stored_watchdog_delay
             self.watchdog_event("stop")
         finally:
-            if self.module_state() == 'locked':
+            if self.module_state() == 'locked' and self._start_stop_status not in (StartStopHardwareState.RUNNING, StartStopHardwareState.PAUSED): 
                 self.module_state.unlock()
 
     def read_data_into_buffer(
-        self, data_buffer: np.ndarray, samples_per_channel: int, timestamp_buffer: Optional[np.ndarray] = None
+        self, data_buffer: np.ndarray, samples_per_channel: int, timestamp_buffer: np.ndarray | None = None
     ) -> None:
         """Read data from the stream buffer into a 1D numpy array given as parameter.
         Samples of all channels are stored interleaved in contiguous memory.
@@ -390,8 +444,7 @@ class QuTagInStreamer(DataInStreamInterface, SampledFiniteStateInterface):
                     if stop >= start:
                         consumed_buffer_indices = stop - start
                         valid_samples_to_the_end = consumed_buffer_indices // self._NUMBER_OF_COINCIDENCE_CHANNELS
-                        if valid_samples_to_the_end > samples_to_be_read:
-                            valid_samples_to_the_end = samples_to_be_read
+                        valid_samples_to_the_end = min(valid_samples_to_the_end, samples_to_be_read)
                     else:
                         number_to_the_end = self.__buffer_size - self.__buffer_start
                         valid_samples_to_the_end = number_to_the_end // self._NUMBER_OF_COINCIDENCE_CHANNELS
@@ -439,7 +492,7 @@ class QuTagInStreamer(DataInStreamInterface, SampledFiniteStateInterface):
             self.stop_stream()
 
     def read_available_data_into_buffer(
-        self, data_buffer: np.ndarray, timestamp_buffer: Optional[np.ndarray] = None
+        self, data_buffer: np.ndarray, timestamp_buffer: np.ndarray | None = None
     ) -> int:
         """Read data from the stream buffer into a 1D numpy array given as parameter.
         All samples for each channel are stored in consecutive blocks one after the other.
@@ -461,7 +514,7 @@ class QuTagInStreamer(DataInStreamInterface, SampledFiniteStateInterface):
         )
         return samples_per_channel
 
-    def read_data(self, samples_per_channel: Optional[int] = None) -> Tuple[np.ndarray, Union[np.ndarray, None]]:
+    def read_data(self, samples_per_channel: int | None = None) -> tuple[np.ndarray, np.ndarray | None]:
         """Read data from the stream buffer into a 1D numpy array and return it.
         All samples for each channel are stored in consecutive blocks one after the other.
         The returned data_buffer can be unraveled into channel samples with:
@@ -483,7 +536,7 @@ class QuTagInStreamer(DataInStreamInterface, SampledFiniteStateInterface):
         self.read_data_into_buffer(data_buffer=data_buffer, samples_per_channel=samples_per_channel)
         return data_buffer, None
 
-    def read_single_point(self) -> Tuple[np.ndarray, Union[None, np.float64]]:
+    def read_single_point(self) -> tuple[np.ndarray, None | np.float64]:
         """This method will initiate a single sample read on each configured data channel.
         In general this sample may not be acquired simultaneous for all channels and timing in
         general can not be assured. Us this method if you want to have a non-timing-critical
@@ -500,3 +553,136 @@ class QuTagInStreamer(DataInStreamInterface, SampledFiniteStateInterface):
         data_buffer = np.empty(len(self.__active_channels), dtype=self._constraints.data_type)
         self.read_data_into_buffer(data_buffer=data_buffer, samples_per_channel=1)
         return data_buffer, None
+
+    # StartStopInterface
+    @configure.overload("StartStopInterface")
+    def configure(self, channels: dict[str, StartStopHistogramConfiguration]):
+        StartStopInterface.configure(self, channels)
+    @property
+    def channels(self):
+        return AVAILABLE_HISTOGRAMS
+    def is_channel_enabled(self, channel: str) -> bool:
+        return self._enabled_histograms[channel]
+    def enable_channel(self, channel:str, enabled: bool):
+        if self.status not in (StartStopHardwareState.IDLE, StartStopHardwareState.UNCONFIGURED):
+            self.log.warning("Histogram enabling is only evaluated when acquisition start. Your setting will only take effect on next run.")
+        self._enabled_histograms[channel] = enabled
+    def channel_configuration(self, channel: str) -> StartStopHistogramConfiguration:
+        return self._histogram_configurations[channel]
+    def configure_channel(self, channel:str, config: StartStopHistogramConfiguration) -> None:
+        self._histogram_configurations[channel] = config
+    @property
+    def status(self) -> StartStopHardwareState:
+        return self._start_stop_status
+    def start_acquisition(self):
+        if self.tdclib is None:
+            raise ValueError("TDC library not initialized.")
+        if self._start_stop_status not in (StartStopHardwareState.UNCONFIGURED, StartStopHardwareState.IDLE, StartStopHardwareState.ERROR):
+            self.log.error(f"Could not start histogram acquisition from state {self._start_stop_status}.")
+            return
+        self._histogram_data = {histogram: None for histogram in self.channels}
+        enabled_histograms = tuple(histogram for (histogram, enabled) in self._enabled_histograms.items() if enabled)
+        if len(enabled_histograms) <= 0:
+            return
+        current_configuration = self.enabled_configuration
+        min_bin_width_ns = min([ configuration.bin_width_ns for configuration in current_configuration.values()])
+        max_duration_ns = max([ configuration.histogram_length_ns for configuration in current_configuration.values()])
+        err = self.tdclib.TDC_enableStartStop(False)
+        self.perror("TDC_enableStartStop", err)
+        for possible_histogram in self.channels:
+            start,stop = histogram_pair_from_name(possible_histogram)
+            present = possible_histogram in enabled_histograms
+            err = self.tdclib.TDC_addHistogram(start, stop, present)
+            self.perror("TDC_addHistogram", err)
+        timebase_s = ctypes.c_double()
+        err = self.tdclib.TDC_getTimebase(ctypes.byref(timebase_s))
+        self.perror("TDC_getTimebase", err)
+        bin_width = int(min_bin_width_ns/(timebase_s.value*1e9))
+        actual_bin_width_ns = timebase_s.value * 1e9 * bin_width
+        bin_count = int(max_duration_ns / actual_bin_width_ns)
+        err = self.tdclib.TDC_setHistogramParams(bin_width, bin_count)
+        self.perror("TDC_setHistogramParams", err)
+        err = self.tdclib.TDC_freezeBuffers(False)
+        self.perror("TDC_freezeBuffers", err)
+        err = self.tdclib.TDC_enableStartStop(True)
+        self.perror("TDC_enableStartStop", err)
+        err = self.tdclib.TDC_enableStartStop(True)
+        self.perror("TDC_enableStartStop", err)
+        if not err:
+            self._start_stop_status = StartStopHardwareState.RUNNING
+            self.module_state.lock()
+        else:
+            self._start_stop_status = StartStopHardwareState.ERROR
+        return self._start_stop_status
+
+    def stop_acquisition(self):
+        new_status = self.pause_acquisition()
+        if new_status is not StartStopHardwareState.ERROR:
+            self._start_stop_status = StartStopHardwareState.IDLE
+        return self._start_stop_status
+
+
+    def pause_acquisition(self):
+        if self.tdclib is None:
+            raise ValueError("TDC library not initialized.")
+        if self._start_stop_status not in (StartStopHardwareState.RUNNING, StartStopHardwareState.PAUSED, StartStopHardwareState.ERROR):
+            self.log.error(f"Could not pause acquisition from state {self._start_stop_status}.")
+            return
+        err = self.tdclib.TDC_freezeBuffers(True)
+        self.perror("TDC_freezeBuffers", err)
+        if not err:
+            self._histogram_data = {
+                    histogram:self._read_hardware_data(histogram)
+                    for histogram in self.channels
+                    if self.is_channel_enabled(histogram)
+                    }
+            self._start_stop_status = StartStopHardwareState.PAUSED
+        else:
+            self._start_stop_status = StartStopHardwareState.ERROR
+        return self._start_stop_status
+
+    def continue_acquisition(self):
+        if self.tdclib is None:
+            raise ValueError("TDC library not initialized.")
+        if self._start_stop_status not in (StartStopHardwareState.PAUSED,):
+            self.log.error(f"Could not restart acquisition from state {self._start_stop_status}.")
+            return
+        err = self.tdclib.TDC_freezeBuffers(False)
+        self.perror("TDC_freezeBuffers", err)
+        if not err:
+            self._start_stop_status = StartStopHardwareState.RUNNING
+        else:
+            self._start_stop_status = StartStopHardwareState.ERROR
+        return self._start_stop_status
+        
+    def _read_hardware_data(self, channel):
+        if self.tdclib is None:
+            raise ValueError("TDC library not initialized.")
+        start,stop = histogram_pair_from_name(channel)
+        bin_count = ctypes.c_int32()
+        bin_width = ctypes.c_int32()
+        err = self.tdclib.TDC_getHistogramParams(ctypes.byref(bin_width), ctypes.byref(bin_count))
+        self.perror("TDC_setHistogramParams", err)
+        timebase_s = ctypes.c_double()
+        err = self.tdclib.TDC_getTimebase(ctypes.byref(timebase_s))
+        self.perror("TDC_getTimebase", err)
+        data = np.zeros(bin_count.value, dtype=np.int32)
+        count = ctypes.c_int32()
+        exposure_time = ctypes.c_int64()
+        self.tdclib.TDC_getHistogram(
+                start, stop, False,
+                data.ctypes.data_as(ctypes.POINTER(ctypes.c_int32)), 
+                ctypes.byref(count), None, None, None, None, ctypes.byref(exposure_time)
+            )
+        return StartStopHistogram(
+                histogram=data,
+                total_count=count.value,
+                bin_width_ns=timebase_s.value*1e9*bin_width.value,
+                exposure_time_s=exposure_time.value*timebase_s.value*1e9
+            )
+
+    def histogram_data(self, channel):
+        if self._start_stop_status is StartStopHardwareState.RUNNING:
+            return self._read_hardware_data(channel)
+        else:
+            return self._histogram_data[channel]

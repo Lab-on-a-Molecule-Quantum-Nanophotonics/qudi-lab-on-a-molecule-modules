@@ -233,8 +233,10 @@ class ScanningExcitationGui(GuiBase):
         step_numbers = step_numbers[:l]
         all_steps = np.unique(step_numbers)
 
+
         self._target_x = self._excitation_logic().idle
-        self._mw.data_widget.target_point.setPos(self._target_x)
+        if self._target_x is not None:
+            self._mw.data_widget.target_point.setPos(self._target_x)
         self.target_changed()
         missing_curves = len(all_steps) - len(self._mw.data_widget.data_curves) 
         if missing_curves > 0:
