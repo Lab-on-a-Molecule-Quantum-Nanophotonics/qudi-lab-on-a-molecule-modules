@@ -88,6 +88,12 @@ class StartStopLogic(LogicBase):
             with self._lock:
                 self._data = self._hardware().data
                 self.sigNewData.emit(self._data)
+            k = list(self._data.keys())[0]
+            times = np.linspace(start=0, stop=self._data[k].bin_width_ns*self._data[k].histogram.shape[0], num=self._data[k].histogram.shape[0])*1e-9
+            times = times - times[self._data[k].zero]
+            start = times[0]
+            stop = times[-1]
+            self.fit_region = (start, stop)
         if status != self.current_status:
             if status == StartStopHardwareState.RUNNING:
                 self.sigAcquisitionRunning.emit()
@@ -147,6 +153,17 @@ class StartStopLogic(LogicBase):
     # Fitting things
 
     @property
+    def fit_histogram(self):
+        return self._fit_histogram
+
+    @fit_histogram.setter
+    def fit_histogram(self, value):
+        self._fit_histogram = value
+
+    def set_fit_histogram(self, value):
+        self.fit_histogram = value
+
+    @property
     def fit_config_model(self):
         return self._fit_config_model
 
@@ -164,7 +181,7 @@ class StartStopLogic(LogicBase):
             return 'No Fit', None
         data = self._data[self._fit_histogram]
         self.fit_region = self._fit_region
-        times = np.linspace(start=0, stop=data.bin_width_ns*data.histogram.shape[0], num=data.histogram.shape[0])
+        times = np.linspace(start=0, stop=data.bin_width_ns*data.histogram.shape[0], num=data.histogram.shape[0])*1e-9
         times = times - times[data.zero]
 
         roi = (self.fit_region[0] <= times) & (times <= self.fit_region[1])
@@ -208,8 +225,13 @@ class StartStopLogic(LogicBase):
         fit_region = fit_region if fit_region[0] <= fit_region[1] else (fit_region[1], fit_region[0])
         if self._fit_histogram not in self._data:
             self._fit_region = fit_region
+            self.sigFitRegionUpdated.emit(self._fit_region)
             return
         data = self._data[self._fit_histogram]
+        if data.histogram.shape[0] <= 0:
+            self._fit_region = fit_region
+            self.sigFitRegionUpdated.emit(self._fit_region)
+            return
         times = np.linspace(start=0, stop=data.bin_width_ns*data.histogram.shape[0], num=data.histogram.shape[0])
         times = times - times[data.zero]
         new_region = (max(min(times), fit_region[0]), min(max(times), fit_region[1]))

@@ -19,12 +19,11 @@ from qudi.util.widgets.scientific_spinbox import ScienDSpinBox
 
 from qudi.util.widgets.fitting import FitConfigurationDialog 
 from qudi.interface.start_stop_interface import (
-        InputEdge,
+    InputEdge,
     InputConfiguration,
     StartStopHardwareState,
     StartStopHistogram,
     StartStopHistogramConfiguration,
-    StartStopInterface,
 )
 from qudi.logic.start_stop_logic import StartStopLogic
 from qudi.util import uic
@@ -165,27 +164,28 @@ class MainWindow(QtWidgets.QMainWindow):
         self.histogram_settings_widgets = {}
 
     def add_input_settings_widget(self, name:str, config: InputConfiguration):
-        layout = self.inputSettingsContents.layout()
-        name_widget = QtWidgets.QLineEdit()
-        name_widget.setReadOnly(True)
-        name_widget.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        level_widget = ScienDSpinBox()
-        level_widget.setSuffix("V")
-        level_widget.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        edge_widget = QtWidgets.QComboBox()
-        edge_widget.addItems(["Rising", "Falling"])
-        edge_widget.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        delay_widget = ScienDSpinBox()
-        delay_widget.setSuffix("s")
-        delay_widget.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        self.input_settings_widgets[name] = InputSettingsWidgets(
-            name_widget, level_widget, edge_widget, delay_widget
-        )
-        row = layout.rowCount()
-        layout.addWidget(name_widget, row, 0)
-        layout.addWidget(level_widget, row, 1)
-        layout.addWidget(edge_widget, row, 2)
-        layout.addWidget(delay_widget, row, 3)
+        if name not in self.input_settings_widgets:
+            layout = self.inputSettingsContents.layout()
+            name_widget = QtWidgets.QLineEdit()
+            name_widget.setReadOnly(True)
+            name_widget.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+            level_widget = ScienDSpinBox()
+            level_widget.setSuffix("V")
+            level_widget.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+            edge_widget = QtWidgets.QComboBox()
+            edge_widget.addItems(["Rising", "Falling"])
+            edge_widget.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+            delay_widget = ScienDSpinBox()
+            delay_widget.setSuffix("s")
+            delay_widget.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+            self.input_settings_widgets[name] = InputSettingsWidgets(
+                name_widget, level_widget, edge_widget, delay_widget
+            )
+            row = layout.rowCount()
+            layout.addWidget(name_widget, row, 0)
+            layout.addWidget(level_widget, row, 1)
+            layout.addWidget(edge_widget, row, 2)
+            layout.addWidget(delay_widget, row, 3)
         self.update_input_settings_widget(name, config)
 
     def update_input_settings_widget(self, name:str, config: InputConfiguration):
@@ -199,34 +199,35 @@ class MainWindow(QtWidgets.QMainWindow):
         self.input_settings_widgets[name].edge.setCurrentIndex(index)
 
     def add_histogram_settings_widget(self, name:str, config: StartStopHistogramConfiguration):
-        layout = self.histogramSettingsContents.layout()
-        enabled_widget = ToggleSwitch()
-        enabled_widget.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        name_widget = QtWidgets.QLineEdit()
-        name_widget.setReadOnly(True)
-        name_widget.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        bin_width_widget = ScienDSpinBox()
-        bin_width_widget.setSuffix("s")
-        bin_width_widget.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        length_widget = ScienDSpinBox()
-        length_widget.setSuffix("s")
-        length_widget.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        exposure_time_widget = ScienDSpinBox()
-        exposure_time_widget.setSuffix("s")
-        exposure_time_widget.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        self.histogram_settings_widgets[name] = HistogramSettingsWidgets(
-            enabled_widget, name_widget, bin_width_widget, length_widget, exposure_time_widget
-        )
-        row = layout.rowCount()
-        layout.addWidget(enabled_widget, row, 0)
-        layout.addWidget(name_widget, row, 1)
-        layout.addWidget(bin_width_widget, row, 2)
-        layout.addWidget(length_widget, row, 3)
-        layout.addWidget(exposure_time_widget, row, 4)
-        enabled_widget.toggled.connect(name_widget.setEnabled)
-        enabled_widget.toggled.connect(bin_width_widget.setEnabled)
-        enabled_widget.toggled.connect(length_widget.setEnabled)
-        enabled_widget.toggled.connect(exposure_time_widget.setEnabled)
+        if name not in self.histogram_settings_widgets:
+            layout = self.histogramSettingsContents.layout()
+            enabled_widget = ToggleSwitch()
+            enabled_widget.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+            name_widget = QtWidgets.QLineEdit()
+            name_widget.setReadOnly(True)
+            name_widget.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+            bin_width_widget = ScienDSpinBox()
+            bin_width_widget.setSuffix("s")
+            bin_width_widget.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+            length_widget = ScienDSpinBox()
+            length_widget.setSuffix("s")
+            length_widget.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+            exposure_time_widget = ScienDSpinBox()
+            exposure_time_widget.setSuffix("s")
+            exposure_time_widget.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+            self.histogram_settings_widgets[name] = HistogramSettingsWidgets(
+                enabled_widget, name_widget, bin_width_widget, length_widget, exposure_time_widget
+            )
+            row = layout.rowCount()
+            layout.addWidget(enabled_widget, row, 0)
+            layout.addWidget(name_widget, row, 1)
+            layout.addWidget(bin_width_widget, row, 2)
+            layout.addWidget(length_widget, row, 3)
+            layout.addWidget(exposure_time_widget, row, 4)
+            enabled_widget.toggled.connect(name_widget.setEnabled)
+            enabled_widget.toggled.connect(bin_width_widget.setEnabled)
+            enabled_widget.toggled.connect(length_widget.setEnabled)
+            enabled_widget.toggled.connect(exposure_time_widget.setEnabled)
         self.update_histogram_settings_widget(name, config)
 
     def update_histogram_settings_widget(self, name:str, config: StartStopHistogramConfiguration):
@@ -266,6 +267,7 @@ class StartStopGui(GuiBase):
                 (self._mw.actionConfigureHardware.triggered, self.on_configure_hardware),
                 (self._mw.actionShowFitSettings.triggered, self.fit_settings_dialog.show),
                 (self._mw.fitWidget.sigDoFit, self.start_stop_logic().do_fit),
+                (self._mw.fitRegionHistogramComboBox.currentTextChanged, self.start_stop_logic().set_fit_histogram),
                 (self.start_stop_logic().sigFitUpdated, self.on_update_fit),
                 (self.start_stop_logic().sigFitRegionUpdated, self.on_update_fit_region_from_logic),
                 (self._mw.fitRegionFromDoubleSpinBox.editingFinished, self.on_fit_region_numerical_update),
@@ -322,6 +324,9 @@ class StartStopGui(GuiBase):
         for name, histogram in data.items():
             if name not in self._mw.data_curves:
                 self._mw.add_curve(name)
+            combo_index = self._mw.fitRegionHistogramComboBox.findText(name)
+            if combo_index < 0:
+                self._mw.fitRegionHistogramComboBox.addItem(name)
             times = np.linspace(start=0, stop=histogram.bin_width_ns*histogram.histogram.shape[0]*1e-9, num=histogram.histogram.shape[0])
             times = times - times[histogram.zero]
             self._mw.data_curves[name].setData(x=times, y=histogram.histogram)
@@ -332,6 +337,8 @@ class StartStopGui(GuiBase):
         for name in to_be_removed:
             self._mw.plotWidget.removeItem(self._mw.data_curves[name])
             self._mw.data_curves.pop(name)
+            combo_index = self._mw.fitRegionHistogramComboBox.findText(name)
+            self._mw.fitRegionHistogramComboBox.removeItem(combo_index)
 
     def on_acquisition_started(self):
         self._mw.actionToggleAcquisition.blockSignals(True)
@@ -365,7 +372,7 @@ class StartStopGui(GuiBase):
                     enabled = widgets.enabled.isChecked(),
                     bin_width_ns= widgets.bin_width.value()*1e9,
                     histogram_length_ns=widgets.length.value()*1e9,
-                    exposure_time_s=widgets.exposure_time.value()*1e9,
+                    exposure_time_s=widgets.exposure_time.value(),
                     )
         self.start_stop_logic().configuration = histogram_configurations
 

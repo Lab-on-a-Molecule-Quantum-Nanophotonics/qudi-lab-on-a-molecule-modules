@@ -17,8 +17,8 @@ from qudi.interface.start_stop_interface import (
 class StartStopDummy(StartStopInterface):
     gamma_1 = ConfigOption(default=1/3.70e-9)
     gamma_2 = ConfigOption(default=0.5/3.70e-9)
-    S = ConfigOption(default=1)
-    photon_rate = ConfigOption(default=20e3)
+    S = ConfigOption(default=10)
+    photon_rate = ConfigOption(default=8e3)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -144,27 +144,24 @@ class StartStopDummy(StartStopInterface):
             return self._data
         now = time.perf_counter()
         ellapsed_time = now - self._start_time
-        number_of_photons = int(self.photon_rate * ellapsed_time / 1000) # too lazy to do  a realistic calculation
+        number_of_photons = int(self.photon_rate * ellapsed_time) # too lazy to do  a realistic calculation
         bin_count = int(self._configuration.histogram_length_ns / self._configuration.bin_width_ns)
         histgram_edges = np.linspace(
                 start=-self._configuration.histogram_length_ns/2,
-                stop=-self._configuration.histogram_length_ns/2,
+                stop=self._configuration.histogram_length_ns/2,
                 num = bin_count
                 )
         ideal_g2 = self._g2(histgram_edges*1e-9)
         normalized_g2 = ideal_g2 / ideal_g2.sum()
         cdf = np.cumsum(normalized_g2)
-        proba_values = np.random.uniform(
+        cdf_samples = np.random.uniform(
                 low=0, 
                 high=1, 
                 size=number_of_photons
         )
-        for p in proba_values:
-            cdf_greater = np.nonzero(cdf >= p)
-            if len(cdf_greater) <= 0:
-                self._data.histogram[-1] += 1
-            else:
-                self._data.histogram[cdf_greater[0]] += 1
+        indices = np.rint(np.interp(cdf_samples, cdf, np.arange(bin_count))).astype(int)
+        histo = np.histogram(indices, bins=np.arange(bin_count+1))[0]
+        self._data.histogram += histo
         self._start_time = now
         return self._data
 
