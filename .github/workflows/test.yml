@@ -52,9 +52,9 @@ jobs:
         cd qudi-core
         python -m pip install --upgrade pip
         pip install -e ".[dev-test]"
-        cd ../qudi-iqo-modules
+        cd ../qudi-lab-on-a-molecule-modules
 
-    - name: Install dependencies iqo modules
+    - name: Install dependencies lab-on-a-molecule modules
       run: |
         pip install -e ".[dev-test]"
         
