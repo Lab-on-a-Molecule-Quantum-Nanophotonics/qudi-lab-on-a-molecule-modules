@@ -88,7 +88,7 @@ jobs:
       working-directory: .github/workflow_utils
       run: |
         git checkout workflow_save
-        python workflow_utils/check_updates.py -v ${{ matrix.python-version }}
+        python check_updates.py -v ${{ matrix.python-version }}
 
   test:
     needs: [make-matrix, check-package-updates]
