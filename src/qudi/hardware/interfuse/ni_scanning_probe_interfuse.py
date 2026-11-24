@@ -23,7 +23,7 @@ If not, see <https://www.gnu.org/licenses/>.
 
 import numpy as np
 import time
-from typing import Optional, Dict, List
+from typing import Optional, Dict, List, Mapping
 from dataclasses import asdict
 
 from PySide6 import QtCore
@@ -188,9 +188,24 @@ class NiScanningProbeInterfuseBare(ScanningProbeInterface):
 
         self.sigNextDataChunk.connect(self._fetch_data_chunk, QtCore.Qt.ConnectionType.QueuedConnection)
 
+    @property
+    def _ao_channels(self) -> list[str]:
+        ni_ao = self._ni_ao()
+        return [ch for ch in self._ni_channel_mapping.values() if ch in ni_ao.constraints.setpoint_channels]
+
+    @property
+    def _ao_setpoints(self):
+        return {ch:self._ni_ao().get_setpoint(ch) for ch in self._ao_channels}
+
+    @_ao_setpoints.setter
+    def _ao_setpoints(self, values):
+        ni_ao = self._ni_ao()
+        for ch,setpoint in values.items():
+            ni_ao.set_setpoint(ch, setpoint)
+
     def _toggle_ao_setpoint_channels(self, enable: bool) -> None:
         ni_ao = self._ni_ao()
-        for channel in ni_ao.constraints.setpoint_channels:
+        for channel in self._ao_channels:
             ni_ao.set_activity_state(channel, enable)
 
     @property
@@ -394,7 +409,7 @@ class NiScanningProbeInterfuseBare(ScanningProbeInterface):
             if not self._ao_setpoint_channels_active:
                 self._toggle_ao_setpoint_channels(True)
 
-            pos = self._voltage_dict_to_position_dict(self._ni_ao().setpoints)
+            pos = self._voltage_dict_to_position_dict(self._ao_setpoints)
             return pos
 
     def start_scan(self):
@@ -808,7 +823,7 @@ class NiScanningProbeInterfuseBare(ScanningProbeInterface):
                     new_voltage = {self._ni_channel_mapping[ax]: self._position_to_voltage(ax, pos)
                                    for ax, pos in new_pos.items()}
 
-                    self._ni_ao().setpoints = new_voltage
+                    self._ao_setpoints = new_voltage
                     #self.log.debug(f'Cursor_write_loop move to {new_pos}, Dist= {distance_to_target} '
                     #               f' to target {self._target_pos} took {1e3*(time.perf_counter()-t_start)} ms.')
 
