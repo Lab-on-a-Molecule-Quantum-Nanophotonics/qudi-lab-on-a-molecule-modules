@@ -91,6 +91,8 @@ class ScanningExcitationDataWidget(QtWidgets.QWidget):
         self.laser_follow_cursor = ToggleSwitch(state_names=('No', 'Yes'))
         channel_input_label = QtWidgets.QLabel("Displayed input channel")
         self.channel_input_combo_box = QtWidgets.QComboBox()
+        step_offset_display_label = QtWidgets.QLabel("Step display offset")
+        self.step_offset_display_spinbox = ScienDSpinBox()
         # main_layout.addWidget(axis_type_label, 1, 0)
         # main_layout.addWidget(self.axis_type, 1, 1)
         h_layout = QtWidgets.QHBoxLayout()
@@ -98,6 +100,8 @@ class ScanningExcitationDataWidget(QtWidgets.QWidget):
         h_layout.addWidget(self.laser_follow_cursor)
         h_layout.addWidget(channel_input_label)
         h_layout.addWidget(self.channel_input_combo_box)
+        h_layout.addWidget(step_offset_display_label)
+        h_layout.addWidget(self.step_offset_display_spinbox)
         h_layout.addStretch()
         main_layout.addLayout(h_layout, 1, 0, 1, 2)
 
