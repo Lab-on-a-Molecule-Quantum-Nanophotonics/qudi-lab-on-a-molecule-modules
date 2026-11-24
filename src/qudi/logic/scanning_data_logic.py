@@ -37,7 +37,7 @@ from qudi.util.mutex import RecursiveMutex
 from qudi.core.connector import Connector
 from qudi.core.configoption import ConfigOption
 from qudi.core.statusvariable import StatusVar
-from qudi.util.datastorage import TextDataStorage
+from qudi.util.tomldatastorage import TOMLHeaderDataStorage
 from qudi.util.units import ScaledFloat
 
 from qudi.interface.scanning_probe_interface import ScanData, ScanImage
@@ -312,7 +312,7 @@ class ScanningDataLogic(LogicBase):
                     self.log.error('Unable to save 2D scan. No data available.')
                     raise ValueError('Unable to save 2D scan. No data available.')
 
-                ds = TextDataStorage(root_dir=self.module_default_data_dir)
+                ds = TOMLHeaderDataStorage(root_dir=self.module_default_data_dir, include_global_metadata=True)
                 timestamp = datetime.datetime.now()
 
                 # ToDo: Add meaningful metadata if missing:

@@ -18,6 +18,7 @@ See the GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with qudi.
 If not, see <https://www.gnu.org/licenses/>.
 """
+from tomli import TOMLDecodeError
 
 import numpy as np
 import datetime as dt
@@ -35,7 +36,7 @@ from qudi.util.helpers import is_integer_type
 from qudi.util.network import netobtain
 from qudi.interface.data_instream_interface import DataInStreamInterface, StreamingMode, SampleTiming
 from qudi.interface.data_instream_interface import DataInStreamConstraints
-from qudi.util.datastorage import TextDataStorage
+from qudi.util.tomldatastorage import TOMLHeaderDataStorage
 from qudi.util.units import ScaledFloat
 
 
@@ -727,7 +728,7 @@ class TimeSeriesReaderLogic(LogicBase):
             try:
                 fig = self._draw_raw_data_thumbnail(data) if save_figure else None
             finally:
-                storage = TextDataStorage(root_dir=self.module_default_data_dir)
+                storage = TOMLHeaderDataStorage(root_dir=self.module_default_data_dir, include_global_metadata=True)
                 filepath, _, _ = storage.save_data(data,
                                                    metadata=metadata,
                                                    nametag=nametag,
@@ -802,7 +803,7 @@ class TimeSeriesReaderLogic(LogicBase):
                     data = np.column_stack([x, data])
                     column_headers.insert(0, 'Time (s)')
 
-                storage = TextDataStorage(root_dir=self.module_default_data_dir)
+                storage = TOMLHeaderDataStorage(root_dir=self.module_default_data_dir, include_global_metadata=True)
                 filepath, _, _ = storage.save_data(data,
                                                    timestamp=timestamp,
                                                    metadata=metadata,

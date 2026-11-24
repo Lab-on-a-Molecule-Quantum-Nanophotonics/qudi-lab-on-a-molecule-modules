@@ -11,7 +11,7 @@ from qudi.util.datastorage import TextDataStorage, _is_dtype_class, _is_dtype_st
 def sanitize_header(header):
     if isinstance(header, (int, float, bool, str, datetime.datetime, datetime.date, datetime.time)):
         return header
-    elif isinstance(header, (list, np.ndarray)):
+    elif isinstance(header, (list, np.ndarray, tuple)):
         return [sanitize_header(elem) for elem in header]
     elif isinstance(header, dict):
         return {k:sanitize_header(elem) for (k,elem) in header.items()}

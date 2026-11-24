@@ -1,0 +1,710 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>923</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="tabPosition">
+       <enum>QTabWidget::TabPosition::West</enum>
+      </property>
+      <property name="tabShape">
+       <enum>QTabWidget::TabShape::Rounded</enum>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="movieTab">
+       <attribute name="title">
+        <string>Movie</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="ImageView" name="movie" native="true"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="metadataTab">
+       <attribute name="title">
+        <string>Metadata</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <widget class="DataTreeWidget" name="metadata" native="true"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="flattenedImageTab">
+       <attribute name="title">
+        <string>Flattened Image</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="ImageView" name="flattened_image" native="true"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="parametersEstimationTab">
+       <attribute name="title">
+        <string>Parameters Estimation</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <widget class="InteractiveCurvesWidget" name="parameters_estimation" native="true"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="PSFTab">
+       <attribute name="title">
+        <string>PSF</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_5">
+        <item>
+         <widget class="ImageView" name="psf_image" native="true"/>
+        </item>
+        <item>
+         <widget class="InteractiveCurvesWidget" name="psf_frequency" native="true"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="resultsTab">
+       <attribute name="title">
+        <string>Results</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_6">
+        <item>
+         <widget class="QWidget" name="widget" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <item>
+            <widget class="QCheckBox" name="showAllMoleculesCheckBox">
+             <property name="text">
+              <string>Show all molecules</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QWidget" name="widget" native="true">
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
+            <widget class="TableWidget" name="resultsTableWidget" native="true">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="ImageView" name="resultsImageView" native="true">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QWidget" name="widget_3" native="true">
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
+           <item>
+            <widget class="ImageView" name="singleMoleculeImageView" native="true"/>
+           </item>
+           <item>
+            <widget class="InteractiveCurvesWidget" name="singeMoleculeInteractiveCurvesWidget" native="true"/>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="inhomogeneousbroadeningTab">
+       <attribute name="title">
+        <string>In-homogeneous broadening</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="TableWidget" name="inhomogeneousTableWidget" native="true"/>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_8">
+          <item>
+           <widget class="InteractiveCurvesWidget" name="inhomogeneousInteractiveCurvesWidget" native="true">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_12">
+            <item>
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string>Mean:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="ScienDSpinBox" name="frequencyMeanDoubleSpinBox">
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+              <property name="buttonSymbols">
+               <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
+              </property>
+              <property name="suffix">
+               <string>Hz</string>
+              </property>
+              <property name="maximum">
+               <double>1000000000000000.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_4">
+              <property name="text">
+               <string>Std:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="ScienDSpinBox" name="frequencyStdDoubleSpinBox">
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+              <property name="buttonSymbols">
+               <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
+              </property>
+              <property name="suffix">
+               <string>Hz</string>
+              </property>
+              <property name="maximum">
+               <double>1000000000000000.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="linewidthStatisticsTab">
+       <attribute name="title">
+        <string>Linewidth statistics</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_7">
+        <item>
+         <widget class="TableWidget" name="linewidthStatisticsTableWidget" native="true"/>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_7">
+          <item>
+           <widget class="InteractiveCurvesWidget" name="linewidthStatisticsInteractiveCurvesWidget" native="true">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_10">
+            <item>
+             <widget class="QLabel" name="label_2">
+              <property name="text">
+               <string>Mean:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="ScienDSpinBox" name="lineWidthMeanDoubleSpinBox">
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+              <property name="buttonSymbols">
+               <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
+              </property>
+              <property name="suffix">
+               <string>Hz</string>
+              </property>
+              <property name="maximum">
+               <double>1000000000000000.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_3">
+              <property name="text">
+               <string>Std:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="ScienDSpinBox" name="lineWidthStdDoubleSpinBox">
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+              <property name="buttonSymbols">
+               <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
+              </property>
+              <property name="suffix">
+               <string>Hz</string>
+              </property>
+              <property name="maximum">
+               <double>1000000000000000.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab">
+       <attribute name="title">
+        <string>Central frequency spatial distribution</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_8">
+        <item>
+         <widget class="ImageView" name="centralFrequencyImageView" native="true"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_2">
+       <attribute name="title">
+        <string>Linewidth spatial distribution</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_9">
+        <item>
+         <widget class="QWidget" name="linewidthImageView" native="true"/>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>923</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>&amp;File</string>
+    </property>
+    <addaction name="actionSelect_tiff"/>
+    <addaction name="actionRead_File"/>
+    <addaction name="separator"/>
+    <addaction name="actionSave_parameter_estimation"/>
+    <addaction name="actionSave_molecule_positions"/>
+    <addaction name="actionSave_superlocalization"/>
+   </widget>
+   <widget class="QMenu" name="menu_Analysis">
+    <property name="title">
+     <string>&amp;Analysis</string>
+    </property>
+    <addaction name="actionRun_noise_statistics"/>
+    <addaction name="actionEstimate_Point_Spread_Function"/>
+    <addaction name="actionRun_molecule_detection_algorithm"/>
+    <addaction name="separator"/>
+    <addaction name="actionSuperlocalize_current_molecule"/>
+    <addaction name="actionSuperlocalize_all_molecules"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionHelp_Noise_Statistics"/>
+    <addaction name="actionHelp_PSF"/>
+    <addaction name="actionHelp_Multithreading"/>
+    <addaction name="actionHelp_Algorithm"/>
+    <addaction name="actionHelp_Superlocalization"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menu_Analysis"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionSelect_tiff"/>
+   <addaction name="actionRead_File"/>
+   <addaction name="actionSave_molecule_positions"/>
+  </widget>
+  <widget class="QToolBar" name="toolBar_2">
+   <property name="windowTitle">
+    <string>toolBar_2</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionRun_noise_statistics"/>
+   <addaction name="actionEstimate_Point_Spread_Function"/>
+   <addaction name="actionRun_molecule_detection_algorithm"/>
+  </widget>
+  <widget class="QToolBar" name="toolBar_3">
+   <property name="windowTitle">
+    <string>toolBar_3</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionSuperlocalize_current_molecule"/>
+   <addaction name="actionSuperlocalize_all_molecules"/>
+  </widget>
+  <widget class="QDockWidget" name="dockWidget">
+   <property name="features">
+    <set>QDockWidget::DockWidgetFeature::DockWidgetFloatable|QDockWidget::DockWidgetFeature::DockWidgetMovable</set>
+   </property>
+   <property name="windowTitle">
+    <string>Settings</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents">
+    <layout class="QHBoxLayout" name="horizontalLayout_5">
+     <item>
+      <widget class="MoleculeDetectionSettings" name="settings" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <action name="actionSelect_tiff">
+   <property name="icon">
+    <iconset theme="document-open"/>
+   </property>
+   <property name="text">
+    <string>&amp;Open tiff</string>
+   </property>
+   <property name="toolTip">
+    <string>Open an Andor TIFF file.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionRead_File">
+   <property name="icon">
+    <iconset theme="emblem-synchronized"/>
+   </property>
+   <property name="text">
+    <string>&amp;Reload File</string>
+   </property>
+   <property name="toolTip">
+    <string>Reload the current file.</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionRun_noise_statistics">
+   <property name="icon">
+    <iconset theme="accessories-calculator"/>
+   </property>
+   <property name="text">
+    <string>Run &amp;noise statistics</string>
+   </property>
+   <property name="toolTip">
+    <string>Evaluate the noise statistics</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionEstimate_Point_Spread_Function">
+   <property name="icon">
+    <iconset theme="system-search"/>
+   </property>
+   <property name="text">
+    <string>Estimate &amp;Point Spread Function</string>
+   </property>
+   <property name="toolTip">
+    <string>Estimate the PSF from the raw data</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionRun_molecule_detection_algorithm">
+   <property name="icon">
+    <iconset theme="media-playback-start"/>
+   </property>
+   <property name="text">
+    <string>&amp;Run molecule detection algorithm</string>
+   </property>
+   <property name="toolTip">
+    <string>Run the molecule detection algorithm</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionSuperlocalize_current_molecule">
+   <property name="icon">
+    <iconset theme="zoom-in"/>
+   </property>
+   <property name="text">
+    <string>&amp;Superlocalize current molecule</string>
+   </property>
+   <property name="toolTip">
+    <string>Superlocalize the currently selected molecule</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionSuperlocalize_all_molecules">
+   <property name="icon">
+    <iconset theme="applications-internet"/>
+   </property>
+   <property name="text">
+    <string>Superlocalize &amp;all molecules</string>
+   </property>
+   <property name="toolTip">
+    <string>Superlocalize all detected molecules</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionSave_parameter_estimation">
+   <property name="icon">
+    <iconset theme="document-save"/>
+   </property>
+   <property name="text">
+    <string>Save &amp;parameter estimation</string>
+   </property>
+   <property name="toolTip">
+    <string>Save the currently displayed parameters estimation</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionSave_molecule_positions">
+   <property name="icon">
+    <iconset theme="document-save"/>
+   </property>
+   <property name="text">
+    <string>&amp;Save molecule positions</string>
+   </property>
+   <property name="toolTip">
+    <string>Save the currently displayed molecule positions</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionSave_superlocalization">
+   <property name="icon">
+    <iconset theme="document-save"/>
+   </property>
+   <property name="text">
+    <string>Save superlocalization</string>
+   </property>
+   <property name="toolTip">
+    <string>Save the last superlocalization dataset</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionHelp_Noise_Statistics">
+   <property name="icon">
+    <iconset theme="help-about"/>
+   </property>
+   <property name="text">
+    <string>Noise Statistics</string>
+   </property>
+   <property name="toolTip">
+    <string>Show help window for noise statistics</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionHelp_PSF">
+   <property name="icon">
+    <iconset theme="help-about"/>
+   </property>
+   <property name="text">
+    <string>Point Spread Function</string>
+   </property>
+   <property name="toolTip">
+    <string>Show help window for point spread function</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionHelp_Multithreading">
+   <property name="icon">
+    <iconset theme="help-about"/>
+   </property>
+   <property name="text">
+    <string>Multithreading</string>
+   </property>
+   <property name="toolTip">
+    <string>Show help window for multithreading</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionHelp_Algorithm">
+   <property name="icon">
+    <iconset theme="help-about"/>
+   </property>
+   <property name="text">
+    <string>Algorithm</string>
+   </property>
+   <property name="toolTip">
+    <string>Show help window for algorithm</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionHelp_Superlocalization">
+   <property name="icon">
+    <iconset theme="help-about"/>
+   </property>
+   <property name="text">
+    <string>Superlocalization</string>
+   </property>
+   <property name="toolTip">
+    <string>Show help window for superlocalization</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MoleculeDetectionSettings</class>
+   <extends>QWidget</extends>
+   <header>qudi.gui.molecule_localization.molecule_detection_settings</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>InteractiveCurvesWidget</class>
+   <extends>QWidget</extends>
+   <header>qudi.util.widgets.plotting.interactive_curve</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ImageView</class>
+   <extends>QWidget</extends>
+   <header>pyqtgraph </header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>DataTreeWidget</class>
+   <extends>QWidget</extends>
+   <header>pyqtgraph</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>TableWidget</class>
+   <extends>QWidget</extends>
+   <header>pyqtgraph </header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ScienDSpinBox</class>
+   <extends>QDoubleSpinBox</extends>
+   <header>qudi.util.widgets.scientific_spinbox</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

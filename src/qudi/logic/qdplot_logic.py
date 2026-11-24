@@ -32,7 +32,7 @@ from qudi.core.statusvariable import StatusVar
 from qudi.core.configoption import ConfigOption
 from qudi.util.mutex import Mutex
 from qudi.core.module import LogicBase
-from qudi.util.datastorage import TextDataStorage
+from qudi.util.tomldatastorage import TOMLHeaderDataStorage
 from qudi.util.datafitting import FitContainer, FitConfigurationsModel
 
 
@@ -613,7 +613,7 @@ class QDPlotLogic(LogicBase):
             header.append(f'{x_label} set {ii:d}')
             header.append(f'{y_label} set {ii:d}')
 
-        ds = TextDataStorage(root_dir=self.module_default_data_dir if root_dir is None else root_dir,
+        ds = TOMLHeaderDataStorage(root_dir=self.module_default_data_dir if root_dir is None else root_dir,
                              column_formats='.15e',
                              include_global_metadata=True)
         file_path, _, _ = ds.save_data(save_data.T,

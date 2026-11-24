@@ -404,4 +404,7 @@ class FiniteSamplingScanningExcitationInterfuse(ExcitationScannerInterface, Samp
                 data_column_unit=["Hz", units[self._input_channel], "s", "c"],
                 data_column_names=["Frequency", self._input_channel, "Step number", "Time"] 
             )
+    @property
+    def number_of_acquisitions_per_step(self) -> int:
+        return self._number_of_samples_per_frame
 

@@ -92,6 +92,7 @@ class ScanningExcitationGui(GuiBase):
         self._mw.data_widget.fit_widget.sigDoFit.connect(self._excitation_logic().do_fit)
 
         # fill initial settings
+        self._mw.data_widget.target_point.setBounds((-np.inf, np.inf))
         self._mw.data_widget.target_point.setPos(self._target_x)
         self.populate_settings()
         self.update_state()
@@ -105,6 +106,7 @@ class ScanningExcitationGui(GuiBase):
         self._excitation_logic().sig_scanner_variables_updated.connect(self.update_scanner_variables)
         self._excitation_logic().sig_fit_updated.connect(self.update_fit)
         self._excitation_logic().sig_scanner_state_updated.connect(self.update_scanner_status)
+        self._excitation_logic().sig_new_information_message.connect(self.on_display_status_information)
         #
         self._mw.control_widget.sig_toggle_acquisition.connect(self.acquire_spectrum)
         self._mw.control_widget.exposure_spinbox.valueChanged.connect(self.set_exposure)
@@ -156,6 +158,7 @@ class ScanningExcitationGui(GuiBase):
         self._excitation_logic().sig_state_updated.disconnect(self.update_state)
         self._excitation_logic().sig_scanner_variables_updated.disconnect(self.update_scanner_variables)
         self._excitation_logic().sig_fit_updated.disconnect(self.update_fit)
+        self._excitation_logic().sig_new_information_message.disconnect(self.on_display_status_information)
 
 
         self._mw.control_widget.acquire_button.clicked.disconnect()
@@ -232,9 +235,11 @@ class ScanningExcitationGui(GuiBase):
         spectrum = spectrum[:l]
         step_numbers = step_numbers[:l]
         all_steps = np.unique(step_numbers)
+        step_offset = self._mw.data_widget.step_offset_display_spinbox.value()
 
         self._target_x = self._excitation_logic().idle
-        self._mw.data_widget.target_point.setPos(self._target_x)
+        if self._target_x is not None:
+            self._mw.data_widget.target_point.setPos(self._target_x)
         self.target_changed()
         missing_curves = len(all_steps) - len(self._mw.data_widget.data_curves) 
         if missing_curves > 0:
@@ -246,7 +251,8 @@ class ScanningExcitationGui(GuiBase):
         # draw new data
         for (i,step) in enumerate(all_steps):
             roi = step_numbers == step
-            self._mw.data_widget.data_curves[i].setData(x=frequency[roi], y=spectrum[roi])
+            offset = i * step_offset
+            self._mw.data_widget.data_curves[i].setData(x=frequency[roi], y=spectrum[roi]+offset)
 
     def update_scanner_variables(self):
         variables = self._excitation_logic().variables
@@ -261,8 +267,10 @@ class ScanningExcitationGui(GuiBase):
         """
         if fit_method != 'No Fit' and fit_results is not None:
             # redraw the fit curve in the GUI plot.
+            step = self._excitation_logic().fit_region[2]
+            offset = self._mw.data_widget.step_offset_display_spinbox.value()*step
             self._mw.data_widget.fit_curve.setData(x=fit_results.high_res_best_fit[0],
-                                                   y=fit_results.high_res_best_fit[1])
+                                                   y=fit_results.high_res_best_fit[1]+offset)
         else:
             self._mw.data_widget.fit_curve.setData(x=[], y=[])
 
@@ -304,8 +312,9 @@ class ScanningExcitationGui(GuiBase):
         self._mw.control_widget.repetitions_spinbox.blockSignals(False)
         self._mw.control_widget.progress_bar.setRange(0, round(100 * exposure_time * repetitions))
         variables = self._excitation_logic().variables
+        groups = self._excitation_logic().suggested_control_groups
         self.log.debug(f"Creating variables {variables}")
-        self._mw.control_widget.create_variable_widgets(variables)
+        self._mw.control_widget.create_variable_widgets(variables, groups)
 
     def target_changed(self):
         mini,maxi = self._excitation_logic().idle_value_limits
@@ -366,6 +375,7 @@ class ScanningExcitationGui(GuiBase):
 
     def delete_current_fit(self, state):
         self._mw.data_widget.fit_curve.setData(x=[], y=[])
+        self._excitation_logic().delete_current_fit()
 
     def set_scroll_divider_decade(self, v):
         self._excitation_logic().set_scroll_divider_decade(v)
@@ -386,3 +396,12 @@ class ScanningExcitationGui(GuiBase):
         self._target_x = mini + (maxi-mini) * current_ratio
         self._mw.data_widget.target_point.setPos(self._target_x)
         self.target_changed()
+
+    def on_display_status_information(self, msg: str):
+        statusbar = self._mw.statusBar()
+        statusbar.showMessage(msg)
+
+    def on_step_offset_changer(self, v):
+        self.update_data()
+        self.update_fit(self._excitation_logic().fit_method, self._excitation_logic().fit_results)
+

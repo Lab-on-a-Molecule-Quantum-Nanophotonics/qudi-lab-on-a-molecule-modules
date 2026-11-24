@@ -1,22 +1,24 @@
-from PySide6 import QtCore
-from PySide6 import QtWidgets
-from typing import Iterable, Union, Tuple, Type, Optional
+import traceback
+from collections import OrderedDict
+from collections.abc import Iterable
+from dataclasses import asdict
+from datetime import datetime
+
+import matplotlib.pyplot as plt
 import numpy as np
 import numpy.typing as npt
-import matplotlib.pyplot as plt
-from datetime import datetime
-import traceback
-from uncertainties import ufloat
-from dataclasses import asdict
-
-from qudi.core.module import LogicBase
-from qudi.core.connector import Connector
+from PySide6 import QtCore, QtWidgets
 from qudi.core.configoption import ConfigOption
+from qudi.core.connector import Connector
+from qudi.core.module import LogicBase
 from qudi.core.statusvariable import StatusVar
-from qudi.util.tomldatastorage import TOMLHeaderDataStorage
+from qudi.util.datafitting import FitConfigurationsModel, FitContainer
 from qudi.util.datastorage import DataStorageBase
-from qudi.util.datafitting import FitContainer, FitConfigurationsModel
 from qudi.util.mutex import Mutex
+from uncertainties import ufloat
+
+from qudi.util.tomldatastorage import TOMLHeaderDataStorage
+
 
 class ScanningExcitationLogic(LogicBase):
     """
@@ -60,6 +62,7 @@ class ScanningExcitationLogic(LogicBase):
     sig_scanner_state_updated = QtCore.Signal(str)
     sig_scanner_variables_updated = QtCore.Signal()
     sig_fit_updated = QtCore.Signal(str, object)
+    sig_new_information_message = QtCore.Signal(str)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -232,7 +235,7 @@ class ScanningExcitationLogic(LogicBase):
                         textstr += f"  - {name} = {ufloat(param.value, param.stderr)}\n"
                     else:
                         textstr += f"  - {name} = {param.value}\n"
-                except e:
+                except Exception as e:
                     self.log.error(f"Failed to evaluate stderr for the fit parameter {name}")
             textstr += f"fit region: {self.fit_region}"
             # place a text box in upper left in axes coords
@@ -240,11 +243,11 @@ class ScanningExcitationLogic(LogicBase):
         verticalalignment='top', bbox=props)
 
         ax1.set_xlabel(f"Frequency ({prefix_freq}Hz)")
-        ax1.set_ylabel('Intensity ({} count)'.format(prefix))
+        ax1.set_ylabel(f'Intensity ({prefix} count)')
         figure.tight_layout()
         return figure
 
-    def save_spectrum_data(self, name_tag:str='', root_dir:Optional[str]=None, parameter:Optional[dict]=None) -> str:
+    def save_spectrum_data(self, name_tag:str='', root_dir:str | None=None, parameter:dict | None=None) -> str:
         """ Saves the current spectrum data to a file.
         @param string name_tag: postfix name tag for saved filename.
         @param string root_dir: overwrite the file position in necessary
@@ -268,7 +271,7 @@ class ScanningExcitationLogic(LogicBase):
         if self.fit_method != 'No Fit' and self.fit_results is not None:
             fit_setup = {}
             fit_setup['method'] = self.fit_method
-            fit_setup['results'] = self.fit_results.params
+            fit_setup['results'] = {k:{"value":v.value, "stderr":v.stderr, "min":v.min, "max":v.max} for k,v in dict(self.fit_results.params).items()}
             fit_setup['region'] = self.fit_region
             parameters['fit'] = fit_setup
 
@@ -283,14 +286,13 @@ class ScanningExcitationLogic(LogicBase):
         for (colname, colunit, col) in zip(self._scanner().data_format.data_column_names, self._scanner().data_format.data_column_unit, self._spectrum):
             if col is None:
                 self.log.error('No spectrum to save.')
-                return
+                return ""
             data.append(col)
             header.append(f"{colname} ({colunit})")
         file_label = 'spectrum' + name_tag
         # save the date to file
         ds = TOMLHeaderDataStorage(root_dir=self.module_default_data_dir if root_dir is None else root_dir,
                              include_global_metadata=True)
-
         file_path, _, _ = ds.save_data(np.array(data).T,
                                        column_headers=header,
                                        metadata=parameters,
@@ -302,10 +304,11 @@ class ScanningExcitationLogic(LogicBase):
         ds.save_thumbnail(self.get_figure(), file_path=file_path.rsplit('.', 1)[0])
 
         self.log.debug(f'Spectrum saved to:{file_path}')
+        self.sig_new_information_message.emit(f'Spectrum saved to:{file_path}')
         return file_path
 
     @staticmethod
-    def _get_si_scaling(number:float) -> Tuple[float, str]:
+    def _get_si_scaling(number:float) -> tuple[float, str]:
 
         prefix = ['', 'k', 'M', 'G', 'T', 'P']
         prefix_index = 0
@@ -336,6 +339,8 @@ class ScanningExcitationLogic(LogicBase):
     @repetitions.setter
     def repetitions(self, v:int):
         self._scanner().set_repeat_number(v)
+        n = self._scanner().number_of_acquisitions_per_step * self.repetitions
+        self.sig_new_information_message.emit(f"Total number of points is {n}.")
     @property
     def idle(self)->float:
         """Get the current idle value."""
@@ -357,10 +362,18 @@ class ScanningExcitationLogic(LogicBase):
     def variables(self)->dict:
         """Get the current fictionary of control variables."""
         return self._scanner().control_dict
+    @property 
+    def suggested_control_groups(self) -> OrderedDict[str, Iterable[str]]:
+        """
+        Get suggested groups of control variables for the UI. 
+        """
+        return self._scanner().suggested_control_groups
     def set_variable(self, name:str, value):
         """Set the `value` of control variable `name`."""
         self._scanner().set_control(name, value)
         self.sig_scanner_variables_updated.emit()
+        n = self._scanner().number_of_acquisitions_per_step * self.repetitions
+        self.sig_new_information_message.emit(f"Total number of points is {n}.")
 
     def available_channels(self)->Iterable[str]:
         """List the available data channels."""
@@ -409,6 +422,11 @@ class ScanningExcitationLogic(LogicBase):
 
     ################
     # Fitting things
+
+    def delete_current_fit(self):
+        self._fit_results = None
+        self.sig_fit_updated.emit(self.fit_method, self._fit_results)
+
 
     @property
     def fit_config_model(self):
