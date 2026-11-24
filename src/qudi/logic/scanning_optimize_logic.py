@@ -292,6 +292,8 @@ class ScanningOptimizeLogic(LogicBase):
             back_resolution = dict()
         if back_frequency is None:
             back_frequency = dict()
+        if optimization_methods is None:
+            optimization_methods = dict()
         with self._thread_lock:
             if self.module_state() != 'idle':
                 self.log.error('Cannot change optimize settings when module is locked.')

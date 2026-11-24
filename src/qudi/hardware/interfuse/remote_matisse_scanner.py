@@ -812,3 +812,7 @@ class RemoteMatisseScanner(ExcitationScannerInterface, SampledFiniteStateInterfa
             ),
         ]
         return OrderedDict(result)
+
+    @property
+    def number_of_acquisitions_per_step(self) -> int:
+        return self._number_of_samples_per_frame

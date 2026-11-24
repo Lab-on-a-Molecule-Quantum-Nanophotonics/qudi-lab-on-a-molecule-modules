@@ -113,6 +113,7 @@ class FiniteSamplingScanningExcitationInterfuse(
         self._setpoints = []
         self._sleep_duration = 0.0
         self._saved_idle_value = 0.0
+        self._new_idle_value = 0.0
 
     # Internal utilities
     @property
@@ -242,18 +243,23 @@ class FiniteSamplingScanningExcitationInterfuse(
         if self._finite_sampling_io().is_running:
             self._finite_sampling_io().stop_buffered_frame()
             self._ao().set_activity_state(self._output_channel, True)
-            self._ao().set_setpoint(self._output_channel, self._idle_value)
+            if self._new_idle_value != self._idle_value:
+                self._ao().set_setpoint(self._output_channel, self._idle_value)
+                self._new_idle_value = self._idle_value
         self.watchdog_event("start_idle")
 
     @state
     @transition_to(("start", "prepare_scan"))
     def idle(self):
         "Idling between scans, setting the analog output value if requested."
-        if self._idle_enabled:
-            if not self._ao().get_activity_state(self._output_channel):
-                self._ao().set_activity_state(self._output_channel, True)
-            if self._ao().get_setpoint(self._output_channel) != self._idle_value:
-                self._ao().set_setpoint(self._output_channel, self._idle_value)
+        if self._idle_enabled and self._new_idle_value != self._idle_value:
+            self._ao().set_activity_state(self._output_channel, True)
+            self._ao().set_setpoint(self._output_channel, self._idle_value)
+            self._new_idle_value = self._idle_value
+        elif self._ao().get_activity_state(self._output_channel):
+            hardware_output_value = self._ao().get_setpoint(self._output_channel)
+            self._idle_value = hardware_output_value
+            self._new_idle_value = self._idle_value
 
     @state
     @transition_to(("next", "prepare_step"))
@@ -666,3 +672,7 @@ class FiniteSamplingScanningExcitationInterfuse(
             ]
         result.append(("External controls", external_controls))
         return OrderedDict(result)
+
+    @property
+    def number_of_acquisitions_per_step(self) -> int:
+        return self._number_of_samples_per_frame

@@ -62,6 +62,7 @@ class ScanningExcitationLogic(LogicBase):
     sig_scanner_state_updated = QtCore.Signal(str)
     sig_scanner_variables_updated = QtCore.Signal()
     sig_fit_updated = QtCore.Signal(str, object)
+    sig_new_information_message = QtCore.Signal(str)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -234,7 +235,7 @@ class ScanningExcitationLogic(LogicBase):
                         textstr += f"  - {name} = {ufloat(param.value, param.stderr)}\n"
                     else:
                         textstr += f"  - {name} = {param.value}\n"
-                except e:
+                except Exception as e:
                     self.log.error(f"Failed to evaluate stderr for the fit parameter {name}")
             textstr += f"fit region: {self.fit_region}"
             # place a text box in upper left in axes coords
@@ -303,6 +304,7 @@ class ScanningExcitationLogic(LogicBase):
         ds.save_thumbnail(self.get_figure(), file_path=file_path.rsplit('.', 1)[0])
 
         self.log.debug(f'Spectrum saved to:{file_path}')
+        self.sig_new_information_message.emit(f'Spectrum saved to:{file_path}')
         return file_path
 
     @staticmethod
@@ -337,6 +339,8 @@ class ScanningExcitationLogic(LogicBase):
     @repetitions.setter
     def repetitions(self, v:int):
         self._scanner().set_repeat_number(v)
+        n = self._scanner().number_of_acquisitions_per_step * self.repetitions
+        self.sig_new_information_message.emit(f"Total number of points is {n}.")
     @property
     def idle(self)->float:
         """Get the current idle value."""
@@ -368,6 +372,8 @@ class ScanningExcitationLogic(LogicBase):
         """Set the `value` of control variable `name`."""
         self._scanner().set_control(name, value)
         self.sig_scanner_variables_updated.emit()
+        n = self._scanner().number_of_acquisitions_per_step * self.repetitions
+        self.sig_new_information_message.emit(f"Total number of points is {n}.")
 
     def available_channels(self)->Iterable[str]:
         """List the available data channels."""
@@ -416,6 +422,11 @@ class ScanningExcitationLogic(LogicBase):
 
     ################
     # Fitting things
+
+    def delete_current_fit(self):
+        self._fit_results = None
+        self.sig_fit_updated.emit(self.fit_method, self._fit_results)
+
 
     @property
     def fit_config_model(self):

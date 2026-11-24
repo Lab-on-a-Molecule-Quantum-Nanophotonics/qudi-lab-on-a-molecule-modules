@@ -189,4 +189,9 @@ class ExcitationScannerInterface(Base):
     def time_column_number(self) -> int:
         "Shortcut for `self.data_format.time_column_number`."
         return self.data_format.time_column_number
+    @property
+    @abstractmethod
+    def number_of_acquisitions_per_step(self) -> int:
+        "Return the number of planned acquisition per step. Indicative only."
+        pass
 
